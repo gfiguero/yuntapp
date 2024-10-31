@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="ruby@\\wsl$\Ubuntu/home/gfiguero/.rbenv/versions/3.3.3/bin/ruby" />
+      </list>
+    </list>
+  </component>
+</project>
