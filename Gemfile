@@ -18,7 +18,7 @@ gem "stimulus-rails"
 gem "jbuilder"
 # App
 gem "tailwindcss-rails", "~> 3.0"
-gem "pagy", "~> 9.1"
+gem "pagy", "~> 9.3"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
