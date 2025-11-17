@@ -1,0 +1,19 @@
+<div class="button-container">
+
+  <%% if %w[index].include? action_name %>
+    <%%= button_tag raw(icon('filter') + icon_text(I18n.t('<%= plural_table_name %>.actions.filter'))), name: 'filter', type: 'button', class: "button-filter", data: { 'drawer-target': "drawer-filter", 'drawer-show': "drawer-filter", 'aria-controls': "drawer-filter" } %>
+  <%% end %>
+
+  <%% unless %w[index].include? action_name %>
+    <%%= link_to raw(icon('back') + icon_text(I18n.t('<%= plural_table_name %>.actions.index'))), <%= index_helper %>_path, class: "button-general" %>
+  <%% end %>
+
+  <%% unless %w[new create edit update].include? action_name %>
+    <%%= link_to raw(icon('new') + icon_text(I18n.t('<%= plural_table_name %>.actions.new'))), new_<%= singular_route_name %>_path, class: "button-new" %>
+  <%% end %>
+
+  <%% unless %w[new create edit update index].include? action_name %>
+    <%%= link_to raw(icon('edit') + icon_text(I18n.t('<%= plural_table_name %>.actions.edit'))), edit_<%= singular_route_name %>_path(@<%= singular_table_name %>), class: "button-edit" %>
+  <%% end %>
+
+</div>

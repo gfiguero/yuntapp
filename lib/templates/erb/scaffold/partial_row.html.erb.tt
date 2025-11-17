@@ -1,0 +1,14 @@
+<%- permitted_attributes = ['name', 'email', 'id'] -%>
+<tr class="row">
+  <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each.each do |attribute| -%>
+  <td class="cell"><%%= <%= singular_table_name %>.<%= attribute.column_name %> %></td>
+  <%- end -%>
+  <td class="actions">
+    <%%= link_to raw(icon('show', 'w-4 h-4')), <%= model_resource_name %>, class: "button-row button-show", data: {'tooltip-target': "tooltip-show_#{<%= singular_table_name %>.id}", 'tooltip-placement': "left"} %>
+    <div id="tooltip-show_<%%= <%= singular_table_name %>.id %>" role="tooltip" class="button-tooltip invisible transition-opacity duration-300 opacity-0 tooltip"><%%= I18n.t('<%= plural_table_name %>.actions.show', id: <%= singular_table_name %>.id) %><div class="tooltip-arrow" data-popper-arrow></div></div>
+    <%%= link_to raw(icon('edit', 'w-4 h-4')), edit_<%= singular_route_name %>_path(<%= singular_table_name %>), class: "button-row button-edit", data: {'tooltip-target': "tooltip-edit_#{<%= singular_table_name %>.id}", 'tooltip-placement': "left"} %>
+    <div id="tooltip-edit_<%%= <%= singular_table_name %>.id %>" role="tooltip" class="button-tooltip invisible transition-opacity duration-300 opacity-0 tooltip"><%%= I18n.t('<%= plural_table_name %>.actions.edit', id: <%= singular_table_name %>.id) %><div class="tooltip-arrow" data-popper-arrow></div></div>
+    <%%= link_to raw(icon('delete', 'w-4 h-4')), <%= model_resource_name %>, class: "button-row button-delete", method: :delete, data: {'tooltip-target': "tooltip-delete_#{<%= singular_table_name %>.id}", 'tooltip-placement': "left"} %>
+    <div id="tooltip-delete_<%%= <%= singular_table_name %>.id %>" role="tooltip" class="button-tooltip invisible transition-opacity duration-300 opacity-0 tooltip"><%%= I18n.t('<%= plural_table_name %>.actions.delete', id: <%= singular_table_name %>.id) %><div class="tooltip-arrow" data-popper-arrow></div></div>
+  </td>
+</tr>

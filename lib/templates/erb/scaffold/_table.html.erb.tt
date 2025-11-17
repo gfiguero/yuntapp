@@ -1,0 +1,20 @@
+<%- permitted_attributes = ['name', 'email', 'id'] -%>
+<div class="table-paginator" data-controller="pagy-initializer"><%%== @pagy.series_nav() %></div>
+
+<div class="table-wrapper">
+  <table class="table">
+    <thead class="header">
+    <tr>
+      <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
+      <th scope="col" class="cell"><%%= sort_link('<%= index_helper %>_path', I18n.t('activerecord.attributes.<%= singular_table_name %>.<%= attribute.name %>'), '<%= attribute.name %>') %></th>
+      <%- end -%>
+      <th scope="col" class="cell"><%%= I18n.t('operator.actions') %></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%% @<%= plural_table_name %>.each.with_index do |<%= singular_table_name %>| %>
+      <%%= render partial: "<%= singular_table_name %>_row", locals: { <%= singular_table_name %>: <%= singular_table_name %> } %>
+    <%% end %>
+    </tbody>
+  </table>
+</div>
