@@ -1,42 +1,48 @@
-<%= form_with(model: listing, class: "contents") do |form| %>
-  <% if listing.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(listing.errors.count, "error") %> prohibited this listing from being saved:</h2>
+<%= form_with(model: listing, class: "form-container") do |form| %>
 
-      <ul class="list-disc ml-6">
-        <% listing.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="my-5">
-    <%= form.label :name %>
-    <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": listing.errors[:name].none?, "border-red-400 focus:outline-red-600": listing.errors[:name].any?}] %>
+  <div class="form-field">
+    <% invalid = listing.errors.include?(:id) %>
+    <%= form.label :id, I18n.t('activerecord.attributes.listing.id'), class: "form-label" %>
+    <%= form.text_field :id, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%= raw(error_message(invalid, listing.errors.full_messages_for(:id))) %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :description %>
-    <%= form.textarea :description, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": listing.errors[:description].none?, "border-red-400 focus:outline-red-600": listing.errors[:description].any?}] %>
+  <div class="form-field">
+    <% invalid = listing.errors.include?(:name) %>
+    <%= form.label :name, I18n.t('activerecord.attributes.listing.name'), class: "form-label" %>
+    <%= form.text_field :name, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%= raw(error_message(invalid, listing.errors.full_messages_for(:name))) %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :price %>
-    <%= form.text_field :price, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": listing.errors[:price].none?, "border-red-400 focus:outline-red-600": listing.errors[:price].any?}] %>
+  <div class="form-field">
+    <% invalid = listing.errors.include?(:description) %>
+    <%= form.label :description, I18n.t('activerecord.attributes.listing.description'), class: "form-label" %>
+    <%= form.textarea :description, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%= raw(error_message(invalid, listing.errors.full_messages_for(:description))) %>
   </div>
 
-  <div class="my-5 flex items-center gap-2">
-    <%= form.label :active %>
-    <%= form.checkbox :active, class: ["block shadow-sm rounded-md border order-first h-5 w-5", {"border-gray-400 focus:outline-blue-600": listing.errors[:active].none?, "border-red-400 focus:outline-red-600": listing.errors[:active].any?}] %>
+  <div class="form-field">
+    <% invalid = listing.errors.include?(:price) %>
+    <%= form.label :price, I18n.t('activerecord.attributes.listing.price'), class: "form-label" %>
+    <%= form.text_field :price, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%= raw(error_message(invalid, listing.errors.full_messages_for(:price))) %>
   </div>
 
-  <div class="my-5">
-    <%= form.label :user_id %>
-    <%= form.text_field :user_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": listing.errors[:user_id].none?, "border-red-400 focus:outline-red-600": listing.errors[:user_id].any?}] %>
+  <div class="form-field">
+    <% invalid = listing.errors.include?(:active) %>
+    <%= form.label :active, I18n.t('activerecord.attributes.listing.active'), class: "form-label" %>
+    <%= form.checkbox :active, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%= raw(error_message(invalid, listing.errors.full_messages_for(:active))) %>
   </div>
 
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <div class="form-field">
+    <% invalid = listing.errors.include?(:user_id) %>
+    <%= form.label :user_id, I18n.t('activerecord.attributes.listing.user_id'), class: "form-label" %>
+    <%= form.text_field :user_id, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%= raw(error_message(invalid, listing.errors.full_messages_for(:user_id))) %>
+  </div>
+
+  <div class="form-actions">
+    <%= form.submit I18n.t('listings.actions.create'), class: "form-submit" %>
   </div>
 <% end %>

@@ -1,22 +1,17 @@
-<div id="<%= dom_id listing %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
+<div id="<%= dom_id listing %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Id:</strong>
+    <%= listing.id %>
+  </p>
+
+  <p class="my-5">
     <strong class="block font-medium mb-1">Name:</strong>
     <%= listing.name %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Description:</strong>
-    <%= listing.description %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Price:</strong>
-    <%= listing.price %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">Active:</strong>
-    <%= listing.active? ? "Yes" : "No" %>
-  </div>
-  <div>
-    <strong class="block font-medium mb-1">User:</strong>
-    <%= listing.user_id %>
-  </div>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this listing", listing, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to "Edit this listing", edit_listing_path(listing), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
 </div>

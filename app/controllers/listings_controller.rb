@@ -1,12 +1,33 @@
 class ListingsController < ApplicationController
-  before_action :set_listing, only: %i[ show edit update destroy ]
+  include Pagy::Method
 
-  # GET /listings or /listings.json
+  before_action :set_listing, only: %i[ show edit update destroy ]
+  before_action :set_listings, only: :index
+  before_action :disabled_pagination
+  after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
+
+  # GET /listings
   def index
-    @listings = Listing.all
+    @pagy, @listings = pagy(@listings)
+
+    respond_to do |format|
+      format.html
+      format.json
+      format.turbo_stream
+    end
   end
 
-  # GET /listings/1 or /listings/1.json
+  # GET /listings/search.json
+  def search
+    @listings = params[:items].present? ? Listing.new.filter_by_id(params[:items]) : Listing.accessible_by(current_ability)
+
+    respond_to do |format|
+      format.json
+      format.turbo_stream
+    end
+  end
+
+  # GET /listings/1
   def show
   end
 
@@ -19,52 +40,59 @@ class ListingsController < ApplicationController
   def edit
   end
 
-  # POST /listings or /listings.json
+  # POST /listings
   def create
     @listing = Listing.new(listing_params)
 
-    respond_to do |format|
-      if @listing.save
-        format.html { redirect_to @listing, notice: "Listing was successfully created." }
-        format.json { render :show, status: :created, location: @listing }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @listing.errors, status: :unprocessable_entity }
-      end
+    if @listing.save
+      redirect_to @listing, created: I18n.t("listing.message.created")
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
-  # PATCH/PUT /listings/1 or /listings/1.json
+  # PATCH/PUT /listings/1
   def update
-    respond_to do |format|
-      if @listing.update(listing_params)
-        format.html { redirect_to @listing, notice: "Listing was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @listing }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @listing.errors, status: :unprocessable_entity }
-      end
+    if @listing.update(listing_params)
+      redirect_to @listing, updated: I18n.t("listing.message.updated"), status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 
-  # DELETE /listings/1 or /listings/1.json
+  # DELETE /listings/1
   def destroy
     @listing.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to listings_path, notice: "Listing was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to listings_path, deleted: I18n.t("listing.message.destroyed"), status: :see_other, format: :html
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_listing
-      @listing = Listing.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def listing_params
-      params.expect(listing: [ :name, :description, :price, :active, :user_id ])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_listing
+    @listing = Listing.find(params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def listing_params
+    params.expect(listing: [ :name, :description, :price, :active, :user_id ])
+  end
+
+  def set_listings
+    @listings = current_user&.listings || Listing.none
+    @listings = @listings.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
+    filter_params.each { |attribute, value| @listings = @listings.send(filter_scope(attribute), value) } if filter_params.present?
+  end
+
+  def sort_params
+    params.permit(:sort_column, :sort_direction)
+  end
+
+  def filter_params
+    params.permit(:id, :name, :description, :price, :active, :user_id).reject { |key, value| value.blank? }
+  end
+
+  def disabled_pagination
+    render json: Listing.all if params[:items] == "all"
+  end
 end

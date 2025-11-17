@@ -1,0 +1,12 @@
+<tr class="row">
+  <td class="cell"><%= listing.id %></td>
+  <td class="cell"><%= listing.name %></td>
+  <td class="actions">
+    <%= link_to raw(icon('show', 'w-4 h-4')), listing, class: "button-row button-show", data: {'tooltip-target': "tooltip-show_#{listing.id}", 'tooltip-placement': "left"} %>
+    <div id="tooltip-show_<%= listing.id %>" role="tooltip" class="button-tooltip invisible transition-opacity duration-300 opacity-0 tooltip"><%= I18n.t('listings.actions.show', id: listing.id) %><div class="tooltip-arrow" data-popper-arrow></div></div>
+    <%= link_to raw(icon('edit', 'w-4 h-4')), edit_listing_path(listing), class: "button-row button-edit", data: {'tooltip-target': "tooltip-edit_#{listing.id}", 'tooltip-placement': "left"} %>
+    <div id="tooltip-edit_<%= listing.id %>" role="tooltip" class="button-tooltip invisible transition-opacity duration-300 opacity-0 tooltip"><%= I18n.t('listings.actions.edit', id: listing.id) %><div class="tooltip-arrow" data-popper-arrow></div></div>
+    <%= link_to raw(icon('delete', 'w-4 h-4')), listing, class: "button-row button-delete", method: :delete, data: {'tooltip-target': "tooltip-delete_#{listing.id}", 'tooltip-placement': "left"} %>
+    <div id="tooltip-delete_<%= listing.id %>" role="tooltip" class="button-tooltip invisible transition-opacity duration-300 opacity-0 tooltip"><%= I18n.t('listings.actions.delete', id: listing.id) %><div class="tooltip-arrow" data-popper-arrow></div></div>
+  </td>
+</tr>
