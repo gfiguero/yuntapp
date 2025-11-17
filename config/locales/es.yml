@@ -1,0 +1,15 @@
+es:
+  listings:
+    properties:
+      title: Título
+    actions:
+      filter: Filtrar
+      new: Nuevo
+  activerecord:
+    attributes:
+      listing:
+        id: ID
+        name: Nombre
+
+  operator:
+    actions: Acciones
