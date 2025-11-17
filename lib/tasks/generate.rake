@@ -6,6 +6,7 @@ namespace :yuntapp do
     puts "Starting yuntapp:generate task..."
 
     scaffolds = %w[ListingScaffold TagScaffold CategoryScaffold]
+    scaffolds = %w[ListingScaffold]
 
     scaffolds.each do |scaffold|
       puts "Generating #{scaffold}..."
