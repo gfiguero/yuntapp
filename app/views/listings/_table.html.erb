@@ -1,12 +1,12 @@
 <div class="table-paginator" data-controller="pagy-initializer"><%== @pagy.series_nav() %></div>
 
-<div class="table-wrapper">
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
   <table class="table">
-    <thead class="header">
+    <thead>
     <tr>
-      <th scope="col" class="cell"><%= sort_link('listings_path', I18n.t('activerecord.attributes.listing.id'), 'id') %></th>
-      <th scope="col" class="cell"><%= sort_link('listings_path', I18n.t('activerecord.attributes.listing.name'), 'name') %></th>
-      <th scope="col" class="cell"><%= I18n.t('operator.actions') %></th>
+      <th><%= sort_link('listings_path', I18n.t('activerecord.attributes.listing.id'), 'id') %></th>
+      <th><%= sort_link('listings_path', I18n.t('activerecord.attributes.listing.name'), 'name') %></th>
+      <th><%= I18n.t('operator.actions') %></th>
     </tr>
     </thead>
     <tbody>
