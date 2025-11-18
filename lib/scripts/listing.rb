@@ -2,7 +2,7 @@ class ListingScaffold
   BASE_COMMAND_GENERATE = "rails g scaffold"
   BASE_COMMAND_DESTROY = "rails d scaffold"
   CLASS_NAME = "Listing"
-  COMMAND_OPTIONS = "--skip-migration --force"
+  COMMAND_OPTIONS = "--skip-fixture --skip-migration --force"
   #COMMAND_OPTIONS = ""
 
   FIELDS = %w[name:string description:text price:decimal active:boolean user:references].freeze
