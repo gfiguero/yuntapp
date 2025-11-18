@@ -1,15 +1,85 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# fixtures/listings.yml
 
-one:
-  name: MyString
-  description: MyText
-  price: 9.99
-  active: false
-  user: one
+artanis_zealot_gauntlets:
+  name: "Protoss Zealot Plasma Gauntlets - Authentic"
+  description: "Genuine pair of plasma gauntlets from Aiur's finest Zealots. Perfect condition, recently purified by Khaydarin crystals. Includes dual warp blades activation system. Limited stock!"
+  price: 1250.99
+  active: true
+  user: artanis
 
-two:
-  name: MyString
-  description: MyText
-  price: 9.99
+artanis_warp_prism:
+  name: "Salvaged Warp Prism - Fully Operational"
+  description: "Phase-smith certified Warp Prism, capable of transporting 8 units and providing power field. Minor cosmetic damage from recent zerg encounter. Includes original phase crystal and navigation system. No Terran modifications."
+  price: 45000.00
+  active: true
+  user: artanis
+
+artanis_khaydarin_crystals:
+  name: "Pure Khaydarin Crystal Set (5 units)"
+  description: "Harvested directly from the crystals of Aiur. Perfect for psionic enhancement, energy weapons, or decorative purposes. Each crystal certified 99.9% pure. Enhances protoss technology efficiency by 15%."
+  price: 3200.50
+  active: true
+  user: artanis
+
+artanis_psi_training:
+  name: "Psionic Warfare Training Program"
+  description: "Learn to harness your psionic potential from veteran Templar. Course includes: Basic psionic control, Neural feedback defense, Energy blade manifestation. Suitable for advanced psionic species only. Terran applications possible with adapter."
+  price: 850.00
+  active: true
+  user: artanis
+
+artanis_observer:
+  name: "Observer Surveillance Unit - Stealth Mode"
+  description: "Cloaked surveillance drone perfect for base security or tactical reconnaissance. Features: Permanent cloaking, advanced sensor array, real-time data streaming. Recently calibrated. Includes remote control interface."
+  price: 7800.75
+  active: true
+  user: artanis
+
+artanis_pylon_power:
+  name: "Emergency Pylon Power Supply"
+  description: "Portable pylon unit providing 200 psi power supply. Ideal for remote outposts or emergency situations. Can sustain up to 8 warpgates simultaneously. Includes self-destruct protocol for security."
+  price: 15000.25
   active: false
-  user: two
+  user: artanis
+
+artanis_photon_cannon:
+  name: "Photon Cannon Defense System"
+  description: "Ground-to-air defense system, perfect for base protection. Recently upgraded with targeting algorithms from the Spear of Adun. Effective against zerg mutalisks and terran medivacs. Installation service available."
+  price: 9200.00
+  active: true
+  user: artanis
+
+artanis_void_ray:
+  name: "Void Ray Prismatic Beam Core"
+  description: "Salvaged prismatic beam core from damaged Void Ray. Can be integrated into existing spacecraft or used for research. Handle with care - contains unstable void energy. Includes technical schematics."
+  price: 28000.00
+  active: true
+  user: artanis
+
+artanis_probe_units:
+  name: "Worker Probe Pair - Resource Gathering"
+  description: "Two fully functional probes for mineral gathering and construction. Programmed with standard protoss protocols. Can construct pylons, gateways, and photon cannons. Recent software update installed."
+  price: 4500.00
+  active: true
+  user: artanis
+
+artanis_templar_archive:
+  name: "Templar Archive Data Crystal"
+  description: "Contains centuries of protoss knowledge and battle strategies. Perfect for historians or military strategists. Compatible with most psychic interfaces. Warning: May contain dark templar secrets."
+  price: 15000.00
+  active: false
+  user: artanis
+
+artanis_shield_battery:
+  name: "Shield Battery Charging Station"
+  description: "Rapid shield regeneration unit. Can restore protoss shields to full capacity in under 10 seconds. Recently tested against zerg hydralisk attacks. Portable design with phase power connection."
+  price: 6800.40
+  active: true
+  user: artanis
+
+artanis_carrier_interceptor:
+  name: "Carrier Interceptor Drone Set (4 units)"
+  description: "Fully armed interceptor drones from decommissioned carrier. Autonomous targeting systems intact. Perfect for defense or display. Can be programmed for different combat patterns."
+  price: 12000.00
+  active: true
+  user: artanis
