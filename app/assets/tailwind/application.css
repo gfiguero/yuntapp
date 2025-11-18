@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./pagy-tailwind";
 
 @source not "./daisyui{,*}.mjs";
 
