@@ -1,10 +1,26 @@
 es:
+  views:
+    title:
+      listings: Publicaciones
+      categories: Categorías
+      tags: Etiquetas
+  actions:
+    back: Atrás
+    edit: Editar
+    show: Ver
+    destroy: Eliminar
+    new: Nuevo
+
   listings:
     properties:
-      title: Título
+      title: Publicaciones
     actions:
       filter: Filtrar
       new: Nuevo
+      show: Ver
+      delete: Eliminar
+      edit: Editar
+      index: volver a la lista
   activerecord:
     attributes:
       listing:
