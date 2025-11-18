@@ -1,6 +1,7 @@
 <tr class="hover:bg-base-300">
   <td><%= listing.id %></td>
   <td><%= listing.name %></td>
+  <td><%= listing.active %></td>
   <td>
     <div class="tooltip" data-tip="<%= I18n.t('listings.actions.show') %>">
       <%= link_to raw(icon('show', 'w-4 h-4')), listing, class: "btn btn-sm btn-info" %>

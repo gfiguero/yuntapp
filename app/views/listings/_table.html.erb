@@ -1,4 +1,4 @@
-<div class="table-paginator" data-controller="pagy-initializer"><%== @pagy.series_nav() %></div>
+<div class="my-4"><%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
   <table class="table">
@@ -6,6 +6,7 @@
     <tr>
       <th><%= sort_link('listings_path', I18n.t('activerecord.attributes.listing.id'), 'id') %></th>
       <th><%= sort_link('listings_path', I18n.t('activerecord.attributes.listing.name'), 'name') %></th>
+      <th><%= sort_link('listings_path', I18n.t('activerecord.attributes.listing.active'), 'active') %></th>
       <th><%= I18n.t('operator.actions') %></th>
     </tr>
     </thead>
@@ -16,3 +17,5 @@
     </tbody>
   </table>
 </div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>
