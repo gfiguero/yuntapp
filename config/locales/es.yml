@@ -26,6 +26,7 @@ es:
       listing:
         id: ID
         name: Nombre
+        active: Activo
 
   operator:
     actions: Acciones
