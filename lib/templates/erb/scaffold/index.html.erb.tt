@@ -1,8 +1,8 @@
+<%% content_for :title, "<%= human_name.pluralize %>" %>
+
 <%- attributes.unshift(Rails::Generators::GeneratedAttribute.parse('id')) -%>
-<div class="container-fluid">
-  <div class="container-title">
-    <h1 class="title-text"><%%= I18n.t '<%= plural_table_name %>.properties.title' %></h1>
-  </div>
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%%= I18n.t 'views.title.<%= plural_table_name %>' %></h1>
 
   <%%= render "buttons" %>
 

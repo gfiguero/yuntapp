@@ -1,14 +1,14 @@
-<%- permitted_attributes = ['name', 'email', 'id'] -%>
-<div class="table-paginator" data-controller="pagy-initializer"><%%== @pagy.series_nav() %></div>
+<%- permitted_attributes = ['name', 'email', 'active', 'id'] -%>
+<div class="my-4"><%%== @pagy.series_nav() %></div>
 
-<div class="table-wrapper">
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
   <table class="table">
-    <thead class="header">
+    <thead>
     <tr>
       <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
-      <th scope="col" class="cell"><%%= sort_link('<%= index_helper %>_path', I18n.t('activerecord.attributes.<%= singular_table_name %>.<%= attribute.name %>'), '<%= attribute.name %>') %></th>
+      <th><%%= sort_link('<%= index_helper %>_path', I18n.t('activerecord.attributes.<%= singular_table_name %>.<%= attribute.name %>'), '<%= attribute.name %>') %></th>
       <%- end -%>
-      <th scope="col" class="cell"><%%= I18n.t('operator.actions') %></th>
+      <th><%%= I18n.t('views.headers.actions') %></th>
     </tr>
     </thead>
     <tbody>
@@ -18,3 +18,5 @@
     </tbody>
   </table>
 </div>
+
+<div class="my-4"><%%== @pagy.series_nav() %></div>
