@@ -26,9 +26,9 @@ module ApplicationHelper
     sort_column = params[:sort_column]
     sort_direction = params[:sort_direction]
     text ||= path
-    return link_to raw(text + icon("chevron-up", "w-5 h-2")), send(path, request.params.merge(sort_column: column, sort_direction: "desc")), {class: "flex items-center"} if sort_column == column && sort_direction == "asc"
-    return link_to raw(text + icon("chevron-down", "w-5 h-2")), send(path, request.params.merge(sort_column: column, sort_direction: "asc")), {class: "flex items-center"} if sort_column == column && sort_direction == "desc"
-    link_to raw(text + icon("chevron-sort", "w-5 h-3")), send(path, request.params.merge(sort_column: column, sort_direction: "asc")), {class: "flex items-center"}
+    return link_to raw(text + icon("chevron-up")), send(path, request.params.merge(sort_column: column, sort_direction: "desc")), {class: "flex items-center"} if sort_column == column && sort_direction == "asc"
+    return link_to raw(text + icon("chevron-down")), send(path, request.params.merge(sort_column: column, sort_direction: "asc")), {class: "flex items-center"} if sort_column == column && sort_direction == "desc"
+    link_to raw(text + icon("chevron-sort")), send(path, request.params.merge(sort_column: column, sort_direction: "asc")), {class: "flex items-center"}
   end
 
   def notification_icon(notification_key)
@@ -42,10 +42,6 @@ module ApplicationHelper
     when "deleted" then icon("trash")
     else icon("info-circle")
     end
-  end
-
-  def icon_text(text)
-    raw("<div class='ml-2''>" + text + "</div>")
   end
 
   def error_message(invalid, messages)
