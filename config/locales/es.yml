@@ -4,29 +4,25 @@ es:
       listings: Publicaciones
       categories: Categorías
       tags: Etiquetas
-  actions:
-    back: Atrás
-    edit: Editar
-    show: Ver
-    destroy: Eliminar
-    new: Nuevo
+    headers:
+      actions: Acciones
 
-  listings:
-    properties:
-      title: Publicaciones
-    actions:
-      filter: Filtrar
-      new: Nuevo
-      show: Ver
-      delete: Eliminar
-      edit: Editar
-      index: volver a la lista
+  actions:
+    index: Listar
+    new: Nuevo
+    show: Ver
+    edit: Editar
+    filter: Filtrar
+    back: Atrás
+    save: Guardar
+    cancel: Cancelar
+    delete: Eliminar
+    destroy: Destruir
+    restart: Reestablecer
+
   activerecord:
     attributes:
       listing:
         id: ID
         name: Nombre
         active: Activo
-
-  operator:
-    actions: Acciones
