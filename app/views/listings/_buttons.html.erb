@@ -1,7 +1,7 @@
 <div class="flex flex-row gap-2">
 
   <% if %w[index].include? action_name %>
-    <%= label_tag :filter, raw(icon('filter') + I18n.t('listings.actions.filter')), class: "btn drawer-button" %>
+    <%= label_tag :filter, raw(icon('filter') + I18n.t('listings.actions.filter')), class: "btn" %>
   <% end %>
 
   <% unless %w[index].include? action_name %>
