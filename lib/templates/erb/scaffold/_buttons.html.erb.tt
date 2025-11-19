@@ -1,19 +1,19 @@
 <div class="flex flex-row gap-2">
 
   <%% if %w[index].include? action_name %>
-    <%%= label_tag :filter, raw(icon('filter') + I18n.t('<%= plural_table_name %>.actions.filter')), class: "btn" %>
+    <%%= label_tag :filter, raw(icon('filter') + I18n.t('actions.filter')), class: "btn" %>
   <%% end %>
 
   <%% unless %w[index].include? action_name %>
-    <%%= link_to raw(icon('back') + I18n.t('<%= plural_table_name %>.actions.index')), <%= index_helper %>_path, class: "btn" %>
+    <%%= link_to raw(icon('back') + I18n.t('actions.index')), <%= index_helper %>_path, class: "btn" %>
   <%% end %>
 
   <%% unless %w[new create edit update].include? action_name %>
-    <%%= link_to raw(icon('new') + I18n.t('<%= plural_table_name %>.actions.new')), new_<%= singular_route_name %>_path, class: "btn btn-primary" %>
+    <%%= link_to raw(icon('new') + I18n.t('actions.new')), new_<%= singular_route_name %>_path, class: "btn btn-primary" %>
   <%% end %>
 
   <%% unless %w[new create edit update index].include? action_name %>
-    <%%= link_to raw(icon('edit') + I18n.t('<%= plural_table_name %>.actions.edit')), edit_<%= singular_route_name %>_path(@<%= singular_table_name %>), class: "btn btn-success" %>
+    <%%= link_to raw(icon('edit') + I18n.t('actions.edit')), edit_<%= singular_route_name %>_path(@<%= singular_table_name %>), class: "btn btn-success" %>
   <%% end %>
 
 </div>

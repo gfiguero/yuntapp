@@ -1,8 +1,8 @@
 <%- permitted_attributes = ['name', 'email', 'id'] -%>
 <div class="drawer">
-  <%= checkbox_tag :filter, true, class: "drawer-toggle" %>
+  <%%= checkbox_tag :filter, true, class: "drawer-toggle" %>
   <div class="drawer-side">
-    <%= label_tag :filter, "", class: "drawer-overlay", aria: { label: "close sidebar" } %>
+    <%%= label_tag :filter, "", class: "drawer-overlay", aria: { label: "close sidebar" } %>
 
     <div class="menu bg-base-200 min-h-full w-80 p-4">
       <h3 class="font-bold text-xl"><%%= I18n.t('actions.filter') %></h3>
