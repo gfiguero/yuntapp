@@ -4,13 +4,13 @@
   <td><%= listing.active %></td>
   <td>
     <div class="tooltip" data-tip="<%= I18n.t('listings.actions.show') %>">
-      <%= link_to raw(icon('show', 'w-4 h-4')), listing, class: "btn btn-sm btn-info" %>
+      <%= link_to icon('show'), listing, class: "btn btn-sm btn-info" %>
     </div>
     <div class="tooltip" data-tip="<%= I18n.t('listings.actions.edit') %>">
-      <%= link_to raw(icon('edit', 'w-4 h-4')), edit_listing_path(listing), class: "btn btn-sm btn-success" %>
+      <%= link_to icon('edit'), edit_listing_path(listing), class: "btn btn-sm btn-success" %>
     </div>
     <div class="tooltip" data-tip="<%= I18n.t('listings.actions.delete') %>">
-      <%= button_to raw(icon('delete', 'w-4 h-4')), listing, class: "btn btn-sm btn-error", method: :delete %>
+      <%= button_to icon('delete'), listing, class: "btn btn-sm btn-error", method: :delete %>
     </div>
   </td>
 </tr>
