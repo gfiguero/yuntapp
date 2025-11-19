@@ -4,7 +4,7 @@
     <%= label_tag :filter, "", class: "drawer-overlay", aria: { label: "close sidebar" } %>
 
     <div class="menu bg-base-200 min-h-full w-80 p-4">
-      <h3 class="font-bold text-xl"><%= I18n.t('listings.actions.filter') %></h3>
+      <h3 class="font-bold text-xl"><%= I18n.t('actions.filter') %></h3>
 
       <%= form_tag listings_path, method: :get do %>
 
@@ -21,7 +21,8 @@
             <%= text_field_tag :name, params[:name], class: "input" %>
           </div>
 
-          <%= button_tag raw(icon('filter') + I18n.t('listings.actions.filter')), type: 'submit', class: "btn btn-info" %>
+          <%= button_tag raw(icon('filter') + I18n.t('actions.filter')), type: 'submit', class: "btn btn-info" %>
+          <%= link_to raw(icon('delete') + I18n.t('actions.clean')), listings_path, class: "btn btn-danger" %>
         </div>
 
       <% end %>
