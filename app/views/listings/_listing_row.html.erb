@@ -3,13 +3,13 @@
   <td><%= listing.name %></td>
   <td><%= listing.active %></td>
   <td>
-    <div class="tooltip" data-tip="<%= I18n.t('listings.actions.show') %>">
+    <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
       <%= link_to icon('show'), listing, class: "btn btn-sm btn-info" %>
     </div>
-    <div class="tooltip" data-tip="<%= I18n.t('listings.actions.edit') %>">
+    <div class="tooltip" data-tip="<%= I18n.t('actions.edit') %>">
       <%= link_to icon('edit'), edit_listing_path(listing), class: "btn btn-sm btn-success" %>
     </div>
-    <div class="tooltip" data-tip="<%= I18n.t('listings.actions.delete') %>">
+    <div class="tooltip" data-tip="<%= I18n.t('actions.delete') %>">
       <%= button_to icon('delete'), listing, class: "btn btn-sm btn-error", method: :delete %>
     </div>
   </td>
