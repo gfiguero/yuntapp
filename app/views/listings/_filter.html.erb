@@ -1,30 +1,30 @@
-<div id="drawer-filter" class="drawer-container -translate-x-full" tabindex="-1" aria-labelledby="drawer-filter-label">
-  <h5 id="drawer-label" class="drawer-title">
-    <%= icon('filter') + icon_text(I18n.t('listings.actions.filter')) %>
-  </h5>
+<div class="drawer">
+  <%= checkbox_tag :filter, true, class: "drawer-toggle" %>
+  <div class="drawer-side">
+    <%= label_tag :filter, "", class: "drawer-overlay", aria: { label: "close sidebar" } %>
 
-  <%= button_tag raw(icon('close', 'w-3 h-3')), name: 'filter', type: 'button', class: "button-close", data: { 'drawer-hide': "drawer-filter", 'aria-controls': "drawer-filter" } %>
+    <div class="menu bg-base-200 min-h-full w-80 p-4">
+      <h3 class="font-bold text-xl"><%= I18n.t('listings.actions.filter') %></h3>
 
-  <%= form_tag listings_path, method: :get do %>
+      <%= form_tag listings_path, method: :get do %>
 
-    <div class="form-field">
-      <%= label_tag :id, I18n.t('activerecord.attributes.listing.id'), class: "form-label" %>
-      <%= text_field_tag :id, params[:id], class: "form-control" %>
+        <div class="divider"></div>
+
+        <div class="grid gap-4">
+          <div>
+            <%= label_tag :id, I18n.t('activerecord.attributes.listing.id'), class: "label" %>
+            <%= text_field_tag :id, params[:id], class: "input" %>
+          </div>
+
+          <div>
+            <%= label_tag :name, I18n.t('activerecord.attributes.listing.name'), class: "label" %>
+            <%= text_field_tag :name, params[:name], class: "input" %>
+          </div>
+
+          <%= button_tag raw(icon('filter') + I18n.t('listings.actions.filter')), type: 'submit', class: "btn btn-info" %>
+        </div>
+
+      <% end %>
     </div>
-
-    <div class="form-field">
-      <%= label_tag :name, I18n.t('activerecord.attributes.listing.name'), class: "form-label" %>
-      <%= text_field_tag :name, params[:name], class: "form-control" %>
-    </div>
-
-    <div class="form-button">
-      <%= button_tag raw(icon('filter') + icon_text(I18n.t('listings.actions.filter'))), type: 'submit', class: "button-filter button-block" %>
-    </div>
-
-  <% end %>
-
-  <div class="form-button">
-    <%= link_to raw(icon('trash') + icon_text(I18n.t('listings.actions.clean'))), listings_path, class: "button-delete button-block" %>
   </div>
-
 </div>
