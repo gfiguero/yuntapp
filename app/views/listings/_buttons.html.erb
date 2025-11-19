@@ -1,19 +1,19 @@
 <div class="flex flex-row gap-2">
 
   <% if %w[index].include? action_name %>
-    <%= button_tag raw(icon('filter') + icon_text(I18n.t('listings.actions.filter'))), name: 'filter', type: 'button', class: "btn", data: { 'drawer-target': "drawer-filter", 'drawer-show': "drawer-filter", 'aria-controls': "drawer-filter" } %>
+    <%= label_tag :filter, raw(icon('filter') + I18n.t('listings.actions.filter')), class: "btn drawer-button" %>
   <% end %>
 
   <% unless %w[index].include? action_name %>
-    <%= link_to raw(icon('back') + icon_text(I18n.t('listings.actions.index'))), listings_path, class: "btn" %>
+    <%= link_to raw(icon('back') + I18n.t('listings.actions.index')), listings_path, class: "btn" %>
   <% end %>
 
   <% unless %w[new create edit update].include? action_name %>
-    <%= link_to raw(icon('new') + icon_text(I18n.t('listings.actions.new'))), new_listing_path, class: "btn btn-primary" %>
+    <%= link_to raw(icon('new') + I18n.t('listings.actions.new')), new_listing_path, class: "btn btn-primary" %>
   <% end %>
 
   <% unless %w[new create edit update index].include? action_name %>
-    <%= link_to raw(icon('edit') + icon_text(I18n.t('listings.actions.edit'))), edit_listing_path(@listing), class: "btn btn-success" %>
+    <%= link_to raw(icon('edit') + I18n.t('listings.actions.edit')), edit_listing_path(@listing), class: "btn btn-success" %>
   <% end %>
 
 </div>
