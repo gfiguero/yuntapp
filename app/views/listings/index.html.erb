@@ -8,11 +8,8 @@
 
 <div class="w-full">
   <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.listings') %></h1>
-
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.count.listing', count: @listings.count) %></h3>
   <%= render "buttons" %>
-
   <%= render "table" %>
-
   <%= render "filter" %>
-
 </div>
