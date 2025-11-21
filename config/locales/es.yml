@@ -9,7 +9,7 @@ es:
     identifier:
       listing: "Publicación ID: %{id}"
     count:
-      listing: "%{count} publicaciones"
+      listings: "%{count} publicaciones"
 
   actions:
     index: Listar
