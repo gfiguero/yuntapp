@@ -6,6 +6,10 @@ es:
       tags: Etiquetas
     headers:
       actions: Acciones
+    identifier:
+      listing: "Publicación ID: %{id}"
+    count:
+      listing: "%{count} publicaciones"
 
   actions:
     index: Listar
