@@ -6,6 +6,7 @@ es:
       tags: Etiquetas
     headers:
       actions: Acciones
+      new: Nuevo Registro
     identifier:
       listing: "Publicación ID: %{id}"
     count:
