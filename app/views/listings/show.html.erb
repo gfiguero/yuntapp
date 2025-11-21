@@ -8,8 +8,8 @@
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.listings') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.listing', id: @listing.id) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t 'listings.properties.title' %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t 'listings.actions.show', id: @listing.id %></h3>
   <%= render "buttons" %>
   <%= render @listing %>
 </div>
