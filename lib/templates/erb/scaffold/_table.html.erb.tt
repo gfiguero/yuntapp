@@ -6,9 +6,9 @@
     <thead>
     <tr>
       <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
-      <th><%%= sort_link('<%= index_helper %>_path', I18n.t('activerecord.attributes.<%= singular_table_name %>.<%= attribute.name %>'), '<%= attribute.name %>') %></th>
+      <th><%%= sort_link('<%= index_helper %>_path', I18n.t('attributes.<%= singular_table_name %>.<%= attribute.name %>'), '<%= attribute.name %>') %></th>
       <%- end -%>
-      <th><%%= I18n.t('views.headers.actions') %></th>
+      <th class="w-46"><%%= I18n.t('views.headers.actions') %></th>
     </tr>
     </thead>
     <tbody>
