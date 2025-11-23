@@ -1,14 +1,14 @@
 <div class="flex flex-row gap-2 mb-4">
 
-  <% if %w[index].include? action_name %>
+  <% if %w[ index ].include? action_name %>
     <%= label_tag :filter, raw(icon('filter') + I18n.t('actions.filter')), class: "btn btn-soft" %>
   <% end %>
 
-  <% unless %w[index].include? action_name %>
+  <% unless %w[ index ].include? action_name %>
     <%= link_to raw(icon('list') + I18n.t('actions.index')), listings_path, class: "btn btn-soft" %>
   <% end %>
 
-  <% unless %w[new create].include? action_name %>
+  <% unless %w[ new create ].include? action_name %>
     <%= link_to raw(icon('new') + I18n.t('actions.new')), new_listing_path, class: "btn btn-soft btn-primary" %>
   <% end %>
 
@@ -16,15 +16,15 @@
     <%= link_to raw(icon('edit') + I18n.t('actions.edit')), edit_listing_path(@listing), class: "btn btn-soft btn-success" %>
   <% end %>
 
-  <% if %w[edit update delete].include? action_name %>
+  <% if %w[ edit update delete ].include? action_name %>
     <%= link_to raw(icon('cancel') + I18n.t('actions.cancel')), @listing, class: "btn btn-soft" %>
   <% end %>
 
-  <% if %w[show edit update].include? action_name %>
+  <% if %w[ show edit update ].include? action_name %>
     <%= link_to raw(icon('delete') + I18n.t('actions.delete')), delete_listing_path(@listing), class: "btn btn-soft btn-warning" %>
   <% end %>
 
-  <% if %w[delete].include? action_name %>
+  <% if %w[ delete ].include? action_name %>
     <%= button_to raw(icon('delete') + I18n.t('actions.confirm')), @listing, class: "btn btn-soft btn-error", method: :delete %>
   <% end %>
 
