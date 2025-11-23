@@ -2,12 +2,14 @@
 
 <% attributes.each do |attribute| -%>
   <%% invalid = <%= model_resource_name %>.errors.include?(:<%= attribute.column_name %>) %>
+<% if attribute.field_type == :textarea -%>
   <%%= form.label :<%= attribute.column_name %>, I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "floating-label" do %>
-<% if attribute.field_type == :text_area -%>
     <%%= form.textarea :<%= attribute.column_name %>, class: "textarea h-64 w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %>
-<% elsif attribute.field_type == :check_box -%>
+<% elsif attribute.field_type == :checkbox -%>
+  <%%= form.label :<%= attribute.column_name %>, I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "label" do %>
     <%%= form.checkbox :<%= attribute.column_name %>, class: "checkbox validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %>
 <% else -%>
+  <%%= form.label :<%= attribute.column_name %>, I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "floating-label" do %>
     <%%= form.<%= attribute.field_type %> :<%= attribute.column_name %>, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %>
 <% end -%>
     <span><%%= I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %></span>
@@ -15,5 +17,5 @@
   <%%= raw(error_message(invalid, <%= model_resource_name %>.errors.full_messages_for(:<%= attribute.column_name %>))) %>
 
 <% end -%>
-  <%%= form.submit I18n.t('actions.create'), class: "form-submit" %>
+  <%%= form.submit I18n.t('actions.save'), class: "btn btn-success" %>
 <%% end %>

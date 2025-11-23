@@ -33,6 +33,14 @@
     <%= form.checkbox :active, class: "checkbox validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.listing.active') %>
     <span><%= I18n.t('attributes.listing.active') %></span>
   <% end %>
+  <%= raw(error_message(invalid, listing.errors.full_messages_for(:active))) %>
+
+  <% invalid = listing.errors.include?(:user_id) %>
+  <%= form.label :user_id, I18n.t('attributes.listing.user_id'), class: "floating-label" do %>
+    <%= form.text_field :user_id, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.listing.user_id') %>
+    <span><%= I18n.t('attributes.listing.user_id') %></span>
+  <% end %>
+  <%= raw(error_message(invalid, listing.errors.full_messages_for(:user_id))) %>
 
   <%= form.submit I18n.t('actions.save'), class: "btn btn-success" %>
 <% end %>
