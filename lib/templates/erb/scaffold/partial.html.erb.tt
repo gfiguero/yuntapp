@@ -1,23 +1,12 @@
 <%- permitted_attributes = ['name', 'email', 'id'] -%>
 <div id="<%%= dom_id <%= singular_name %> %>">
 <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
-  <p class="my-5">
-    <strong class="block font-medium mb-1"><%= attribute.human_name %>:</strong>
-<% if attribute.attachment? -%>
-    <%%= link_to <%= singular_name %>.<%= attribute.column_name %>.filename, <%= singular_name %>.<%= attribute.column_name %> if <%= singular_name %>.<%= attribute.column_name %>.attached? %>
-<% elsif attribute.attachments? -%>
-    <%% <%= singular_name %>.<%= attribute.column_name %>.each do |<%= attribute.singular_name %>| %>
-      <div><%%= link_to <%= attribute.singular_name %>.filename, <%= attribute.singular_name %> %></div>
-    <%% end %>
-<% else -%>
-    <%%= <%= singular_name %>.<%= attribute.column_name %> %>
-<% end -%>
-  </p>
+  <dl class="mb-4 divide-y divide-gray-400 w-1/3">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%%= I18n.t('attributes.<%= singular_name %>.<%= attribute.column_name %>g') %></dt>
+      <dd><%%= <%= singular_name %>.<%= attribute.column_name %> %></dd>
+    </div>
+  </dl>
 
 <% end -%>
-  <%% if action_name != "show" %>
-    <%%= link_to "Show this <%= human_name.downcase %>", <%= singular_name %>, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
-    <%%= link_to "Edit this <%= human_name.downcase %>", edit_<%= singular_name %>_path(<%= singular_name %>), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
-    <hr class="mt-6">
-  <%% end %>
 </div>
