@@ -10,7 +10,7 @@
 
   <%% unless %w[ new create ].include? action_name %>
     <%%= link_to raw(icon('new') + I18n.t('actions.new')), new_<%= singular_route_name %>_path, class: "btn btn-soft btn-primary" %>
-  <% end %>
+  <%% end %>
 
   <%% if %w[ show delete ].include? action_name %>
     <%%= link_to raw(icon('edit') + I18n.t('actions.edit')), edit_<%= singular_route_name %>_path(@<%= singular_table_name %>), class: "btn btn-soft btn-success" %>
