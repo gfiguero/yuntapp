@@ -1,38 +1,19 @@
-<%%= form_with(model: <%= model_resource_name %>, class: "form-container") do |form| %>
+<%%= form_with(model: <%= model_resource_name %>, class: "grid gap-4 w-1/3") do |form| %>
 
 <% attributes.each do |attribute| -%>
-  <div class="form-field">
-    <%% invalid = <%= model_resource_name %>.errors.include?(:<%= attribute.column_name %>) %>
-<% if attribute.password_digest? -%>
-    <%%= form.label :password, I18n.t('activerecord.attributes.<%= model_resource_name %>.password'), class: "form-label" %>
-    <%%= form.password_field :password, class: "form-control #{'form-control-invalid' if invalid}" %>
-  </div>
-
-  <div class="form-field">
-    <%%= form.label :password_confirmation, I18n.t('activerecord.attributes.<%= model_resource_name %>.password_confirmation'), class: "form-label" %>
-    <%%= form.password_field :password_confirmation, class: "form-control #{'form-control-invalid' if invalid}" %>
-<% elsif attribute.attachments? -%>
-    <%%= form.label :<%= attribute.column_name %>, I18n.t('activerecord.attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "form-label" %>
-    <%%= form.<%= attribute.field_type %> :<%= attribute.column_name %>, multiple: true, class: "form-control #{'form-control-invalid' if invalid}" %>
-<% else -%>
+  <%% invalid = <%= model_resource_name %>.errors.include?(:<%= attribute.column_name %>) %>
+  <%%= form.label :<%= attribute.column_name %>, I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "floating-label" do %>
 <% if attribute.field_type == :text_area -%>
-    <%%= form.label :<%= attribute.column_name %>, I18n.t('activerecord.attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "form-label" %>
-    <%%= form.text_area :<%= attribute.column_name %>, rows: 4, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%%= form.textarea :<%= attribute.column_name %>, class: "textarea h-64 w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %>
 <% elsif attribute.field_type == :check_box -%>
-    <div class="form-checkbox-container">
-      <%%= form.check_box :<%= attribute.column_name %>, class: "form-checkbox-control" %>
-      <%%= form.label :<%= attribute.column_name %>, I18n.t('activerecord.attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "form-checkbox-label" %>
-    </div>
+    <%%= form.checkbox :<%= attribute.column_name %>, class: "checkbox validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %>
 <% else -%>
-    <%%= form.label :<%= attribute.column_name %>, I18n.t('activerecord.attributes.<%= model_resource_name %>.<%= attribute.column_name %>'), class: "form-label" %>
-    <%%= form.<%= attribute.field_type %> :<%= attribute.column_name %>, class: "form-control #{'form-control-invalid' if invalid}" %>
+    <%%= form.<%= attribute.field_type %> :<%= attribute.column_name %>, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %>
 <% end -%>
-<% end -%>
-    <%%= raw(error_message(invalid, <%= model_resource_name %>.errors.full_messages_for(:<%= attribute.column_name %>))) %>
-  </div>
+    <span><%%= I18n.t('attributes.<%= model_resource_name %>.<%= attribute.column_name %>') %></span>
+  <%% end %>
+  <%%= raw(error_message(invalid, <%= model_resource_name %>.errors.full_messages_for(:<%= attribute.column_name %>))) %>
 
 <% end -%>
-  <div class="form-actions">
-    <%%= form.submit I18n.t('<%= plural_table_name %>.actions.create'), class: "form-submit" %>
-  </div>
+  <%%= form.submit I18n.t('actions.create'), class: "form-submit" %>
 <%% end %>
