@@ -1,7 +1,7 @@
 class ListingsController < ApplicationController
   include Pagy::Method
 
-  before_action :set_listing, only: %i[ show edit update destroy ]
+  before_action :set_listing, only: %i[ show edit update delete destroy ]
   before_action :set_listings, only: :index
   before_action :disabled_pagination
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -13,13 +13,12 @@ class ListingsController < ApplicationController
     respond_to do |format|
       format.html
       format.json
-      format.turbo_stream
     end
   end
 
   # GET /listings/search.json
   def search
-    @listings = params[:items].present? ? Listing.new.filter_by_id(params[:items]) : Listing.accessible_by(current_ability)
+    @listings = params[:items].present? ? Listing.filter_by_name(params[:items]) : Listing.all
 
     respond_to do |format|
       format.json
@@ -60,10 +59,14 @@ class ListingsController < ApplicationController
     end
   end
 
+  # GET /listings/1/remove
+  def delete
+  end
+
   # DELETE /listings/1
   def destroy
     @listing.destroy!
-    redirect_to listings_path, deleted: I18n.t("listing.message.destroyed"), status: :see_other, format: :html
+    redirect_to listings_url, deleted: I18n.t("listing.message.destroyed"), status: :see_other
   end
 
   private
