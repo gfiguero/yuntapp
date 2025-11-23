@@ -1,0 +1,16 @@
+<%% content_for :title do %>
+  <%%= I18n.t('views.title.<%= plural_table_name %>') %>
+<%% end %>
+
+<%% content_for :breadcrumb do %>
+  <li><%%= link_to I18n.t('views.title.<%= plural_table_name %>'), <%= index_helper %>_path %></li>
+  <li><%%= link_to @<%= singular_table_name %>.id, <%= singular_table_name %>_path(@<%= singular_table_name %>) %></li>
+  <li><%%= I18n.t('actions.delete') %></li>
+<%% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%%= I18n.t('views.title.<%= plural_table_name %>') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%%= I18n.t('views.identifier.<%= singular_table_name %>', id: @<%= singular_table_name %>.id) %></h3>
+  <%%= render "buttons" %>
+  <%%= render @<%= singular_table_name %> %>
+</div>

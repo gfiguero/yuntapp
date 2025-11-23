@@ -26,7 +26,7 @@ module Tailwindcss
       private
 
       def available_views
-        %w[index edit show new _table _form _filter _buttons]
+        %w[index edit show new delete _table _form _filter _buttons]
       end
     end
   end
