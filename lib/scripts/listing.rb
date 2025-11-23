@@ -5,7 +5,7 @@ class ListingScaffold
   COMMAND_OPTIONS = "--skip-fixture --skip-migration --force"
   #COMMAND_OPTIONS = ""
 
-  FIELDS = %w[name:string description:text price:decimal active:boolean user:references].freeze
+  FIELDS = %w[name:string price:decimal description:text active:boolean user:references].freeze
 
   def generate_command
     @command = "#{BASE_COMMAND_GENERATE} #{CLASS_NAME} #{FIELDS.join(" ")} #{COMMAND_OPTIONS}"
