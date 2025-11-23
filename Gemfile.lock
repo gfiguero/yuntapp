@@ -68,6 +68,8 @@ GEM
       activemodel (= 8.1.1)
       activesupport (= 8.1.1)
       timeout (>= 0.4.0)
+    activerecord-like (7.0.1)
+      activerecord (>= 7.0.0, < 9.0)
     activestorage (8.1.1)
       actionpack (= 8.1.1)
       activejob (= 8.1.1)
@@ -412,6 +414,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  activerecord-like
   bootsnap
   brakeman
   bundler-audit
