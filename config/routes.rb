@@ -1,7 +1,23 @@
 Rails.application.routes.draw do
+  concern :default_routes do
+    collection do
+      get :search
+    end
+    member do
+      get :delete
+    end
+  end
+
   resources :categories
   resources :tags
-  resources :listings
+  resources :listings do
+    collection do
+      get :search
+    end
+    member do
+      get :delete
+      end
+  end
   devise_for :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
