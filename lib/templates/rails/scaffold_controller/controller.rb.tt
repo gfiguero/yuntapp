@@ -2,7 +2,7 @@
 class <%= controller_class_name %>Controller < ApplicationController
   include Pagy::Method
 
-  before_action :set_<%= singular_table_name %>, only: %i[ show edit update destroy ]
+  before_action :set_<%= singular_table_name %>, only: %i[ show edit update delete destroy ]
   before_action :set_<%= plural_table_name %>, only: :index
   before_action :disabled_pagination
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -14,13 +14,12 @@ class <%= controller_class_name %>Controller < ApplicationController
     respond_to do |format|
       format.html
       format.json
-      format.turbo_stream
     end
   end
 
   # GET <%= route_url %>/search.json
   def search
-    @<%= plural_table_name %> = params[:items].present? ? <%= orm_class.build(class_name) %>.filter_by_id(params[:items]) : <%= class_name %>.accessible_by(current_ability)
+    @<%= plural_table_name %> = params[:items].present? ? <%= orm_class.build(class_name) %>.filter_by_id(params[:items]) : <%= class_name %>.all
 
     respond_to do |format|
       format.json
@@ -59,6 +58,10 @@ class <%= controller_class_name %>Controller < ApplicationController
     else
       render :edit, status: <%= ActionDispatch::Constants::UNPROCESSABLE_CONTENT.inspect %>
     end
+  end
+
+  # GET /<%= route_url %>/1/delete
+  def delete
   end
 
   # DELETE <%= route_url %>/1
