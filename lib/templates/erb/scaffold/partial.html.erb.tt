@@ -1,12 +1,11 @@
-<%- permitted_attributes = ['name', 'email', 'id'] -%>
+<%- permitted_attributes = %w[ name email id price description ] -%>
 <div id="<%%= dom_id <%= singular_name %> %>">
-<%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
   <dl class="mb-4 divide-y divide-gray-400 w-1/3">
+<%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%%= I18n.t('attributes.<%= singular_name %>.<%= attribute.column_name %>g') %></dt>
+      <dt class="font-medium"><%%= I18n.t('attributes.<%= singular_name %>.<%= attribute.column_name %>') %></dt>
       <dd><%%= <%= singular_name %>.<%= attribute.column_name %> %></dd>
     </div>
-  </dl>
-
 <% end -%>
+  </dl>
 </div>
