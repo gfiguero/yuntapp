@@ -15,19 +15,26 @@ es:
   actions:
     index: Listar
     new: Nuevo
+    create: Crear
     show: Ver
     edit: Editar
     filter: Filtrar
     back: Atrás
     save: Guardar
+    update: Actualizar
     cancel: Cancelar
+    remove: Remover
     delete: Eliminar
     destroy: Destruir
+    confirm: Confirmar
+    archive: Archivar
+    restore: Restaurar
     restart: Reestablecer
 
-  activerecord:
-    attributes:
-      listing:
-        id: ID
-        name: Nombre
-        active: Activo
+  attributes:
+    listing:
+      id: ID
+      name: Nombre
+      price: Precio
+      description: Descripción
+      active: Activo
