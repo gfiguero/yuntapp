@@ -83,3 +83,205 @@ artanis_carrier_interceptor:
   price: 12000.00
   active: true
   user: artanis
+
+artanis_phase_sword:
+  name: "Legendary Phase Sword - Forged by Hierarch"
+  description: "Designed for elite templars, this phase sword is imbued with Khaydarin energy to cut through any zerg carapace or terran reinforced armor. Handle included with psi-channel capability."
+  price: 18000.50
+  active: true
+  user: artanis
+
+artanis_assault_shuttle:
+  name: "Warp Assault Shuttle - Upgraded Model"
+  description: "Capable of warp-speed transportation for strike teams. Updated shielding matrix ensures survival in active combat zones. Perfect for infiltration operations."
+  price: 65000.00
+  active: true
+  user: artanis
+
+artanis_immortal_parts:
+  name: "Immortal Mechanized Frame Parts"
+  description: "Primary control systems and armor plates salvaged from an ancient Immortal unit. Needs restoration. Ideal for prototype development or collection."
+  price: 30500.00
+  active: false
+  user: artanis
+
+artanis_aiur_artifact:
+  name: "Preserved Aiur Healing Relic"
+  description: "Ancient relic imbued with psionic healing wards. Can provide health restoration in proximity. Artifact shines under psionically charged environments."
+  price: 20000.00
+  active: true
+  user: artanis
+
+artanis_dark_templar_blade:
+  name: "Shadow-Forged Warp Blade (Dark Templar Design)"
+  description: "Engineered by the Nerazim faction, this warp blade can cut through dimensions, leaving traces of void energy. Rare item not suitable for untrained individuals."
+  price: 26000.40
+  active: false
+  user: artanis
+
+artanis_scout_drone:
+  name: "Scout Recon Drone - High Altitude Model"
+  description: "Fast-response drone equipped with aerial energy shields and sensor arrays. Designed for high-altitude scouting missions with stealth capabilities."
+  price: 14500.70
+  active: true
+  user: artanis
+
+artanis_warp_core_crystal:
+  name: "Ultra-Pure Warp Core Crystal"
+  description: "Primary energy source for starships. This crystal amplifies warp capabilities by 275%, ensuring faster-than-light travel on warp-class ships."
+  price: 58000.00
+  active: true
+  user: artanis
+
+artanis_stalker_frame:
+  name: "Stalker Combat Frame - Damaged"
+  description: "Chassis of a Stalker unit retrieved from the battlefield. Suitable for repairs or as parts. Includes targeting software intact."
+  price: 12000.30
+  active: false
+  user: artanis
+
+artanis_hallucinator_module:
+  name: "Psychic Hallucinator Module"
+  description: "A rare psionic device capable of creating tactical holograms for battlefield deception. Used by advanced protoss tacticians."
+  price: 7300.00
+  active: true
+  user: artanis
+
+artanis_energy_shield_matrix:
+  name: "Energy Shield Matrix - Advanced Defense"
+  description: "Compact matrix generating robust defensive shields. Protects units or structures from up to 85% damage. Recharge capacity included."
+  price: 21500.90
+  active: true
+  user: artanis
+
+artanis_base_teleporter:
+  name: "Field Teleporter Unit (Portable)"
+  description: "Allows immediate extraction of units to a preset safe zone. Warp calibration included for rapid deployment in hostile conditions."
+  price: 33000.00
+  active: true
+  user: artanis
+
+artanis_psionic_enhancer_ring:
+  name: "Psionic Capacitor Enhancement Ring"
+  description: "Wearable device that enhances psionic amplification by 45%. Commonly used by templar leaders during high-intensity warfare."
+  price: 4000.00
+  active: true
+  user: artanis
+
+artanis_shield_generator:
+  name: "Deployable Shield Generator"
+  description: "Generates large-scale energy barriers to protect forces during battle. Recently upgraded by phase-smiths for enhanced durability."
+  price: 35000.00
+  active: true
+  user: artanis
+
+artanis_tal'darim_relic:
+  name: "Tal'darim Collector's Relic"
+  description: "Mysterious artifact retrieved from outer Tal'darim colonies. Usage unknown but radiates faint psionic energy. Rare collectible."
+  price: 98000.00
+  active: true
+  user: artanis
+
+artanis_oracle_surveillance:
+  name: "Oracle Surveillance System"
+  description: "Oracle-class surveillance device for precise field detection of enemy cloaked units. Features advanced psionic sensors."
+  price: 48500.80
+  active: true
+  user: artanis
+
+artanis_khaydarin_weapon_core:
+  name: "Khaydarin Weapon Core"
+  description: "Weapon enhancement module capable of powering energy-based armament systems. Compatible with photon cannons and void rays."
+  price: 37800.60
+  active: true
+  user: artanis
+
+artanis_crystalline_psidata:
+  name: "Crystalline Psionic Data Storage"
+  description: "Highly secure data storage unit protected by a crystalline lattice for psionic users. Contains encrypted records of protoss battles."
+  price: 18500.00
+  active: false
+  user: artanis
+
+artanis_golden_wings_figure:
+  name: "Golden Wings Archetype Figurine"
+  description: "Crafted to honor fallen warriors, this artifact is often used as centerpieces in ceremonial tributes. Limited craftsmanship from purifiers."
+  price: 15200.00
+  active: true
+  user: artanis
+
+artanis_phase_field_processor:
+  name: "Tactical Phase Field Processor"
+  description: "Enhances warp field accuracy around bases, reducing energy lag by 12%. Certified for prolonged operational use."
+  price: 4200.00
+  active: true
+  user: artanis
+
+artanis_arbiter_field:
+  name: "Arbiter Command Beacon"
+  description: "Issue orders to operators within massive distances remotely across planetary colonies via this preserved controlled vox-using AI shadow."
+  price: 70.00
+  user: artanis
+
+artanis_probe_maintenance_kit:
+  name: "Probe Maintenance Kit"
+  description: "Comprehensive toolkit for repairing and maintaining Probe units. Essential for field engineers and expeditions far from Aiur."
+  price: 1200.00
+  active: true
+  user: artanis
+
+artanis_energy_amplifier:
+  name: "Energy Amplifier Unit"
+  description: "Boosts shield charge rates and increases energy efficiency by 20%. Compact and designed for attachment to small units."
+  price: 8500.00
+  active: true
+  user: artanis
+
+artanis_dark_shard:
+  name: "Dark Shard Psionic Crystal"
+  description: "A fragment of powerful psionic energy capable of enhancing void energy interfaces. Highly unstable but invaluable in research."
+  price: 22000.00
+  active: true
+  user: artanis
+
+artanis_photon_array:
+  name: "Photon Destroyer Array"
+  description: "Advanced photon cannon deployed for intercepting large fleets. Designed to protect planetary-scale infrastructure."
+  price: 48000.50
+  active: false
+  user: artanis
+
+artanis_forge_blueprints:
+  name: "Forge Blueprints - Templar Architect Version"
+  description: "Detailed plans for constructing protoss forges. Includes upgraded material specifications for phase blades."
+  price: 11500.00
+  active: false
+  user: artanis
+
+artanis_assimilator_unit:
+  name: "Assimilator Gas Extraction Hub"
+  description: "Facilitates the harvesting of Vespene gas for base installations. Minimal maintenance required. Includes power stabilizer."
+  price: 6400.00
+  active: true
+  user: artanis
+
+artanis_aiur_relic_preserver:
+  name: "Aiur Relic Preserver Casing"
+  description: "Protect precious relics or artifacts safely in this durable containment unit. Reinforced by shielding fields."
+  price: 14000.00
+  active: true
+  user: artanis
+
+artanis_drone_shield_array:
+  name: "Drone Shield Array Enhancer"
+  description: "Portable device enhancing shielding capacities around large swarms, ideal for zerg-related skirmish territories."
+  price: 38000.00
+  active: true
+  user: artanis
+
+artanis_titan_core:
+  name: "Titan Core Power Distributor"
+  description: "The pinnacle of protoss engineering, this Titan Core serves massive planetary projects. Rare and expensive."
+  price: 185000.00
+  active: true
+  user: artanis
