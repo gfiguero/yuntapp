@@ -1,48 +1,38 @@
-<%= form_with(model: listing, class: "form-container") do |form| %>
+<%= form_with(model: listing, class: "grid gap-4 w-1/3") do |form| %>
 
-  <div class="form-field">
-    <% invalid = listing.errors.include?(:id) %>
-    <%= form.label :id, I18n.t('activerecord.attributes.listing.id'), class: "form-label" %>
-    <%= form.text_field :id, class: "form-control #{'form-control-invalid' if invalid}" %>
-    <%= raw(error_message(invalid, listing.errors.full_messages_for(:id))) %>
-  </div>
+  <% invalid = listing.errors.include?(:id) %>
+  <%= form.label :id, I18n.t('attributes.listing.id'), class: "floating-label" do %>
+    <%= form.text_field :id, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.listing.id') %>
+    <span><%= I18n.t('attributes.listing.id') %></span>
+  <% end %>
+  <%= raw(error_message(invalid, listing.errors.full_messages_for(:id))) %>
 
-  <div class="form-field">
-    <% invalid = listing.errors.include?(:name) %>
-    <%= form.label :name, I18n.t('activerecord.attributes.listing.name'), class: "form-label" %>
-    <%= form.text_field :name, class: "form-control #{'form-control-invalid' if invalid}" %>
-    <%= raw(error_message(invalid, listing.errors.full_messages_for(:name))) %>
-  </div>
+  <% invalid = listing.errors.include?(:name) %>
+  <%= form.label :name, I18n.t('attributes.listing.name'), class: "floating-label" do %>
+    <%= form.text_field :name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.listing.name') %>
+    <span><%= I18n.t('attributes.listing.name') %></span>
+  <% end %>
+  <%= raw(error_message(invalid, listing.errors.full_messages_for(:name))) %>
 
-  <div class="form-field">
-    <% invalid = listing.errors.include?(:description) %>
-    <%= form.label :description, I18n.t('activerecord.attributes.listing.description'), class: "form-label" %>
-    <%= form.textarea :description, class: "form-control #{'form-control-invalid' if invalid}" %>
-    <%= raw(error_message(invalid, listing.errors.full_messages_for(:description))) %>
-  </div>
+  <% invalid = listing.errors.include?(:price) %>
+  <%= form.label :price, I18n.t('attributes.listing.price'), class: "floating-label" do %>
+    <%= form.text_field :price, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.listing.price') %>
+    <span><%= I18n.t('attributes.listing.price') %></span>
+  <% end %>
+  <%= raw(error_message(invalid, listing.errors.full_messages_for(:price))) %>
 
-  <div class="form-field">
-    <% invalid = listing.errors.include?(:price) %>
-    <%= form.label :price, I18n.t('activerecord.attributes.listing.price'), class: "form-label" %>
-    <%= form.text_field :price, class: "form-control #{'form-control-invalid' if invalid}" %>
-    <%= raw(error_message(invalid, listing.errors.full_messages_for(:price))) %>
-  </div>
+  <% invalid = listing.errors.include?(:description) %>
+  <%= form.label :description, I18n.t('attributes.listing.description'), class: "floating-label" do %>
+    <%= form.textarea :description, class: "textarea h-64 w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.listing.description') %>
+    <span><%= I18n.t('attributes.listing.description') %></span>
+  <% end %>
+  <%= raw(error_message(invalid, listing.errors.full_messages_for(:description))) %>
 
-  <div class="form-field">
-    <% invalid = listing.errors.include?(:active) %>
-    <%= form.label :active, I18n.t('activerecord.attributes.listing.active'), class: "form-label" %>
-    <%= form.checkbox :active, class: "form-control #{'form-control-invalid' if invalid}" %>
-    <%= raw(error_message(invalid, listing.errors.full_messages_for(:active))) %>
-  </div>
+  <% invalid = listing.errors.include?(:active) %>
+  <%= form.label :active, I18n.t('attributes.listing.active'), class: "label" do %>
+    <%= form.checkbox :active, class: "checkbox validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.listing.active') %>
+    <span><%= I18n.t('attributes.listing.active') %></span>
+  <% end %>
 
-  <div class="form-field">
-    <% invalid = listing.errors.include?(:user_id) %>
-    <%= form.label :user_id, I18n.t('activerecord.attributes.listing.user_id'), class: "form-label" %>
-    <%= form.text_field :user_id, class: "form-control #{'form-control-invalid' if invalid}" %>
-    <%= raw(error_message(invalid, listing.errors.full_messages_for(:user_id))) %>
-  </div>
-
-  <div class="form-actions">
-    <%= form.submit I18n.t('listings.actions.create'), class: "form-submit" %>
-  </div>
+  <%= form.submit I18n.t('actions.save'), class: "btn btn-success" %>
 <% end %>
