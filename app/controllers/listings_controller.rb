@@ -18,7 +18,7 @@ class ListingsController < ApplicationController
 
   # GET /listings/search.json
   def search
-    @listings = params[:items].present? ? Listing.filter_by_name(params[:items]) : Listing.all
+    @listings = params[:items].present? ? Listing.new.filter_by_id(params[:items]) : Listing.all
 
     respond_to do |format|
       format.json
@@ -59,14 +59,14 @@ class ListingsController < ApplicationController
     end
   end
 
-  # GET /listings/1/remove
+  # GET //listings/1/delete
   def delete
   end
 
   # DELETE /listings/1
   def destroy
     @listing.destroy!
-    redirect_to listings_url, deleted: I18n.t("listing.message.destroyed"), status: :see_other
+    redirect_to listings_path, deleted: I18n.t("listing.message.destroyed"), status: :see_other, format: :html
   end
 
   private
@@ -78,7 +78,7 @@ class ListingsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def listing_params
-    params.expect(listing: [ :name, :description, :price, :active, :user_id ])
+    params.expect(listing: [ :name, :price, :description, :active, :user_id ])
   end
 
   def set_listings
@@ -92,7 +92,7 @@ class ListingsController < ApplicationController
   end
 
   def filter_params
-    params.permit(:id, :name, :description, :price, :active, :user_id).reject { |key, value| value.blank? }
+    params.permit(:id, :name, :price, :description, :active, :user_id).reject { |key, value| value.blank? }
   end
 
   def disabled_pagination
