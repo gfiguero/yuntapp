@@ -3,12 +3,10 @@
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
   <table class="table">
     <thead>
-    <tr>
-      <th><%= sort_link('listings_path', I18n.t('attributes.listing.id'), 'id') %></th>
-      <th><%= sort_link('listings_path', I18n.t('attributes.listing.name'), 'name') %></th>
-      <th><%= sort_link('listings_path', I18n.t('attributes.listing.active'), 'active') %></th>
-      <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
-    </tr>
+      <tr>
+        <th><%= sort_link('listings_path', I18n.t('attributes.listing.name'), 'name') %></th>
+        <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+      </tr>
     </thead>
     <tbody>
     <% @listings.each.with_index do |listing| %>
