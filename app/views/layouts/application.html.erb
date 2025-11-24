@@ -59,15 +59,17 @@
         </div>
       </div>
     </nav>
-    <div class="container mx-auto my-2 px-5 flex">
-      <div class="breadcrumbs text-sm">
-        <ul>
-          <li><%= link_to "Inicio", root_path %></li>
-          <%= content_for(:breadcrumb) %>
-        </ul>
+    <%= content_for :breadcrumb_bar do %>
+      <div class="container mx-auto my-2 px-5 flex">
+        <div class="breadcrumbs text-sm">
+          <ul>
+            <li><%= link_to "Inicio", root_path %></li>
+            <%= content_for(:breadcrumb) %>
+          </ul>
+        </div>
       </div>
-    </div>
-    <main class="container mx-auto mt-2 mb-5 px-5 flex">
+    <% end %>
+    <main class="container mx-auto mt-2 mb-5 px-5 flex flex-col">
       <%= yield %>
     </main>
   </body>
