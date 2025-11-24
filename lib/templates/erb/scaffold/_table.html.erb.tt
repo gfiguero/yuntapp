@@ -1,15 +1,15 @@
-<%- permitted_attributes = ['name', 'email', 'active', 'id'] -%>
+<%- permitted_attributes = ['name', 'email'] -%>
 <div class="my-4"><%%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
   <table class="table">
     <thead>
-    <tr>
-      <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
-      <th><%%= sort_link('<%= index_helper %>_path', I18n.t('attributes.<%= singular_table_name %>.<%= attribute.name %>'), '<%= attribute.name %>') %></th>
-      <%- end -%>
-      <th class="w-46"><%%= I18n.t('views.headers.actions') %></th>
-    </tr>
+      <tr>
+        <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
+        <th><%%= sort_link('<%= index_helper %>_path', I18n.t('attributes.<%= singular_table_name %>.<%= attribute.name %>'), '<%= attribute.name %>') %></th>
+        <%- end -%>
+        <th class="w-46"><%%= I18n.t('views.headers.actions') %></th>
+      </tr>
     </thead>
     <tbody>
     <%% @<%= plural_table_name %>.each.with_index do |<%= singular_table_name %>| %>
