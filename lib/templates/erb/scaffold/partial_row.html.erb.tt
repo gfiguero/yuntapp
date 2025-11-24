@@ -1,4 +1,4 @@
-<%- permitted_attributes = ['name', 'email', 'active', 'id'] -%>
+<%- permitted_attributes = ['name', 'email'] -%>
 <tr class="hover:bg-base-300">
   <%- attributes.select{|attr| permitted_attributes.include?(attr.name)}.each do |attribute| -%>
   <td><%%= <%= singular_table_name %>.<%= attribute.column_name %> %></td>
