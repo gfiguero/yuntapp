@@ -1,12 +1,32 @@
 class TagsController < ApplicationController
-  before_action :set_tag, only: %i[ show edit update destroy ]
+  include Pagy::Method
 
-  # GET /tags or /tags.json
+  before_action :set_tag, only: %i[ show edit update delete destroy ]
+  before_action :set_tags, only: :index
+  before_action :disabled_pagination
+  after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
+
+  # GET /tags
   def index
-    @tags = Tag.all
+    @pagy, @tags = pagy(@tags)
+
+    respond_to do |format|
+      format.html
+      format.json
+    end
   end
 
-  # GET /tags/1 or /tags/1.json
+  # GET /tags/search.json
+  def search
+    @tags = params[:items].present? ? Tag.new.filter_by_id(params[:items]) : Tag.all
+
+    respond_to do |format|
+      format.json
+      format.turbo_stream
+    end
+  end
+
+  # GET /tags/1
   def show
   end
 
@@ -19,52 +39,63 @@ class TagsController < ApplicationController
   def edit
   end
 
-  # POST /tags or /tags.json
+  # POST /tags
   def create
     @tag = Tag.new(tag_params)
 
-    respond_to do |format|
-      if @tag.save
-        format.html { redirect_to @tag, notice: "Tag was successfully created." }
-        format.json { render :show, status: :created, location: @tag }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @tag.errors, status: :unprocessable_entity }
-      end
+    if @tag.save
+      redirect_to @tag, created: I18n.t("tag.message.created")
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
-  # PATCH/PUT /tags/1 or /tags/1.json
+  # PATCH/PUT /tags/1
   def update
-    respond_to do |format|
-      if @tag.update(tag_params)
-        format.html { redirect_to @tag, notice: "Tag was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @tag }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @tag.errors, status: :unprocessable_entity }
-      end
+    if @tag.update(tag_params)
+      redirect_to @tag, updated: I18n.t("tag.message.updated"), status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 
-  # DELETE /tags/1 or /tags/1.json
+  # GET //tags/1/delete
+  def delete
+  end
+
+  # DELETE /tags/1
   def destroy
     @tag.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to tags_path, notice: "Tag was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to tags_path, deleted: I18n.t("tag.message.destroyed"), status: :see_other, format: :html
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_tag
-      @tag = Tag.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def tag_params
-      params.expect(tag: [ :name ])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_tag
+    @tag = Tag.find(params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def tag_params
+    params.expect(tag: [ :name ])
+  end
+
+  def set_tags
+    @tags = current_user&.tags || Tag.none
+    @tags = @tags.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
+    filter_params.each { |attribute, value| @tags = @tags.send(filter_scope(attribute), value) } if filter_params.present?
+  end
+
+  def sort_params
+    params.permit(:sort_column, :sort_direction)
+  end
+
+  def filter_params
+    params.permit(:id, :name).reject { |key, value| value.blank? }
+  end
+
+  def disabled_pagination
+    render json: Tag.all if params[:items] == "all"
+  end
 end

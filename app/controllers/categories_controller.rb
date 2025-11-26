@@ -1,12 +1,32 @@
 class CategoriesController < ApplicationController
-  before_action :set_category, only: %i[ show edit update destroy ]
+  include Pagy::Method
 
-  # GET /categories or /categories.json
+  before_action :set_category, only: %i[ show edit update delete destroy ]
+  before_action :set_categories, only: :index
+  before_action :disabled_pagination
+  after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
+
+  # GET /categories
   def index
-    @categories = Category.all
+    @pagy, @categories = pagy(@categories)
+
+    respond_to do |format|
+      format.html
+      format.json
+    end
   end
 
-  # GET /categories/1 or /categories/1.json
+  # GET /categories/search.json
+  def search
+    @categories = params[:items].present? ? Category.new.filter_by_id(params[:items]) : Category.all
+
+    respond_to do |format|
+      format.json
+      format.turbo_stream
+    end
+  end
+
+  # GET /categories/1
   def show
   end
 
@@ -19,52 +39,63 @@ class CategoriesController < ApplicationController
   def edit
   end
 
-  # POST /categories or /categories.json
+  # POST /categories
   def create
     @category = Category.new(category_params)
 
-    respond_to do |format|
-      if @category.save
-        format.html { redirect_to @category, notice: "Category was successfully created." }
-        format.json { render :show, status: :created, location: @category }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @category.errors, status: :unprocessable_entity }
-      end
+    if @category.save
+      redirect_to @category, created: I18n.t("category.message.created")
+    else
+      render :new, status: :unprocessable_content
     end
   end
 
-  # PATCH/PUT /categories/1 or /categories/1.json
+  # PATCH/PUT /categories/1
   def update
-    respond_to do |format|
-      if @category.update(category_params)
-        format.html { redirect_to @category, notice: "Category was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @category }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @category.errors, status: :unprocessable_entity }
-      end
+    if @category.update(category_params)
+      redirect_to @category, updated: I18n.t("category.message.updated"), status: :see_other
+    else
+      render :edit, status: :unprocessable_content
     end
   end
 
-  # DELETE /categories/1 or /categories/1.json
+  # GET //categories/1/delete
+  def delete
+  end
+
+  # DELETE /categories/1
   def destroy
     @category.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to categories_path, notice: "Category was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to categories_path, deleted: I18n.t("category.message.destroyed"), status: :see_other, format: :html
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_category
-      @category = Category.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def category_params
-      params.expect(category: [ :name ])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_category
+    @category = Category.find(params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def category_params
+    params.expect(category: [ :name ])
+  end
+
+  def set_categories
+    @categories = current_user&.categories || Category.none
+    @categories = @categories.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
+    filter_params.each { |attribute, value| @categories = @categories.send(filter_scope(attribute), value) } if filter_params.present?
+  end
+
+  def sort_params
+    params.permit(:sort_column, :sort_direction)
+  end
+
+  def filter_params
+    params.permit(:id, :name).reject { |key, value| value.blank? }
+  end
+
+  def disabled_pagination
+    render json: Category.all if params[:items] == "all"
+  end
 end

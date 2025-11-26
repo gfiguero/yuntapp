@@ -1,6 +1,12 @@
-<div id="<%= dom_id category %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">Name:</strong>
-    <%= category.name %>
-  </div>
+<div id="<%= dom_id category %>">
+  <dl class="mb-4 divide-y divide-gray-400 w-1/3">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.category.id') %></dt>
+      <dd><%= category.id %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.category.name') %></dt>
+      <dd><%= category.name %></dd>
+    </div>
+  </dl>
 </div>

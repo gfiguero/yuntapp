@@ -1,0 +1,30 @@
+<div class="drawer">
+  <%= checkbox_tag :filter, true, class: "drawer-toggle" %>
+  <div class="drawer-side">
+    <%= label_tag :filter, "", class: "drawer-overlay", aria: { label: "close sidebar" } %>
+
+    <div class="menu bg-base-200 min-h-full w-80 p-4">
+      <h3 class="font-bold text-xl"><%= I18n.t('actions.filter') %></h3>
+      <div class="divider"></div>
+
+      <%= form_tag tags_path, method: :get do %>
+
+        <div class="grid gap-4">
+          <div>
+            <%= label_tag :id, I18n.t('attributes.tag.id'), class: "label" %>
+            <%= text_field_tag :id, params[:id], class: "input" %>
+          </div>
+
+          <div>
+            <%= label_tag :name, I18n.t('attributes.tag.name'), class: "label" %>
+            <%= text_field_tag :name, params[:name], class: "input" %>
+          </div>
+
+          <%= button_tag raw(icon('filter') + I18n.t('actions.filter')), type: 'submit', class: "btn btn-info" %>
+          <%= link_to raw(icon('restart') + I18n.t('actions.restart')), tags_path, class: "btn" %>
+        </div>
+
+      <% end %>
+    </div>
+  </div>
+</div>

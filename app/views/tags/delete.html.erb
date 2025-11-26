@@ -4,7 +4,8 @@
 
 <% content_for :breadcrumb do %>
   <li><%= link_to I18n.t('views.title.tags'), tags_path %></li>
-  <li><%= @tag.id %></li>
+  <li><%= link_to @tag.id, tag_path(@tag) %></li>
+  <li><%= I18n.t('actions.delete') %></li>
 <% end %>
 
 <div class="w-full">
