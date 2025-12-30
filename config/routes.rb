@@ -41,4 +41,32 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
   get "contact", to: "home#contact"
+
+  namespace :admin do
+    root to: "dashboard#index"
+    resources :categories do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :tags do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :listings do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+  end
 end
