@@ -1,0 +1,15 @@
+<% content_for :title do %>
+  <%= I18n.t('views.title.categories') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('views.title.categories'), admin_categories_path %></li>
+  <li><%= @category.id %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.categories') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.category', id: @category.id) %></h3>
+  <%= render "buttons" %>
+  <%= render @category %>
+</div>
