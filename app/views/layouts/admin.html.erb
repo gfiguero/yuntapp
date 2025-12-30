@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html data-theme="light">
+  <head>
+    <title><%= content_for(:title) || "Yuntapp Admin" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <div class="drawer lg:drawer-open">
+      <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col items-center justify-start">
+        <!-- Page content here -->
+        <div class="w-full navbar bg-base-100 lg:hidden shadow-sm mb-4">
+            <div class="flex-none">
+                <label for="my-drawer-2" class="btn btn-square btn-ghost drawer-button lg:hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </label>
+            </div>
+            <div class="flex-1 px-2 mx-2 font-bold text-xl">Admin Panel</div>
+        </div>
+
+        <main class="container mx-auto mt-2 mb-5 px-5 flex flex-col w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-2xl font-bold">Administración</h1>
+                <%= link_to "Volver a la App", root_path, class: "btn btn-sm btn-outline" %>
+            </div>
+            <%= yield %>
+        </main>
+      
+      </div> 
+      <div class="drawer-side h-full">
+        <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label> 
+        <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content h-full">
+          <!-- Sidebar content here -->
+          <li class="mb-4 text-xl font-bold px-4">Yuntapp Admin</li>
+          <li><%= link_to "Dashboard", admin_root_path, class: ("active" if current_page?(admin_root_path)) %></li>
+          
+          <li class="menu-title mt-4">Entidades</li>
+          <li><%= link_to "Categorías", admin_categories_path, class: ("active" if controller_name == "categories") %></li>
+          <li><%= link_to "Etiquetas", admin_tags_path, class: ("active" if controller_name == "tags") %></li>
+          <li><%= link_to "Publicaciones", admin_listings_path, class: ("active" if controller_name == "listings") %></li>
+          
+          <li class="menu-title mt-4">Sistema</li>
+          <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
+        </ul>
+      
+      </div>
+    </div>
+    <%= yield :filter_drawer %>
+  </body>
+</html>
