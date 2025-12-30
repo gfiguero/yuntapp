@@ -87,7 +87,7 @@ class <%= controller_class_name %>Controller < ApplicationController
   end
 
   def set_<%= plural_table_name %>
-    @<%= plural_table_name %> = current_user&.<%= plural_table_name %> || <%= class_name %>.none
+    @<%= plural_table_name %> = <%= class_name %>.all
     @<%= plural_table_name %> = @<%= plural_table_name %>.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
     filter_params.each { |attribute, value| @<%= plural_table_name %> = @<%= plural_table_name %>.send(filter_scope(attribute), value) } if filter_params.present?
   end
