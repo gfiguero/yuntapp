@@ -82,7 +82,7 @@ class CategoriesController < ApplicationController
   end
 
   def set_categories
-    @categories = current_user&.categories || Category.none
+    @categories = Category.all
     @categories = @categories.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
     filter_params.each { |attribute, value| @categories = @categories.send(filter_scope(attribute), value) } if filter_params.present?
   end

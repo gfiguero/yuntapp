@@ -82,7 +82,7 @@ class ListingsController < ApplicationController
   end
 
   def set_listings
-    @listings = current_user&.listings || Listing.none
+    @listings = Listing.all
     @listings = @listings.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
     filter_params.each { |attribute, value| @listings = @listings.send(filter_scope(attribute), value) } if filter_params.present?
   end

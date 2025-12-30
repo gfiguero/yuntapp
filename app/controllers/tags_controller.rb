@@ -82,7 +82,7 @@ class TagsController < ApplicationController
   end
 
   def set_tags
-    @tags = current_user&.tags || Tag.none
+    @tags = Tag.all
     @tags = @tags.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
     filter_params.each { |attribute, value| @tags = @tags.send(filter_scope(attribute), value) } if filter_params.present?
   end
