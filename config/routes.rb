@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
-  resources :listings
-  concern :default_routes do
+  resources :categories do
     collection do
       get :search
     end
@@ -8,20 +7,25 @@ Rails.application.routes.draw do
       get :delete
     end
   end
-
-  resources :categories
-  resources :tags
+  resources :tags do
+    collection do
+      get :search
+    end
+    member do
+      get :delete
+    end
+  end
   resources :listings do
     collection do
       get :search
     end
     member do
       get :delete
-      end
+    end
   end
 
   devise_for :users, controllers: {
-    sessions: 'users/sessions'
+    sessions: "users/sessions"
   }
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
