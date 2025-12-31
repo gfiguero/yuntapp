@@ -4,11 +4,15 @@ es:
       listings: Publicaciones
       categories: Categorías
       tags: Etiquetas
+      users: Usuarios
     headers:
       actions: Acciones
       new: Nuevo Registro
     identifier:
       listing: "Publicación ID: %{id}"
+      category: "Categoría ID: %{id}"
+      tag: "Etiqueta ID: %{id}"
+      user: "Usuario ID: %{id}"
     count:
       listings: "%{count} publicaciones"
 
@@ -32,9 +36,47 @@ es:
     restart: Reestablecer
 
   attributes:
+    user:
+      id: ID
+      first_name: Nombre
+      last_name: Apellido
+      email: Email
+      admin: Es Admin
+      password: Contraseña
+      password_confirmation: Confirmar Contraseña
+    category:
+      id: ID
+      name: Nombre
+    tag:
+      id: ID
+      name: Nombre
     listing:
       id: ID
       name: Nombre
       price: Precio
       description: Descripción
       active: Activo
+
+  category:
+    message:
+      created: Categoría creada exitosamente.
+      updated: Categoría actualizada exitosamente.
+      destroyed: Categoría eliminada exitosamente.
+
+  tag:
+    message:
+      created: Etiqueta creada exitosamente.
+      updated: Etiqueta actualizada exitosamente.
+      destroyed: Etiqueta eliminada exitosamente.
+
+  listing:
+    message:
+      created: Publicación creada exitosamente.
+      updated: Publicación actualizada exitosamente.
+      destroyed: Publicación eliminada exitosamente.
+
+  user:
+    message:
+      created: Usuario creado exitosamente.
+      updated: Usuario actualizado exitosamente.
+      destroyed: Usuario eliminado exitosamente.
