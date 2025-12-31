@@ -1,0 +1,16 @@
+<% content_for :title do %>
+  <%= I18n.t('views.title.users') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('views.title.users'), admin_users_path %></li>
+  <li><%= link_to @user.id, admin_user_path(@user) %></li>
+  <li><%= I18n.t('actions.delete') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.users') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.user', id: @user.id) %></h3>
+  <%= render "buttons" %>
+  <%= render @user %>
+</div>

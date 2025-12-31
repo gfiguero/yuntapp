@@ -1,0 +1,22 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('admin_users_path', I18n.t('attributes.user.email'), 'email') %></th>
+        <th><%= I18n.t('attributes.user.first_name') %></th>
+        <th><%= I18n.t('attributes.user.last_name') %></th>
+        <th><%= I18n.t('attributes.user.admin') %></th>
+        <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @users.each.with_index do |user| %>
+      <%= render partial: "user_row", locals: { user: user } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>
