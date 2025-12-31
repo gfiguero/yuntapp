@@ -68,5 +68,13 @@ Rails.application.routes.draw do
         get :delete
       end
     end
+    resources :users do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
   end
 end
