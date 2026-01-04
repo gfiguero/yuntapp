@@ -18,7 +18,7 @@ class ListingsController < ApplicationController
 
   # GET /listings/search.json
   def search
-    @listings = params[:items].present? ? Listing.new.filter_by_id(params[:items]) : Listing.all
+    @listings = params[:items].present? ? Listing.all.filter_by_id(params[:items]) : Listing.all
 
     respond_to do |format|
       format.json

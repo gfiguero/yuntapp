@@ -18,7 +18,7 @@ class CategoriesController < ApplicationController
 
   # GET /categories/search.json
   def search
-    @categories = params[:items].present? ? Category.new.filter_by_id(params[:items]) : Category.all
+    @categories = params[:items].present? ? Category.all.filter_by_id(params[:items]) : Category.all
 
     respond_to do |format|
       format.json
