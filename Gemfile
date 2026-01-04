@@ -70,3 +70,5 @@ end
 
 gem "devise", github: "heartcombo/devise", branch: "main"
 gem "pagy"
+
+gem "minitest", "~> 5.25", group: :test
