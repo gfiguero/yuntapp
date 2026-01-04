@@ -6,6 +6,7 @@ artanis_zealot_gauntlets:
   price: 1250.99
   active: true
   user: artanis
+  category: weapons
 
 artanis_warp_prism:
   name: "Salvaged Warp Prism - Fully Operational"
@@ -13,6 +14,7 @@ artanis_warp_prism:
   price: 45000.00
   active: true
   user: artanis
+  category: vehicles
 
 artanis_khaydarin_crystals:
   name: "Pure Khaydarin Crystal Set (5 units)"
@@ -20,6 +22,7 @@ artanis_khaydarin_crystals:
   price: 3200.50
   active: true
   user: artanis
+  category: resources
 
 artanis_psi_training:
   name: "Psionic Warfare Training Program"
@@ -27,6 +30,7 @@ artanis_psi_training:
   price: 850.00
   active: true
   user: artanis
+  category: services
 
 artanis_observer:
   name: "Observer Surveillance Unit - Stealth Mode"
@@ -34,6 +38,7 @@ artanis_observer:
   price: 7800.75
   active: true
   user: artanis
+  category: technology
 
 artanis_pylon_power:
   name: "Emergency Pylon Power Supply"
@@ -41,6 +46,7 @@ artanis_pylon_power:
   price: 15000.25
   active: false
   user: artanis
+  category: structures
 
 artanis_photon_cannon:
   name: "Photon Cannon Defense System"
@@ -48,6 +54,7 @@ artanis_photon_cannon:
   price: 9200.00
   active: true
   user: artanis
+  category: structures
 
 artanis_void_ray:
   name: "Void Ray Prismatic Beam Core"
@@ -55,6 +62,7 @@ artanis_void_ray:
   price: 28000.00
   active: true
   user: artanis
+  category: parts
 
 artanis_probe_units:
   name: "Worker Probe Pair - Resource Gathering"
@@ -62,6 +70,7 @@ artanis_probe_units:
   price: 4500.00
   active: true
   user: artanis
+  category: technology
 
 artanis_templar_archive:
   name: "Templar Archive Data Crystal"
@@ -69,6 +78,7 @@ artanis_templar_archive:
   price: 15000.00
   active: false
   user: artanis
+  category: artifacts
 
 artanis_shield_battery:
   name: "Shield Battery Charging Station"
@@ -76,6 +86,7 @@ artanis_shield_battery:
   price: 6800.40
   active: true
   user: artanis
+  category: technology
 
 artanis_carrier_interceptor:
   name: "Carrier Interceptor Drone Set (4 units)"
@@ -83,6 +94,7 @@ artanis_carrier_interceptor:
   price: 12000.00
   active: true
   user: artanis
+  category: weapons
 
 artanis_phase_sword:
   name: "Legendary Phase Sword - Forged by Hierarch"
@@ -90,6 +102,7 @@ artanis_phase_sword:
   price: 18000.50
   active: true
   user: artanis
+  category: weapons
 
 artanis_assault_shuttle:
   name: "Warp Assault Shuttle - Upgraded Model"
@@ -97,6 +110,7 @@ artanis_assault_shuttle:
   price: 65000.00
   active: true
   user: artanis
+  category: vehicles
 
 artanis_immortal_parts:
   name: "Immortal Mechanized Frame Parts"
@@ -104,6 +118,7 @@ artanis_immortal_parts:
   price: 30500.00
   active: false
   user: artanis
+  category: parts
 
 artanis_aiur_artifact:
   name: "Preserved Aiur Healing Relic"
@@ -111,6 +126,7 @@ artanis_aiur_artifact:
   price: 20000.00
   active: true
   user: artanis
+  category: artifacts
 
 artanis_dark_templar_blade:
   name: "Shadow-Forged Warp Blade (Dark Templar Design)"
@@ -118,6 +134,7 @@ artanis_dark_templar_blade:
   price: 26000.40
   active: false
   user: artanis
+  category: weapons
 
 artanis_scout_drone:
   name: "Scout Recon Drone - High Altitude Model"
@@ -125,6 +142,7 @@ artanis_scout_drone:
   price: 14500.70
   active: true
   user: artanis
+  category: technology
 
 artanis_warp_core_crystal:
   name: "Ultra-Pure Warp Core Crystal"
@@ -132,6 +150,7 @@ artanis_warp_core_crystal:
   price: 58000.00
   active: true
   user: artanis
+  category: parts
 
 artanis_stalker_frame:
   name: "Stalker Combat Frame - Damaged"
@@ -139,6 +158,7 @@ artanis_stalker_frame:
   price: 12000.30
   active: false
   user: artanis
+  category: parts
 
 artanis_hallucinator_module:
   name: "Psychic Hallucinator Module"
@@ -146,6 +166,7 @@ artanis_hallucinator_module:
   price: 7300.00
   active: true
   user: artanis
+  category: technology
 
 artanis_energy_shield_matrix:
   name: "Energy Shield Matrix - Advanced Defense"
@@ -153,6 +174,7 @@ artanis_energy_shield_matrix:
   price: 21500.90
   active: true
   user: artanis
+  category: armor
 
 artanis_base_teleporter:
   name: "Field Teleporter Unit (Portable)"
@@ -160,6 +182,7 @@ artanis_base_teleporter:
   price: 33000.00
   active: true
   user: artanis
+  category: technology
 
 artanis_psionic_enhancer_ring:
   name: "Psionic Capacitor Enhancement Ring"
@@ -167,6 +190,7 @@ artanis_psionic_enhancer_ring:
   price: 4000.00
   active: true
   user: artanis
+  category: artifacts
 
 artanis_shield_generator:
   name: "Deployable Shield Generator"
@@ -174,6 +198,7 @@ artanis_shield_generator:
   price: 35000.00
   active: true
   user: artanis
+  category: structures
 
 artanis_tal'darim_relic:
   name: "Tal'darim Collector's Relic"
@@ -181,6 +206,7 @@ artanis_tal'darim_relic:
   price: 98000.00
   active: true
   user: artanis
+  category: collectibles
 
 artanis_oracle_surveillance:
   name: "Oracle Surveillance System"
@@ -188,6 +214,7 @@ artanis_oracle_surveillance:
   price: 48500.80
   active: true
   user: artanis
+  category: technology
 
 artanis_khaydarin_weapon_core:
   name: "Khaydarin Weapon Core"
@@ -195,6 +222,7 @@ artanis_khaydarin_weapon_core:
   price: 37800.60
   active: true
   user: artanis
+  category: parts
 
 artanis_crystalline_psidata:
   name: "Crystalline Psionic Data Storage"
@@ -202,6 +230,7 @@ artanis_crystalline_psidata:
   price: 18500.00
   active: false
   user: artanis
+  category: artifacts
 
 artanis_golden_wings_figure:
   name: "Golden Wings Archetype Figurine"
@@ -209,6 +238,7 @@ artanis_golden_wings_figure:
   price: 15200.00
   active: true
   user: artanis
+  category: collectibles
 
 artanis_phase_field_processor:
   name: "Tactical Phase Field Processor"
@@ -216,12 +246,14 @@ artanis_phase_field_processor:
   price: 4200.00
   active: true
   user: artanis
+  category: technology
 
 artanis_arbiter_field:
   name: "Arbiter Command Beacon"
   description: "Issue orders to operators within massive distances remotely across planetary colonies via this preserved controlled vox-using AI shadow."
   price: 70.00
   user: artanis
+  category: technology
 
 artanis_probe_maintenance_kit:
   name: "Probe Maintenance Kit"
@@ -229,6 +261,7 @@ artanis_probe_maintenance_kit:
   price: 1200.00
   active: true
   user: artanis
+  category: parts
 
 artanis_energy_amplifier:
   name: "Energy Amplifier Unit"
@@ -236,6 +269,7 @@ artanis_energy_amplifier:
   price: 8500.00
   active: true
   user: artanis
+  category: parts
 
 artanis_dark_shard:
   name: "Dark Shard Psionic Crystal"
@@ -243,6 +277,7 @@ artanis_dark_shard:
   price: 22000.00
   active: true
   user: artanis
+  category: resources
 
 artanis_photon_array:
   name: "Photon Destroyer Array"
@@ -250,6 +285,7 @@ artanis_photon_array:
   price: 48000.50
   active: false
   user: artanis
+  category: structures
 
 artanis_forge_blueprints:
   name: "Forge Blueprints - Templar Architect Version"
@@ -257,6 +293,7 @@ artanis_forge_blueprints:
   price: 11500.00
   active: false
   user: artanis
+  category: artifacts
 
 artanis_assimilator_unit:
   name: "Assimilator Gas Extraction Hub"
@@ -264,6 +301,7 @@ artanis_assimilator_unit:
   price: 6400.00
   active: true
   user: artanis
+  category: structures
 
 artanis_aiur_relic_preserver:
   name: "Aiur Relic Preserver Casing"
@@ -271,6 +309,7 @@ artanis_aiur_relic_preserver:
   price: 14000.00
   active: true
   user: artanis
+  category: artifacts
 
 artanis_drone_shield_array:
   name: "Drone Shield Array Enhancer"
@@ -278,6 +317,7 @@ artanis_drone_shield_array:
   price: 38000.00
   active: true
   user: artanis
+  category: technology
 
 artanis_titan_core:
   name: "Titan Core Power Distributor"
@@ -285,3 +325,4 @@ artanis_titan_core:
   price: 185000.00
   active: true
   user: artanis
+  category: technology

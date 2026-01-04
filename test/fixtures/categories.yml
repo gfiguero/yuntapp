@@ -1,7 +1,31 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
+weapons:
+  name: Armas
 
-two:
-  name: MyString
+armor:
+  name: Armaduras
+
+vehicles:
+  name: Vehículos
+
+technology:
+  name: Tecnología
+
+artifacts:
+  name: Artefactos
+
+resources:
+  name: Recursos
+
+structures:
+  name: Estructuras
+
+services:
+  name: Servicios
+
+collectibles:
+  name: Coleccionables
+
+parts:
+  name: Repuestos
