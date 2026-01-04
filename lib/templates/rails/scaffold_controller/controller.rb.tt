@@ -19,7 +19,7 @@ class <%= controller_class_name %>Controller < ApplicationController
 
   # GET <%= route_url %>/search.json
   def search
-    @<%= plural_table_name %> = params[:items].present? ? <%= orm_class.build(class_name) %>.filter_by_id(params[:items]) : <%= class_name %>.all
+    @<%= plural_table_name %> = params[:items].present? ? <%= orm_class.all(class_name) %>.filter_by_id(params[:items]) : <%= class_name %>.all
 
     respond_to do |format|
       format.json
