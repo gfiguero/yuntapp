@@ -14,7 +14,7 @@
 
   <body>
     <div class="drawer lg:drawer-open">
-      <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+      <input id="my-drawer-2" type="checkbox" class="drawer-toggle">
       <div class="drawer-content flex flex-col items-center justify-start">
         <!-- Page content here -->
         <div class="w-full navbar bg-base-100 lg:hidden shadow-sm mb-4">
@@ -33,26 +33,25 @@
             </div>
             <%= yield %>
         </main>
-      
-      </div> 
+
+      </div>
       <div class="drawer-side h-full">
-        <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label> 
+        <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content h-full">
           <!-- Sidebar content here -->
           <li class="mb-4 text-xl font-bold px-4">Yuntapp Admin</li>
           <li><%= link_to "Dashboard", admin_root_path, class: ("active" if current_page?(admin_root_path)) %></li>
-          
+
           <li class="menu-title mt-4">Entidades</li>
           <li><%= link_to "Usuarios", admin_users_path, class: ("active" if controller_name == "users") %></li>
           <li><%= link_to "Categorías", admin_categories_path, class: ("active" if controller_name == "categories") %></li>
           <li><%= link_to "Juntas de Vecinos", admin_neighborhood_associations_path, class: ("active" if controller_name == "neighborhood_associations") %></li>
           <li><%= link_to "Etiquetas", admin_tags_path, class: ("active" if controller_name == "tags") %></li>
           <li><%= link_to "Publicaciones", admin_listings_path, class: ("active" if controller_name == "listings") %></li>
-          
           <li class="menu-title mt-4">Sistema</li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
         </ul>
-      
+
       </div>
     </div>
     <%= yield :filter_drawer %>
