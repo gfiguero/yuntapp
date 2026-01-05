@@ -19,7 +19,7 @@ module Admin
 
     # GET /admin/tags/search.json
     def search
-      @tags = params[:items].present? ? Tag.all.filter_by_id(params[:items]) : Tag.all
+      @tags = params[:items].present? ? Tag.filter_by_id(params[:items]) : Tag.all
 
       respond_to do |format|
         format.json
