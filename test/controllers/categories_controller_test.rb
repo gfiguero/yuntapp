@@ -4,7 +4,7 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 
   setup do
-    @category = categories(:one)
+    @category = categories(:weapons)
     @user = users(:artanis)
     sign_in @user
   end
@@ -15,9 +15,9 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get search with json format" do
-    get search_categories_url(format: :json), params: { items: [@category.id] }
+    get search_categories_url(format: :json), params: {items: [@category.id]}
     assert_response :success
-    
+
     json_response = JSON.parse(response.body)
     assert_not_empty json_response
     assert_equal @category.id, json_response.first["value"]
@@ -30,7 +30,7 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create category" do
     assert_difference("Category.count") do
-      post categories_url, params: { category: { name: "New Category" } }
+      post categories_url, params: {category: {name: "New Category"}}
     end
 
     assert_redirected_to category_url(Category.last)
@@ -38,7 +38,7 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
 
   test "should not create category with invalid params" do
     assert_no_difference("Category.count") do
-      post categories_url, params: { category: { name: "" } }
+      post categories_url, params: {category: {name: ""}}
     end
 
     assert_response :unprocessable_content
@@ -55,14 +55,14 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update category" do
-    patch category_url(@category), params: { category: { name: "Updated Category" } }
+    patch category_url(@category), params: {category: {name: "Updated Category"}}
     assert_redirected_to category_url(@category)
     @category.reload
     assert_equal "Updated Category", @category.name
   end
 
   test "should not update category with invalid params" do
-    patch category_url(@category), params: { category: { name: "" } }
+    patch category_url(@category), params: {category: {name: ""}}
     assert_response :unprocessable_content
   end
 
