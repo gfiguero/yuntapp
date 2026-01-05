@@ -16,9 +16,9 @@ module Admin
     end
 
     test "should get search with json format" do
-      get search_admin_listings_url(format: :json), params: { items: [@listing.id] }
+      get search_admin_listings_url(format: :json), params: {items: [@listing.id]}
       assert_response :success
-      
+
       json_response = JSON.parse(response.body)
       assert_not_empty json_response
       assert_equal @listing.id, json_response.first["value"]
@@ -31,13 +31,13 @@ module Admin
 
     test "should create listing" do
       assert_difference("Listing.count") do
-        post admin_listings_url, params: { listing: { 
-          active: @listing.active, 
-          description: @listing.description, 
-          name: "New Admin Listing", 
-          price: @listing.price, 
-          user_id: @user.id 
-        } }
+        post admin_listings_url, params: {listing: {
+          active: @listing.active,
+          description: @listing.description,
+          name: "New Admin Listing",
+          price: @listing.price,
+          user_id: @user.id
+        }}
       end
 
       assert_redirected_to admin_listing_url(Listing.last)
@@ -45,7 +45,7 @@ module Admin
 
     test "should not create listing with invalid params" do
       assert_no_difference("Listing.count") do
-        post admin_listings_url, params: { listing: { name: "" } }
+        post admin_listings_url, params: {listing: {name: ""}}
       end
 
       assert_response :unprocessable_content
@@ -62,14 +62,14 @@ module Admin
     end
 
     test "should update listing" do
-      patch admin_listing_url(@listing), params: { listing: { name: "Updated Admin Listing" } }
+      patch admin_listing_url(@listing), params: {listing: {name: "Updated Admin Listing"}}
       assert_redirected_to admin_listing_url(@listing)
       @listing.reload
       assert_equal "Updated Admin Listing", @listing.name
     end
 
     test "should not update listing with invalid params" do
-      patch admin_listing_url(@listing), params: { listing: { name: "" } }
+      patch admin_listing_url(@listing), params: {listing: {name: ""}}
       assert_response :unprocessable_content
     end
 

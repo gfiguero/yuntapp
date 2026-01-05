@@ -16,9 +16,9 @@ module Admin
     end
 
     test "should get search with json format" do
-      get search_admin_tags_url(format: :json), params: { items: [@tag.id] }
+      get search_admin_tags_url(format: :json), params: {items: [@tag.id]}
       assert_response :success
-      
+
       json_response = JSON.parse(response.body)
       assert_not_empty json_response
       assert_equal @tag.id, json_response.first["value"]
@@ -31,7 +31,7 @@ module Admin
 
     test "should create tag" do
       assert_difference("Tag.count") do
-        post admin_tags_url, params: { tag: { name: "New Admin Tag" } }
+        post admin_tags_url, params: {tag: {name: "New Admin Tag"}}
       end
 
       assert_redirected_to admin_tag_url(Tag.last)
@@ -39,7 +39,7 @@ module Admin
 
     test "should not create tag with invalid params" do
       assert_no_difference("Tag.count") do
-        post admin_tags_url, params: { tag: { name: "" } }
+        post admin_tags_url, params: {tag: {name: ""}}
       end
 
       assert_response :unprocessable_content
@@ -56,14 +56,14 @@ module Admin
     end
 
     test "should update tag" do
-      patch admin_tag_url(@tag), params: { tag: { name: "Updated Admin Tag" } }
+      patch admin_tag_url(@tag), params: {tag: {name: "Updated Admin Tag"}}
       assert_redirected_to admin_tag_url(@tag)
       @tag.reload
       assert_equal "Updated Admin Tag", @tag.name
     end
 
     test "should not update tag with invalid params" do
-      patch admin_tag_url(@tag), params: { tag: { name: "" } }
+      patch admin_tag_url(@tag), params: {tag: {name: ""}}
       assert_response :unprocessable_content
     end
 

@@ -15,9 +15,9 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get search with json format" do
-    get search_tags_url(format: :json), params: { items: [@tag.id] }
+    get search_tags_url(format: :json), params: {items: [@tag.id]}
     assert_response :success
-    
+
     json_response = JSON.parse(response.body)
     assert_not_empty json_response
     assert_equal @tag.id, json_response.first["value"]
@@ -30,7 +30,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create tag" do
     assert_difference("Tag.count") do
-      post tags_url, params: { tag: { name: "New Tag" } }
+      post tags_url, params: {tag: {name: "New Tag"}}
     end
 
     assert_redirected_to tag_url(Tag.last)
@@ -38,7 +38,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
   test "should not create tag with invalid params" do
     assert_no_difference("Tag.count") do
-      post tags_url, params: { tag: { name: "" } }
+      post tags_url, params: {tag: {name: ""}}
     end
 
     assert_response :unprocessable_content
@@ -55,14 +55,14 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update tag" do
-    patch tag_url(@tag), params: { tag: { name: "Updated Tag" } }
+    patch tag_url(@tag), params: {tag: {name: "Updated Tag"}}
     assert_redirected_to tag_url(@tag)
     @tag.reload
     assert_equal "Updated Tag", @tag.name
   end
 
   test "should not update tag with invalid params" do
-    patch tag_url(@tag), params: { tag: { name: "" } }
+    patch tag_url(@tag), params: {tag: {name: ""}}
     assert_response :unprocessable_content
   end
 
