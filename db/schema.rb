@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_30_054301) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_04_135225) do
   create_table "categories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -19,12 +19,14 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_30_054301) do
 
   create_table "listings", force: :cascade do |t|
     t.boolean "active"
+    t.integer "category_id"
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name"
     t.decimal "price"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["category_id"], name: "index_listings_on_category_id"
     t.index ["user_id"], name: "index_listings_on_user_id"
   end
 
@@ -49,5 +51,6 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_30_054301) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "listings", "categories"
   add_foreign_key "listings", "users"
 end
