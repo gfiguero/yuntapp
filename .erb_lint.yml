@@ -1,0 +1,12 @@
+---
+EnableDefaultLinters: true
+exclude:
+  - 'node_modules/**/*'
+  - 'vendor/**/*'
+linters:
+  FinalNewline:
+    enabled: true
+  SpaceAroundErTag:
+    enabled: true
+  ErSafety:
+    enabled: true
