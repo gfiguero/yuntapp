@@ -2,7 +2,7 @@ module Admin
   class UsersController < ApplicationController
     include Pagy::Method
 
-    before_action :set_user, only: %i[ show edit update delete destroy ]
+    before_action :set_user, only: %i[show edit update delete destroy]
     before_action :set_users, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -88,7 +88,7 @@ module Admin
       if params[:sort_column].present? && params[:sort_direction].present?
         @users = @users.order("#{params[:sort_column]} #{params[:sort_direction]}")
       end
-      
+
       # Add simple filter
       if params[:id].present?
         @users = @users.where(id: params[:id])

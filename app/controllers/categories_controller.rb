@@ -1,7 +1,7 @@
 class CategoriesController < ApplicationController
   include Pagy::Method
 
-  before_action :set_category, only: %i[ show edit update delete destroy ]
+  before_action :set_category, only: %i[show edit update delete destroy]
   before_action :set_categories, only: :index
   before_action :disabled_pagination
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -78,7 +78,7 @@ class CategoriesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def category_params
-    params.expect(category: [ :name ])
+    params.expect(category: [:name])
   end
 
   def set_categories

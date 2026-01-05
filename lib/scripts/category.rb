@@ -3,7 +3,7 @@ class CategoryScaffold
   BASE_COMMAND_DESTROY = "rails d scaffold"
   CLASS_NAME = "Category"
   COMMAND_OPTIONS = "--skip-migration --force"
-  #COMMAND_OPTIONS = ""
+  # COMMAND_OPTIONS = ""
 
   FIELDS = %w[name:string]
 

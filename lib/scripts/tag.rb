@@ -3,7 +3,7 @@ class TagScaffold
   BASE_COMMAND_DESTROY = "rails d scaffold"
   CLASS_NAME = "Tag"
   COMMAND_OPTIONS = "--skip-migration --force"
-  #COMMAND_OPTIONS = ""
+  # COMMAND_OPTIONS = ""
 
   FIELDS = %w[name:string]
 

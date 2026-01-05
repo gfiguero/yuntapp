@@ -1,7 +1,7 @@
 class TagsController < ApplicationController
   include Pagy::Method
 
-  before_action :set_tag, only: %i[ show edit update delete destroy ]
+  before_action :set_tag, only: %i[show edit update delete destroy]
   before_action :set_tags, only: :index
   before_action :disabled_pagination
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -78,7 +78,7 @@ class TagsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def tag_params
-    params.expect(tag: [ :name ])
+    params.expect(tag: [:name])
   end
 
   def set_tags

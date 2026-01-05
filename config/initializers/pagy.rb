@@ -13,7 +13,6 @@ Pagy.options[:client_max_limit] = 100   # The client can request a limit up to 1
 Pagy.options[:max_pages] = 200          # Allow only 200 pages
 Pagy.options[:jsonapi] = true           # Use JSON:API compliant URLs
 
-
 ############ JavaScript ####################################################################
 # See https://ddnexus.github.io/pagy/resources/javascript/ for details.
 # Examples for Rails:
@@ -24,7 +23,6 @@ Pagy.options[:jsonapi] = true           # Use JSON:API compliant URLs
 # javascript_dir = Rails.root.join('app/javascript')
 # Pagy.sync_javascript(javascript_dir, 'pagy.mjs') if Rails.env.development?
 
-
 ############# Overriding Pagy::I18n Lookup #################################################
 # Refer to https://ddnexus.github.io/pagy/resources/i18n/ for details.
 # Override the I18n lookup by dropping your custom dictionary in some pagy dir.
@@ -32,12 +30,10 @@ Pagy.options[:jsonapi] = true           # Use JSON:API compliant URLs
 #
 # Pagy::I18n.pathnames << Rails.root.join('config/locales/pagy')
 
-
 ############# I18n Gem Translation #########################################################
 # See https://ddnexus.github.io/pagy/resources/i18n/ for details.
 #
 # Pagy.translate_with_the_slower_i18n_gem!
-
 
 ############# Calendar Localization for non-en locales ####################################
 # See https://ddnexus.github.io/pagy/toolbox/paginators/calendar#localization for details.

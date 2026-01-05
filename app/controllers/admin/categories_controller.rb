@@ -2,7 +2,7 @@ module Admin
   class CategoriesController < ApplicationController
     include Pagy::Method
 
-    before_action :set_category, only: %i[ show edit update delete destroy ]
+    before_action :set_category, only: %i[show edit update delete destroy]
     before_action :set_categories, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }

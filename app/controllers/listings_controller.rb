@@ -1,7 +1,7 @@
 class ListingsController < ApplicationController
   include Pagy::Method
 
-  before_action :set_listing, only: %i[ show edit update delete destroy ]
+  before_action :set_listing, only: %i[show edit update delete destroy]
   before_action :set_listings, only: :index
   before_action :disabled_pagination
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -78,7 +78,7 @@ class ListingsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def listing_params
-    params.expect(listing: [ :name, :price, :description, :active, :user_id, :category_id ])
+    params.expect(listing: [:name, :price, :description, :active, :user_id, :category_id])
   end
 
   def set_listings
