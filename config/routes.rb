@@ -7,6 +7,14 @@ Rails.application.routes.draw do
       get :delete
     end
   end
+  resources :neighborhood_associations do
+    collection do
+      get :search
+    end
+    member do
+      get :delete
+    end
+  end
   resources :tags do
     collection do
       get :search
@@ -45,6 +53,14 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index"
     resources :categories do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :neighborhood_associations do
       collection do
         get :search
       end
