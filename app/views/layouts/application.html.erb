@@ -47,16 +47,17 @@
         <div class="navbar-center hidden lg:flex">
           <ul class="menu menu-horizontal px-1">
             <li><%= link_to "Inicio", root_path %></li>
-            <% if current_user&.admin? %>
-              <li><%= link_to "Panel Admin", admin_root_path, class: "text-primary font-bold" %></li>
-            <% end %>
             <li><%= link_to "Categorías", categories_path %></li>
             <li><%= link_to "Etiquetas", tags_path %></li>
             <li><%= link_to "Publicaciones", listings_path %></li>
             <li><%= link_to "Contacto", contact_path %></li>
           </ul>
         </div>
-        <div class="navbar-end">
+        <div class="navbar-end gap-2">
+          <% if current_user&.admin? %>
+            <%= link_to "Panel Admin", admin_root_path, class: "btn btn-soft btn-primary" %>
+          <% end %>
+
           <% if user_signed_in? %>
             <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "btn btn-ghost" %>
           <% else %>
