@@ -3,6 +3,7 @@ es:
     title:
       listings: Publicaciones
       categories: Categorías
+      neighborhood_associations: Juntas de Vecinos
       tags: Etiquetas
       users: Usuarios
     headers:
@@ -11,10 +12,12 @@ es:
     identifier:
       listing: "Publicación ID: %{id}"
       category: "Categoría ID: %{id}"
+      neighborhood_association: "Junta de Vecinos ID: %{id}"
       tag: "Etiqueta ID: %{id}"
       user: "Usuario ID: %{id}"
     count:
       listings: "%{count} publicaciones"
+      neighborhood_associations: "%{count} juntas de vecinos"
 
   actions:
     index: Listar
@@ -47,6 +50,9 @@ es:
     category:
       id: ID
       name: Nombre
+    neighborhood_association:
+      id: ID
+      name: Nombre
     tag:
       id: ID
       name: Nombre
@@ -62,6 +68,12 @@ es:
       created: Categoría creada exitosamente.
       updated: Categoría actualizada exitosamente.
       destroyed: Categoría eliminada exitosamente.
+
+  neighborhood_association:
+    message:
+      created: Junta de Vecinos creada exitosamente.
+      updated: Junta de Vecinos actualizada exitosamente.
+      destroyed: Junta de Vecinos eliminada exitosamente.
 
   tag:
     message:
