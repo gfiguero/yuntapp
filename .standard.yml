@@ -1,0 +1,7 @@
+fix: true
+format: "progress"
+ignore:
+  - 'config/**/*'
+  - 'bin/**/*'
+  - 'node_modules/**/*'
+  - 'vendor/**/*'
