@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_04_135225) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_05_021233) do
   create_table "categories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -28,6 +28,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_04_135225) do
     t.integer "user_id", null: false
     t.index ["category_id"], name: "index_listings_on_category_id"
     t.index ["user_id"], name: "index_listings_on_user_id"
+  end
+
+  create_table "neighborhood_associations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
   end
 
   create_table "tags", force: :cascade do |t|
