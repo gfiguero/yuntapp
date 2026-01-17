@@ -13,11 +13,17 @@ es:
       listing: "Publicación ID: %{id}"
       category: "Categoría ID: %{id}"
       neighborhood_association: "Junta de Vecinos ID: %{id}"
+      neighborhood_delegation: "Delegación Vecinal ID: %{id}"
+      household_unit: "Domicilio ID: %{id}"
+      member: "Socio ID: %{id}"
       tag: "Etiqueta ID: %{id}"
       user: "Usuario ID: %{id}"
     count:
       listings: "%{count} publicaciones"
       neighborhood_associations: "%{count} juntas de vecinos"
+      neighborhood_delegations: "%{count} delegaciones vecinales"
+      household_units: "%{count} domicilios"
+      members: "%{count} socios"
 
   actions:
     index: Listar
@@ -53,6 +59,11 @@ es:
     neighborhood_association:
       id: ID
       name: Nombre
+      commune: Comuna
+    neighborhood_delegation:
+      id: ID
+      name: Nombre (Calle)
+      neighborhood_association: Junta de Vecinos
     tag:
       id: ID
       name: Nombre
@@ -62,6 +73,29 @@ es:
       price: Precio
       description: Descripción
       active: Activo
+    household_unit:
+      id: ID
+      number: Numeración
+      neighborhood_delegation: Delegación Vecinal (Calle)
+      address_line_1: Dirección 1
+      address_line_2: Dirección 2
+      city: Ciudad
+      region: Región
+      country: País
+      postal_code: Código Postal
+      commune: Comuna
+    country:
+      id: ID
+      name: Nombre
+      iso_code: Código ISO
+    region:
+      id: ID
+      name: Nombre
+      country: País
+    commune:
+      id: ID
+      name: Nombre
+      region: Región
 
   category:
     message:
@@ -74,6 +108,24 @@ es:
       created: Junta de Vecinos creada exitosamente.
       updated: Junta de Vecinos actualizada exitosamente.
       destroyed: Junta de Vecinos eliminada exitosamente.
+
+  neighborhood_delegation:
+    message:
+      created: Delegación Vecinal creada exitosamente.
+      updated: Delegación Vecinal actualizada exitosamente.
+      destroyed: Delegación Vecinal eliminada exitosamente.
+
+  household_unit:
+    message:
+      created: Domicilio creado exitosamente.
+      updated: Domicilio actualizado exitosamente.
+      destroyed: Domicilio eliminado exitosamente.
+
+  member:
+    message:
+      created: Socio creado exitosamente.
+      updated: Socio actualizado exitosamente.
+      destroyed: Socio eliminado exitosamente.
 
   tag:
     message:

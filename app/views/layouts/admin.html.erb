@@ -46,8 +46,17 @@
           <li><%= link_to "Usuarios", admin_users_path, class: ("active" if controller_name == "users") %></li>
           <li><%= link_to "Categorías", admin_categories_path, class: ("active" if controller_name == "categories") %></li>
           <li><%= link_to "Juntas de Vecinos", admin_neighborhood_associations_path, class: ("active" if controller_name == "neighborhood_associations") %></li>
+          <li><%= link_to "Delegaciones Vecinales", admin_neighborhood_delegations_path, class: ("active" if controller_name == "neighborhood_delegations") %></li>
+          <li><%= link_to "Domicilios", admin_household_units_path, class: ("active" if controller_name == "household_units") %></li>
+          <li><%= link_to "Socios", admin_members_path, class: ("active" if controller_name == "members") %></li>
           <li><%= link_to "Etiquetas", admin_tags_path, class: ("active" if controller_name == "tags") %></li>
           <li><%= link_to "Publicaciones", admin_listings_path, class: ("active" if controller_name == "listings") %></li>
+
+          <li class="menu-title mt-4">Geografía</li>
+          <li><%= link_to "Países", admin_countries_path, class: ("active" if controller_name == "countries") %></li>
+          <li><%= link_to "Regiones", admin_regions_path, class: ("active" if controller_name == "regions") %></li>
+          <li><%= link_to "Comunas", admin_communes_path, class: ("active" if controller_name == "communes") %></li>
+
           <li class="menu-title mt-4">Sistema</li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
         </ul>

@@ -59,6 +59,7 @@
           <% end %>
 
           <% if user_signed_in? %>
+            <%= link_to "Mi Panel", panel_root_path, class: "btn btn-soft btn-secondary" %>
             <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "btn btn-ghost" %>
           <% else %>
             <%= link_to "Login", new_user_session_path, class: "btn btn-ghost" %>

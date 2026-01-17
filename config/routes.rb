@@ -50,6 +50,18 @@ Rails.application.routes.draw do
   root "home#index"
   get "contact", to: "home#contact"
 
+  namespace :panel do
+    root to: "dashboard#index"
+    resources :listings do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+  end
+
   namespace :admin do
     root to: "dashboard#index"
     resources :categories do
@@ -61,6 +73,54 @@ Rails.application.routes.draw do
       end
     end
     resources :neighborhood_associations do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :neighborhood_delegations do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :countries do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :regions do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :communes do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :household_units do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :members do
       collection do
         get :search
       end

@@ -1,4 +1,16 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+<%
+factions = [
+  "Raynor's Raiders", "Dominion Guard", "Zerg Swarm", "Protoss Conclave", "Kel-Morian Combine",
+  "Umojan Protectorate", "Taldarim Death Fleet", "Nerazim Shadow Guard", "Purifiers", "Primal Zerg Pack",
+  "Golden Armada", "Sons of Korhal", "UED Expeditionary Fleet", "Daelaam Hierarchy", "Moebius Foundation",
+  "Mira's Marauders", "Alpha Squadron", "Omega Squadron", "Nova's Covert Ops", "Tosh's Pirates",
+  "Warfield's Battlegroup", "Horner's Command", "Valerian's Foundation", "Arcturus's Elite", "Kerrigan's Brood",
+  "Zagara's Swarm", "Abathur's Evolution Pit", "Dehaka's Pack", "Stukov's Infested", "Artanis's Zealots"
+]
+%>
 
-manios_de_buin:
-  name: Mañíos de Buin
+<% factions.each_with_index do |name, index| %>
+association_<%= index %>:
+  name: <%= name %>
+  commune: commune_0_0_<%= index % 10 %>
+<% end %>
