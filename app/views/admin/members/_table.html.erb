@@ -1,0 +1,19 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('admin_members_path', I18n.t('attributes.member.name'), 'name') %></th>
+        <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @members.each.with_index do |member| %>
+      <%= render partial: "member_row", locals: { member: member } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

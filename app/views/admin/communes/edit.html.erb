@@ -1,0 +1,16 @@
+<% content_for :title do %>
+  <%= I18n.t('views.title.communes') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('views.title.communes'), admin_communes_path %></li>
+  <li><%= link_to @commune.id, admin_commune_path(@commune) %></li>
+  <li><%= I18n.t('actions.edit') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.communes') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.commune', id: @commune.id) %></h3>
+  <%= render "buttons" %>
+  <%= render "form", commune: @commune %>
+</div>

@@ -1,0 +1,15 @@
+<%
+sectors = [
+  { name: "Koprulu Sector", iso: "KOP" },
+  { name: "Earth Directorate", iso: "UED" },
+  { name: "Aiur System", iso: "AIR" },
+  { name: "Char System", iso: "CHR" },
+  { name: "Shakuras System", iso: "SHK" }
+]
+%>
+
+<% sectors.each_with_index do |sector, index| %>
+country_<%= index %>:
+  name: <%= sector[:name] %>
+  iso_code: <%= sector[:iso] %>
+<% end %>

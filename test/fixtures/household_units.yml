@@ -1,0 +1,22 @@
+<%
+housing_types = ["Barracks", "Supply Depot", "Hatchery", "Spawning Pool", "Pylon", "Gateway", "Command Center", "Nexus", "Lair"]
+planets = ["Korhal", "Mar Sara", "Char", "Shakuras", "Aiur", "Tarsonis", "Braxis", "Antiga Prime"]
+regions = ["Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5"]
+%>
+
+<% 30.times do |assoc_index| %>
+  <% 15.times do |unit_index| %>
+    <% 20.times do |house_index| %>
+household_unit_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
+  number: "<%= housing_types.sample %> #<%= house_index + 1 %>-<%= (65 + rand(26)).chr %>"
+  neighborhood_delegation: neighborhood_delegation_<%= assoc_index %>_<%= unit_index %>
+  address_line_1: "<%= rand(100..999) %> <%= ['Main St', 'Minerals Rd', 'Vespene Ave', 'Zergling Way'].sample %>"
+  address_line_2: "Apt <%= rand(1..100) %>"
+  city: "<%= planets.sample %> City"
+  region: "<%= regions.sample %>"
+  country: "Koprulu Sector"
+  postal_code: "<%= rand(10000..99999) %>"
+  commune: commune_0_0_<%= rand(0..9) %>
+    <% end %>
+  <% end %>
+<% end %>

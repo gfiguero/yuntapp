@@ -1,0 +1,20 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('admin_household_units_path', I18n.t('attributes.household_unit.number'), 'number') %></th>
+        <th><%= sort_link('admin_household_units_path', I18n.t('attributes.household_unit.neighborhood_delegation'), 'neighborhood_delegation_id') %></th>
+        <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @household_units.each.with_index do |household_unit| %>
+      <%= render partial: "household_unit_row", locals: { household_unit: household_unit } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

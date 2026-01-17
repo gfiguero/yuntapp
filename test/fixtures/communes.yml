@@ -1,0 +1,16 @@
+<%
+communes_data = [
+  "City Center", "Outskirts", "Industrial Zone", "Mining Facility", "Spaceport",
+  "Research Lab", "Command Hub", "Bunker Complex", "Supply Depot", "Refinery"
+]
+%>
+
+<% 5.times do |country_index| %>
+  <% 5.times do |region_index| %>
+    <% communes_data.each_with_index do |commune_name, commune_index| %>
+commune_<%= country_index %>_<%= region_index %>_<%= commune_index %>:
+  name: <%= commune_name %> <%= commune_index + 1 %>
+  region: region_<%= country_index %>_<%= region_index %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -1,0 +1,16 @@
+<div id="<%= dom_id neighborhood_delegation %>">
+  <dl class="mb-4 divide-y divide-gray-400 w-1/3">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.neighborhood_delegation.id') %></dt>
+      <dd><%= neighborhood_delegation.id %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.neighborhood_delegation.name') %></dt>
+      <dd><%= neighborhood_delegation.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.neighborhood_delegation.neighborhood_association') %></dt>
+      <dd><%= neighborhood_delegation.neighborhood_association.name %></dd>
+    </div>
+  </dl>
+</div>

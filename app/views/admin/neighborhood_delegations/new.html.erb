@@ -1,0 +1,15 @@
+<% content_for :title do %>
+  <%= I18n.t('views.title.neighborhood_delegations') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('views.title.neighborhood_delegations'), admin_neighborhood_delegations_path %></li>
+  <li><%= I18n.t('actions.new') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.neighborhood_delegations') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.headers.new') %></h3>
+  <%= render "buttons" %>
+  <%= render "form", neighborhood_delegation: @neighborhood_delegation %>
+</div>

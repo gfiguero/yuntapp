@@ -1,0 +1,11 @@
+<%
+street_types = ["Sector", "District", "Platform", "Hive Cluster", "Warp Node", "Bunker Line", "Creep Colony"]
+%>
+
+<% 30.times do |assoc_index| %>
+  <% 15.times do |unit_index| %>
+neighborhood_delegation_<%= assoc_index %>_<%= unit_index %>:
+  name: "<%= street_types.sample %> <%= (unit_index + 65).chr %>-<%= rand(100..999) %>"
+  neighborhood_association: association_<%= assoc_index %>
+  <% end %>
+<% end %>

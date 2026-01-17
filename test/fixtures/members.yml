@@ -1,0 +1,19 @@
+<%
+first_names = ["Jim", "Sarah", "Arcturus", "Valerian", "Matt", "Rory", "Tychus", "Gabriel", "Ariel", "Egon", "Zeratul", "Artanis", "Selendis", "Vorazun", "Alarak", "Kerrigan", "Zagara", "Dehaka", "Abathur", "Stukov"]
+last_names = ["Raynor", "Kerrigan", "Mengsk", "Horner", "Swann", "Findlay", "Tosh", "Hanson", "Stetmann", "Tassadar", "Fenix", "Raszagal", "Narud", "Duran", "Duke", "Warfield", "Davis", "Vermillion", "Liberty", "Vern"]
+%>
+
+<% 30.times do |assoc_index| %>
+  <% 15.times do |unit_index| %>
+    <% 20.times do |house_index| %>
+      <%# Generate 1 member per household for now to keep it reasonable %>
+member_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
+  first_name: <%= first_names.sample %>
+  last_name: <%= last_names.sample %>
+  run: "<%= rand(1_000_000..25_000_000) %>-<%= ['0','1','2','3','4','5','6','7','8','9','K'].sample %>"
+  phone: "+569<%= rand(10000000..99999999) %>"
+  email: "member_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>@koprulu.sector"
+  household_unit: household_unit_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>
+    <% end %>
+  <% end %>
+<% end %>

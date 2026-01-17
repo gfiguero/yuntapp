@@ -1,0 +1,22 @@
+<%
+regions_data = [
+  # Koprulu Sector
+  ["Mar Sara", "Tarsonis", "Korhal", "Antiga Prime", "Chau Sara"],
+  # Earth Directorate
+  ["Earth", "Luna", "Mars", "Titan", "Ganymede"],
+  # Aiur System
+  ["Antioch", "Scion", "Shelak", "Judicator", "Templar"],
+  # Char System
+  ["Primary Hive", "Ash World", "Lava Fields", "Volcanic Ridge", "Spire Cluster"],
+  # Shakuras System
+  ["Talematros", "New Antioch", "Xel'Naga Temple", "Dark Shrine", "Shadow Lands"]
+]
+%>
+
+<% regions_data.each_with_index do |regions, country_index| %>
+  <% regions.each_with_index do |region_name, region_index| %>
+region_<%= country_index %>_<%= region_index %>:
+  name: <%= region_name %>
+  country: country_<%= country_index %>
+  <% end %>
+<% end %>
