@@ -2,12 +2,12 @@
 service: yuntapp
 
 # Name of the container image (use your-user/app-name on external registries).
-image: yuntapp
+image: <%= ENV.fetch("KAMAL_REGISTRY_IMAGE", "garrifigueroa/yuntapp") %>
 
 # Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
+    - <%= ENV.fetch("SERVER_IP", "192.168.0.1") %>
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -27,14 +27,14 @@ servers:
 # Where you keep your container images.
 registry:
   # Alternatives: hub.docker.com / registry.digitalocean.com / ghcr.io / ...
-  server: localhost:5555
+  server: <%= ENV.fetch("KAMAL_REGISTRY_SERVER", "registry.digitalocean.com") %>
 
   # Needed for authenticated registries.
-  # username: your-user
+  username: <%= ENV.fetch("KAMAL_REGISTRY_USERNAME", "garrifigueroa") %>
 
   # Always use an access token rather than real password when possible.
-  # password:
-  #   - KAMAL_REGISTRY_PASSWORD
+  password:
+    - KAMAL_REGISTRY_PASSWORD
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
@@ -86,7 +86,7 @@ builder:
   #
   # # Pass arguments and secrets to the Docker build process
   # args:
-  #   RUBY_VERSION: 3.4.7
+  #   RUBY_VERSION: 3.4.8
   # secrets:
   #   - GITHUB_TOKEN
   #   - RAILS_MASTER_KEY
