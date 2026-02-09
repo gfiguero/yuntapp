@@ -1,0 +1,15 @@
+<% content_for :title do %>
+  <%= I18n.t('views.title.board_members') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= I18n.t('views.title.board_members') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.board_members') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.count.board_members', count: @pagy.count) %></h3>
+  <%= render "buttons" %>
+  <%= render "table" %>
+  <%= render "filter" %>
+</div>

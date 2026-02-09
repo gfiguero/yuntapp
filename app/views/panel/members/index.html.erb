@@ -1,0 +1,42 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.household_members') %></h1>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('new') + I18n.t('actions.new')), new_panel_member_path, class: "btn btn-soft btn-primary" %>
+  </div>
+
+  <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+    <table class="table">
+      <thead>
+        <tr>
+          <th><%= I18n.t('attributes.member.name') %></th>
+          <th><%= I18n.t('attributes.member.run') %></th>
+          <th><%= I18n.t('attributes.member.status') %></th>
+          <th class="w-20"><%= I18n.t('views.headers.actions') %></th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @members.each do |member| %>
+        <tr class="hover:bg-base-300">
+          <td><%= member.name %></td>
+          <td><%= member.run %></td>
+          <td>
+            <% if member.pending? %>
+              <span class="badge badge-warning badge-sm"><%= I18n.t('member.statuses.pending') %></span>
+            <% elsif member.approved? %>
+              <span class="badge badge-success badge-sm"><%= I18n.t('member.statuses.approved') %></span>
+            <% elsif member.rejected? %>
+              <span class="badge badge-error badge-sm"><%= I18n.t('member.statuses.rejected') %></span>
+            <% end %>
+          </td>
+          <td>
+            <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
+              <%= link_to icon('show'), panel_member_path(member), class: "btn btn-sm btn-soft btn-info" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

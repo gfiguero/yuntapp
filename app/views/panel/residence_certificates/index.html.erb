@@ -1,0 +1,46 @@
+<% content_for :title do %>
+  <%= I18n.t('views.title.residence_certificates') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= I18n.t('views.title.residence_certificates') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.residence_certificates') %></h1>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('new') + I18n.t('actions.new')), new_panel_residence_certificate_path, class: "btn btn-soft btn-primary" %>
+  </div>
+
+  <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+    <table class="table">
+      <thead>
+        <tr>
+          <th><%= I18n.t('attributes.residence_certificate.folio') %></th>
+          <th><%= I18n.t('attributes.residence_certificate.member') %></th>
+          <th><%= I18n.t('attributes.residence_certificate.status') %></th>
+          <th><%= I18n.t('attributes.residence_certificate.purpose') %></th>
+          <th><%= I18n.t('attributes.residence_certificate.created_at') %></th>
+          <th class="w-20"><%= I18n.t('views.headers.actions') %></th>
+        </tr>
+      </thead>
+      <tbody>
+      <% @residence_certificates.each do |certificate| %>
+        <tr class="hover:bg-base-300">
+          <td><%= certificate.folio || "—" %></td>
+          <td><%= certificate.member.name %></td>
+          <td><%= I18n.t("residence_certificate.statuses.#{certificate.status}") %></td>
+          <td><%= truncate(certificate.purpose, length: 50) %></td>
+          <td><%= certificate.created_at.strftime("%d/%m/%Y") %></td>
+          <td>
+            <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
+              <%= link_to icon('show'), panel_residence_certificate_path(certificate), class: "btn btn-sm btn-soft btn-info" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

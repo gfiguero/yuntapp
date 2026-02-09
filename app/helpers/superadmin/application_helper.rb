@@ -1,0 +1,2 @@
+module Superadmin::ApplicationHelper
+end

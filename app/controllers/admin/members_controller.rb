@@ -2,7 +2,7 @@ module Admin
   class MembersController < ApplicationController
     include Pagy::Method
 
-    before_action :set_member, only: %i[show edit update delete destroy]
+    before_action :set_member, only: %i[show edit update delete destroy approve reject]
     before_action :set_members, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -70,11 +70,28 @@ module Admin
       redirect_to admin_members_path, notice: I18n.t("member.message.destroyed"), status: :see_other, format: :html
     end
 
+    # PATCH /admin/members/1/approve
+    def approve
+      @member.update!(
+        status: "approved",
+        approved_by: current_user,
+        approved_at: Time.current,
+        household_admin: @member.user.present? && @member.household_unit.household_admin.nil?
+      )
+      redirect_to admin_member_path(@member), notice: I18n.t("member.message.approved"), status: :see_other
+    end
+
+    # PATCH /admin/members/1/reject
+    def reject
+      @member.update!(status: "rejected", approved_by: current_user, rejection_reason: params[:rejection_reason])
+      redirect_to admin_member_path(@member), notice: I18n.t("member.message.rejected"), status: :see_other
+    end
+
     private
 
     # Use callbacks to share common setup or constraints between actions.
     def set_member
-      @member = Member.find(params[:id])
+      @member = current_neighborhood_association.members.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
@@ -83,7 +100,7 @@ module Admin
     end
 
     def set_members
-      @members = Member.all
+      @members = current_neighborhood_association.members
       @members = @members.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
       filter_params.each { |attribute, value| @members = @members.send(filter_scope(attribute), value) } if filter_params.present?
     end
@@ -93,11 +110,11 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :first_name, :last_name, :run).reject { |key, value| value.blank? }
+      params.permit(:id, :first_name, :last_name, :run, :status).reject { |key, value| value.blank? }
     end
 
     def disabled_pagination
-      render json: Member.all if params[:items] == "all"
+      render json: current_neighborhood_association.members if params[:items] == "all"
     end
   end
 end

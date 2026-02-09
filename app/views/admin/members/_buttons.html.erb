@@ -28,4 +28,9 @@
     <%= button_to raw(icon('delete') + I18n.t('actions.confirm')), [:admin, @member], class: "btn btn-soft btn-error", method: :delete %>
   <% end %>
 
+  <% if %w[ show ].include?(action_name) && @member.pending? %>
+    <%= button_to I18n.t('member.actions.approve'), approve_admin_member_path(@member), class: "btn btn-soft btn-success", method: :patch %>
+    <%= button_to I18n.t('member.actions.reject'), reject_admin_member_path(@member), class: "btn btn-soft btn-error", method: :patch %>
+  <% end %>
+
 </div>

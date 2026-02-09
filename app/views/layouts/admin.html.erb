@@ -27,6 +27,14 @@
         </div>
 
         <main class="container mx-auto mt-2 mb-5 px-5 flex flex-col w-full">
+            <% if session[:impersonated_neighborhood_association_id] %>
+              <div class="alert alert-warning mb-4">
+                <%= icon("users", class: "w-6 h-6") %>
+                <span>Estás administrando la junta: <strong><%= current_neighborhood_association.name %></strong></span>
+                <%= button_to "Dejar de administrar", admin_stop_impersonating_path, class: "btn btn-sm btn-ghost" %>
+              </div>
+            <% end %>
+
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-2xl font-bold">Administración</h1>
                 <%= link_to "Volver a la App", root_path, class: "btn btn-sm btn-outline" %>
@@ -43,19 +51,20 @@
           <li><%= link_to "Dashboard", admin_root_path, class: ("active" if current_page?(admin_root_path)) %></li>
 
           <li class="menu-title mt-4">Entidades</li>
-          <li><%= link_to "Usuarios", admin_users_path, class: ("active" if controller_name == "users") %></li>
-          <li><%= link_to "Categorías", admin_categories_path, class: ("active" if controller_name == "categories") %></li>
-          <li><%= link_to "Juntas de Vecinos", admin_neighborhood_associations_path, class: ("active" if controller_name == "neighborhood_associations") %></li>
           <li><%= link_to "Delegaciones Vecinales", admin_neighborhood_delegations_path, class: ("active" if controller_name == "neighborhood_delegations") %></li>
           <li><%= link_to "Domicilios", admin_household_units_path, class: ("active" if controller_name == "household_units") %></li>
-          <li><%= link_to "Socios", admin_members_path, class: ("active" if controller_name == "members") %></li>
-          <li><%= link_to "Etiquetas", admin_tags_path, class: ("active" if controller_name == "tags") %></li>
+          <li>
+            <%= link_to admin_members_path, class: ("active" if controller_name == "members") do %>
+              Socios
+              <% pending = current_neighborhood_association.members.where(status: "pending").count %>
+              <% if pending > 0 %>
+                <span class="badge badge-warning badge-sm"><%= pending %></span>
+              <% end %>
+            <% end %>
+          </li>
+          <li><%= link_to "Directiva", admin_board_members_path, class: ("active" if controller_name == "board_members") %></li>
+          <li><%= link_to "Certificados", admin_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
           <li><%= link_to "Publicaciones", admin_listings_path, class: ("active" if controller_name == "listings") %></li>
-
-          <li class="menu-title mt-4">Geografía</li>
-          <li><%= link_to "Países", admin_countries_path, class: ("active" if controller_name == "countries") %></li>
-          <li><%= link_to "Regiones", admin_regions_path, class: ("active" if controller_name == "regions") %></li>
-          <li><%= link_to "Comunas", admin_communes_path, class: ("active" if controller_name == "communes") %></li>
 
           <li class="menu-title mt-4">Sistema</li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>

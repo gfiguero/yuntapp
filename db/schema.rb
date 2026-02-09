@@ -10,7 +10,48 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_16_033526) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_09_142133) do
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "board_members", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.date "end_date"
+    t.integer "member_id", null: false
+    t.integer "neighborhood_association_id", null: false
+    t.string "position", null: false
+    t.date "start_date"
+    t.datetime "updated_at", null: false
+    t.index ["member_id"], name: "index_board_members_on_member_id"
+    t.index ["neighborhood_association_id"], name: "index_board_members_on_neighborhood_association_id"
+  end
+
   create_table "categories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -62,15 +103,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_033526) do
   end
 
   create_table "members", force: :cascade do |t|
+    t.datetime "approved_at"
+    t.integer "approved_by_id"
     t.datetime "created_at", null: false
     t.string "email"
     t.string "first_name"
+    t.boolean "household_admin", default: false
     t.integer "household_unit_id", null: false
     t.string "last_name"
     t.string "phone"
+    t.text "rejection_reason"
+    t.integer "requested_by_id"
     t.string "run"
+    t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["approved_by_id"], name: "index_members_on_approved_by_id"
     t.index ["household_unit_id"], name: "index_members_on_household_unit_id"
+    t.index ["requested_by_id"], name: "index_members_on_requested_by_id"
+    t.index ["status"], name: "index_members_on_status"
+    t.index ["user_id"], name: "index_members_on_user_id"
   end
 
   create_table "neighborhood_associations", force: :cascade do |t|
@@ -97,6 +149,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_033526) do
     t.index ["country_id"], name: "index_regions_on_country_id"
   end
 
+  create_table "residence_certificates", force: :cascade do |t|
+    t.integer "approved_by_id"
+    t.datetime "created_at", null: false
+    t.date "expiration_date"
+    t.string "folio"
+    t.integer "household_unit_id", null: false
+    t.date "issue_date"
+    t.integer "member_id", null: false
+    t.integer "neighborhood_association_id", null: false
+    t.text "notes"
+    t.text "purpose"
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_id"], name: "index_residence_certificates_on_approved_by_id"
+    t.index ["household_unit_id"], name: "index_residence_certificates_on_household_unit_id"
+    t.index ["member_id"], name: "index_residence_certificates_on_member_id"
+    t.index ["neighborhood_association_id", "folio"], name: "index_residence_certificates_on_association_and_folio", unique: true
+    t.index ["neighborhood_association_id"], name: "index_residence_certificates_on_neighborhood_association_id"
+  end
+
   create_table "tags", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -109,22 +181,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_16_033526) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "first_name"
+    t.integer "household_unit_id"
     t.string "last_name"
+    t.integer "neighborhood_association_id"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.boolean "superadmin", default: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["household_unit_id"], name: "index_users_on_household_unit_id"
+    t.index ["neighborhood_association_id"], name: "index_users_on_neighborhood_association_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "board_members", "members"
+  add_foreign_key "board_members", "neighborhood_associations"
   add_foreign_key "communes", "regions"
   add_foreign_key "household_units", "communes"
   add_foreign_key "household_units", "neighborhood_delegations"
   add_foreign_key "listings", "categories"
   add_foreign_key "listings", "users"
   add_foreign_key "members", "household_units"
+  add_foreign_key "members", "users"
+  add_foreign_key "members", "users", column: "approved_by_id"
+  add_foreign_key "members", "users", column: "requested_by_id"
   add_foreign_key "neighborhood_associations", "communes"
   add_foreign_key "neighborhood_delegations", "neighborhood_associations"
   add_foreign_key "regions", "countries"
+  add_foreign_key "residence_certificates", "household_units"
+  add_foreign_key "residence_certificates", "members"
+  add_foreign_key "residence_certificates", "neighborhood_associations"
+  add_foreign_key "residence_certificates", "users", column: "approved_by_id"
+  add_foreign_key "users", "household_units"
+  add_foreign_key "users", "neighborhood_associations"
 end

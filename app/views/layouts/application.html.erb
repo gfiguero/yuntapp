@@ -33,6 +33,9 @@
             </div>
             <ul tabindex="-1" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
               <li><%= link_to "Inicio", root_path %></li>
+              <% if current_user&.superadmin? %>
+                <li><%= link_to "Superadmin", superadmin_root_path, class: "text-error font-bold" %></li>
+              <% end %>
               <% if current_user&.admin? %>
                 <li><%= link_to "Panel Admin", admin_root_path, class: "text-primary font-bold" %></li>
               <% end %>
@@ -54,6 +57,10 @@
           </ul>
         </div>
         <div class="navbar-end gap-2">
+          <% if current_user&.superadmin? %>
+            <%= link_to "Superadmin", superadmin_root_path, class: "btn btn-soft btn-error" %>
+          <% end %>
+
           <% if current_user&.admin? %>
             <%= link_to "Panel Admin", admin_root_path, class: "btn btn-soft btn-primary" %>
           <% end %>

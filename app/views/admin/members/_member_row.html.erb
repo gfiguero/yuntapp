@@ -1,5 +1,15 @@
 <tr class="hover:bg-base-300">
   <td><%= member.name %></td>
+  <td><%= member.run %></td>
+  <td>
+    <% if member.pending? %>
+      <span class="badge badge-warning badge-sm"><%= I18n.t('member.statuses.pending') %></span>
+    <% elsif member.approved? %>
+      <span class="badge badge-success badge-sm"><%= I18n.t('member.statuses.approved') %></span>
+    <% elsif member.rejected? %>
+      <span class="badge badge-error badge-sm"><%= I18n.t('member.statuses.rejected') %></span>
+    <% end %>
+  </td>
   <td>
     <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
       <%= link_to icon('show'), [:admin, member], class: "btn btn-sm btn-soft btn-info" %>

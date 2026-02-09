@@ -1,0 +1,79 @@
+<% content_for :title do %>
+  <%= I18n.t('views.title.neighborhood_associations') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('views.title.neighborhood_associations'), superadmin_neighborhood_associations_path %></li>
+  <li><%= @neighborhood_association.id %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.neighborhood_associations') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.neighborhood_association', id: @neighborhood_association.id) %></h3>
+  <%= render "buttons" %>
+  
+  <div class="flex gap-8 mb-8">
+    <%= render @neighborhood_association %>
+
+    <div class="grid grid-cols-3 divide-x divide-base-content/10 bg-base-100 rounded-box shadow border border-base-content/5 h-fit w-1/2">
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('views.count.neighborhood_delegations', count: 0).split.last.capitalize %></div>
+          <div class="text-2xl font-extrabold text-primary"><%= @neighborhood_association.neighborhood_delegations.count %></div>
+          <div class="text-xs opacity-60 mt-1">Delegaciones asignadas</div>
+        </div>
+        <div class="text-primary opacity-20">
+          <%= icon('map-pin', class: "w-8 h-8") %>
+        </div>
+      </div>
+
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('views.count.household_units', count: 0).split.last.capitalize %></div>
+          <div class="text-2xl font-extrabold text-secondary"><%= @neighborhood_association.household_units.count %></div>
+          <div class="text-xs opacity-60 mt-1">Total domicilios</div>
+        </div>
+        <div class="text-secondary opacity-20">
+          <%= icon('home', class: "w-8 h-8") %>
+        </div>
+      </div>
+
+      <div class="p-4 flex items-center justify-between">
+        <div>
+          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('views.count.members', count: 0).split.last.capitalize %></div>
+          <div class="text-2xl font-extrabold text-accent"><%= @neighborhood_association.members.count %></div>
+          <div class="text-xs opacity-60 mt-1">Socios registrados</div>
+        </div>
+        <div class="text-accent opacity-20">
+          <%= icon('users', class: "w-8 h-8") %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <h2 class="font-bold text-2xl mb-4"><%= I18n.t('views.title.neighborhood_delegations') %></h2>
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><%= I18n.t('attributes.neighborhood_delegation.name') %></th>
+            <th><%= I18n.t('attributes.neighborhood_delegation.neighborhood_association') %></th>
+            <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if @neighborhood_association.neighborhood_delegations.any? %>
+            <% @neighborhood_association.neighborhood_delegations.each do |delegation| %>
+              <%= render partial: "admin/neighborhood_delegations/neighborhood_delegation_row", locals: { neighborhood_delegation: delegation } %>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="3" class="text-center py-4 text-gray-500">No hay delegaciones registradas.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

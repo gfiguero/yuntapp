@@ -1,0 +1,2 @@
+module Panel::ProfileHelper
+end

@@ -1,0 +1,10 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.household_members') %></h1>
+  <h3 class="font-bold text-xl mb-4">Editar y reenviar solicitud</h3>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('back') + I18n.t('actions.back')), panel_member_path(@member), class: "btn btn-soft" %>
+  </div>
+
+  <%= render "form", member: @member %>
+</div>

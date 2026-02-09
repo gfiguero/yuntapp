@@ -74,16 +74,16 @@ module Admin
 
     # Use callbacks to share common setup or constraints between actions.
     def set_household_unit
-      @household_unit = HouseholdUnit.find(params[:id])
+      @household_unit = current_neighborhood_association.household_units.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def household_unit_params
-      params.require(:household_unit).permit(:number, :neighborhood_delegation_id, :address_line_1, :address_line_2, :city, :region, :country, :postal_code)
+      params.require(:household_unit).permit(:number, :neighborhood_delegation_id, :address_line_1, :address_line_2, :city, :region, :country, :postal_code, :commune_id)
     end
 
     def set_household_units
-      @household_units = HouseholdUnit.all
+      @household_units = current_neighborhood_association.household_units
       @household_units = @household_units.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
       filter_params.each { |attribute, value| @household_units = @household_units.send(filter_scope(attribute), value) } if filter_params.present?
     end
@@ -97,7 +97,7 @@ module Admin
     end
 
     def disabled_pagination
-      render json: HouseholdUnit.all if params[:items] == "all"
+      render json: current_neighborhood_association.household_units if params[:items] == "all"
     end
   end
 end

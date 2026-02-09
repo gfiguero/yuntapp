@@ -1,0 +1,21 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('admin_board_members_path', I18n.t('attributes.board_member.member'), 'member_id') %></th>
+        <th><%= sort_link('admin_board_members_path', I18n.t('attributes.board_member.position'), 'position') %></th>
+        <th><%= sort_link('admin_board_members_path', I18n.t('attributes.board_member.active'), 'active') %></th>
+        <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @board_members.each.with_index do |board_member| %>
+      <%= render partial: "board_member_row", locals: { board_member: board_member } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

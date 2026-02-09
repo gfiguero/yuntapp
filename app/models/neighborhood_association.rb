@@ -7,4 +7,7 @@ class NeighborhoodAssociation < ApplicationRecord
   has_many :neighborhood_delegations, dependent: :destroy
   has_many :household_units, through: :neighborhood_delegations
   has_many :members, through: :household_units
+  has_many :users
+  has_many :board_members, dependent: :destroy
+  has_many :residence_certificates, dependent: :destroy
 end

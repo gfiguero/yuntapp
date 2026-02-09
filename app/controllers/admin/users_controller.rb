@@ -74,16 +74,16 @@ module Admin
 
     # Use callbacks to share common setup or constraints between actions.
     def set_user
-      @user = User.find(params[:id])
+      @user = current_neighborhood_association.users.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :email, :admin, :password, :password_confirmation)
+      params.require(:user).permit(:first_name, :last_name, :email, :admin, :password, :password_confirmation).merge(neighborhood_association_id: current_neighborhood_association.id)
     end
 
     def set_users
-      @users = User.all
+      @users = current_neighborhood_association.users
       # Add simple sort if params present, similar to other controllers
       if params[:sort_column].present? && params[:sort_direction].present?
         @users = @users.order("#{params[:sort_column]} #{params[:sort_direction]}")
@@ -99,7 +99,7 @@ module Admin
     end
 
     def disabled_pagination
-      render json: User.all if params[:items] == "all"
+      render json: current_neighborhood_association.users if params[:items] == "all"
     end
   end
 end

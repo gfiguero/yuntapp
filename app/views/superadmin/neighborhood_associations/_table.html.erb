@@ -1,0 +1,19 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('superadmin_neighborhood_associations_path', I18n.t('attributes.neighborhood_association.name'), 'name') %></th>
+        <th><%= I18n.t('views.headers.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @neighborhood_associations.each.with_index do |neighborhood_association| %>
+      <%= render partial: "neighborhood_association_row", locals: { neighborhood_association: neighborhood_association } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

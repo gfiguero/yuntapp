@@ -1,0 +1,22 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('admin_residence_certificates_path', I18n.t('attributes.residence_certificate.folio'), 'folio') %></th>
+        <th><%= sort_link('admin_residence_certificates_path', I18n.t('attributes.residence_certificate.member'), 'member_id') %></th>
+        <th><%= sort_link('admin_residence_certificates_path', I18n.t('attributes.residence_certificate.status'), 'status') %></th>
+        <th><%= sort_link('admin_residence_certificates_path', I18n.t('attributes.residence_certificate.created_at'), 'created_at') %></th>
+        <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @residence_certificates.each.with_index do |residence_certificate| %>
+      <%= render partial: "residence_certificate_row", locals: { residence_certificate: residence_certificate } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

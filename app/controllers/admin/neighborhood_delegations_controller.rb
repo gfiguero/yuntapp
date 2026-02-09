@@ -74,16 +74,16 @@ module Admin
 
     # Use callbacks to share common setup or constraints between actions.
     def set_neighborhood_delegation
-      @neighborhood_delegation = NeighborhoodDelegation.find(params[:id])
+      @neighborhood_delegation = current_neighborhood_association.neighborhood_delegations.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.
     def neighborhood_delegation_params
-      params.require(:neighborhood_delegation).permit(:name, :neighborhood_association_id)
+      params.require(:neighborhood_delegation).permit(:name).merge(neighborhood_association_id: current_neighborhood_association.id)
     end
 
     def set_neighborhood_delegations
-      @neighborhood_delegations = NeighborhoodDelegation.all
+      @neighborhood_delegations = current_neighborhood_association.neighborhood_delegations
       @neighborhood_delegations = @neighborhood_delegations.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
       filter_params.each { |attribute, value| @neighborhood_delegations = @neighborhood_delegations.send(filter_scope(attribute), value) } if filter_params.present?
     end
@@ -97,7 +97,7 @@ module Admin
     end
 
     def disabled_pagination
-      render json: NeighborhoodDelegation.all if params[:items] == "all"
+      render json: current_neighborhood_association.neighborhood_delegations if params[:items] == "all"
     end
   end
 end

@@ -6,6 +6,10 @@ es:
       neighborhood_associations: Juntas de Vecinos
       tags: Etiquetas
       users: Usuarios
+      board_members: Directiva
+      residence_certificates: Certificados de Residencia
+      accreditation: Acreditación
+      household_members: Socios del Domicilio
     headers:
       actions: Acciones
       new: Nuevo Registro
@@ -18,12 +22,16 @@ es:
       member: "Socio ID: %{id}"
       tag: "Etiqueta ID: %{id}"
       user: "Usuario ID: %{id}"
+      board_member: "Directivo ID: %{id}"
+      residence_certificate: "Certificado ID: %{id}"
     count:
       listings: "%{count} publicaciones"
       neighborhood_associations: "%{count} juntas de vecinos"
       neighborhood_delegations: "%{count} delegaciones vecinales"
       household_units: "%{count} domicilios"
       members: "%{count} socios"
+      board_members: "%{count} directivos"
+      residence_certificates: "%{count} certificados"
 
   actions:
     index: Listar
@@ -84,6 +92,22 @@ es:
       country: País
       postal_code: Código Postal
       commune: Comuna
+    member:
+      id: ID
+      name: Nombre Completo
+      first_name: Nombre
+      last_name: Apellido
+      run: RUN
+      phone: Teléfono
+      email: Email
+      household_unit: Domicilio
+      status: Estado
+      household_admin: Administrador de Domicilio
+      requested_by: Solicitado Por
+      approved_by: Aprobado Por
+      approved_at: Fecha de Aprobación
+      rejection_reason: Motivo de Rechazo
+      documents: Documentos
     country:
       id: ID
       name: Nombre
@@ -96,6 +120,25 @@ es:
       id: ID
       name: Nombre
       region: Región
+    board_member:
+      id: ID
+      member: Socio
+      position: Cargo
+      start_date: Fecha Inicio
+      end_date: Fecha Término
+      active: Activo
+    residence_certificate:
+      id: ID
+      folio: Folio
+      status: Estado
+      member: Socio
+      household_unit: Domicilio
+      purpose: Motivo
+      notes: Notas
+      approved_by: Aprobado Por
+      issue_date: Fecha Emisión
+      expiration_date: Fecha Vencimiento
+      created_at: Fecha Solicitud
 
   category:
     message:
@@ -126,6 +169,20 @@ es:
       created: Socio creado exitosamente.
       updated: Socio actualizado exitosamente.
       destroyed: Socio eliminado exitosamente.
+      approved: Socio aprobado exitosamente.
+      rejected: Socio rechazado exitosamente.
+      requested: Solicitud de acreditación enviada exitosamente.
+      resubmitted: Solicitud de acreditación reenviada exitosamente.
+      linked: Tu cuenta ha sido vinculada exitosamente a tu registro de socio existente.
+      run_not_found_no_household: No se encontró un socio con ese RUN. Debes crear un domicilio primero para solicitar acreditación.
+    actions:
+      approve: Aprobar
+      reject: Rechazar
+      resubmit: Reenviar
+    statuses:
+      pending: Pendiente
+      approved: Aprobado
+      rejected: Rechazado
 
   tag:
     message:
@@ -144,3 +201,28 @@ es:
       created: Usuario creado exitosamente.
       updated: Usuario actualizado exitosamente.
       destroyed: Usuario eliminado exitosamente.
+
+  board_member:
+    message:
+      created: Directivo creado exitosamente.
+      updated: Directivo actualizado exitosamente.
+      destroyed: Directivo eliminado exitosamente.
+
+  residence_certificate:
+    message:
+      created: Certificado creado exitosamente.
+      updated: Certificado actualizado exitosamente.
+      destroyed: Certificado eliminado exitosamente.
+      approved: Certificado aprobado exitosamente.
+      rejected: Certificado rechazado exitosamente.
+      issued: Certificado emitido exitosamente.
+      requested: Certificado solicitado exitosamente.
+    actions:
+      approve: Aprobar
+      reject: Rechazar
+      issue: Emitir
+    statuses:
+      pending: Pendiente
+      approved: Aprobado
+      rejected: Rechazado
+      issued: Emitido

@@ -21,6 +21,11 @@
               <%= text_field_tag :name, params[:name], class: "input", autocomplete: "off" %>
             </div>
 
+            <div>
+              <%= label_tag :status, I18n.t('attributes.member.status'), class: "label" %>
+              <%= select_tag :status, options_for_select(Member::STATUSES.map { |s| [I18n.t("member.statuses.#{s}"), s] }, params[:status]), { prompt: "Todos", class: "select w-full" } %>
+            </div>
+
             <%= button_tag raw(icon('filter') + I18n.t('actions.filter')), type: 'submit', class: "btn btn-info" %>
             <%= link_to raw(icon('restart') + I18n.t('actions.restart')), admin_members_path, class: "btn" %>
           </div>

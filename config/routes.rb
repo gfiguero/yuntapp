@@ -52,6 +52,10 @@ Rails.application.routes.draw do
 
   namespace :panel do
     root to: "dashboard#index"
+    resource :profile, only: [ :show, :edit, :update ], controller: "profile"
+    resources :household_units, only: [ :new, :create, :edit, :update ]
+    resource :accreditation, only: [ :show, :new, :create, :edit, :update ]
+    resources :members, only: [ :index, :show, :new, :create, :edit, :update ]
     resources :listings do
       collection do
         get :search
@@ -60,9 +64,10 @@ Rails.application.routes.draw do
         get :delete
       end
     end
+    resources :residence_certificates, only: [:index, :show, :new, :create]
   end
 
-  namespace :admin do
+  namespace :superadmin do
     root to: "dashboard#index"
     resources :categories do
       collection do
@@ -78,14 +83,7 @@ Rails.application.routes.draw do
       end
       member do
         get :delete
-      end
-    end
-    resources :neighborhood_delegations do
-      collection do
-        get :search
-      end
-      member do
-        get :delete
+        post :impersonate
       end
     end
     resources :countries do
@@ -112,6 +110,35 @@ Rails.application.routes.draw do
         get :delete
       end
     end
+    resources :tags do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+    resources :users do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
+  end
+
+  namespace :admin do
+    post "stop_impersonating", to: "impersonations#stop"
+    root to: "dashboard#index"
+    resources :neighborhood_delegations do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+      end
+    end
     resources :household_units do
       collection do
         get :search
@@ -126,14 +153,8 @@ Rails.application.routes.draw do
       end
       member do
         get :delete
-      end
-    end
-    resources :tags do
-      collection do
-        get :search
-      end
-      member do
-        get :delete
+        patch :approve
+        patch :reject
       end
     end
     resources :listings do
@@ -144,12 +165,23 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :users do
+    resources :board_members do
       collection do
         get :search
       end
       member do
         get :delete
+      end
+    end
+    resources :residence_certificates do
+      collection do
+        get :search
+      end
+      member do
+        get :delete
+        patch :approve
+        patch :reject
+        patch :issue
       end
     end
   end

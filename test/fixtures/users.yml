@@ -5,7 +5,7 @@ artanis:
   last_name: "Akilae"
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>
-  admin: true
+  superadmin: true
 
 selendis:
   email: selendis@daelaam.io
