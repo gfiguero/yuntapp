@@ -47,15 +47,17 @@
           </div>
           <%= link_to "Yuntapp", root_path, class: "btn btn-ghost text-xl" %>
         </div>
+<!--
         <div class="navbar-center hidden lg:flex">
           <ul class="menu menu-horizontal px-1">
-            <li><%= link_to "Inicio", root_path %></li>
-            <li><%= link_to "Categorías", categories_path %></li>
-            <li><%= link_to "Etiquetas", tags_path %></li>
-            <li><%= link_to "Publicaciones", listings_path %></li>
-            <li><%= link_to "Contacto", contact_path %></li>
+            <li><%#= link_to "Inicio", root_path %></li>
+            <li><%#= link_to "Categorías", categories_path %></li>
+            <li><%#= link_to "Etiquetas", tags_path %></li>
+            <li><%#= link_to "Publicaciones", listings_path %></li>
+            <li><%#= link_to "Contacto", contact_path %></li>
           </ul>
         </div>
+-->
         <div class="navbar-end gap-2">
           <% if current_user&.superadmin? %>
             <%= link_to "Superadmin", superadmin_root_path, class: "btn btn-soft btn-error" %>

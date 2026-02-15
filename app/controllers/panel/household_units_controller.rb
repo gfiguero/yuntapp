@@ -2,7 +2,7 @@ module Panel
   class HouseholdUnitsController < ApplicationController
     layout "panel"
     before_action :authenticate_user!
-    before_action :set_household_unit, only: [ :edit, :update ]
+    before_action :set_household_unit, only: [:edit, :update]
 
     def new
       if current_user.household_unit

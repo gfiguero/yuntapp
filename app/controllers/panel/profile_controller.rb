@@ -7,14 +7,20 @@ module Panel
     def show
     end
 
-    def edit
-    end
-
     def update
+      # Si el campo password está vacío, lo removemos para evitar errores de validación
+      # y permitir actualizar otros datos sin cambiar la clave.
+      if params[:user][:password].blank?
+        params[:user].delete(:password)
+        params[:user].delete(:password_confirmation)
+      end
+
       if @user.update(user_params)
+        # Sign in the user by passing validation in case their password changed
+        bypass_sign_in(@user)
         redirect_to panel_profile_path, notice: "Perfil actualizado exitosamente."
       else
-        render :edit, status: :unprocessable_content
+        render :show, status: :unprocessable_content
       end
     end
 

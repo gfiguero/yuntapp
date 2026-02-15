@@ -7,44 +7,44 @@
   <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step1.title') %></h2>
   <p class="text-base-content/60 mb-6"><%= I18n.t('onboarding.step1.description') %></p>
 
-  <%= form_with(url: panel_onboarding_step1_path, method: :patch, class: "w-full max-w-md") do |form| %>
-    <div class="grid gap-4"
-         data-controller="cascading-select"
-         data-cascading-select-data-value="<%= @cascading_data.to_json %>">
+  <%= form_with(url: panel_onboarding_step1_path, method: :patch, class: "w-full max-w-md", data: { turbo_frame: "step1_form" }) do |form| %>
+    <%= turbo_frame_tag "step1_form" do %>
+      <div class="grid gap-4">
+        
+        <label class="floating-label">
+          <%= form.select :region_id, 
+              options_for_select(@cascading_data.map { |r| [r[:name], r[:id]] }, @selected_region_id), 
+              { prompt: I18n.t('onboarding.step1.select_region') },
+              { class: "select w-full", onchange: "this.form.requestSubmit()" } 
+          %>
+          <span><%= I18n.t('onboarding.step1.region_label') %></span>
+        </label>
 
-      <label class="floating-label">
-        <select data-cascading-select-target="region"
-                data-prompt="<%= I18n.t('onboarding.step1.select_region') %>"
-                data-action="cascading-select#regionChanged"
-                class="select w-full">
-        </select>
-        <span><%= I18n.t('onboarding.step1.region_label') %></span>
-      </label>
+        <% communes = @cascading_data.find { |r| r[:id] == @selected_region_id.to_i }&.dig(:communes) || [] %>
+        <label class="floating-label">
+          <%= form.select :commune_id,
+              options_for_select(communes.map { |c| [c[:name], c[:id]] }, @selected_commune_id),
+              { prompt: I18n.t('onboarding.step1.select_commune') },
+              { class: "select w-full", disabled: communes.empty?, onchange: "this.form.requestSubmit()" }
+          %>
+          <span><%= I18n.t('onboarding.step1.commune_label') %></span>
+        </label>
 
-      <label class="floating-label">
-        <select data-cascading-select-target="commune"
-                data-prompt="<%= I18n.t('onboarding.step1.select_commune') %>"
-                data-action="cascading-select#communeChanged"
-                class="select w-full" disabled>
-        </select>
-        <span><%= I18n.t('onboarding.step1.commune_label') %></span>
-      </label>
+        <% associations = communes.find { |c| c[:id] == @selected_commune_id.to_i }&.dig(:associations) || [] %>
+        <label class="floating-label">
+          <%= form.select :neighborhood_association_id,
+              options_for_select(associations.map { |a| [a[:name], a[:id]] }, @selected_association_id),
+              { prompt: I18n.t('onboarding.step1.select_association') },
+              { class: "select w-full", disabled: associations.empty?, onchange: "this.form.requestSubmit()" }
+          %>
+          <span><%= I18n.t('onboarding.step1.association_label') %></span>
+        </label>
 
-      <label class="floating-label">
-        <select data-cascading-select-target="association"
-                data-prompt="<%= I18n.t('onboarding.step1.select_association') %>"
-                data-action="cascading-select#associationChanged"
-                class="select w-full" disabled>
-        </select>
-        <span><%= I18n.t('onboarding.step1.association_label') %></span>
-      </label>
+      </div>
 
-      <input type="hidden" name="neighborhood_association_id"
-             data-cascading-select-target="output" required>
-    </div>
-
-    <div class="mt-6">
-      <%= form.submit I18n.t('actions.confirm'), class: "btn btn-primary" %>
-    </div>
+      <div class="mt-6">
+        <%= form.submit I18n.t('actions.continue'), class: "btn btn-primary", disabled: @selected_association_id.blank?, name: "commit_continue", data: { turbo_frame: "_top" } %>
+      </div>
+    <% end %>
   <% end %>
 </div>

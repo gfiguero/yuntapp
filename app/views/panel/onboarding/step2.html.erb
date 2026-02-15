@@ -4,50 +4,61 @@
 
   <%= render "steps", current_step: 2 %>
 
-  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step2.title') %></h2>
-  <p class="text-base-content/60 mb-2"><%= I18n.t('onboarding.step2.description') %></p>
+  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step3.title') %></h2>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('onboarding.step3.description') %></p>
 
-  <div class="alert alert-info mb-4">
-    <p><strong><%= I18n.t('onboarding.steps.neighborhood') %>:</strong> <%= @neighborhood_association.name %>
-      <% if @neighborhood_association.commune %>
-        &mdash; <%= @neighborhood_association.commune.name %>
-      <% end %>
-    </p>
-  </div>
-
-  <%= form_with(model: @household_unit, url: panel_onboarding_step2_path, method: :patch, class: "grid gap-4 w-full max-w-md") do |form| %>
-
-    <% invalid = @household_unit.errors.include?(:neighborhood_delegation_id) %>
-    <%= form.label :neighborhood_delegation_id, I18n.t('attributes.household_unit.neighborhood_delegation'), class: "floating-label" do %>
-      <%= form.collection_select :neighborhood_delegation_id, @delegations, :id, :name, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
-      <span><%= I18n.t('attributes.household_unit.neighborhood_delegation') %></span>
-    <% end %>
-    <%= raw(error_message(invalid, @household_unit.errors.full_messages_for(:neighborhood_delegation_id))) %>
-
-    <% invalid = @household_unit.errors.include?(:number) %>
-    <%= form.label :number, I18n.t('attributes.household_unit.number'), class: "floating-label" do %>
-      <%= form.text_field :number, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.household_unit.number') %>
-      <span><%= I18n.t('attributes.household_unit.number') %></span>
-    <% end %>
-    <%= raw(error_message(invalid, @household_unit.errors.full_messages_for(:number))) %>
-
-    <% invalid = @household_unit.errors.include?(:address_line_1) %>
-    <%= form.label :address_line_1, I18n.t('attributes.household_unit.address_line_1'), class: "floating-label" do %>
-      <%= form.text_field :address_line_1, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.address_line_1') %>
-      <span><%= I18n.t('attributes.household_unit.address_line_1') %></span>
-    <% end %>
-    <%= raw(error_message(invalid, @household_unit.errors.full_messages_for(:address_line_1))) %>
-
-    <% invalid = @household_unit.errors.include?(:address_line_2) %>
-    <%= form.label :address_line_2, I18n.t('attributes.household_unit.address_line_2'), class: "floating-label" do %>
-      <%= form.text_field :address_line_2, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.address_line_2') %>
-      <span><%= I18n.t('attributes.household_unit.address_line_2') %></span>
-    <% end %>
-    <%= raw(error_message(invalid, @household_unit.errors.full_messages_for(:address_line_2))) %>
-
-    <div class="flex gap-2 mt-2">
-      <%= link_to I18n.t('actions.back'), panel_onboarding_step1_path, class: "btn btn-soft" %>
-      <%= form.submit I18n.t('actions.confirm'), class: "btn btn-primary" %>
+  <% if current_user.verified_identity %>
+    <div class="alert alert-info mb-4">
+      <%= icon("check-circle", class: "w-6 h-6") %>
+      <span>Ya tienes una identidad verificada. Por favor, confirma tus datos para esta nueva solicitud.</span>
     </div>
+  <% end %>
+
+  <%= form_with(model: @identity_request, url: panel_onboarding_step2_path, method: :patch, class: "w-full max-w-md", data: { turbo_frame: "step2_form", controller: "autosave", autosave_delay_value: "2000" }) do |form| %>
+    <%= turbo_frame_tag "step2_form" do %>
+    
+    <div class="grid gap-4">
+      <% invalid = @identity_request.errors.include?(:first_name) %>
+      <%= form.label :first_name, I18n.t('attributes.persona.first_name'), class: "floating-label" do %>
+        <%= form.text_field :first_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.persona.first_name'), data: { action: "input->autosave#submit" } %>
+        <span><%= I18n.t('attributes.persona.first_name') %></span>
+      <% end %>
+      <%= raw(error_message(invalid, @identity_request.errors.full_messages_for(:first_name))) %>
+
+      <% invalid = @identity_request.errors.include?(:last_name) %>
+      <%= form.label :last_name, I18n.t('attributes.persona.last_name'), class: "floating-label" do %>
+        <%= form.text_field :last_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.persona.last_name'), data: { action: "input->autosave#submit" } %>
+        <span><%= I18n.t('attributes.persona.last_name') %></span>
+      <% end %>
+      <%= raw(error_message(invalid, @identity_request.errors.full_messages_for(:last_name))) %>
+
+      <% invalid = @identity_request.errors.include?(:run) %>
+      <%= form.label :run, I18n.t('attributes.persona.run'), class: "floating-label" do %>
+        <%= form.text_field :run, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.persona.run'), data: { action: "input->autosave#submit" } %>
+        <span><%= I18n.t('attributes.persona.run') %></span>
+      <% end %>
+      <%= raw(error_message(invalid, @identity_request.errors.full_messages_for(:run))) %>
+
+      <% invalid = @identity_request.errors.include?(:phone) %>
+      <%= form.label :phone, I18n.t('attributes.persona.phone'), class: "floating-label" do %>
+        <%= form.text_field :phone, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.persona.phone'), data: { action: "input->autosave#submit" } %>
+        <span><%= I18n.t('attributes.persona.phone') %></span>
+      <% end %>
+      <%= raw(error_message(invalid, @identity_request.errors.full_messages_for(:phone))) %>
+
+      <% invalid = @identity_request.errors.include?(:identity_document) %>
+      <div>
+        <%= form.label :identity_document, I18n.t('attributes.persona.identity_document'), class: "label" %>
+        <p class="text-sm text-base-content/60 mb-1"><%= I18n.t('persona.help.upload_ci') %></p>
+        <%= form.file_field :identity_document, class: "file-input w-full #{'input-error' if invalid}", data: { action: "change->autosave#submit" } %>
+      </div>
+      <%= raw(error_message(invalid, @identity_request.errors.full_messages_for(:identity_document))) %>
+    </div>
+
+    <div class="mt-6 flex gap-2">
+      <%= link_to I18n.t('actions.back'), panel_onboarding_step1_path, class: "btn btn-soft", data: { turbo_frame: "_top" } %>
+      <%= form.submit I18n.t('actions.continue'), class: "btn btn-primary", name: "commit_continue", data: { turbo_frame: "_top" } %>
+    </div>
+    <% end %>
   <% end %>
 </div>

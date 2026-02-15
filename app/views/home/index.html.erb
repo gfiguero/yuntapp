@@ -1,5 +1,87 @@
-<h1>Home#index</h1>
+<div class="hero min-h-screen bg-base-200">
+  <div class="hero-content flex-col lg:flex-row-reverse gap-8 lg:gap-16">
+    <div class="text-center lg:text-left max-w-lg">
+      <h1 class="text-5xl font-bold">Certificados de Residencia en Minutos</h1>
+      <p class="py-6 text-lg">
+        Yuntapp permite a tu Junta de Vecinos emitir certificados de residencia digitales, verificables y seguros. 
+        Moderniza la gestión documental y facilita la vida de tus vecinos con validación en línea.
+      </p>
+      <div class="flex gap-4 justify-center lg:justify-start">
+        <% if user_signed_in? %>
+          <%= link_to "Ir a mi Panel", panel_root_path, class: "btn btn-primary btn-lg" %>
+        <% else %>
+          <%= link_to "Comenzar Ahora", new_user_registration_path, class: "btn btn-primary btn-lg" %>
+          <%= link_to "Ingresar", new_user_session_path, class: "btn btn-outline btn-lg" %>
+        <% end %>
+      </div>
+    </div>
+    
+    <div class="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div class="card-body">
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center gap-4">
+            <div class="bg-primary/10 p-3 rounded-full text-primary">
+              <%= icon("document-check", class: "w-6 h-6") %>
+            </div>
+            <div>
+              <h3 class="font-bold">Verificación QR</h3>
+              <p class="text-sm text-base-content/70">Cada certificado incluye un código único para validar su autenticidad.</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <div class="bg-primary/10 p-3 rounded-full text-primary">
+              <%= icon("shield-check", class: "w-6 h-6") %>
+            </div>
+            <div>
+              <h3 class="font-bold">Respaldo Documental</h3>
+              <p class="text-sm text-base-content/70">Sube boletas de servicios o contratos para validar la dirección.</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <div class="bg-primary/10 p-3 rounded-full text-primary">
+              <%= icon("printer", class: "w-6 h-6") %>
+            </div>
+            <div>
+              <h3 class="font-bold">Listo para Imprimir</h3>
+              <p class="text-sm text-base-content/70">Formato PDF estandarizado aceptado en trámites oficiales.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<button class="btn btn-primary">Hello daisyUI!</button>
-
-<p>Find me in app/views/home/index.html.erb</p>
+<div class="py-20 bg-base-100">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-12">Cómo Funciona</h2>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="card bg-base-200 shadow-xl">
+        <div class="card-body items-center text-center">
+          <div class="badge badge-primary badge-lg mb-4">1</div>
+          <h3 class="card-title">Regístrate</h3>
+          <p>Crea tu cuenta y asocia tu domicilio a tu Junta de Vecinos correspondiente.</p>
+        </div>
+      </div>
+      
+      <div class="card bg-base-200 shadow-xl">
+        <div class="card-body items-center text-center">
+          <div class="badge badge-primary badge-lg mb-4">2</div>
+          <h3 class="card-title">Sube Documentos</h3>
+          <p>Adjunta una boleta de servicio o documento que acredite tu residencia.</p>
+        </div>
+      </div>
+      
+      <div class="card bg-base-200 shadow-xl">
+        <div class="card-body items-center text-center">
+          <div class="badge badge-primary badge-lg mb-4">3</div>
+          <h3 class="card-title">Recibe tu Certificado</h3>
+          <p>Una vez validado por la directiva, descarga tu certificado con firma digital y QR.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

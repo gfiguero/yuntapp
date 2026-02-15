@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  neighborhood_association: one
+  run: MyString
+  first_name: MyString
+  last_name: MyString
+  phone: MyString
+  status: MyString
+  rejection_reason: MyText
+
+two:
+  user: two
+  neighborhood_association: two
+  run: MyString
+  first_name: MyString
+  last_name: MyString
+  phone: MyString
+  status: MyString
+  rejection_reason: MyText

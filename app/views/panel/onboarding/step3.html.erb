@@ -4,67 +4,50 @@
 
   <%= render "steps", current_step: 3 %>
 
-  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step3.title') %></h2>
-  <p class="text-base-content/60 mb-6"><%= I18n.t('onboarding.step3.description') %></p>
+  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step2.title') %></h2>
+  <p class="text-base-content/60 mb-2"><%= I18n.t('onboarding.step2.description') %></p>
 
-  <% if current_user.persona&.pending_verification? %>
-    <div class="alert alert-info mb-4">
-      <p><%= I18n.t('onboarding.step3.already_verified') %></p>
-    </div>
-    <div class="card bg-base-200 shadow-sm max-w-md mb-4">
-      <div class="card-body">
-        <p><strong><%= I18n.t('attributes.persona.name') %>:</strong> <%= current_user.persona.name %></p>
-        <p><strong><%= I18n.t('attributes.persona.run') %>:</strong> <%= current_user.persona.run %></p>
-        <p><strong><%= I18n.t('attributes.persona.phone') %>:</strong> <%= current_user.persona.phone %></p>
-      </div>
-    </div>
-    <div class="flex gap-2">
-      <%= link_to I18n.t('actions.back'), panel_onboarding_step2_path, class: "btn btn-soft" %>
-      <%= link_to I18n.t('actions.confirm'), panel_onboarding_step4_path, class: "btn btn-primary" %>
-    </div>
-  <% else %>
-    <%= form_with(model: @persona, url: panel_onboarding_step3_path, method: :patch, class: "grid gap-4 w-full max-w-md") do |form| %>
-
-      <% invalid = @persona.errors.include?(:first_name) %>
-      <%= form.label :first_name, I18n.t('attributes.persona.first_name'), class: "floating-label" do %>
-        <%= form.text_field :first_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.persona.first_name') %>
-        <span><%= I18n.t('attributes.persona.first_name') %></span>
+  <div class="alert alert-info mb-4">
+    <p><strong><%= I18n.t('onboarding.steps.neighborhood') %>:</strong> <%= @neighborhood_association.name %>
+      <% if @neighborhood_association.commune %>
+        &mdash; <%= @neighborhood_association.commune.name %>
       <% end %>
-      <%= raw(error_message(invalid, @persona.errors.full_messages_for(:first_name))) %>
+    </p>
+  </div>
 
-      <% invalid = @persona.errors.include?(:last_name) %>
-      <%= form.label :last_name, I18n.t('attributes.persona.last_name'), class: "floating-label" do %>
-        <%= form.text_field :last_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.persona.last_name') %>
-        <span><%= I18n.t('attributes.persona.last_name') %></span>
-      <% end %>
-      <%= raw(error_message(invalid, @persona.errors.full_messages_for(:last_name))) %>
+  <%= form_with(model: @residence_request, url: panel_onboarding_step3_path, method: :patch, class: "grid gap-4 w-full max-w-md") do |form| %>
 
-      <% invalid = @persona.errors.include?(:run) %>
-      <%= form.label :run, I18n.t('attributes.persona.run'), class: "floating-label" do %>
-        <%= form.text_field :run, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.persona.run') %>
-        <span><%= I18n.t('attributes.persona.run') %></span>
-      <% end %>
-      <%= raw(error_message(invalid, @persona.errors.full_messages_for(:run))) %>
-
-      <% invalid = @persona.errors.include?(:phone) %>
-      <%= form.label :phone, I18n.t('attributes.persona.phone'), class: "floating-label" do %>
-        <%= form.text_field :phone, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.persona.phone') %>
-        <span><%= I18n.t('attributes.persona.phone') %></span>
-      <% end %>
-      <%= raw(error_message(invalid, @persona.errors.full_messages_for(:phone))) %>
-
-      <% invalid = @persona.errors.include?(:identity_document) %>
-      <div>
-        <%= form.label :identity_document, I18n.t('attributes.persona.identity_document'), class: "label" %>
-        <p class="text-sm text-base-content/60 mb-1"><%= I18n.t('persona.help.upload_ci') %></p>
-        <%= form.file_field :identity_document, class: "file-input w-full #{'input-error' if invalid}" %>
-      </div>
-      <%= raw(error_message(invalid, @persona.errors.full_messages_for(:identity_document))) %>
-
-      <div class="flex gap-2 mt-2">
-        <%= link_to I18n.t('actions.back'), panel_onboarding_step2_path, class: "btn btn-soft" %>
-        <%= form.submit I18n.t('actions.confirm'), class: "btn btn-primary" %>
-      </div>
+    <% invalid = @residence_request.errors.include?(:neighborhood_delegation_id) %>
+    <%= form.label :neighborhood_delegation_id, I18n.t('attributes.household_unit.neighborhood_delegation'), class: "floating-label" do %>
+      <%= form.collection_select :neighborhood_delegation_id, @delegations, :id, :name, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
+      <span><%= I18n.t('attributes.household_unit.neighborhood_delegation') %></span>
     <% end %>
+    <%= raw(error_message(invalid, @residence_request.errors.full_messages_for(:neighborhood_delegation_id))) %>
+
+    <% invalid = @residence_request.errors.include?(:number) %>
+    <%= form.label :number, I18n.t('attributes.household_unit.number'), class: "floating-label" do %>
+      <%= form.text_field :number, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.household_unit.number') %>
+      <span><%= I18n.t('attributes.household_unit.number') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @residence_request.errors.full_messages_for(:number))) %>
+
+    <% invalid = @residence_request.errors.include?(:address_line_1) %>
+    <%= form.label :address_line_1, I18n.t('attributes.household_unit.address_line_1'), class: "floating-label" do %>
+      <%= form.text_field :address_line_1, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.address_line_1') %>
+      <span><%= I18n.t('attributes.household_unit.address_line_1') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @residence_request.errors.full_messages_for(:address_line_1))) %>
+
+    <% invalid = @residence_request.errors.include?(:address_line_2) %>
+    <%= form.label :address_line_2, I18n.t('attributes.household_unit.address_line_2'), class: "floating-label" do %>
+      <%= form.text_field :address_line_2, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.address_line_2') %>
+      <span><%= I18n.t('attributes.household_unit.address_line_2') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @residence_request.errors.full_messages_for(:address_line_2))) %>
+
+    <div class="flex gap-2 mt-2">
+      <%= link_to I18n.t('actions.back'), panel_onboarding_step2_path, class: "btn btn-soft" %>
+      <%= form.submit I18n.t('actions.confirm'), class: "btn btn-primary" %>
+    </div>
   <% end %>
 </div>

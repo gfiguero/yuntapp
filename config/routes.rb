@@ -54,8 +54,8 @@ Rails.application.routes.draw do
 
   namespace :panel do
     root to: "dashboard#index"
-    resource :profile, only: [ :show, :edit, :update ], controller: "profile"
-    resources :household_units, only: [ :new, :create, :edit, :update ]
+    resource :profile, only: [:show, :update], controller: "profile"
+    resources :household_units, only: [:new, :create, :edit, :update]
     resource :verification, only: [ :show, :new, :create ], controller: "verification"
     resource :accreditation, only: [ :show, :new, :create, :edit, :update ]
     resources :members, only: [ :index, :show, :new, :create, :edit, :update ]
@@ -70,6 +70,8 @@ Rails.application.routes.draw do
     resources :residence_certificates, only: [:index, :show, :new, :create]
 
     delete "reset_account", to: "account_resets#destroy", as: :reset_account
+
+    delete "onboarding/restart", to: "onboarding#restart", as: :onboarding_restart
 
     scope :onboarding do
       get "step1", to: "onboarding#step1", as: :onboarding_step1

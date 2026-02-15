@@ -1,0 +1,112 @@
+<div class="flex justify-between items-center mb-4">
+  <h1 class="text-2xl font-bold">Mi Perfil</h1>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title mb-4">Información Personal</h2>
+      
+      <p class="text-sm text-base-content/70 mb-4">
+        Los datos personales (nombre, RUT, teléfono) están vinculados a tu identidad verificada. 
+        Si necesitas actualizarlos, deberás realizar un nuevo proceso de verificación.
+      </p>
+
+      <%= form_with(model: [:panel, @user], url: panel_profile_path, method: :patch, class: "grid gap-4") do |form| %>
+        
+        <% if @user.errors.any? %>
+          <div class="alert alert-error">
+            <ul>
+              <% @user.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if @user.verified_identity %>
+          <div class="form-control">
+            <label class="label">Nombres</label>
+            <input type="text" class="input input-bordered w-full" value="<%= @user.verified_identity.first_name %>" disabled />
+          </div>
+
+          <div class="form-control">
+            <label class="label">Apellidos</label>
+            <input type="text" class="input input-bordered w-full" value="<%= @user.verified_identity.last_name %>" disabled />
+          </div>
+          
+          <div class="form-control">
+            <label class="label">RUT</label>
+            <input type="text" class="input input-bordered w-full" value="<%= @user.verified_identity.run %>" disabled />
+          </div>
+        <% else %>
+          <div class="alert alert-info">
+            <%= icon("information-circle", class: "w-6 h-6") %>
+            <span>Aún no has verificado tu identidad.</span>
+          </div>
+        <% end %>
+
+        <div class="form-control">
+          <%= form.label :email, "Correo Electrónico", class: "label" %>
+          <%= form.email_field :email, class: "input input-bordered w-full", disabled: true %>
+          <span class="label-text-alt mt-1 text-info">Para cambiar tu correo, contacta a soporte.</span>
+        </div>
+
+        <div class="divider">Seguridad</div>
+
+        <div class="form-control">
+          <%= form.label :password, "Nueva Contraseña (opcional)", class: "label" %>
+          <%= form.password_field :password, class: "input input-bordered w-full", placeholder: "Dejar en blanco para mantener la actual" %>
+        </div>
+
+        <div class="form-control">
+          <%= form.label :password_confirmation, "Confirmar Nueva Contraseña", class: "label" %>
+          <%= form.password_field :password_confirmation, class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="card-actions justify-end mt-4">
+          <%= form.submit "Guardar Cambios", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-8">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title mb-4">Estado de la Cuenta</h2>
+        
+        <div class="flex items-center gap-4 mb-4">
+          <div class="avatar placeholder">
+            <div class="bg-neutral text-neutral-content rounded-full w-12">
+              <span class="text-xl"><%= @user.verified_identity&.first_name&.first || @user.email.first.upcase %></span>
+            </div>
+          </div>
+          <div>
+            <div class="font-bold"><%= @user.email %></div>
+            <div class="text-sm opacity-70">Miembro desde <%= l(@user.created_at.to_date) %></div>
+          </div>
+        </div>
+
+        <% if @user.member.present? %>
+          <div class="alert alert-success">
+            <%= icon("check-circle", class: "w-6 h-6") %>
+            <div>
+              <h3 class="font-bold">Vinculado a Junta de Vecinos</h3>
+              <div class="text-xs">Estás registrado en <%= @user.member.household_unit.neighborhood_delegation.neighborhood_association.name %></div>
+            </div>
+          </div>
+        <% else %>
+          <div class="alert alert-warning">
+            <%= icon("exclamation-circle", class: "w-6 h-6") %>
+            <div>
+              <h3 class="font-bold">Sin Vinculación</h3>
+              <div class="text-xs">No perteneces a ninguna Junta de Vecinos activa.</div>
+              <%= link_to "Comenzar Onboarding", panel_onboarding_step1_path, class: "btn btn-sm btn-ghost mt-2" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

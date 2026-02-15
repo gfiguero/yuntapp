@@ -44,7 +44,7 @@ module Panel
       sign_in @karass
 
       assert_difference("Persona.count", 1) do
-        post panel_verification_url, params: { persona: {
+        post panel_verification_url, params: {persona: {
           first_name: "Karass",
           last_name: "Templar",
           run: "77.777.777-7",
@@ -69,7 +69,7 @@ module Panel
       karass_persona.update!(user: nil) # ensure no user
 
       assert_no_difference("Persona.count") do
-        post panel_verification_url, params: { persona: {
+        post panel_verification_url, params: {persona: {
           first_name: "Karass",
           last_name: "Templar",
           run: "222222222",
@@ -86,7 +86,7 @@ module Panel
       sign_in @karass
 
       # selendis_persona is already linked to selendis user
-      post panel_verification_url, params: { persona: {
+      post panel_verification_url, params: {persona: {
         first_name: "Fake",
         last_name: "Person",
         run: "111111111",
@@ -101,7 +101,7 @@ module Panel
       sign_in @selendis
 
       assert_no_difference("Persona.count") do
-        post panel_verification_url, params: { persona: {
+        post panel_verification_url, params: {persona: {
           first_name: "Selendis",
           last_name: "Daelaam",
           run: "999999999",

@@ -40,7 +40,7 @@ module Panel
 
     test "update_step1 saves association in session and redirects to step2" do
       sign_in @karass
-      patch panel_onboarding_step1_url, params: { neighborhood_association_id: @association.id }
+      patch panel_onboarding_step1_url, params: {neighborhood_association_id: @association.id}
       assert_redirected_to panel_onboarding_step2_url
     end
 
@@ -54,17 +54,17 @@ module Panel
 
     test "step2 renders household unit form" do
       sign_in @karass
-      patch panel_onboarding_step1_url, params: { neighborhood_association_id: @association.id }
+      patch panel_onboarding_step1_url, params: {neighborhood_association_id: @association.id}
       get panel_onboarding_step2_url
       assert_response :success
     end
 
     test "update_step2 creates household unit and redirects to step3" do
       sign_in @karass
-      patch panel_onboarding_step1_url, params: { neighborhood_association_id: @association.id }
+      patch panel_onboarding_step1_url, params: {neighborhood_association_id: @association.id}
 
       assert_difference("HouseholdUnit.count", 1) do
-        patch panel_onboarding_step2_url, params: { household_unit: {
+        patch panel_onboarding_step2_url, params: {household_unit: {
           neighborhood_delegation_id: @delegation.id,
           number: "Casa 42"
         }}
@@ -77,7 +77,7 @@ module Panel
 
     test "step3 without step2 redirects to step2" do
       sign_in @karass
-      patch panel_onboarding_step1_url, params: { neighborhood_association_id: @association.id }
+      patch panel_onboarding_step1_url, params: {neighborhood_association_id: @association.id}
       get panel_onboarding_step3_url
       assert_redirected_to panel_onboarding_step2_url
     end
@@ -94,7 +94,7 @@ module Panel
       complete_steps_1_and_2(@karass)
 
       assert_difference("Persona.count", 1) do
-        patch panel_onboarding_step3_url, params: { persona: {
+        patch panel_onboarding_step3_url, params: {persona: {
           first_name: "Karass",
           last_name: "Templar",
           run: "77.777.777-7",
@@ -125,7 +125,7 @@ module Panel
       complete_steps_1_and_2(@karass)
 
       # selendis_persona run 11111111-1 is already linked to selendis
-      patch panel_onboarding_step3_url, params: { persona: {
+      patch panel_onboarding_step3_url, params: {persona: {
         first_name: "Fake",
         last_name: "Person",
         run: "111111111",
@@ -183,8 +183,8 @@ module Panel
     private
 
     def complete_steps_1_and_2(user)
-      patch panel_onboarding_step1_url, params: { neighborhood_association_id: @association.id }
-      patch panel_onboarding_step2_url, params: { household_unit: {
+      patch panel_onboarding_step1_url, params: {neighborhood_association_id: @association.id}
+      patch panel_onboarding_step2_url, params: {household_unit: {
         neighborhood_delegation_id: @delegation.id,
         number: "Casa 42"
       }}
@@ -192,7 +192,7 @@ module Panel
 
     def complete_all_steps(user)
       complete_steps_1_and_2(user)
-      patch panel_onboarding_step3_url, params: { persona: {
+      patch panel_onboarding_step3_url, params: {persona: {
         first_name: "Karass",
         last_name: "Templar",
         run: "77.777.777-7",

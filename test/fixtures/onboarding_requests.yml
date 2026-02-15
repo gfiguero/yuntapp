@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  neighborhood_association: one
+  status: MyString
+  rejection_reason: MyText
+
+two:
+  user: two
+  neighborhood_association: two
+  status: MyString
+  rejection_reason: MyText

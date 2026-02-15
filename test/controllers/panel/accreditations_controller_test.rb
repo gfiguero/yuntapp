@@ -48,7 +48,7 @@ module Panel
       sign_in @karass
       assert_not @karass.verified?
 
-      post panel_accreditation_url, params: { member: { documents: [] } }
+      post panel_accreditation_url, params: {member: {documents: []}}
       assert_redirected_to new_panel_verification_url
     end
 
@@ -86,13 +86,13 @@ module Panel
 
       # Create household unit and store it in session
       sign_in @karass
-      post panel_household_units_url, params: { household_unit: {
+      post panel_household_units_url, params: {household_unit: {
         number: "Test #1",
         neighborhood_delegation: household_units(:selendis_household).neighborhood_delegation.id
-      }.merge(neighborhood_delegation_id: household_units(:selendis_household).neighborhood_delegation.id) }
+      }.merge(neighborhood_delegation_id: household_units(:selendis_household).neighborhood_delegation.id)}
 
       assert_difference("Member.count", 1) do
-        post panel_accreditation_url, params: { member: { documents: [] } }
+        post panel_accreditation_url, params: {member: {documents: []}}
       end
 
       assert_redirected_to panel_accreditation_url
@@ -115,7 +115,7 @@ module Panel
       assert_nil @karass.household_unit
 
       assert_no_difference("Member.count") do
-        post panel_accreditation_url, params: { member: { documents: [] } }
+        post panel_accreditation_url, params: {member: {documents: []}}
       end
 
       assert_redirected_to new_panel_household_unit_url
@@ -141,7 +141,7 @@ module Panel
       get new_panel_accreditation_url
       assert_redirected_to panel_accreditation_url
 
-      post panel_accreditation_url, params: { member: { documents: [] } }
+      post panel_accreditation_url, params: {member: {documents: []}}
       assert_redirected_to panel_accreditation_url
     end
   end

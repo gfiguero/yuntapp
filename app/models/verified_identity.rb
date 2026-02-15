@@ -1,7 +1,9 @@
-class Persona < ApplicationRecord
+class VerifiedIdentity < ApplicationRecord
+  self.table_name = "verified_identities"
+
   VERIFICATION_STATUSES = %w[pending verified rejected].freeze
 
-  has_one :user
+  has_many :users
   has_many :members
   has_one_attached :identity_document
 
@@ -11,7 +13,7 @@ class Persona < ApplicationRecord
   validates :first_name, :last_name, :run, presence: true
   validates :run, uniqueness: true
   validate :run_must_be_valid_chilean_rut, if: -> { run.present? }
-  validates :verification_status, presence: true, inclusion: { in: VERIFICATION_STATUSES }
+  validates :verification_status, presence: true, inclusion: {in: VERIFICATION_STATUSES}
 
   scope :verified, -> { where(verification_status: "verified") }
   scope :pending, -> { where(verification_status: "pending") }
@@ -45,7 +47,7 @@ class Persona < ApplicationRecord
     multiplier = 2
     body.reverse.each_char do |char|
       sum += char.to_i * multiplier
-      multiplier = multiplier == 7 ? 2 : multiplier + 1
+      multiplier = (multiplier == 7) ? 2 : multiplier + 1
     end
     remainder = 11 - (sum % 11)
     case remainder

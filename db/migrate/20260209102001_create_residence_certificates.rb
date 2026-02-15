@@ -4,7 +4,7 @@ class CreateResidenceCertificates < ActiveRecord::Migration[8.1]
       t.references :neighborhood_association, null: false, foreign_key: true
       t.references :member, null: false, foreign_key: true
       t.references :household_unit, null: false, foreign_key: true
-      t.references :approved_by, null: true, foreign_key: { to_table: :users }
+      t.references :approved_by, null: true, foreign_key: {to_table: :users}
       t.string :status, null: false, default: "pending"
       t.string :folio
       t.text :purpose

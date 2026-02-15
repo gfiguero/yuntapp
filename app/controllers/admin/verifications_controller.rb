@@ -1,11 +1,11 @@
 module Admin
   class VerificationsController < Admin::ApplicationController
-    before_action :set_persona, only: [ :show, :approve, :reject ]
+    before_action :set_persona, only: [:show, :approve, :reject]
 
     def index
       @personas = Persona.pending
         .joins(:user)
-        .where(users: { neighborhood_association_id: current_neighborhood_association.id })
+        .where(users: {neighborhood_association_id: current_neighborhood_association.id})
         .order(created_at: :asc)
     end
 
@@ -26,7 +26,7 @@ module Admin
 
     def set_persona
       @persona = Persona.joins(:user)
-        .where(users: { neighborhood_association_id: current_neighborhood_association.id })
+        .where(users: {neighborhood_association_id: current_neighborhood_association.id})
         .find(params[:id])
     end
   end

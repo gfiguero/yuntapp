@@ -3,35 +3,36 @@
     <% 20.times do |house_index| %>
 member_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
   household_unit: household_unit_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>
-  persona: persona_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>
+  # La referencia a 'persona' ya no existe en el modelo Member, debe ser 'verified_identity'
+  verified_identity: persona_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>
     <% end %>
   <% end %>
 <% end %>
 
 selendis_member:
   household_unit: selendis_household
-  persona: selendis_persona
+  verified_identity: selendis_persona
   status: "approved"
   household_admin: true
   approved_at: <%= Time.zone.now %>
 
 karass_dependent:
   household_unit: selendis_household
-  persona: karass_persona
+  verified_identity: karass_persona
   status: "approved"
   household_admin: false
   approved_at: <%= Time.zone.now %>
 
 vorazun_dependent:
   household_unit: selendis_household
-  persona: vorazun_persona
+  verified_identity: vorazun_persona
   status: "approved"
   household_admin: false
   approved_at: <%= Time.zone.now %>
 
 fenix_dependent:
   household_unit: selendis_household
-  persona: fenix_persona
+  verified_identity: fenix_persona
   status: "approved"
   household_admin: false
   approved_at: <%= Time.zone.now %>
