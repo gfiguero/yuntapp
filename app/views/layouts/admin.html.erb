@@ -54,9 +54,18 @@
           <li><%= link_to "Delegaciones Vecinales", admin_neighborhood_delegations_path, class: ("active" if controller_name == "neighborhood_delegations") %></li>
           <li><%= link_to "Domicilios", admin_household_units_path, class: ("active" if controller_name == "household_units") %></li>
           <li>
+            <%= link_to admin_verifications_path, class: ("active" if controller_name == "verifications") do %>
+              Verificaciones
+              <% pending_verifications = current_neighborhood_association ? Persona.pending.joins(:user).where(users: { neighborhood_association_id: current_neighborhood_association.id }).count : 0 %>
+              <% if pending_verifications > 0 %>
+                <span class="badge badge-warning badge-sm"><%= pending_verifications %></span>
+              <% end %>
+            <% end %>
+          </li>
+          <li>
             <%= link_to admin_members_path, class: ("active" if controller_name == "members") do %>
               Socios
-              <% pending = current_neighborhood_association.members.where(status: "pending").count %>
+              <% pending = current_neighborhood_association ? current_neighborhood_association.members.where(status: "pending").count : 0 %>
               <% if pending > 0 %>
                 <span class="badge badge-warning badge-sm"><%= pending %></span>
               <% end %>

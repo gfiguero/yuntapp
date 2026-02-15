@@ -1,0 +1,18 @@
+<div class="overflow-x-auto">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= I18n.t('attributes.persona.id') %></th>
+        <th><%= I18n.t('attributes.persona.name') %></th>
+        <th><%= I18n.t('attributes.persona.run') %></th>
+        <th><%= I18n.t('attributes.persona.verification_status') %></th>
+        <th><%= I18n.t('views.headers.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% personas.each do |persona| %>
+        <%= render "persona_row", persona: persona %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,77 @@
+<%
+def compute_rut_dv(body_str)
+  sum = 0
+  multiplier = 2
+  body_str.to_s.reverse.each_char do |char|
+    sum += char.to_i * multiplier
+    multiplier = multiplier == 7 ? 2 : multiplier + 1
+  end
+  remainder = 11 - (sum % 11)
+  case remainder
+  when 11 then "0"
+  when 10 then "K"
+  else remainder.to_s
+  end
+end
+%>
+
+<% 30.times do |assoc_index| %>
+  <% 15.times do |unit_index| %>
+    <% 20.times do |house_index| %>
+      <% body = (assoc_index * 100_000 + unit_index * 1_000 + house_index + 1_000_000).to_s %>
+persona_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
+  first_name: "Member"
+  last_name: "A<%= assoc_index %>U<%= unit_index %>H<%= house_index %>"
+  run: "<%= body %>-<%= compute_rut_dv(body) %>"
+  phone: "+569<%= (assoc_index * 100_000 + unit_index * 1_000 + house_index + 10_000_000).to_s.ljust(8, '0') %>"
+  email: "member_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>@koprulu.sector"
+  verification_status: "verified"
+    <% end %>
+  <% end %>
+<% end %>
+
+selendis_persona:
+  first_name: "Selendis"
+  last_name: "Daelaam"
+  run: "11111111-1"
+  phone: "+56912345678"
+  email: "selendis@daelaam.io"
+  verification_status: "verified"
+
+karass_persona:
+  first_name: "Karass"
+  last_name: "Templar"
+  run: "22222222-2"
+  phone: "+56987654321"
+  email: "karass@daelaam.io"
+  verification_status: "verified"
+
+vorazun_persona:
+  first_name: "Vorazun"
+  last_name: "Nerazim"
+  run: "33333333-3"
+  phone: "+56911112222"
+  verification_status: "verified"
+
+fenix_persona:
+  first_name: "Fenix"
+  last_name: "Purifier"
+  run: "44444444-4"
+  phone: "+56933334444"
+  verification_status: "verified"
+
+rohana_persona:
+  first_name: "Rohana"
+  last_name: "Preserver"
+  run: "55555555-5"
+  phone: "+56955556666"
+  email: "rohana@daelaam.io"
+  verification_status: "pending"
+
+karax_persona:
+  first_name: "Karax"
+  last_name: "Khalai"
+  run: "66666666-6"
+  phone: "+56977778888"
+  email: "karax@daelaam.io"
+  verification_status: "pending"

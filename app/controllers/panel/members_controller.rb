@@ -17,7 +17,21 @@ module Panel
     end
 
     def create
-      @member = Member.new(member_params)
+      run = normalize_run(persona_params[:run])
+      persona = Persona.find_or_initialize_by(run: run)
+      persona.assign_attributes(persona_params.except(:run))
+      persona.run = run
+      persona.verification_status ||= "pending"
+
+      unless persona.save
+        @member = Member.new
+        @member.errors.merge!(persona.errors)
+        render :new, status: :unprocessable_content
+        return
+      end
+
+      @member = Member.new(documents: params.dig(:member, :documents))
+      @member.persona = persona
       @member.household_unit = current_user.household_unit
       @member.requested_by = current_user
       @member.status = "pending"
@@ -41,7 +55,7 @@ module Panel
         return
       end
 
-      @member.assign_attributes(member_params)
+      @member.persona.update!(persona_params)
       @member.status = "pending"
       @member.rejection_reason = nil
 
@@ -64,8 +78,17 @@ module Panel
       @member = current_user.household_unit.members.find(params[:id])
     end
 
-    def member_params
-      params.require(:member).permit(:first_name, :last_name, :run, :phone, :email, documents: [])
+    def normalize_run(value)
+      cleaned = value.to_s.gsub(/[.\-\s]/, "").upcase
+      if cleaned.match?(/\A\d{7,8}[0-9K]\z/)
+        "#{cleaned[0..-2]}-#{cleaned[-1]}"
+      else
+        cleaned
+      end
+    end
+
+    def persona_params
+      params.require(:member).permit(:first_name, :last_name, :run, :phone, :email)
     end
   end
 end

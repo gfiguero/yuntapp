@@ -1,38 +1,29 @@
-<% content_for :title, "Log in" %>
+<% content_for :title, "Iniciar Sesión" %>
 
-<% content_for :breadcrumb_bar %>
+<div class="card bg-base-100 shadow-lg">
+  <div class="card-body">
+    <h2 class="card-title text-2xl font-bold justify-center mb-2">Iniciar Sesión</h2>
 
-<div class="flex flex-1 flex-col justify-center min-h-full">
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "grid gap-4" }) do |f| %>
 
-  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm grid gap-4">
+      <%= f.label :email, "Email", class: "floating-label" do %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input w-full", placeholder: "Email" %>
+        <span>Email</span>
+      <% end %>
 
-    <h2 class="text-2xl font-bold">Login</h2>
+      <%= f.label :password, "Contraseña", class: "floating-label" do %>
+        <%= f.password_field :password, autocomplete: "current-password", class: "input w-full", placeholder: "Contraseña" %>
+        <span>Contraseña</span>
+      <% end %>
 
-    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <%= f.check_box :remember_me, class: "checkbox checkbox-sm" %>
+        <span class="label-text">Recordarme</span>
+      </label>
 
-      <fieldset class="fieldset bg-base-200 border-base-300 rounded-box border p-4 grid gap-4">
-        <legend class="fieldset-legend">Login</legend>
-
-        <div class="grid gap-2">
-          <%= f.label :email, class: "label" %>
-          <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input w-full", placeholder: "Email" %>
-        </div>
-
-        <div class="grid gap-2">
-          <%= f.label :password, class: "label" %>
-          <%= f.password_field :password, autocomplete: "current-password", class: "input w-full", placeholder: "Password" %>
-        </div>
-
-        <div class="grid gap-2">
-          <%= f.check_box :remember_me %>
-          <%= f.label :remember_me, class: "label" %>
-        </div>
-
-        <%= f.submit "Login", class: "btn btn-neutral mt-4" %>
-      </fieldset>
-
+      <%= f.submit "Iniciar Sesión", class: "btn btn-primary w-full" %>
     <% end %>
-
-    <%= render "users/shared/links" %>
   </div>
 </div>
+
+<%= render "users/shared/links" %>

@@ -1,0 +1,12 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.verification') %></h1>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('back') + I18n.t('actions.back')), admin_verifications_path, class: "btn btn-soft" %>
+    <% if @persona.pending_verification? %>
+      <%= render "buttons", persona: @persona %>
+    <% end %>
+  </div>
+
+  <%= render "persona", persona: @persona %>
+</div>

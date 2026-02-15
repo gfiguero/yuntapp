@@ -1,0 +1,50 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('onboarding.title') %></h1>
+  <p class="text-base-content/60 mb-4"><%= I18n.t('onboarding.subtitle') %></p>
+
+  <%= render "steps", current_step: 1 %>
+
+  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step1.title') %></h2>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('onboarding.step1.description') %></p>
+
+  <%= form_with(url: panel_onboarding_step1_path, method: :patch, class: "w-full max-w-md") do |form| %>
+    <div class="grid gap-4"
+         data-controller="cascading-select"
+         data-cascading-select-data-value="<%= @cascading_data.to_json %>">
+
+      <label class="floating-label">
+        <select data-cascading-select-target="region"
+                data-prompt="<%= I18n.t('onboarding.step1.select_region') %>"
+                data-action="cascading-select#regionChanged"
+                class="select w-full">
+        </select>
+        <span><%= I18n.t('onboarding.step1.region_label') %></span>
+      </label>
+
+      <label class="floating-label">
+        <select data-cascading-select-target="commune"
+                data-prompt="<%= I18n.t('onboarding.step1.select_commune') %>"
+                data-action="cascading-select#communeChanged"
+                class="select w-full" disabled>
+        </select>
+        <span><%= I18n.t('onboarding.step1.commune_label') %></span>
+      </label>
+
+      <label class="floating-label">
+        <select data-cascading-select-target="association"
+                data-prompt="<%= I18n.t('onboarding.step1.select_association') %>"
+                data-action="cascading-select#associationChanged"
+                class="select w-full" disabled>
+        </select>
+        <span><%= I18n.t('onboarding.step1.association_label') %></span>
+      </label>
+
+      <input type="hidden" name="neighborhood_association_id"
+             data-cascading-select-target="output" required>
+    </div>
+
+    <div class="mt-6">
+      <%= form.submit I18n.t('actions.confirm'), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

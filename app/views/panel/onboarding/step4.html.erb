@@ -1,0 +1,54 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('onboarding.title') %></h1>
+  <p class="text-base-content/60 mb-4"><%= I18n.t('onboarding.subtitle') %></p>
+
+  <%= render "steps", current_step: 4 %>
+
+  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step4.title') %></h2>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('onboarding.step4.description') %></p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <%# Junta de Vecinos %>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.association_label') %></h3>
+        <p><%= @neighborhood_association.name %></p>
+        <% if @neighborhood_association.commune %>
+          <p class="text-sm text-base-content/60"><%= @neighborhood_association.commune.name %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Domicilio %>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.household_label') %></h3>
+        <p><%= @household_unit.neighborhood_delegation.name %></p>
+        <p><%= @household_unit.number %></p>
+        <% if @household_unit.address_line_1.present? %>
+          <p class="text-sm text-base-content/60"><%= @household_unit.address_line_1 %></p>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Identidad %>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.identity_label') %></h3>
+        <p><%= @persona.name %></p>
+        <p><%= @persona.run %></p>
+        <% if @persona.phone.present? %>
+          <p class="text-sm text-base-content/60"><%= @persona.phone %></p>
+        <% end %>
+        <% if @persona.identity_document.attached? %>
+          <div class="badge badge-success badge-sm mt-1"><%= I18n.t('attributes.persona.identity_document') %></div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-2">
+    <%= link_to I18n.t('actions.back'), panel_onboarding_step3_path, class: "btn btn-soft" %>
+    <%= button_to I18n.t('onboarding.step4.submit'), panel_onboarding_submit_path, method: :post, class: "btn btn-primary" %>
+  </div>
+</div>

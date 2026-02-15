@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_09_142133) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_09_210920) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -106,23 +106,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_142133) do
     t.datetime "approved_at"
     t.integer "approved_by_id"
     t.datetime "created_at", null: false
-    t.string "email"
-    t.string "first_name"
     t.boolean "household_admin", default: false
     t.integer "household_unit_id", null: false
-    t.string "last_name"
-    t.string "phone"
+    t.integer "persona_id", null: false
     t.text "rejection_reason"
     t.integer "requested_by_id"
-    t.string "run"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id"
     t.index ["approved_by_id"], name: "index_members_on_approved_by_id"
     t.index ["household_unit_id"], name: "index_members_on_household_unit_id"
+    t.index ["persona_id"], name: "index_members_on_persona_id"
     t.index ["requested_by_id"], name: "index_members_on_requested_by_id"
     t.index ["status"], name: "index_members_on_status"
-    t.index ["user_id"], name: "index_members_on_user_id"
   end
 
   create_table "neighborhood_associations", force: :cascade do |t|
@@ -139,6 +134,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_142133) do
     t.integer "neighborhood_association_id", null: false
     t.datetime "updated_at", null: false
     t.index ["neighborhood_association_id"], name: "index_neighborhood_delegations_on_neighborhood_association_id"
+  end
+
+  create_table "personas", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "first_name", null: false
+    t.string "last_name", null: false
+    t.string "phone"
+    t.string "run", null: false
+    t.datetime "updated_at", null: false
+    t.string "verification_status", default: "pending", null: false
+    t.index ["run"], name: "index_personas_on_run", unique: true
+    t.index ["verification_status"], name: "index_personas_on_verification_status"
   end
 
   create_table "regions", force: :cascade do |t|
@@ -180,18 +188,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_142133) do
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
-    t.string "first_name"
-    t.integer "household_unit_id"
-    t.string "last_name"
     t.integer "neighborhood_association_id"
+    t.integer "persona_id"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.boolean "superadmin", default: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["household_unit_id"], name: "index_users_on_household_unit_id"
     t.index ["neighborhood_association_id"], name: "index_users_on_neighborhood_association_id"
+    t.index ["persona_id"], name: "index_users_on_persona_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
@@ -205,7 +211,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_142133) do
   add_foreign_key "listings", "categories"
   add_foreign_key "listings", "users"
   add_foreign_key "members", "household_units"
-  add_foreign_key "members", "users"
+  add_foreign_key "members", "personas"
   add_foreign_key "members", "users", column: "approved_by_id"
   add_foreign_key "members", "users", column: "requested_by_id"
   add_foreign_key "neighborhood_associations", "communes"
@@ -215,6 +221,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_09_142133) do
   add_foreign_key "residence_certificates", "members"
   add_foreign_key "residence_certificates", "neighborhood_associations"
   add_foreign_key "residence_certificates", "users", column: "approved_by_id"
-  add_foreign_key "users", "household_units"
   add_foreign_key "users", "neighborhood_associations"
+  add_foreign_key "users", "personas"
 end

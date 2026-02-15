@@ -14,3 +14,7 @@ association_<%= index %>:
   name: <%= name %>
   commune: commune_0_0_<%= index % 10 %>
 <% end %>
+
+manios_de_buin:
+  name: "Junta de Vecinos Mañíos de Buin"
+  commune: commune_0_0_39

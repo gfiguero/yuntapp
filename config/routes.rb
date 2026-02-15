@@ -33,7 +33,9 @@ Rails.application.routes.draw do
   end
 
   devise_for :users, controllers: {
-    sessions: "users/sessions"
+    sessions: "users/sessions",
+    registrations: "users/registrations",
+    passwords: "users/passwords"
   }
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -54,6 +56,7 @@ Rails.application.routes.draw do
     root to: "dashboard#index"
     resource :profile, only: [ :show, :edit, :update ], controller: "profile"
     resources :household_units, only: [ :new, :create, :edit, :update ]
+    resource :verification, only: [ :show, :new, :create ], controller: "verification"
     resource :accreditation, only: [ :show, :new, :create, :edit, :update ]
     resources :members, only: [ :index, :show, :new, :create, :edit, :update ]
     resources :listings do
@@ -65,6 +68,19 @@ Rails.application.routes.draw do
       end
     end
     resources :residence_certificates, only: [:index, :show, :new, :create]
+
+    delete "reset_account", to: "account_resets#destroy", as: :reset_account
+
+    scope :onboarding do
+      get "step1", to: "onboarding#step1", as: :onboarding_step1
+      patch "step1", to: "onboarding#update_step1"
+      get "step2", to: "onboarding#step2", as: :onboarding_step2
+      patch "step2", to: "onboarding#update_step2"
+      get "step3", to: "onboarding#step3", as: :onboarding_step3
+      patch "step3", to: "onboarding#update_step3"
+      get "step4", to: "onboarding#step4", as: :onboarding_step4
+      post "submit", to: "onboarding#submit", as: :onboarding_submit
+    end
   end
 
   namespace :superadmin do
@@ -145,6 +161,12 @@ Rails.application.routes.draw do
       end
       member do
         get :delete
+      end
+    end
+    resources :verifications, only: [ :index, :show ] do
+      member do
+        patch :approve
+        patch :reject
       end
     end
     resources :members do

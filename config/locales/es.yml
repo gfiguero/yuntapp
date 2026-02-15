@@ -1,4 +1,13 @@
 es:
+  activerecord:
+    errors:
+      models:
+        persona:
+          attributes:
+            run:
+              invalid_rut_format: no tiene un formato de RUT válido
+              invalid_rut_check_digit: tiene un dígito verificador incorrecto
+
   views:
     title:
       listings: Publicaciones
@@ -9,6 +18,7 @@ es:
       board_members: Directiva
       residence_certificates: Certificados de Residencia
       accreditation: Acreditación
+      verification: Verificación de Identidad
       household_members: Socios del Domicilio
     headers:
       actions: Acciones
@@ -92,6 +102,16 @@ es:
       country: País
       postal_code: Código Postal
       commune: Comuna
+    persona:
+      id: ID
+      first_name: Nombre
+      last_name: Apellido
+      name: Nombre Completo
+      run: RUN
+      phone: Teléfono
+      email: Email
+      identity_document: Documento de Identidad (CI)
+      verification_status: Estado de Verificación
     member:
       id: ID
       name: Nombre Completo
@@ -184,6 +204,28 @@ es:
       approved: Aprobado
       rejected: Rechazado
 
+  persona:
+    message:
+      submitted: Solicitud de verificación enviada. Un administrador revisará tu documento.
+      approved: Verificación de identidad aprobada exitosamente.
+      rejected: Verificación de identidad rechazada.
+      must_verify_first: Debes verificar tu identidad antes de solicitar acreditación.
+      run_already_claimed: Este RUN ya está vinculado a otra cuenta de usuario.
+    subtitle:
+      verify_identity: Verifica tu identidad
+      your_identity: Tu Identidad
+    help:
+      verification_info: Para verificar tu identidad, sube una foto de tu Cédula de Identidad e ingresa tus datos.
+      upload_ci: Sube una foto clara de tu Cédula de Identidad.
+      pending_review: Tu verificación está siendo revisada por un administrador.
+      not_verified: Aún no has verificado tu identidad.
+    actions:
+      verify: Verificar Identidad
+    statuses:
+      pending: Pendiente
+      verified: Verificada
+      rejected: Rechazada
+
   tag:
     message:
       created: Etiqueta creada exitosamente.
@@ -207,6 +249,47 @@ es:
       created: Directivo creado exitosamente.
       updated: Directivo actualizado exitosamente.
       destroyed: Directivo eliminado exitosamente.
+
+  account_reset:
+    message:
+      completed: Tu cuenta ha sido restablecida exitosamente.
+    actions:
+      reset: Resetear Cuenta
+    confirm: "¿Estás seguro? Se eliminarán todos tus datos (identidad, domicilio, acreditación). Esta acción no se puede deshacer."
+
+  onboarding:
+    title: Acreditación
+    subtitle: Completa tu solicitud de acreditación paso a paso
+    message:
+      completed: Solicitud de acreditación enviada exitosamente. La directiva revisará tu solicitud.
+    steps:
+      neighborhood: Junta de Vecinos
+      household: Domicilio
+      identity: Identidad
+      confirm: Confirmar
+    step1:
+      title: Selecciona tu Junta de Vecinos
+      description: Elige la junta de vecinos a la que deseas acreditarte.
+      region_label: Región
+      commune_label: Comuna
+      association_label: Junta de Vecinos
+      select_region: Selecciona una región
+      select_commune: Selecciona una comuna
+      select_association: Selecciona una junta de vecinos
+    step2:
+      title: Define tu Domicilio
+      description: Ingresa los datos de tu domicilio dentro de la junta de vecinos.
+    step3:
+      title: Verifica tu Identidad
+      description: Ingresa tus datos personales y sube una foto de tu Cédula de Identidad.
+      already_verified: Tu identidad ya fue verificada.
+    step4:
+      title: Revisa y Confirma
+      description: Revisa los datos de tu solicitud antes de enviarla.
+      association_label: Junta de Vecinos
+      household_label: Domicilio
+      identity_label: Identidad
+      submit: Enviar Solicitud
 
   residence_certificate:
     message:

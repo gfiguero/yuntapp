@@ -44,17 +44,28 @@
           
           <li class="menu-title mt-4">Mis Cosas</li>
           <li><%= link_to "Mi Perfil", edit_panel_profile_path, class: ("active" if controller_name == "profile") %></li>
+          <li>
+            <%= link_to panel_verification_path, class: ("active" if controller_name == "verification") do %>
+              Verificar Identidad
+              <% if current_user.persona&.pending_verification? %>
+                <span class="badge badge-warning badge-sm"><%= I18n.t('persona.statuses.pending') %></span>
+              <% elsif current_user.persona&.verified? %>
+                <span class="badge badge-success badge-sm"><%= I18n.t('persona.statuses.verified') %></span>
+              <% end %>
+            <% end %>
+          </li>
           <li><%= link_to "Mi Domicilio", new_panel_household_unit_path, class: ("active" if controller_name == "household_units") %></li>
           <li><%= link_to "Acreditación", panel_accreditation_path, class: ("active" if controller_name == "accreditations") %></li>
           <% if current_user.household_admin? %>
             <li><%= link_to "Socios del Domicilio", panel_members_path, class: ("active" if controller_name == "members") %></li>
           <% end %>
-          <li><%= link_to "Publicaciones", panel_listings_path, class: ("active" if controller_name == "listings") %></li>
+
           <% if current_user.household_admin? %>
             <li><%= link_to "Certificados", panel_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
           <% end %>
 
           <li class="menu-title mt-4">Sistema</li>
+          <li><%= link_to I18n.t('account_reset.actions.reset'), panel_reset_account_path, data: { turbo_method: :delete, turbo_confirm: I18n.t('account_reset.confirm') }, class: "text-error" %></li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
         </ul>
       

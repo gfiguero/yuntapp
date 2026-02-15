@@ -1,0 +1,45 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.verification') %></h1>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('back') + I18n.t('actions.back')), panel_root_path, class: "btn btn-soft" %>
+  </div>
+
+  <div class="mb-4">
+    <% if @persona.pending_verification? %>
+      <div class="badge badge-warning badge-lg"><%= I18n.t('persona.statuses.pending') %></div>
+      <p class="text-sm mt-2"><%= I18n.t('persona.help.pending_review') %></p>
+    <% elsif @persona.verified? %>
+      <div class="badge badge-success badge-lg"><%= I18n.t('persona.statuses.verified') %></div>
+    <% elsif @persona.rejected_verification? %>
+      <div class="badge badge-error badge-lg"><%= I18n.t('persona.statuses.rejected') %></div>
+    <% end %>
+  </div>
+
+  <dl class="mb-4 divide-y divide-gray-400 w-1/3">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.persona.name') %></dt>
+      <dd><%= @persona.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.persona.run') %></dt>
+      <dd><%= @persona.run %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('attributes.persona.phone') %></dt>
+      <dd><%= @persona.phone || "—" %></dd>
+    </div>
+    <% if @persona.identity_document.attached? %>
+      <div class="p-2 grid gap-2">
+        <dt class="font-medium"><%= I18n.t('attributes.persona.identity_document') %></dt>
+        <dd>
+          <% if @persona.identity_document.image? %>
+            <%= image_tag rails_blob_path(@persona.identity_document, disposition: "inline"), class: "max-w-xs rounded-lg" %>
+          <% else %>
+            <%= link_to @persona.identity_document.filename, rails_blob_path(@persona.identity_document, disposition: "attachment"), class: "link link-primary" %>
+          <% end %>
+        </dd>
+      </div>
+    <% end %>
+  </dl>
+</div>

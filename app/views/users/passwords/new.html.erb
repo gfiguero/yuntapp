@@ -1,16 +1,21 @@
-<h2>Forgot your password?</h2>
+<% content_for :title, "Recuperar Contraseña" %>
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "users/shared/error_messages", resource: resource %>
+<div class="card bg-base-100 shadow-lg">
+  <div class="card-body">
+    <h2 class="card-title text-2xl font-bold justify-center mb-2">Recuperar Contraseña</h2>
+    <p class="text-sm text-base-content/60 text-center mb-2">Ingresa tu email y te enviaremos instrucciones para restablecer tu contraseña.</p>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: "grid gap-4" }) do |f| %>
+      <%= render "users/shared/error_messages", resource: resource %>
+
+      <%= f.label :email, "Email", class: "floating-label" do %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input w-full", placeholder: "Email" %>
+        <span>Email</span>
+      <% end %>
+
+      <%= f.submit "Enviar instrucciones", class: "btn btn-primary w-full" %>
+    <% end %>
   </div>
-
-  <div class="actions">
-    <%= f.submit "Send me password reset instructions" %>
-  </div>
-<% end %>
+</div>
 
 <%= render "users/shared/links" %>

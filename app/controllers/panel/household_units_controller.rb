@@ -16,7 +16,7 @@ module Panel
       @household_unit = HouseholdUnit.new(household_unit_params)
 
       if @household_unit.save
-        current_user.update!(household_unit: @household_unit)
+        session[:pending_household_unit_id] = @household_unit.id
 
         redirect_to new_panel_accreditation_path, notice: "Domicilio creado. Ahora completa tu acreditación."
       else

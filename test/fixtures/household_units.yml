@@ -20,3 +20,13 @@ household_unit_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
     <% end %>
   <% end %>
 <% end %>
+
+selendis_household:
+  number: "Nexus #1-A"
+  neighborhood_delegation: neighborhood_delegation_0_0
+  address_line_1: "742 Aiur Boulevard"
+  city: "Shakuras City"
+  region: "Sector 1"
+  country: "Koprulu Sector"
+  postal_code: "10001"
+  commune: commune_0_0_0

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html data-theme="light">
+  <head>
+    <title><%= content_for(:title) || "Yuntapp" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-base-200 min-h-screen flex flex-col">
+    <div class="flex flex-1 items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+          <%= link_to root_path, class: "inline-block" do %>
+            <h1 class="text-4xl font-bold tracking-tight">Yuntapp</h1>
+            <p class="text-base-content/60 text-sm mt-1">Plataforma vecinal</p>
+          <% end %>
+        </div>
+
+        <% flash.each do |type, message| %>
+          <% alert_class = case type
+               when "notice" then "alert-success"
+               when "alert" then "alert-warning"
+               when "error" then "alert-error"
+               else "alert-info"
+             end %>
+          <div class="alert <%= alert_class %> mb-4">
+            <span><%= message %></span>
+          </div>
+        <% end %>
+
+        <%= yield %>
+
+      </div>
+    </div>
+  </body>
+</html>

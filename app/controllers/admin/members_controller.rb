@@ -1,5 +1,5 @@
 module Admin
-  class MembersController < ApplicationController
+  class MembersController < Admin::ApplicationController
     include Pagy::Method
 
     before_action :set_member, only: %i[show edit update delete destroy approve reject]
@@ -42,7 +42,21 @@ module Admin
 
     # POST /admin/members
     def create
-      @member = Member.new(member_params)
+      run = normalize_run(persona_params[:run])
+      persona = Persona.find_or_initialize_by(run: run)
+      persona.assign_attributes(persona_params.except(:run))
+      persona.run = run
+      persona.verification_status ||= "pending"
+
+      unless persona.save
+        @member = Member.new
+        @member.errors.merge!(persona.errors)
+        render :new, status: :unprocessable_content
+        return
+      end
+
+      @member = Member.new(household_unit_id: params.dig(:member, :household_unit_id))
+      @member.persona = persona
 
       if @member.save
         redirect_to admin_member_path(@member), notice: I18n.t("member.message.created")
@@ -53,7 +67,8 @@ module Admin
 
     # PATCH/PUT /admin/members/1
     def update
-      if @member.update(member_params)
+      @member.persona.update!(persona_params)
+      if @member.update(household_unit_id: params.dig(:member, :household_unit_id))
         redirect_to admin_member_path(@member), notice: I18n.t("member.message.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
@@ -94,9 +109,17 @@ module Admin
       @member = current_neighborhood_association.members.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
-    def member_params
-      params.require(:member).permit(:first_name, :last_name, :run, :phone, :email, :household_unit_id)
+    def normalize_run(value)
+      cleaned = value.to_s.gsub(/[.\-\s]/, "").upcase
+      if cleaned.match?(/\A\d{7,8}[0-9K]\z/)
+        "#{cleaned[0..-2]}-#{cleaned[-1]}"
+      else
+        cleaned
+      end
+    end
+
+    def persona_params
+      params.require(:member).permit(:first_name, :last_name, :run, :phone, :email)
     end
 
     def set_members
@@ -110,7 +133,7 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :first_name, :last_name, :run, :status).reject { |key, value| value.blank? }
+      params.permit(:id, :name, :run, :status).reject { |key, value| value.blank? }
     end
 
     def disabled_pagination
