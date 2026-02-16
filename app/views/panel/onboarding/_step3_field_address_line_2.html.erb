@@ -1,0 +1,11 @@
+    <%# CAMPO: Detalle (Address Line 2) %>
+    <%= turbo_frame_tag "field_address_line_2" do %>
+      <%= form_with(model: residence_request, url: panel_onboarding_step3_path, method: :patch, data: { controller: "autosave", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
+        <% invalid = residence_request.errors.include?(:address_line_2) %>
+        <%= form.label :address_line_2, I18n.t('attributes.household_unit.address_line_2'), class: "floating-label" do %>
+          <%= form.text_field :address_line_2, class: "input w-full #{input_class(residence_request, :address_line_2)}", placeholder: I18n.t('attributes.household_unit.address_line_2'), data: { action: "input->autosave#submit" } %>
+          <span><%= I18n.t('attributes.household_unit.address_line_2') %></span>
+        <% end %>
+        <%= raw(error_message(invalid, residence_request.errors.full_messages_for(:address_line_2))) %>
+      <% end %>
+    <% end %>

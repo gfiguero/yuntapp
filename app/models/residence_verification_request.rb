@@ -1,13 +1,15 @@
 class ResidenceVerificationRequest < ApplicationRecord
   belongs_to :user
   belongs_to :neighborhood_association
-  belongs_to :neighborhood_delegation
+  belongs_to :neighborhood_delegation, optional: true
   belongs_to :commune
   belongs_to :onboarding_request, optional: true
 
   STATUSES = %w[pending approved rejected].freeze
 
-  validates :number, :neighborhood_delegation_id, presence: true
+  validates :number, presence: true, allow_blank: true
+  validates :neighborhood_delegation_id, presence: true, if: -> { address_line_1.blank? }, allow_blank: true
+  validates :address_line_1, presence: true, if: -> { neighborhood_delegation_id.blank? }, allow_blank: true
   validates :status, inclusion: {in: STATUSES}
 
   scope :pending, -> { where(status: "pending") }

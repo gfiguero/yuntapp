@@ -129,8 +129,8 @@ es:
       id: ID
       number: Numeración
       neighborhood_delegation: Delegación Vecinal (Calle)
-      address_line_1: Dirección 1
-      address_line_2: Dirección 2
+      address_line_1: Calle
+      address_line_2: Detalle (Depto, Casa, Piso, etc.) - Opcional
       city: Ciudad
       region: Región
       country: País
@@ -317,6 +317,8 @@ es:
     step3:
       title: Define tu Domicilio
       description: Ingresa los datos de tu domicilio dentro de la junta de vecinos.
+      manual_address_option: "Mi dirección no aparece en la lista / Ingresar manualmente"
+      manual_address_hint: "Ingresa el nombre de tu calle o pasaje si no se encuentra en el listado oficial."
     step4:
       title: Revisa y Confirma
       description: Revisa los datos de tu solicitud antes de enviarla.

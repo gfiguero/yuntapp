@@ -1,0 +1,13 @@
+    <%= turbo_frame_tag "step3_submit_button" do %>
+      <% 
+         # Validación básica para habilitar botón
+         # Debe tener número Y (delegación O calle manual)
+         has_location = residence_request.neighborhood_delegation_id.present? || residence_request.address_line_1.present?
+         can_continue = residence_request.number.present? && has_location
+      %>
+      <%= form_with(url: panel_onboarding_step3_path, method: :patch, data: { turbo: false }) do |form| %>
+    <%# Enviar un campo dummy para que residence_verification_params no falle por ParameterMissing %>
+    <%= hidden_field_tag "residence_verification_request[dummy]", "1" %>
+    <%= form.submit I18n.t('actions.continue'), class: "btn btn-primary", name: "commit_continue", disabled: !can_continue %>
+  <% end %>
+    <% end %>

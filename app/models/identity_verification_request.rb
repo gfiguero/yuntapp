@@ -45,6 +45,10 @@ class IdentityVerificationRequest < ApplicationRecord
   before_validation :normalize_run_field
   before_validation :normalize_names
 
+  def full_name
+    "#{first_name} #{last_name}".strip
+  end
+
   def draft? = status == "draft"
   def pending? = status == "pending"
   def approved? = status == "approved"

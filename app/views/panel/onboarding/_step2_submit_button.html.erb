@@ -7,6 +7,8 @@
                         identity_request.identity_documents.attached? 
       %>
       <%= form_with(url: panel_onboarding_step2_path, method: :patch, data: { turbo: false }) do |form| %>
+        <%# Enviar un campo dummy para evitar ParameterMissing en el controlador %>
+        <%= hidden_field_tag "identity_verification_request[dummy]", "1" %>
         <%= form.submit I18n.t('actions.continue'), class: "btn btn-primary", name: "commit_continue", disabled: !can_continue %>
       <% end %>
     <% end %>

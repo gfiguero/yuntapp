@@ -154,7 +154,7 @@ module Panel
 
         # CREAMOS la solicitud inmediatamente en estado draft
         # NO pre-llenamos datos (limpieza de proceso de revalidación)
-        
+
         @identity_request = IdentityVerificationRequest.new(
           user: current_user,
           neighborhood_association_id: @onboarding_request.neighborhood_association_id,
@@ -311,40 +311,146 @@ module Panel
       @neighborhood_association = NeighborhoodAssociation.find(session.dig(:onboarding, "neighborhood_association_id"))
       @delegations = @neighborhood_association.neighborhood_delegations.order(:name)
 
-      # Pre-llenamos si existe una solicitud previa
-      # last_request = current_user.residence_verification_requests.last
+      # Recuperamos la solicitud de onboarding
+      @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
 
-      @residence_request = ResidenceVerificationRequest.new
+      # Si ya existe una solicitud de residencia asociada, la usamos
+      if @onboarding_request&.residence_verification_request
+        @residence_request = @onboarding_request.residence_verification_request
+      else
+        # Si no, creamos una nueva vacía
+        @residence_request = ResidenceVerificationRequest.new(
+          user: current_user,
+          neighborhood_association_id: @onboarding_request.neighborhood_association_id,
+          onboarding_request: @onboarding_request,
+          status: "draft"
+        )
+        
+        # Guardamos inmediatamente en draft para tener ID y persistencia
+        if @residence_request.save
+          session[:onboarding]["residence_request_id"] = @residence_request.id
+        else
+          flash[:alert] = "No se pudo iniciar el paso de residencia: #{@residence_request.errors.full_messages.join(', ')}"
+          redirect_to panel_onboarding_step2_path
+        end
+      end
     end
 
     def update_step3
       @neighborhood_association = NeighborhoodAssociation.find(session.dig(:onboarding, "neighborhood_association_id"))
       @delegations = @neighborhood_association.neighborhood_delegations.order(:name)
 
-      @residence_request = ResidenceVerificationRequest.new(residence_verification_params)
-      @residence_request.user = current_user
-      @residence_request.neighborhood_association = @neighborhood_association
-      @residence_request.onboarding_request_id = session.dig(:onboarding, "onboarding_request_id")
-      @residence_request.commune = @neighborhood_association.commune # Asumimos misma comuna que la junta
-      @residence_request.status = "pending"
+      @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
+      
+      # Recuperamos la solicitud existente asociada al onboarding request
+      @residence_request = @onboarding_request.residence_verification_request
+      
+      # Fallback por si no existiera (aunque debería por step3)
+      if @residence_request.nil?
+         @residence_request = ResidenceVerificationRequest.new(
+          user: current_user,
+          neighborhood_association_id: @onboarding_request.neighborhood_association_id,
+          onboarding_request: @onboarding_request,
+          status: "draft"
+        )
+      end
 
-      # Rellenamos datos geográficos básicos basados en la asociación si faltan en el form
-      @residence_request.region = @neighborhood_association.commune&.region&.name
-      @residence_request.country = @neighborhood_association.commune&.region&.country&.name
+      # Actualizamos atributos
+      @residence_request.assign_attributes(residence_verification_params)
 
+      # Intentamos guardar
       if @residence_request.save
         session[:onboarding]["residence_request_id"] = @residence_request.id
-        redirect_to panel_onboarding_step4_path
+
+        # Si se hizo clic en continuar
+        if params[:commit_continue].present?
+          # Validamos completitud
+          has_location = @residence_request.neighborhood_delegation_id.present? || @residence_request.address_line_1.present?
+          if @residence_request.number.present? && has_location
+            redirect_to panel_onboarding_step4_path
+          else
+            @residence_request.errors.add(:base, "Debes completar los campos obligatorios.")
+            # Forzamos errores visuales
+            @residence_request.errors.add(:number, :blank) if @residence_request.number.blank?
+            unless has_location
+              @residence_request.errors.add(:neighborhood_delegation_id, :blank) if @residence_request.address_line_1.blank?
+              @residence_request.errors.add(:address_line_1, :blank) if @residence_request.neighborhood_delegation_id.blank?
+            end
+
+            respond_to do |format|
+              format.html { render :step3, status: :unprocessable_content }
+            end
+          end
+        else
+          # Actualización parcial (Autosave)
+          # Identificamos qué campo se envió para actualizar solo ese frame
+
+          respond_to do |format|
+            format.turbo_stream do
+              streams = []
+
+              # Si se envió delegación, dirección manual o checkbox manual
+              if params[:residence_verification_request].key?(:neighborhood_delegation_id) ||
+                 params[:residence_verification_request].key?(:address_line_1) ||
+                 params[:residence_verification_request].key?(:manual_address)
+
+                 streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: { residence_request: @residence_request, delegations: @delegations })
+              end
+
+              # Si se envió número
+              if params[:residence_verification_request].key?(:number)
+                streams << turbo_stream.replace("field_number", partial: "panel/onboarding/step3_field_number", locals: { residence_request: @residence_request })
+              end
+
+              # Si se envió detalle
+              if params[:residence_verification_request].key?(:address_line_2)
+                streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: { residence_request: @residence_request })
+              end
+
+              # Siempre actualizamos el botón de continuar
+              streams << turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: { residence_request: @residence_request })
+
+              render turbo_stream: streams
+            end
+            format.html { render :step3 }
+          end
+        end
       else
-        render :step3, status: :unprocessable_content
+        # Si falla validación
+        respond_to do |format|
+          format.html { render :step3, status: :unprocessable_content }
+          format.turbo_stream do
+             # Renderizamos los mismos streams para mostrar errores
+             streams = []
+             streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: { residence_request: @residence_request, delegations: @delegations })
+             streams << turbo_stream.replace("field_number", partial: "panel/onboarding/step3_field_number", locals: { residence_request: @residence_request })
+             streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: { residence_request: @residence_request })
+             streams << turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: { residence_request: @residence_request })
+             render turbo_stream: streams
+          end
+        end
       end
     end
 
     def step4
-      @onboarding_request = OnboardingRequest.find(session.dig(:onboarding, "onboarding_request_id"))
+      @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
+      
+      # Si no encontramos la solicitud principal, algo anda mal con la sesión
+      if @onboarding_request.nil?
+        redirect_to panel_onboarding_step1_path
+        return
+      end
+
+      # Cargamos las asociaciones a través del onboarding_request para garantizar consistencia
       @neighborhood_association = @onboarding_request.neighborhood_association
       @identity_request = @onboarding_request.identity_verification_request
       @residence_request = @onboarding_request.residence_verification_request
+
+      # Validación final: Si falta alguna pieza clave, redirigimos al paso correspondiente
+      unless @neighborhood_association && @identity_request && @residence_request
+        flash[:alert] = "Faltan datos para completar el resumen. Por favor revisa los pasos anteriores."
+        redirect_to panel_onboarding_step1_path
+      end
     end
 
     def submit
@@ -399,11 +505,22 @@ module Panel
     end
 
     def verification_params
-      params.fetch(:identity_verification_request, {}).permit(:first_name, :last_name, :run, :phone, :email, identity_documents: [])
+      # Permitimos parámetros vacíos si vienen del botón continuar (dummy)
+      if params[:identity_verification_request].present?
+        params.fetch(:identity_verification_request, {}).permit(:first_name, :last_name, :run, :phone, :email, identity_documents: [])
+      else
+        {}
+      end
     end
 
     def residence_verification_params
-      params.require(:residence_verification_request).permit(:number, :address_line_1, :address_line_2, :neighborhood_delegation_id)
+      # Permitimos parámetros vacíos si vienen del botón continuar (dummy)
+      # Pero si vienen datos reales, los procesamos.
+      if params[:residence_verification_request].present?
+        params.require(:residence_verification_request).permit(:number, :address_line_1, :address_line_2, :neighborhood_delegation_id, :manual_address)
+      else
+        {}
+      end
     end
 
     def build_cascading_data

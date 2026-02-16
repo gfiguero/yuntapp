@@ -23,7 +23,7 @@
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
         <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.identity_label') %></h3>
-        <p><%= @identity_request.name %></p>
+        <p><%= @identity_request.full_name %></p>
         <p><%= @identity_request.run %></p>
         <% if @identity_request.phone.present? %>
           <p class="text-sm text-base-content/60"><%= @identity_request.phone %></p>
