@@ -55,64 +55,90 @@ module Panel
     end
 
     def update_step1
-      # Este método ahora puede recibir region_id, commune_id y neighborhood_association_id
-      # para ir guardando el progreso parcial.
+      @selected_region_id = params[:region_id]
+      @selected_commune_id = params[:commune_id]
+      @selected_association_id = params[:neighborhood_association_id]
 
+      # Si cambió la región, reseteamos comuna y asociación
+      # Detectamos cambio si viene región pero no comuna (indicando que el submit fue del selector de región)
+      # O comparamos con lo que había en sesión si quisiéramos ser más estrictos, pero el frontend envía lo que tiene.
+      # La lógica de cascada simple es: Si llega region_id nuevo, y commune_id no coincide con una válida de esa región (o está vacío), resetear.
+
+      # Lógica de cascada:
+      # El formulario de región solo envía :region_id.
+      # El formulario de comuna envía :commune_id y :region_id (hidden).
+
+      # Si commit_continue está presente, intentamos avanzar
+      if params[:commit_continue].present?
+        if @selected_association_id.present?
+          # Aseguramos persistencia antes de continuar
+          @onboarding_request = current_user.current_onboarding_request
+          @onboarding_request ||= OnboardingRequest.create!(user: current_user, status: "draft")
+          @onboarding_request.update(
+            region_id: @selected_region_id,
+            commune_id: @selected_commune_id,
+            neighborhood_association_id: @selected_association_id
+          )
+
+          session[:onboarding]["neighborhood_association_id"] = @selected_association_id
+          session[:onboarding]["onboarding_request_id"] = @onboarding_request.id
+
+          redirect_to panel_onboarding_step2_path
+        else
+          # Esto no debería pasar si el botón está disabled, pero por seguridad:
+          respond_to do |format|
+            format.html { render :step1, status: :unprocessable_content }
+          end
+        end
+        return
+      end
+
+      # Si no es continuar, es una actualización de selectores
+
+      # Si se seleccionó región (y no venía comuna, o venía pero queremos validar cascada)
+      # Al cambiar región, el params[:commune_id] no vendrá porque el form de región no lo incluye.
+      # Por lo tanto, si params[:commune_id] es nil, asumimos reset de comuna.
+      if params[:region_id].present? && params[:commune_id].nil?
+        @selected_commune_id = nil
+        @selected_association_id = nil
+      end
+
+      # Si se seleccionó comuna (y no venía asociación)
+      if params[:commune_id].present? && params[:neighborhood_association_id].nil?
+        @selected_association_id = nil
+      end
+
+      # Persistencia parcial (opcional pero recomendada para no perder progreso si refrescan)
       @onboarding_request = current_user.current_onboarding_request
-      # Fallback create if missing (should not happen due to step1 logic but safe to keep)
-      @onboarding_request ||= OnboardingRequest.create!(user: current_user, status: "draft")
-
-      # Actualizamos campos según lo que venga en params
-      updates = {}
-
-      # Si cambia la región (incluso a vacío)
-      if params.key?(:region_id)
-        if params[:region_id] != @onboarding_request.region_id.to_s
-          updates[:region_id] = params[:region_id].presence # Guarda nil si es string vacío
-          updates[:commune_id] = nil
-          updates[:neighborhood_association_id] = nil
-        end
+      if @onboarding_request
+        @onboarding_request.update(
+          region_id: @selected_region_id,
+          commune_id: @selected_commune_id,
+          neighborhood_association_id: @selected_association_id
+        )
       end
 
-      # Si cambia la comuna (incluso a vacío)
-      if params.key?(:commune_id)
-        # Solo procesamos cambio de comuna si no se está reseteando la región al mismo tiempo (para evitar doble seteo)
-        # O si ya tenemos una región válida
-        if params[:commune_id] != @onboarding_request.commune_id.to_s && !updates.key?(:region_id)
-          updates[:commune_id] = params[:commune_id].presence
-          updates[:neighborhood_association_id] = nil
+      @cascading_data = build_cascading_data
+
+      respond_to do |format|
+        format.turbo_stream do
+          streams = []
+
+          # Siempre actualizamos el selector de región (para feedback visual de selección)
+          streams << turbo_stream.replace("field_region", partial: "panel/onboarding/step1_field_region", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id})
+
+          # Actualizamos selector de comuna (contenido cambia según región)
+          streams << turbo_stream.replace("field_commune", partial: "panel/onboarding/step1_field_commune", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id})
+
+          # Actualizamos selector de asociación (contenido cambia según comuna)
+          streams << turbo_stream.replace("field_association", partial: "panel/onboarding/step1_field_association", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id, selected_association_id: @selected_association_id})
+
+          # Actualizamos botón submit (habilitar/deshabilitar)
+          streams << turbo_stream.replace("step1_submit_button", partial: "panel/onboarding/step1_submit_button", locals: {selected_association_id: @selected_association_id, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id})
+
+          render turbo_stream: streams
         end
-      end
-
-      # Si cambia la junta (incluso a vacío)
-      if params.key?(:neighborhood_association_id)
-        if params[:neighborhood_association_id] != @onboarding_request.neighborhood_association_id.to_s && !updates.key?(:commune_id)
-          updates[:neighborhood_association_id] = params[:neighborhood_association_id].presence
-        end
-      end
-
-      @onboarding_request.update(updates) if updates.any?
-
-      # Si se hizo clic en el botón "Continuar" (name="commit_continue")
-      # O si viene el ID y NO es una petición de Turbo Frame (fallback para navegadores sin JS/Turbo)
-      if params[:commit_continue].present? && @onboarding_request.neighborhood_association_id.present?
-        session[:onboarding] ||= {}
-        session[:onboarding]["neighborhood_association_id"] = @onboarding_request.neighborhood_association_id
-        session[:onboarding]["onboarding_request_id"] = @onboarding_request.id
-
-        redirect_to panel_onboarding_step2_path
-      else
-        # Si es solo una actualización parcial (ej: cambio de región o selección de junta via onchange)
-        # Respondemos con HTML para actualizar el formulario (y habilitar el botón si corresponde)
-
-        @cascading_data = build_cascading_data
-        @selected_region_id = @onboarding_request.region_id
-        @selected_commune_id = @onboarding_request.commune_id
-        @selected_association_id = @onboarding_request.neighborhood_association_id
-
-        respond_to do |format|
-          format.html { render :step1 }
-        end
+        format.html { render :step1 }
       end
     end
 
@@ -163,8 +189,11 @@ module Panel
       @identity_request.assign_attributes(verification_params)
 
       # Intentamos guardar (en draft no valida campos obligatorios, pero sí formatos si los hay)
+      # Forzamos validación para ver si hay errores de formato, pero permitimos guardar si es draft
       if @identity_request.save
-        @identity_request.identity_document.attach(params[:identity_verification_request][:identity_document]) if params[:identity_verification_request][:identity_document].present?
+        # La adjunción de documentos ya se manejó automáticamente mediante assign_attributes(verification_params)
+        # al inicio del método, ya que verification_params incluye :identity_documents.
+        # No es necesario llamar a attach manualmente.
 
         # Guardamos el ID de la solicitud en sesión
         session[:onboarding]["identity_request_id"] = @identity_request.id
@@ -172,36 +201,107 @@ module Panel
         # Si se hizo clic en continuar, VALIDAMOS COMPLETITUD y redirigimos
         if params[:commit_continue].present?
           # Validamos manualmente que estén los campos requeridos antes de avanzar
-          if @identity_request.first_name.present? && @identity_request.last_name.present? && @identity_request.run.present? && @identity_request.phone.present?
+          if @identity_request.first_name.present? && @identity_request.last_name.present? && @identity_request.run.present? && @identity_request.phone.present? && @identity_request.identity_documents.attached?
             redirect_to panel_onboarding_step3_path
           else
             @identity_request.errors.add(:base, "Debes completar todos los campos obligatorios para continuar.")
             # Forzamos validación de presencia para mostrar errores en la vista
-            @identity_request.valid?
             # Agregamos errores manualmente a los campos vacíos para que se iluminen
             [:first_name, :last_name, :run, :phone].each do |attr|
               @identity_request.errors.add(attr, :blank) if @identity_request.send(attr).blank?
             end
+            @identity_request.errors.add(:identity_documents, :blank) unless @identity_request.identity_documents.attached?
 
             respond_to do |format|
               format.html { render :step2, status: :unprocessable_content }
             end
           end
         else
-          # Si es actualización parcial, respondemos con HTML para Turbo Frame
+          # Si es actualización parcial (autosave), validamos SOLO los campos que se enviaron
+
+          # Identificamos qué campo se envió
+          field_name = params[:identity_verification_request].keys.first
+
+          # Limpiamos errores de OTROS campos
+          @identity_request.errors.attribute_names.each do |attr|
+            next if attr == :base
+            unless attr.to_s == field_name.to_s
+              @identity_request.errors.delete(attr)
+            end
+          end
+
+          # Validamos presencia solo para el campo enviado
+          if @identity_request.send(field_name).blank?
+            @identity_request.errors.add(field_name, :blank)
+          end
+
+          # Estrategia Correcta: Devolver Turbo Streams para actualizar:
+          # 1. El campo que se editó (con su validación visual)
+          # 2. El botón de continuar (habilitar/deshabilitar)
+
           respond_to do |format|
+            format.turbo_stream do
+              render turbo_stream: [
+                # Reemplazamos el frame del campo específico extrayéndolo de la vista completa (truco de rendering)
+                # O mejor, usamos un partial genérico si es posible, pero como cada campo es diferente,
+                # lo más limpio ahora es renderizar inline el contenido del frame específico.
+
+                # Opción pragmática: Actualizamos el frame del campo usando `replace` con el contenido renderizado del bloque correspondiente
+                # Pero eso requiere tener el bloque aislado.
+
+                # Vamos a usar una técnica de "Self-Replacement" usando `render_to_string` y Nokogiri? No, muy lento.
+                # Mejor refactorizar la vista para usar partials por campo.
+
+                turbo_stream.replace("field_#{field_name}", partial: "panel/onboarding/step2_field_#{field_name}", locals: {identity_request: @identity_request}),
+
+                # Actualizamos el botón
+                turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: {identity_request: @identity_request})
+              ]
+            end
+            # Fallback para navegadores sin JS
             format.html { render :step2 }
           end
         end
       else
-        # Si hay errores de formato u otros
+        # Si falla el guardado (ej: formato inválido), mostramos errores
+        # Pero limpiamos errores irrelevantes
+        if params[:identity_verification_request].present?
+          field_name = params[:identity_verification_request].keys.first
+          @identity_request.errors.attribute_names.each do |attr|
+            next if attr == :base
+            unless attr.to_s == field_name.to_s
+              @identity_request.errors.delete(attr)
+            end
+          end
+        end
+
         respond_to do |format|
           format.html { render :step2, status: :unprocessable_content }
         end
       end
     end
 
-    # STEP 3: Domicilio (Antes Step 2)
+    def delete_document
+      @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
+      @identity_request = @onboarding_request.identity_verification_request
+
+      if @identity_request
+        attachment = @identity_request.identity_documents.find_by(id: params[:attachment_id])
+        attachment&.purge
+      end
+
+      respond_to do |format|
+        format.html { redirect_to panel_onboarding_step2_path }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("field_identity_documents", partial: "panel/onboarding/step2_field_identity_documents", locals: {identity_request: @identity_request}),
+            turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: {identity_request: @identity_request})
+          ]
+        end
+      end
+    end
+
+    # STEP 3: Confirmación (Antes Step 4)
     def step3
       @neighborhood_association = NeighborhoodAssociation.find(session.dig(:onboarding, "neighborhood_association_id"))
       @delegations = @neighborhood_association.neighborhood_delegations.order(:name)
@@ -296,7 +396,7 @@ module Panel
     end
 
     def verification_params
-      params.require(:identity_verification_request).permit(:first_name, :last_name, :run, :phone)
+      params.fetch(:identity_verification_request, {}).permit(:first_name, :last_name, :run, :phone, :email, identity_documents: [])
     end
 
     def residence_verification_params

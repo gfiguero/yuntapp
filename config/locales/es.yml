@@ -14,11 +14,28 @@ es:
   activerecord:
     errors:
       models:
+        identity_verification_request:
+          attributes:
+            run:
+              invalid_rut_format: no tiene un formato de RUT válido
+              invalid_rut_check_digit: tiene un dígito verificador incorrecto
+              blank: no puede estar en blanco
+            first_name:
+              blank: no puede estar en blanco
+            last_name:
+              blank: no puede estar en blanco
+            phone:
+              blank: no puede estar en blanco
+              invalid_phone_format: debe ser un número de celular válido (+569...)
+            identity_document:
+              blank: debes adjuntar una foto de tu cédula
         persona:
           attributes:
             run:
               invalid_rut_format: no tiene un formato de RUT válido
               invalid_rut_check_digit: tiene un dígito verificador incorrecto
+            phone:
+              invalid_phone_format: debe ser un número de celular válido (+569...)
 
   views:
     title:

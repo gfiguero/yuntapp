@@ -3,14 +3,39 @@ class IdentityVerificationRequest < ApplicationRecord
   belongs_to :neighborhood_association
   belongs_to :onboarding_request, optional: true
 
-  has_one_attached :identity_document
+  has_many_attached :identity_documents
 
   STATUSES = %w[draft pending approved rejected].freeze
 
-  validates :status, inclusion: { in: STATUSES }
+  validates :status, inclusion: {in: STATUSES}
 
   # Validaciones solo si no está en borrador
-  validates :first_name, :last_name, :run, :phone, presence: true, unless: :draft?
+  validates :first_name, :last_name, :run, :phone, presence: true, unless: -> { draft? || status == "draft" }
+
+  # Validaciones de formato siempre (incluso en draft, si el campo no está vacío)
+  validates :run, run: true, if: -> { run.present? }
+  validates :phone, phone: true, if: -> { phone.present? }
+
+  # Normalización de teléfono antes de validar
+  before_validation :normalize_phone
+
+  def normalize_phone
+    return if phone.blank?
+
+    # Limpiamos caracteres no numéricos excepto el + inicial
+    clean_phone = phone.to_s.gsub(/[^0-9+]/, "")
+
+    # Si empieza con 9 y tiene 9 dígitos (ej: 912345678), agregamos +56
+    self.phone = if clean_phone.match?(/\A9\d{8}\z/)
+      "+56#{clean_phone}"
+    # Si empieza con 569 y tiene 11 dígitos, agregamos +
+    elsif clean_phone.match?(/\A569\d{8}\z/)
+      "+#{clean_phone}"
+    # Si ya tiene formato correcto (+569...), lo dejamos igual (o limpiamos espacios extra si hubiera)
+    else
+      clean_phone
+    end
+  end
 
   scope :draft, -> { where(status: "draft") }
   scope :pending, -> { where(status: "pending") }

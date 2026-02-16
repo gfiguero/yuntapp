@@ -9,11 +9,24 @@ class VerifiedIdentity < ApplicationRecord
 
   before_validation :normalize_run_field
   before_validation :normalize_names
+  before_validation :normalize_phone
 
   validates :first_name, :last_name, :run, presence: true
-  validates :run, uniqueness: true
-  validate :run_must_be_valid_chilean_rut, if: -> { run.present? }
+  validates :run, uniqueness: true, run: true, if: -> { run.present? }
+  validates :phone, phone: true, if: -> { phone.present? }
   validates :verification_status, presence: true, inclusion: {in: VERIFICATION_STATUSES}
+
+  def normalize_phone
+    return if phone.blank?
+    clean_phone = phone.to_s.gsub(/[^0-9+]/, "")
+    self.phone = if clean_phone.match?(/\A9\d{8}\z/)
+      "+56#{clean_phone}"
+    elsif clean_phone.match?(/\A569\d{8}\z/)
+      "+#{clean_phone}"
+    else
+      clean_phone
+    end
+  end
 
   scope :verified, -> { where(verification_status: "verified") }
   scope :pending, -> { where(verification_status: "pending") }
@@ -30,31 +43,6 @@ class VerifiedIdentity < ApplicationRecord
     self.run = run.to_s.gsub(/[.\-\s]/, "").upcase
     # Insertar guión antes del dígito verificador: 12345678K → 12345678-K
     self.run = "#{run[0..-2]}-#{run[-1]}" if run.match?(/\A\d{7,8}[0-9K]\z/)
-  end
-
-  def run_must_be_valid_chilean_rut
-    unless run.match?(/\A\d{7,8}-[0-9K]\z/)
-      errors.add(:run, :invalid_rut_format)
-      return
-    end
-
-    body, dv = run.split("-")
-    errors.add(:run, :invalid_rut_check_digit) unless dv == compute_rut_check_digit(body)
-  end
-
-  def compute_rut_check_digit(body)
-    sum = 0
-    multiplier = 2
-    body.reverse.each_char do |char|
-      sum += char.to_i * multiplier
-      multiplier = (multiplier == 7) ? 2 : multiplier + 1
-    end
-    remainder = 11 - (sum % 11)
-    case remainder
-    when 11 then "0"
-    when 10 then "K"
-    else remainder.to_s
-    end
   end
 
   def normalize_names

@@ -1,0 +1,24 @@
+    <%# CAMPO: Neighborhood Association %>
+    <%= turbo_frame_tag "field_association" do %>
+      <%= form_with(url: panel_onboarding_step1_path, method: :patch, data: { turbo_frame: "step1_form" }) do |form| %>
+        <%
+          # Helper para clase de selector
+          def select_class(value)
+            return "select-success" if value.present?
+            ""
+          end
+          communes = cascading_data.find { |r| r[:id] == selected_region_id.to_i }&.dig(:communes) || []
+          associations = communes.find { |c| c[:id] == selected_commune_id.to_i }&.dig(:associations) || []
+        %>
+        <label class="floating-label">
+          <%= form.select :neighborhood_association_id,
+              options_for_select(associations.map { |a| [a[:name], a[:id]] }, selected_association_id),
+              { prompt: I18n.t('onboarding.step1.select_association') },
+              { class: "select w-full #{select_class(selected_association_id)}", disabled: associations.empty?, onchange: "this.form.requestSubmit()" }
+          %>
+          <span><%= I18n.t('onboarding.step1.association_label') %></span>
+        </label>
+        <%= hidden_field_tag :region_id, selected_region_id %>
+        <%= hidden_field_tag :commune_id, selected_commune_id %>
+      <% end %>
+    <% end %>

@@ -1,0 +1,11 @@
+    <%# CAMPO: Phone %>
+    <%= turbo_frame_tag "field_phone" do %>
+      <%= form_with(model: identity_request, url: panel_onboarding_step2_path, method: :patch, data: { controller: "autosave", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
+        <% invalid = identity_request.errors.include?(:phone) %>
+        <%= form.label :phone, I18n.t('attributes.persona.phone'), class: "floating-label" do %>
+          <%= form.text_field :phone, class: "input w-full #{input_class(identity_request, :phone)}", placeholder: I18n.t('attributes.persona.phone'), data: { action: "input->autosave#submit" } %>
+          <span><%= I18n.t('attributes.persona.phone') %></span>
+        <% end %>
+        <%= raw(error_message(invalid, identity_request.errors.full_messages_for(:phone))) %>
+      <% end %>
+    <% end %>

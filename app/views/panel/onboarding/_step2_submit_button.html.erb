@@ -1,0 +1,12 @@
+    <%= turbo_frame_tag "step2_submit_button" do %>
+      <% 
+         can_continue = identity_request.first_name.present? && 
+                        identity_request.last_name.present? && 
+                        identity_request.run.present? && 
+                        identity_request.phone.present? && 
+                        identity_request.identity_documents.attached? 
+      %>
+      <%= form_with(url: panel_onboarding_step2_path, method: :patch, data: { turbo: false }) do |form| %>
+        <%= form.submit I18n.t('actions.continue'), class: "btn btn-primary", name: "commit_continue", disabled: !can_continue %>
+      <% end %>
+    <% end %>

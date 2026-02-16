@@ -1,0 +1,8 @@
+    <%= turbo_frame_tag "step1_submit_button" do %>
+      <%= form_with(url: panel_onboarding_step1_path, method: :patch, data: { turbo: false }) do |form| %>
+        <%= form.submit I18n.t('actions.continue'), class: "btn btn-primary", disabled: selected_association_id.blank?, name: "commit_continue" %>
+        <%= hidden_field_tag :region_id, selected_region_id %>
+        <%= hidden_field_tag :commune_id, selected_commune_id %>
+        <%= hidden_field_tag :neighborhood_association_id, selected_association_id %>
+      <% end %>
+    <% end %>
