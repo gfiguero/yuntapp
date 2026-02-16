@@ -93,8 +93,8 @@ module Panel
       sign_in @karass
       complete_steps_1_and_2(@karass)
 
-      assert_difference("Persona.count", 1) do
-        patch panel_onboarding_step3_url, params: {persona: {
+      assert_difference("VerifiedIdentity.count", 1) do
+        patch panel_onboarding_step3_url, params: {verified_identity: {
           first_name: "Karass",
           last_name: "Templar",
           run: "77.777.777-7",
@@ -104,15 +104,15 @@ module Panel
 
       assert_redirected_to panel_onboarding_step4_url
       @karass.reload
-      assert_not_nil @karass.persona
-      assert_equal "pending", @karass.persona.verification_status
+      assert_not_nil @karass.verified_identity
+      assert_equal "pending", @karass.verified_identity.verification_status
     end
 
     test "step3 with verified persona redirects to step4" do
       # Give rohana a verified persona and complete steps 1-2
-      rohana_persona = personas(:rohana_persona)
+      rohana_persona = verified_identities(:rohana_persona)
       rohana_persona.update!(verification_status: "verified")
-      @rohana.update!(persona: rohana_persona)
+      @rohana.update!(verified_identity: rohana_persona)
 
       sign_in @rohana
       complete_steps_1_and_2(@rohana)
@@ -125,7 +125,7 @@ module Panel
       complete_steps_1_and_2(@karass)
 
       # selendis_persona run 11111111-1 is already linked to selendis
-      patch panel_onboarding_step3_url, params: {persona: {
+      patch panel_onboarding_step3_url, params: {verified_identity: {
         first_name: "Fake",
         last_name: "Person",
         run: "111111111",
@@ -168,7 +168,7 @@ module Panel
 
       member = Member.last
       assert_equal "pending", member.status
-      assert_equal @karass.reload.persona, member.persona
+      assert_equal @karass.reload.verified_identity, member.verified_identity
       assert_equal @karass, member.requested_by
     end
 
@@ -192,7 +192,7 @@ module Panel
 
     def complete_all_steps(user)
       complete_steps_1_and_2(user)
-      patch panel_onboarding_step3_url, params: {persona: {
+      patch panel_onboarding_step3_url, params: {verified_identity: {
         first_name: "Karass",
         last_name: "Templar",
         run: "77.777.777-7",

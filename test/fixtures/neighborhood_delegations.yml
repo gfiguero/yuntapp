@@ -9,3 +9,30 @@ neighborhood_delegation_<%= assoc_index %>_<%= unit_index %>:
   neighborhood_association: association_<%= assoc_index %>
   <% end %>
 <% end %>
+
+<%
+manios_streets = [
+  "Adelita Martínez Miranda",
+  "Ana Caro Rojas",
+  "Atilio Pruzzo Percibale",
+  "Bajos De Matte",
+  "Carlos Manzor Fournet",
+  "Carlos Vasallo Vasquez",
+  "Emilio Pulgar Soto",
+  "Freddy Bahamondes Jiménez",
+  "Freddy Bahamondes Ximenes",
+  "Hermes Navarro Lira",
+  "José Matus Goméz",
+  "Juana Eliana Fuentes Martínez",
+  "Manuel Espina Ramírez",
+  "Manuel Gregorio Albornoz",
+  "Manuel Montt",
+  "Oscar Guerra Rojas"
+]
+%>
+
+<% manios_streets.each_with_index do |street_name, index| %>
+manios_delegation_<%= index %>:
+  name: "<%= street_name %>"
+  neighborhood_association: manios_de_buin
+<% end %>

@@ -43,8 +43,8 @@ module Panel
     test "creates persona and links to user" do
       sign_in @karass
 
-      assert_difference("Persona.count", 1) do
-        post panel_verification_url, params: {persona: {
+      assert_difference("VerifiedIdentity.count", 1) do
+        post panel_verification_url, params: {verified_identity: {
           first_name: "Karass",
           last_name: "Templar",
           run: "77.777.777-7",
@@ -56,20 +56,28 @@ module Panel
       assert_equal I18n.t("persona.message.submitted"), flash[:notice]
 
       @karass.reload
-      assert_not_nil @karass.persona
-      assert_equal "77777777-7", @karass.persona.run
-      assert_equal "pending", @karass.persona.verification_status
+      assert_not_nil @karass.verified_identity
+      assert_equal "77777777-7", @karass.verified_identity.run
+      assert_equal "pending", @karass.verified_identity.verification_status
     end
 
     test "finds existing persona by RUN if not claimed by another user" do
       sign_in @rohana
 
       # karass_persona exists with run 222222222 and no user linked
-      karass_persona = personas(:karass_persona)
-      karass_persona.update!(user: nil) # ensure no user
-
-      assert_no_difference("Persona.count") do
-        post panel_verification_url, params: {persona: {
+      karass_persona = verified_identities(:karass_persona)
+      # No user linked because users.yml does not link karass user to karass_persona?
+      # Wait, karass user in users.yml DOES NOT link to verified_identity.
+      # users.yml:
+      # karass:
+      #   email: karass@daelaam.io
+      #   ... (no verified_identity)
+      
+      # So karass_persona is free?
+      # personas.yml defines karass_persona.
+      
+      assert_no_difference("VerifiedIdentity.count") do
+        post panel_verification_url, params: {verified_identity: {
           first_name: "Karass",
           last_name: "Templar",
           run: "222222222",
@@ -79,14 +87,14 @@ module Panel
 
       assert_redirected_to panel_verification_url
       @rohana.reload
-      assert_equal karass_persona, @rohana.persona
+      assert_equal karass_persona, @rohana.verified_identity
     end
 
     test "rejects RUN already claimed by another user" do
       sign_in @karass
 
       # selendis_persona is already linked to selendis user
-      post panel_verification_url, params: {persona: {
+      post panel_verification_url, params: {verified_identity: {
         first_name: "Fake",
         last_name: "Person",
         run: "111111111",
@@ -100,8 +108,8 @@ module Panel
     test "redirects verified user trying to create" do
       sign_in @selendis
 
-      assert_no_difference("Persona.count") do
-        post panel_verification_url, params: {persona: {
+      assert_no_difference("VerifiedIdentity.count") do
+        post panel_verification_url, params: {verified_identity: {
           first_name: "Selendis",
           last_name: "Daelaam",
           run: "999999999",

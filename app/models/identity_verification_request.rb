@@ -13,8 +13,8 @@ class IdentityVerificationRequest < ApplicationRecord
   validates :first_name, :last_name, :run, :phone, presence: true, unless: -> { draft? || status == "draft" }
 
   # Validaciones de formato siempre (incluso en draft, si el campo no está vacío)
-  validates :run, run: true, if: -> { run.present? }
-  validates :phone, phone: true, if: -> { phone.present? }
+  validates :run, run: true, allow_blank: true
+  validates :phone, phone: true, allow_blank: true
 
   # Normalización de teléfono antes de validar
   before_validation :normalize_phone

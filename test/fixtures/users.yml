@@ -9,7 +9,7 @@ selendis:
   email: selendis@daelaam.io
   encrypted_password: <%= Devise::Encryptor.digest(User, 'purifytheenemy') %>
   neighborhood_association: association_0
-  persona: selendis_persona
+  verified_identity: selendis_persona
   admin: true
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>

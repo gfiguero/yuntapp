@@ -10,13 +10,13 @@ module Panel
       @selendis_household = household_units(:selendis_household)
       @selendis_member = members(:selendis_member)
       @karass_dependent = members(:karass_dependent)
-      @karass_persona = personas(:karass_persona)
+      @karass_persona = verified_identities(:karass_persona)
     end
 
     # --- Fixture sanity checks ---
 
     test "selendis has persona, member, and household_unit via member" do
-      assert @selendis.persona.verified?
+      assert @selendis.verified_identity.verified?
       assert @selendis_member.approved?
       assert @selendis_member.household_admin?
       assert_equal @selendis, @selendis_member.user
@@ -25,7 +25,7 @@ module Panel
 
     test "karass_dependent is approved, linked to karass_persona" do
       assert @karass_dependent.approved?
-      assert_equal @karass_persona, @karass_dependent.persona
+      assert_equal @karass_persona, @karass_dependent.verified_identity
     end
 
     test "selendis household has multiple approved dependents" do
@@ -58,7 +58,7 @@ module Panel
       # When karass verifies with karass_persona (which has karass_dependent member),
       # current_user.member returns karass_dependent automatically via persona
       @karass_persona.update!(verification_status: "verified")
-      @karass.update!(persona: @karass_persona)
+      @karass.update!(verified_identity: @karass_persona)
       sign_in @karass
 
       # karass now has a member via persona (karass_dependent)
@@ -71,7 +71,7 @@ module Panel
 
     test "auto-linked user can see their accreditation" do
       @karass_persona.update!(verification_status: "verified")
-      @karass.update!(persona: @karass_persona)
+      @karass.update!(verified_identity: @karass_persona)
       sign_in @karass
 
       get panel_accreditation_url
@@ -81,8 +81,8 @@ module Panel
     # --- Normal flow: verified user, no existing member, with household_unit ---
 
     test "creates pending member for verified user with household_unit" do
-      persona = Persona.create!(first_name: "Karass", last_name: "New", run: "88888888-8", verification_status: "verified")
-      @karass.update!(persona: persona)
+      persona = VerifiedIdentity.create!(first_name: "Karass", last_name: "New", run: "88888888-8", verification_status: "verified")
+      @karass.update!(verified_identity: persona)
 
       # Create household unit and store it in session
       sign_in @karass
@@ -100,7 +100,7 @@ module Panel
 
       new_member = Member.last
       assert_equal "pending", new_member.status
-      assert_equal persona, new_member.persona
+      assert_equal persona, new_member.verified_identity
       assert_equal "Karass", new_member.first_name
       assert_equal "88888888-8", new_member.run
     end
@@ -108,8 +108,8 @@ module Panel
     # --- Error: no match and no household_unit ---
 
     test "redirects with error when verified user has no household_unit" do
-      persona = Persona.create!(first_name: "Karass", last_name: "New", run: "88888888-8", verification_status: "verified")
-      @karass.update!(persona: persona)
+      persona = VerifiedIdentity.create!(first_name: "Karass", last_name: "New", run: "88888888-8", verification_status: "verified")
+      @karass.update!(verified_identity: persona)
       sign_in @karass
 
       assert_nil @karass.household_unit
@@ -125,8 +125,8 @@ module Panel
     # --- new action accessible for verified user ---
 
     test "verified user without existing member can access new accreditation form" do
-      persona = Persona.create!(first_name: "Karass", last_name: "New", run: "88888888-8", verification_status: "verified")
-      @karass.update!(persona: persona)
+      persona = VerifiedIdentity.create!(first_name: "Karass", last_name: "New", run: "88888888-8", verification_status: "verified")
+      @karass.update!(verified_identity: persona)
       sign_in @karass
 
       get new_panel_accreditation_url

@@ -37,10 +37,10 @@ class User < ApplicationRecord
   end
 
   def verified?
-    persona&.verified? || false
+    verified_identity&.verified? || false
   end
 
   def pending_verification?
-    persona&.pending_verification? || false
+    verified_identity&.pending_verification? || false
   end
 end

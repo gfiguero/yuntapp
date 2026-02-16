@@ -1,31 +1,27 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  user: one
-  neighborhood_association: one
-  neighborhood_delegation: one
-  address_line_1: MyString
-  address_line_2: MyString
-  number: MyString
-  city: MyString
-  region: MyString
-  country: MyString
-  postal_code: MyString
-  commune: one
-  status: MyString
-  rejection_reason: MyText
+  user: artanis
+  neighborhood_association: association_0
+  neighborhood_delegation: neighborhood_delegation_0_0
+  address_line_1: "Calle Falsa 123"
+  number: "123"
+  city: "Santiago"
+  region: region_0_0
+  country: country_0
+  postal_code: "1234567"
+  commune: commune_0_0_0
+  status: "pending"
 
 two:
-  user: two
-  neighborhood_association: two
-  neighborhood_delegation: two
-  address_line_1: MyString
-  address_line_2: MyString
-  number: MyString
-  city: MyString
-  region: MyString
-  country: MyString
-  postal_code: MyString
-  commune: two
-  status: MyString
-  rejection_reason: MyText
+  user: karass
+  neighborhood_association: association_0
+  neighborhood_delegation: neighborhood_delegation_0_0
+  address_line_1: "Calle Verdadera 456"
+  number: "456"
+  city: "Santiago"
+  region: region_0_0
+  country: country_0
+  postal_code: "7654321"
+  commune: commune_0_0_0
+  status: "approved"

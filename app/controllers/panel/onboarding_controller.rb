@@ -153,35 +153,42 @@ module Panel
         last_request = current_user.identity_verification_requests.last
 
         # CREAMOS la solicitud inmediatamente en estado draft
-        @identity_request = IdentityVerificationRequest.create!(
+        # NO pre-llenamos datos (limpieza de proceso de revalidación)
+        
+        @identity_request = IdentityVerificationRequest.new(
           user: current_user,
           neighborhood_association_id: @onboarding_request.neighborhood_association_id,
           onboarding_request: @onboarding_request,
-          status: "draft",
-          run: last_request&.run || current_user.verified_identity&.run,
-          first_name: last_request&.first_name || current_user.verified_identity&.first_name,
-          last_name: last_request&.last_name || current_user.verified_identity&.last_name,
-          phone: last_request&.phone || current_user.verified_identity&.phone
+          status: "draft"
         )
 
-        # Guardamos el ID en sesión
-        session[:onboarding]["identity_request_id"] = @identity_request.id
+        if @identity_request.save
+          # Guardamos el ID en sesión
+          session[:onboarding]["identity_request_id"] = @identity_request.id
+        else
+          # Si falla al crear (ej: validaciones de unicidad u otros), manejamos el error
+          # Probablemente redirigir a step1 o mostrar un error
+          flash[:alert] = "No se pudo iniciar el paso de identidad: #{@identity_request.errors.full_messages.join(', ')}"
+          redirect_to panel_onboarding_step1_path
+        end
       end
     end
 
     def update_step2
       @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
 
-      # Recuperamos la solicitud existente (siempre debería existir por step2)
+      # Recuperamos la solicitud existente
       @identity_request = @onboarding_request.identity_verification_request
 
-      # Fallback por seguridad
-      @identity_request ||= IdentityVerificationRequest.create!(
-        user: current_user,
-        neighborhood_association_id: @onboarding_request.neighborhood_association_id,
-        onboarding_request: @onboarding_request,
-        status: "draft"
-      )
+      # Si no existe, la inicializamos (sin guardar bang!)
+      if @identity_request.nil?
+        @identity_request = IdentityVerificationRequest.new(
+          user: current_user,
+          neighborhood_association_id: @onboarding_request.neighborhood_association_id,
+          onboarding_request: @onboarding_request,
+          status: "draft"
+        )
+      end
 
       # Actualizamos atributos
       @identity_request.assign_attributes(verification_params)
@@ -305,14 +312,9 @@ module Panel
       @delegations = @neighborhood_association.neighborhood_delegations.order(:name)
 
       # Pre-llenamos si existe una solicitud previa
-      last_request = current_user.residence_verification_requests.last
+      # last_request = current_user.residence_verification_requests.last
 
-      @residence_request = ResidenceVerificationRequest.new(
-        number: last_request&.number,
-        address_line_1: last_request&.address_line_1,
-        address_line_2: last_request&.address_line_2,
-        neighborhood_delegation_id: last_request&.neighborhood_delegation_id
-      )
+      @residence_request = ResidenceVerificationRequest.new
     end
 
     def update_step3
@@ -371,7 +373,10 @@ module Panel
 
     def ensure_step2!
       # Debe existir una solicitud de onboarding en sesión (creada en step 1)
-      redirect_to panel_onboarding_step1_path unless session.dig(:onboarding, "onboarding_request_id").present?
+      # Y también el registro en base de datos. Si no existe, volvemos a step 1.
+      unless session.dig(:onboarding, "onboarding_request_id").present? && OnboardingRequest.exists?(session.dig(:onboarding, "onboarding_request_id"))
+        redirect_to panel_onboarding_step1_path
+      end
     end
 
     def ensure_step3!

@@ -13,6 +13,10 @@ es:
 
   activerecord:
     errors:
+      messages:
+        record_invalid: "La validación falló: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "No se puede eliminar el registro porque existe un %{record} dependiente"
       models:
         identity_verification_request:
           attributes:

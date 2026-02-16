@@ -1,21 +1,17 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  user: one
-  neighborhood_association: one
-  run: MyString
-  first_name: MyString
-  last_name: MyString
-  phone: MyString
-  status: MyString
-  rejection_reason: MyText
+  user: artanis
+  neighborhood_association: association_0
+  run: "12345678-5"
+  first_name: "Artanis"
+  last_name: "Hierarch"
+  phone: "+56912345678"
+  status: "draft"
 
 two:
-  user: two
-  neighborhood_association: two
-  run: MyString
-  first_name: MyString
-  last_name: MyString
-  phone: MyString
-  status: MyString
-  rejection_reason: MyText
+  user: karass
+  neighborhood_association: association_0
+  run: "87654321-9"
+  first_name: "Karass"
+  last_name: "Templar"
+  phone: "+56987654321"
+  status: "pending"
