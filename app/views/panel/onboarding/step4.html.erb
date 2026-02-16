@@ -19,29 +19,29 @@
       </div>
     </div>
 
-    <%# Domicilio %>
-    <div class="card bg-base-200 shadow-sm">
-      <div class="card-body">
-        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.household_label') %></h3>
-        <p><%= @household_unit.neighborhood_delegation.name %></p>
-        <p><%= @household_unit.number %></p>
-        <% if @household_unit.address_line_1.present? %>
-          <p class="text-sm text-base-content/60"><%= @household_unit.address_line_1 %></p>
-        <% end %>
-      </div>
-    </div>
-
     <%# Identidad %>
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
         <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.identity_label') %></h3>
-        <p><%= @persona.name %></p>
-        <p><%= @persona.run %></p>
-        <% if @persona.phone.present? %>
-          <p class="text-sm text-base-content/60"><%= @persona.phone %></p>
+        <p><%= @identity_request.name %></p>
+        <p><%= @identity_request.run %></p>
+        <% if @identity_request.phone.present? %>
+          <p class="text-sm text-base-content/60"><%= @identity_request.phone %></p>
         <% end %>
-        <% if @persona.identity_document.attached? %>
+        <% if @identity_request.identity_documents.attached? %>
           <div class="badge badge-success badge-sm mt-1"><%= I18n.t('attributes.persona.identity_document') %></div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Domicilio %>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.household_label') %></h3>
+        <p><%= @residence_request.neighborhood_delegation&.name %></p>
+        <p><%= @residence_request.number %></p>
+        <% if @residence_request.address_line_1.present? %>
+          <p class="text-sm text-base-content/60"><%= @residence_request.address_line_1 %></p>
         <% end %>
       </div>
     </div>

@@ -2,11 +2,11 @@ module Panel
   class OnboardingController < ApplicationController
     layout "panel"
     before_action :authenticate_user!
-    before_action :redirect_if_onboarded!, except: [:restart]
-    before_action :ensure_step1!, only: [:step2, :update_step2, :step3, :update_step3, :step4, :submit]
-    before_action :ensure_step2!, only: [:step3, :update_step3, :step4, :submit]
-    before_action :ensure_step3!, only: [:step4, :submit]
-    before_action :ensure_step4!, only: [:step4, :submit]
+    before_action :redirect_if_onboarded!, except: [ :restart ]
+    before_action :ensure_step1!, only: [ :step2, :update_step2, :step3, :update_step3, :step4, :submit ]
+    before_action :ensure_step2!, only: [ :step3, :update_step3, :step4, :submit ]
+    before_action :ensure_step3!, only: [ :step4, :submit ]
+    before_action :ensure_step4!, only: [ :step4, :submit ]
 
     def restart
       # 1. Eliminar datos de sesión
@@ -110,13 +110,11 @@ module Panel
 
       # Persistencia parcial (opcional pero recomendada para no perder progreso si refrescan)
       @onboarding_request = current_user.current_onboarding_request
-      if @onboarding_request
-        @onboarding_request.update(
-          region_id: @selected_region_id,
-          commune_id: @selected_commune_id,
-          neighborhood_association_id: @selected_association_id
-        )
-      end
+      @onboarding_request&.update(
+        region_id: @selected_region_id,
+        commune_id: @selected_commune_id,
+        neighborhood_association_id: @selected_association_id
+      )
 
       @cascading_data = build_cascading_data
 
@@ -125,16 +123,16 @@ module Panel
           streams = []
 
           # Siempre actualizamos el selector de región (para feedback visual de selección)
-          streams << turbo_stream.replace("field_region", partial: "panel/onboarding/step1_field_region", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id})
+          streams << turbo_stream.replace("field_region", partial: "panel/onboarding/step1_field_region", locals: { cascading_data: @cascading_data, selected_region_id: @selected_region_id })
 
           # Actualizamos selector de comuna (contenido cambia según región)
-          streams << turbo_stream.replace("field_commune", partial: "panel/onboarding/step1_field_commune", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id})
+          streams << turbo_stream.replace("field_commune", partial: "panel/onboarding/step1_field_commune", locals: { cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id })
 
           # Actualizamos selector de asociación (contenido cambia según comuna)
-          streams << turbo_stream.replace("field_association", partial: "panel/onboarding/step1_field_association", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id, selected_association_id: @selected_association_id})
+          streams << turbo_stream.replace("field_association", partial: "panel/onboarding/step1_field_association", locals: { cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id, selected_association_id: @selected_association_id })
 
           # Actualizamos botón submit (habilitar/deshabilitar)
-          streams << turbo_stream.replace("step1_submit_button", partial: "panel/onboarding/step1_submit_button", locals: {selected_association_id: @selected_association_id, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id})
+          streams << turbo_stream.replace("step1_submit_button", partial: "panel/onboarding/step1_submit_button", locals: { selected_association_id: @selected_association_id, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id })
 
           render turbo_stream: streams
         end
@@ -207,7 +205,7 @@ module Panel
             @identity_request.errors.add(:base, "Debes completar todos los campos obligatorios para continuar.")
             # Forzamos validación de presencia para mostrar errores en la vista
             # Agregamos errores manualmente a los campos vacíos para que se iluminen
-            [:first_name, :last_name, :run, :phone].each do |attr|
+            [ :first_name, :last_name, :run, :phone ].each do |attr|
               @identity_request.errors.add(attr, :blank) if @identity_request.send(attr).blank?
             end
             @identity_request.errors.add(:identity_documents, :blank) unless @identity_request.identity_documents.attached?
@@ -252,10 +250,10 @@ module Panel
                 # Vamos a usar una técnica de "Self-Replacement" usando `render_to_string` y Nokogiri? No, muy lento.
                 # Mejor refactorizar la vista para usar partials por campo.
 
-                turbo_stream.replace("field_#{field_name}", partial: "panel/onboarding/step2_field_#{field_name}", locals: {identity_request: @identity_request}),
+                turbo_stream.replace("field_#{field_name}", partial: "panel/onboarding/step2_field_#{field_name}", locals: { identity_request: @identity_request }),
 
                 # Actualizamos el botón
-                turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: {identity_request: @identity_request})
+                turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: { identity_request: @identity_request })
               ]
             end
             # Fallback para navegadores sin JS
@@ -294,8 +292,8 @@ module Panel
         format.html { redirect_to panel_onboarding_step2_path }
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("field_identity_documents", partial: "panel/onboarding/step2_field_identity_documents", locals: {identity_request: @identity_request}),
-            turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: {identity_request: @identity_request})
+            turbo_stream.replace("field_identity_documents", partial: "panel/onboarding/step2_field_identity_documents", locals: { identity_request: @identity_request }),
+            turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: { identity_request: @identity_request })
           ]
         end
       end
@@ -417,7 +415,7 @@ module Panel
               id: commune.id,
               name: commune.name,
               associations: (associations_by_commune[commune.id] || []).map do |assoc|
-                {id: assoc.id, name: assoc.name}
+                { id: assoc.id, name: assoc.name }
               end
             }
           end

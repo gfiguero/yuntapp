@@ -307,12 +307,12 @@ es:
       select_commune: Selecciona una comuna
       select_association: Selecciona una junta de vecinos
     step2:
-      title: Define tu Domicilio
-      description: Ingresa los datos de tu domicilio dentro de la junta de vecinos.
-    step3:
       title: Verifica tu Identidad
       description: Ingresa tus datos personales y sube una foto de tu Cédula de Identidad.
       already_verified: Tu identidad ya fue verificada.
+    step3:
+      title: Define tu Domicilio
+      description: Ingresa los datos de tu domicilio dentro de la junta de vecinos.
     step4:
       title: Revisa y Confirma
       description: Revisa los datos de tu solicitud antes de enviarla.
