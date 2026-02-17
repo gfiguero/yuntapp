@@ -1,0 +1,92 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.onboarding.status.title') %></h1>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('panel.onboarding.status.description') %></p>
+
+  <div class="grid grid-cols-1 gap-4">
+    <%# Junta de Vecinos %>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body">
+        <div class="flex justify-between items-center">
+          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.status.association_label') %></h3>
+          <%= status_badge(@onboarding_request.status) %>
+        </div>
+        <dl class="mt-2 space-y-1">
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.neighborhood_association.name') %></dt>
+            <dd class="font-medium"><%= @neighborhood_association&.name %></dd>
+          </div>
+          <% if @neighborhood_association&.commune %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.neighborhood_association.commune') %></dt>
+              <dd><%= @neighborhood_association.commune.name %></dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+    </div>
+
+    <%# Verificación de Identidad %>
+    <% if @identity_request %>
+      <div class="card bg-base-200 shadow-sm">
+        <div class="card-body">
+          <div class="flex justify-between items-center">
+            <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.status.identity_label') %></h3>
+            <%= status_badge(@identity_request.status) %>
+          </div>
+          <dl class="mt-2 space-y-1">
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.name') %></dt>
+              <dd class="font-medium"><%= @identity_request.full_name %></dd>
+            </div>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.run') %></dt>
+              <dd><%= @identity_request.run %></dd>
+            </div>
+            <% if @identity_request.phone.present? %>
+              <div>
+                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.phone') %></dt>
+                <dd><%= @identity_request.phone %></dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Verificación de Residencia %>
+    <% if @residence_request %>
+      <div class="card bg-base-200 shadow-sm">
+        <div class="card-body">
+          <div class="flex justify-between items-center">
+            <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.status.residence_label') %></h3>
+            <%= status_badge(@residence_request.status) %>
+          </div>
+          <dl class="mt-2 space-y-1">
+            <% if @residence_request.neighborhood_delegation.present? %>
+              <div>
+                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.neighborhood_delegation') %></dt>
+                <dd class="font-medium"><%= @residence_request.neighborhood_delegation.name %></dd>
+              </div>
+            <% end %>
+            <% if @residence_request.address_line_1.present? %>
+              <div>
+                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></dt>
+                <dd class="font-medium"><%= @residence_request.address_line_1 %></dd>
+              </div>
+            <% end %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.number') %></dt>
+              <dd><%= @residence_request.number %></dd>
+            </div>
+            <% if @residence_request.address_line_2.present? %>
+              <div>
+                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></dt>
+                <dd><%= @residence_request.address_line_2 %></dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

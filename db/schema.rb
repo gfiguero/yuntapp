@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_012207) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -198,17 +198,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_012207) do
   create_table "residence_verification_requests", force: :cascade do |t|
     t.string "address_line_1"
     t.string "address_line_2"
-    t.string "city"
     t.integer "commune_id", null: false
-    t.string "country"
     t.datetime "created_at", null: false
     t.boolean "manual_address", default: false, null: false
     t.integer "neighborhood_association_id", null: false
     t.integer "neighborhood_delegation_id"
     t.string "number"
     t.integer "onboarding_request_id"
-    t.string "postal_code"
-    t.string "region"
     t.text "rejection_reason"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false

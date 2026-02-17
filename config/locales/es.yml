@@ -371,6 +371,20 @@ es:
       subtitle: Completa tu solicitud de acreditación paso a paso
       flash:
         completed: Solicitud de acreditación enviada exitosamente. La directiva revisará tu solicitud.
+        pending: Tu solicitud de acreditación ya fue enviada y está siendo revisada.
+      status:
+        title: Estado de tu Solicitud
+        description: Tu solicitud de acreditación ha sido enviada. A continuación puedes ver el estado de cada parte.
+        sidebar: Mi Solicitud
+        association_label: Junta de Vecinos
+        identity_label: Verificación de Identidad
+        residence_label: Verificación de Residencia
+        pending: Pendiente
+        approved: Aprobada
+        rejected: Rechazada
+        pending_message: Tu solicitud está siendo revisada por la directiva.
+        approved_message: Tu solicitud ha sido aprobada.
+        rejected_message: Tu solicitud ha sido rechazada.
       steps:
         neighborhood: Junta de Vecinos
         household: Domicilio

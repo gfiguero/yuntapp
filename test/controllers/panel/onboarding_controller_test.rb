@@ -14,12 +14,12 @@ module Panel
       @commune = @association.commune
     end
 
-    # --- redirect from dashboard ---
+    # --- dashboard ---
 
-    test "new user is redirected from dashboard to onboarding step1" do
+    test "new user can access dashboard" do
       sign_in @urunis
       get panel_root_url
-      assert_redirected_to panel_onboarding_step1_url
+      assert_response :success
     end
 
     # --- step1 ---

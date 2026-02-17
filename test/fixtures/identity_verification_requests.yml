@@ -5,11 +5,3 @@ one:
   last_name: "Hierarch"
   phone: "+56912345678"
   status: "draft"
-
-two:
-  user: karass
-  run: "87654321-9"
-  first_name: "Karass"
-  last_name: "Templar"
-  phone: "+56987654321"
-  status: "pending"

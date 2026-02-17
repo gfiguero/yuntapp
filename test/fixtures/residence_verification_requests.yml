@@ -6,22 +6,5 @@ one:
   neighborhood_delegation: neighborhood_delegation_0_0
   address_line_1: "Calle Falsa 123"
   number: "123"
-  city: "Santiago"
-  region: region_0_0
-  country: country_0
-  postal_code: "1234567"
   commune: commune_0_0_0
   status: "pending"
-
-two:
-  user: karass
-  neighborhood_association: association_0
-  neighborhood_delegation: neighborhood_delegation_0_0
-  address_line_1: "Calle Verdadera 456"
-  number: "456"
-  city: "Santiago"
-  region: region_0_0
-  country: country_0
-  postal_code: "7654321"
-  commune: commune_0_0_0
-  status: "approved"

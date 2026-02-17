@@ -52,6 +52,19 @@ module ApplicationHelper
     end
   end
 
+  def status_badge(status)
+    badge_class = case status
+    when "approved" then "badge-success"
+    when "pending" then "badge-warning"
+    when "rejected" then "badge-error"
+    when "draft" then "badge-ghost"
+    else "badge-ghost"
+    end
+
+    label = I18n.t("panel.onboarding.status.#{status}", default: status&.capitalize)
+    content_tag(:span, label, class: "badge badge-sm #{badge_class}")
+  end
+
   def mini_token
     rand(36**8).to_s(36)
   end

@@ -2,7 +2,7 @@ module Panel
   class OnboardingController < ApplicationController
     layout "panel"
     before_action :authenticate_user!
-    before_action :redirect_if_onboarded!, except: [:restart]
+    before_action :redirect_if_onboarded!, except: [:restart, :status]
     before_action :ensure_step1!, only: [:step2, :update_step2, :step3, :update_step3, :step4, :submit]
     before_action :ensure_step2!, only: [:step3, :update_step3, :step4, :submit]
     before_action :ensure_step3!, only: [:step4, :submit]
@@ -453,6 +453,19 @@ module Panel
       end
     end
 
+    def status
+      @onboarding_request = current_user.current_onboarding_request
+
+      if @onboarding_request.nil? || @onboarding_request.draft?
+        redirect_to panel_onboarding_step1_path
+        return
+      end
+
+      @neighborhood_association = @onboarding_request.neighborhood_association
+      @identity_request = @onboarding_request.identity_verification_request
+      @residence_request = @onboarding_request.residence_verification_request
+    end
+
     def submit
       @onboarding_request = OnboardingRequest.find(session.dig(:onboarding, "onboarding_request_id"))
 
@@ -475,7 +488,15 @@ module Panel
     private
 
     def redirect_if_onboarded!
-      redirect_to panel_root_path if current_user.member.present?
+      if current_user.member.present?
+        redirect_to panel_root_path
+        return
+      end
+
+      onboarding_request = current_user.current_onboarding_request
+      if onboarding_request.present? && !onboarding_request.draft?
+        redirect_to panel_root_path, notice: I18n.t("panel.onboarding.flash.pending")
+      end
     end
 
     def ensure_step1!

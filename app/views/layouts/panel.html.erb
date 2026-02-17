@@ -41,21 +41,19 @@
           <!-- Sidebar content here -->
           <li class="mb-4 text-xl font-bold px-4">Yuntapp Panel</li>
           <li><%= link_to "Dashboard", panel_root_path, class: ("active" if current_page?(panel_root_path)) %></li>
-          
-          <li class="menu-title mt-4">Mis Cosas</li>
-          <li><%= link_to "Mi Perfil", panel_profile_path, class: ("active" if controller_name == "profile") %></li>
+          <% onboarding_req = current_user.current_onboarding_request %>
+          <% onboarding_link = (onboarding_req.present? && !onboarding_req.draft?) ? panel_onboarding_status_path : panel_onboarding_step1_path %>
           <li>
-            <%= link_to panel_verification_path, class: ("active" if controller_name == "verification") do %>
-              Mi Identidad
-              <% if current_user.verified_identity&.pending_verification? %>
-                <span class="badge badge-warning badge-sm"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.pending') %></span>
-              <% elsif current_user.verified_identity&.verified? %>
-                <span class="badge badge-success badge-sm"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.verified') %></span>
+            <%= link_to onboarding_link, class: ("active" if controller_name == "onboarding") do %>
+              <%= I18n.t('panel.onboarding.status.sidebar') %>
+              <% if onboarding_req.present? && !onboarding_req.draft? %>
+                <%= status_badge(onboarding_req.status) %>
               <% end %>
             <% end %>
           </li>
-          <li><%= link_to "Mi Domicilio", new_panel_household_unit_path, class: ("active" if controller_name == "household_units") %></li>
-          <li><%= link_to "Acreditación", panel_accreditation_path, class: ("active" if controller_name == "accreditations") %></li>
+
+          <li class="menu-title mt-4">Mis Cosas</li>
+          <li><%= link_to "Mi Perfil", panel_profile_path, class: ("active" if controller_name == "profile") %></li>
           <% if current_user.household_admin? %>
             <li><%= link_to "Socios del Domicilio", panel_members_path, class: ("active" if controller_name == "members") %></li>
           <% end %>
