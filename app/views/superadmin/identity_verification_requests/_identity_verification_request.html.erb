@@ -1,0 +1,54 @@
+<div id="<%= dom_id identity_verification_request %>">
+  <dl class="mb-4 divide-y divide-gray-400 w-1/2">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.id') %></dt>
+      <dd><%= identity_verification_request.id %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.user') %></dt>
+      <dd><%= identity_verification_request.user&.email %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.first_name') %></dt>
+      <dd><%= identity_verification_request.first_name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.last_name') %></dt>
+      <dd><%= identity_verification_request.last_name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.run') %></dt>
+      <dd><%= identity_verification_request.run %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.phone') %></dt>
+      <dd><%= identity_verification_request.phone %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.status') %></dt>
+      <dd><%= status_badge(identity_verification_request.status) %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.rejection_reason') %></dt>
+      <dd><%= identity_verification_request.rejection_reason || "-" %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.identity_documents') %></dt>
+      <dd>
+        <% if identity_verification_request.identity_documents.attached? %>
+          <div class="flex flex-wrap gap-2">
+            <% identity_verification_request.identity_documents.each do |doc| %>
+              <%= link_to doc.filename, url_for(doc), target: "_blank", class: "link link-primary" %>
+            <% end %>
+          </div>
+        <% else %>
+          -
+        <% end %>
+      </dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.identity_verification_request.created_at') %></dt>
+      <dd><%= l(identity_verification_request.created_at, format: :long) if identity_verification_request.created_at %></dd>
+    </div>
+  </dl>
+</div>

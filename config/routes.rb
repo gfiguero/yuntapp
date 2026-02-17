@@ -144,6 +144,18 @@ Rails.application.routes.draw do
         get :delete
       end
     end
+    resources :onboarding_requests, except: [:new, :create] do
+      collection { get :search }
+      member { get :delete }
+    end
+    resources :identity_verification_requests, except: [:new, :create] do
+      collection { get :search }
+      member { get :delete }
+    end
+    resources :residence_verification_requests, except: [:new, :create] do
+      collection { get :search }
+      member { get :delete }
+    end
   end
 
   namespace :admin do

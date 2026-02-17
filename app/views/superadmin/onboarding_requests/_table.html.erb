@@ -1,0 +1,23 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('superadmin_onboarding_requests_path', I18n.t('activerecord.attributes.onboarding_request.id'), 'id') %></th>
+        <th><%= I18n.t('activerecord.attributes.onboarding_request.user') %></th>
+        <th><%= I18n.t('activerecord.attributes.onboarding_request.neighborhood_association') %></th>
+        <th><%= sort_link('superadmin_onboarding_requests_path', I18n.t('activerecord.attributes.onboarding_request.status'), 'status') %></th>
+        <th><%= sort_link('superadmin_onboarding_requests_path', I18n.t('activerecord.attributes.onboarding_request.created_at'), 'created_at') %></th>
+        <th class="w-46"><%= I18n.t('shared.table.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @onboarding_requests.each do |onboarding_request| %>
+      <%= render partial: "onboarding_request_row", locals: { onboarding_request: onboarding_request } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

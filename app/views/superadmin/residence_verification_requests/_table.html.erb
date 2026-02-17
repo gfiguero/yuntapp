@@ -1,0 +1,24 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('superadmin_residence_verification_requests_path', I18n.t('activerecord.attributes.residence_verification_request.id'), 'id') %></th>
+        <th><%= I18n.t('activerecord.attributes.residence_verification_request.user') %></th>
+        <th><%= I18n.t('activerecord.attributes.residence_verification_request.neighborhood_delegation') %></th>
+        <th><%= I18n.t('activerecord.attributes.residence_verification_request.commune') %></th>
+        <th><%= sort_link('superadmin_residence_verification_requests_path', I18n.t('activerecord.attributes.residence_verification_request.status'), 'status') %></th>
+        <th><%= sort_link('superadmin_residence_verification_requests_path', I18n.t('activerecord.attributes.residence_verification_request.created_at'), 'created_at') %></th>
+        <th class="w-46"><%= I18n.t('shared.table.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @residence_verification_requests.each do |residence_verification_request| %>
+      <%= render partial: "residence_verification_request_row", locals: { residence_verification_request: residence_verification_request } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

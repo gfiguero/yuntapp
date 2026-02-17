@@ -108,6 +108,38 @@ es:
         id: ID
         name: Nombre
         region: Región
+      onboarding_request:
+        id: ID
+        user: Usuario
+        neighborhood_association: Junta de Vecinos
+        region: Región
+        commune: Comuna
+        status: Estado
+        terms_accepted_at: Aceptación de términos
+        created_at: Fecha de creación
+      identity_verification_request:
+        id: ID
+        user: Usuario
+        first_name: Nombre
+        last_name: Apellido
+        run: RUN
+        phone: Teléfono
+        status: Estado
+        rejection_reason: Motivo de rechazo
+        identity_documents: Documentos de identidad
+        created_at: Fecha de creación
+      residence_verification_request:
+        id: ID
+        user: Usuario
+        neighborhood_association: Junta de Vecinos
+        neighborhood_delegation: Delegación Vecinal
+        commune: Comuna
+        address_line_1: Dirección
+        number: Número
+        status: Estado
+        rejection_reason: Motivo de rechazo
+        manual_address: Dirección manual
+        created_at: Fecha de creación
       board_member:
         id: ID
         member: Socio
@@ -481,6 +513,33 @@ es:
         created: Junta de Vecinos creada exitosamente.
         updated: Junta de Vecinos actualizada exitosamente.
         destroyed: Junta de Vecinos eliminada exitosamente.
+    onboarding_requests:
+      index:
+        title: Solicitudes de Onboarding
+        count: "%{count} solicitudes"
+      show:
+        identifier: "Solicitud #%{id}"
+      flash:
+        updated: Solicitud actualizada correctamente.
+        destroyed: Solicitud eliminada correctamente.
+    identity_verification_requests:
+      index:
+        title: Solicitudes de Verificación de Identidad
+        count: "%{count} solicitudes"
+      show:
+        identifier: "Solicitud #%{id}"
+      flash:
+        updated: Solicitud actualizada correctamente.
+        destroyed: Solicitud eliminada correctamente.
+    residence_verification_requests:
+      index:
+        title: Solicitudes de Verificación de Residencia
+        count: "%{count} solicitudes"
+      show:
+        identifier: "Solicitud #%{id}"
+      flash:
+        updated: Solicitud actualizada correctamente.
+        destroyed: Solicitud eliminada correctamente.
 
   categories:
     index:

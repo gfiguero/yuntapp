@@ -1,0 +1,48 @@
+<div id="<%= dom_id onboarding_request %>">
+  <dl class="mb-4 divide-y divide-gray-400 w-1/2">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.id') %></dt>
+      <dd><%= onboarding_request.id %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.user') %></dt>
+      <dd><%= onboarding_request.user&.email %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.neighborhood_association') %></dt>
+      <dd><%= onboarding_request.neighborhood_association&.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.region') %></dt>
+      <dd><%= onboarding_request.region&.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.commune') %></dt>
+      <dd><%= onboarding_request.commune&.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.status') %></dt>
+      <dd><%= status_badge(onboarding_request.status) %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.terms_accepted_at') %></dt>
+      <dd><%= onboarding_request.terms_accepted_at ? l(onboarding_request.terms_accepted_at, format: :short) : "-" %></dd>
+    </div>
+    <% if onboarding_request.identity_verification_request %>
+      <div class="p-2 grid gap-2">
+        <dt class="font-medium"><%= I18n.t('activerecord.models.identity_verification_request') %></dt>
+        <dd><%= link_to "##{onboarding_request.identity_verification_request.id}", superadmin_identity_verification_request_path(onboarding_request.identity_verification_request), class: "link link-primary" %></dd>
+      </div>
+    <% end %>
+    <% if onboarding_request.residence_verification_request %>
+      <div class="p-2 grid gap-2">
+        <dt class="font-medium"><%= I18n.t('activerecord.models.residence_verification_request') %></dt>
+        <dd><%= link_to "##{onboarding_request.residence_verification_request.id}", superadmin_residence_verification_request_path(onboarding_request.residence_verification_request), class: "link link-primary" %></dd>
+      </div>
+    <% end %>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.onboarding_request.created_at') %></dt>
+      <dd><%= l(onboarding_request.created_at, format: :long) if onboarding_request.created_at %></dd>
+    </div>
+  </dl>
+</div>

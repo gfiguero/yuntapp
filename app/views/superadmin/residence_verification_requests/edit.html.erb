@@ -1,0 +1,16 @@
+<% content_for :title do %>
+  <%= I18n.t('superadmin.residence_verification_requests.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('superadmin.residence_verification_requests.index.title'), superadmin_residence_verification_requests_path %></li>
+  <li><%= link_to @residence_verification_request.id, superadmin_residence_verification_request_path(@residence_verification_request) %></li>
+  <li><%= I18n.t('actions.edit') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.residence_verification_requests.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.residence_verification_requests.show.identifier', id: @residence_verification_request.id) %></h3>
+  <%= render "buttons" %>
+  <%= render "form", residence_verification_request: @residence_verification_request %>
+</div>

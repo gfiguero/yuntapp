@@ -1,0 +1,11 @@
+<%= form_with(model: [:superadmin, onboarding_request], class: "grid gap-4 w-1/3") do |form| %>
+
+  <% invalid = onboarding_request.errors.include?(:status) %>
+  <%= form.label :status, I18n.t('activerecord.attributes.onboarding_request.status'), class: "floating-label" do %>
+    <%= form.select :status, OnboardingRequest::STATUSES.map { |s| [s.capitalize, s] }, {}, class: "select w-full #{'select-error' if invalid}" %>
+    <span><%= I18n.t('activerecord.attributes.onboarding_request.status') %></span>
+  <% end %>
+  <%= raw(error_message(invalid, onboarding_request.errors.full_messages_for(:status))) %>
+
+  <%= form.submit I18n.t('actions.save'), class: "btn btn-success" %>
+<% end %>

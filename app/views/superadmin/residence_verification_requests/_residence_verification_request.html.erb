@@ -1,0 +1,48 @@
+<div id="<%= dom_id residence_verification_request %>">
+  <dl class="mb-4 divide-y divide-gray-400 w-1/2">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.id') %></dt>
+      <dd><%= residence_verification_request.id %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.user') %></dt>
+      <dd><%= residence_verification_request.user&.email %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.neighborhood_association') %></dt>
+      <dd><%= residence_verification_request.neighborhood_association&.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.neighborhood_delegation') %></dt>
+      <dd><%= residence_verification_request.neighborhood_delegation&.name || "-" %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.address_line_1') %></dt>
+      <dd><%= residence_verification_request.address_line_1 || "-" %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.number') %></dt>
+      <dd><%= residence_verification_request.number || "-" %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.commune') %></dt>
+      <dd><%= residence_verification_request.commune&.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.manual_address') %></dt>
+      <dd><%= residence_verification_request.manual_address ? "Si" : "No" %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.status') %></dt>
+      <dd><%= status_badge(residence_verification_request.status) %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.rejection_reason') %></dt>
+      <dd><%= residence_verification_request.rejection_reason || "-" %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.created_at') %></dt>
+      <dd><%= l(residence_verification_request.created_at, format: :long) if residence_verification_request.created_at %></dd>
+    </div>
+  </dl>
+</div>

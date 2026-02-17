@@ -1,0 +1,15 @@
+<% content_for :title do %>
+  <%= I18n.t('superadmin.onboarding_requests.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('superadmin.onboarding_requests.index.title'), superadmin_onboarding_requests_path %></li>
+  <li><%= @onboarding_request.id %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.onboarding_requests.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.onboarding_requests.show.identifier', id: @onboarding_request.id) %></h3>
+  <%= render "buttons" %>
+  <%= render @onboarding_request %>
+</div>

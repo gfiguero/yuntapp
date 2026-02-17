@@ -1,0 +1,25 @@
+<div class="my-4"><%== @pagy.series_nav() %></div>
+
+<div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+  <table class="table">
+    <thead>
+      <tr>
+        <th><%= sort_link('superadmin_identity_verification_requests_path', I18n.t('activerecord.attributes.identity_verification_request.id'), 'id') %></th>
+        <th><%= I18n.t('activerecord.attributes.identity_verification_request.first_name') %></th>
+        <th><%= I18n.t('activerecord.attributes.identity_verification_request.last_name') %></th>
+        <th><%= I18n.t('activerecord.attributes.identity_verification_request.run') %></th>
+        <th><%= I18n.t('activerecord.attributes.identity_verification_request.phone') %></th>
+        <th><%= sort_link('superadmin_identity_verification_requests_path', I18n.t('activerecord.attributes.identity_verification_request.status'), 'status') %></th>
+        <th><%= sort_link('superadmin_identity_verification_requests_path', I18n.t('activerecord.attributes.identity_verification_request.created_at'), 'created_at') %></th>
+        <th class="w-46"><%= I18n.t('shared.table.actions') %></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @identity_verification_requests.each do |identity_verification_request| %>
+      <%= render partial: "identity_verification_request_row", locals: { identity_verification_request: identity_verification_request } %>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

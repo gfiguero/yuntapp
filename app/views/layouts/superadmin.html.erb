@@ -44,7 +44,12 @@
 
           <li class="menu-title mt-4">Gestión Global</li>
           <li><%= link_to "Juntas de Vecinos", superadmin_neighborhood_associations_path, class: ("active" if controller_name == "neighborhood_associations") %></li>
-          
+
+          <li class="menu-title mt-4">Solicitudes</li>
+          <li><%= link_to "Onboarding", superadmin_onboarding_requests_path, class: ("active" if controller_name == "onboarding_requests") %></li>
+          <li><%= link_to "Identidad", superadmin_identity_verification_requests_path, class: ("active" if controller_name == "identity_verification_requests") %></li>
+          <li><%= link_to "Residencia", superadmin_residence_verification_requests_path, class: ("active" if controller_name == "residence_verification_requests") %></li>
+
           <li class="menu-title mt-4">Geografía</li>
           <li><%= link_to "Países", superadmin_countries_path, class: ("active" if controller_name == "countries") %></li>
           <li><%= link_to "Regiones", superadmin_regions_path, class: ("active" if controller_name == "regions") %></li>
