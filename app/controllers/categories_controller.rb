@@ -44,7 +44,7 @@ class CategoriesController < ApplicationController
     @category = Category.new(category_params)
 
     if @category.save
-      redirect_to @category, created: I18n.t("category.message.created")
+      redirect_to @category, created: I18n.t("categories.flash.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -53,7 +53,7 @@ class CategoriesController < ApplicationController
   # PATCH/PUT /categories/1
   def update
     if @category.update(category_params)
-      redirect_to @category, updated: I18n.t("category.message.updated"), status: :see_other
+      redirect_to @category, updated: I18n.t("categories.flash.updated"), status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -66,7 +66,7 @@ class CategoriesController < ApplicationController
   # DELETE /categories/1
   def destroy
     @category.destroy!
-    redirect_to categories_path, deleted: I18n.t("category.message.destroyed"), status: :see_other, format: :html
+    redirect_to categories_path, deleted: I18n.t("categories.flash.destroyed"), status: :see_other, format: :html
   end
 
   private

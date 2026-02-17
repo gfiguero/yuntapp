@@ -45,7 +45,7 @@ module Admin
       @listing = Listing.new(listing_params)
 
       if @listing.save
-        redirect_to admin_listing_path(@listing), notice: I18n.t("listing.message.created")
+        redirect_to admin_listing_path(@listing), notice: I18n.t("admin.listings.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Admin
     # PATCH/PUT /admin/listings/1
     def update
       if @listing.update(listing_params)
-        redirect_to admin_listing_path(@listing), notice: I18n.t("listing.message.updated"), status: :see_other
+        redirect_to admin_listing_path(@listing), notice: I18n.t("admin.listings.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Admin
     # DELETE /admin/listings/1
     def destroy
       @listing.destroy!
-      redirect_to admin_listings_path, notice: I18n.t("listing.message.destroyed"), status: :see_other, format: :html
+      redirect_to admin_listings_path, notice: I18n.t("admin.listings.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

@@ -56,7 +56,7 @@
           <li>
             <%= link_to admin_verifications_path, class: ("active" if controller_name == "verifications") do %>
               Verificaciones
-              <% pending_verifications = current_neighborhood_association ? Persona.pending.joins(:user).where(users: { neighborhood_association_id: current_neighborhood_association.id }).count : 0 %>
+              <% pending_verifications = current_neighborhood_association ? VerifiedIdentity.pending.joins(:users).where(users: { neighborhood_association_id: current_neighborhood_association.id }).count : 0 %>
               <% if pending_verifications > 0 %>
                 <span class="badge badge-warning badge-sm"><%= pending_verifications %></span>
               <% end %>

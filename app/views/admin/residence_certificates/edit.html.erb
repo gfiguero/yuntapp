@@ -1,16 +1,16 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.residence_certificates') %>
+  <%= I18n.t('admin.residence_certificates.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= link_to I18n.t('views.title.residence_certificates'), admin_residence_certificates_path %></li>
+  <li><%= link_to I18n.t('admin.residence_certificates.index.title'), admin_residence_certificates_path %></li>
   <li><%= link_to @residence_certificate.id, admin_residence_certificate_path(@residence_certificate) %></li>
   <li><%= I18n.t('actions.edit') %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.residence_certificates') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.residence_certificate', id: @residence_certificate.id) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.residence_certificates.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('admin.residence_certificates.show.identifier', id: @residence_certificate.id) %></h3>
   <%= render "buttons" %>
   <%= render "form", residence_certificate: @residence_certificate %>
 </div>

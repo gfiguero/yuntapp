@@ -1,16 +1,16 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.listings') %>
+  <%= I18n.t('admin.listings.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= link_to I18n.t('views.title.listings'), admin_listings_path %></li>
+  <li><%= link_to I18n.t('admin.listings.index.title'), admin_listings_path %></li>
   <li><%= link_to @listing.id, admin_listing_path(@listing) %></li>
   <li><%= I18n.t('actions.delete') %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.listings') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.listing', id: @listing.id) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.listings.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('admin.listings.show.identifier', id: @listing.id) %></h3>
   <%= render "buttons" %>
   <%= render @listing %>
 </div>

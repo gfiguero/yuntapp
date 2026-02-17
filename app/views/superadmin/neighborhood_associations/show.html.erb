@@ -1,15 +1,15 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.neighborhood_associations') %>
+  <%= I18n.t('superadmin.neighborhood_associations.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= link_to I18n.t('views.title.neighborhood_associations'), superadmin_neighborhood_associations_path %></li>
+  <li><%= link_to I18n.t('superadmin.neighborhood_associations.index.title'), superadmin_neighborhood_associations_path %></li>
   <li><%= @neighborhood_association.id %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.neighborhood_associations') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.neighborhood_association', id: @neighborhood_association.id) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.neighborhood_associations.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.neighborhood_associations.show.identifier', id: @neighborhood_association.id) %></h3>
   <%= render "buttons" %>
   
   <div class="flex gap-8 mb-8">
@@ -18,7 +18,7 @@
     <div class="grid grid-cols-3 divide-x divide-base-content/10 bg-base-100 rounded-box shadow border border-base-content/5 h-fit w-1/2">
       <div class="p-4 flex items-center justify-between">
         <div>
-          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('views.count.neighborhood_delegations', count: 0).split.last.capitalize %></div>
+          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('admin.neighborhood_delegations.index.count', count: 0).split.last.capitalize %></div>
           <div class="text-2xl font-extrabold text-primary"><%= @neighborhood_association.neighborhood_delegations.count %></div>
           <div class="text-xs opacity-60 mt-1">Delegaciones asignadas</div>
         </div>
@@ -29,7 +29,7 @@
 
       <div class="p-4 flex items-center justify-between">
         <div>
-          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('views.count.household_units', count: 0).split.last.capitalize %></div>
+          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('admin.household_units.index.count', count: 0).split.last.capitalize %></div>
           <div class="text-2xl font-extrabold text-secondary"><%= @neighborhood_association.household_units.count %></div>
           <div class="text-xs opacity-60 mt-1">Total domicilios</div>
         </div>
@@ -40,7 +40,7 @@
 
       <div class="p-4 flex items-center justify-between">
         <div>
-          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('views.count.members', count: 0).split.last.capitalize %></div>
+          <div class="text-xs font-bold uppercase tracking-wider opacity-60 mb-1"><%= I18n.t('admin.members.index.count', count: 0).split.last.capitalize %></div>
           <div class="text-2xl font-extrabold text-accent"><%= @neighborhood_association.members.count %></div>
           <div class="text-xs opacity-60 mt-1">Socios registrados</div>
         </div>
@@ -52,14 +52,14 @@
   </div>
 
   <div class="mt-8">
-    <h2 class="font-bold text-2xl mb-4"><%= I18n.t('views.title.neighborhood_delegations') %></h2>
+    <h2 class="font-bold text-2xl mb-4"><%= I18n.t('admin.neighborhood_delegations.index.title') %></h2>
     <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
       <table class="table">
         <thead>
           <tr>
-            <th><%= I18n.t('attributes.neighborhood_delegation.name') %></th>
-            <th><%= I18n.t('attributes.neighborhood_delegation.neighborhood_association') %></th>
-            <th class="w-46"><%= I18n.t('views.headers.actions') %></th>
+            <th><%= I18n.t('activerecord.attributes.neighborhood_delegation.name') %></th>
+            <th><%= I18n.t('activerecord.attributes.neighborhood_delegation.neighborhood_association') %></th>
+            <th class="w-46"><%= I18n.t('shared.table.actions') %></th>
           </tr>
         </thead>
         <tbody>

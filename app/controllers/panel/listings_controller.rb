@@ -47,7 +47,7 @@ module Panel
       @listing = current_user.listings.new(listing_params)
 
       if @listing.save
-        redirect_to panel_listing_path(@listing), notice: I18n.t("listing.message.created")
+        redirect_to panel_listing_path(@listing), notice: I18n.t("panel.listings.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -56,7 +56,7 @@ module Panel
     # PATCH/PUT /panel/listings/1
     def update
       if @listing.update(listing_params)
-        redirect_to panel_listing_path(@listing), notice: I18n.t("listing.message.updated"), status: :see_other
+        redirect_to panel_listing_path(@listing), notice: I18n.t("panel.listings.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -69,7 +69,7 @@ module Panel
     # DELETE /panel/listings/1
     def destroy
       @listing.destroy!
-      redirect_to panel_listings_path, notice: I18n.t("listing.message.destroyed"), status: :see_other, format: :html
+      redirect_to panel_listings_path, notice: I18n.t("panel.listings.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

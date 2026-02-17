@@ -34,7 +34,7 @@ module Panel
       )
 
       if @residence_certificate.save
-        redirect_to panel_residence_certificate_path(@residence_certificate), notice: I18n.t("residence_certificate.message.requested")
+        redirect_to panel_residence_certificate_path(@residence_certificate), notice: I18n.t("panel.residence_certificates.flash.requested")
       else
         @approved_members = current_user.household_unit.approved_members
         render :new, status: :unprocessable_content

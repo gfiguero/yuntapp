@@ -29,12 +29,12 @@
   <% end %>
 
   <% if %w[ show ].include?(action_name) && @residence_certificate.pending? %>
-    <%= button_to I18n.t('residence_certificate.actions.approve'), approve_admin_residence_certificate_path(@residence_certificate), class: "btn btn-soft btn-success", method: :patch %>
-    <%= button_to I18n.t('residence_certificate.actions.reject'), reject_admin_residence_certificate_path(@residence_certificate), class: "btn btn-soft btn-error", method: :patch %>
+    <%= button_to I18n.t('actions.approve'), approve_admin_residence_certificate_path(@residence_certificate), class: "btn btn-soft btn-success", method: :patch %>
+    <%= button_to I18n.t('actions.reject'), reject_admin_residence_certificate_path(@residence_certificate), class: "btn btn-soft btn-error", method: :patch %>
   <% end %>
 
   <% if %w[ show ].include?(action_name) && @residence_certificate.approved? %>
-    <%= button_to I18n.t('residence_certificate.actions.issue'), issue_admin_residence_certificate_path(@residence_certificate), class: "btn btn-soft btn-primary", method: :patch %>
+    <%= button_to I18n.t('actions.issue'), issue_admin_residence_certificate_path(@residence_certificate), class: "btn btn-soft btn-primary", method: :patch %>
   <% end %>
 
 </div>

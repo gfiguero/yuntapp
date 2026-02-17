@@ -44,7 +44,7 @@ class NeighborhoodAssociationsController < ApplicationController
     @neighborhood_association = NeighborhoodAssociation.new(neighborhood_association_params)
 
     if @neighborhood_association.save
-      redirect_to @neighborhood_association, created: I18n.t("neighborhood_association.message.created")
+      redirect_to @neighborhood_association, created: I18n.t("neighborhood_associations.flash.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -53,7 +53,7 @@ class NeighborhoodAssociationsController < ApplicationController
   # PATCH/PUT /neighborhood_associations/1
   def update
     if @neighborhood_association.update(neighborhood_association_params)
-      redirect_to @neighborhood_association, updated: I18n.t("neighborhood_association.message.updated"), status: :see_other
+      redirect_to @neighborhood_association, updated: I18n.t("neighborhood_associations.flash.updated"), status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -66,7 +66,7 @@ class NeighborhoodAssociationsController < ApplicationController
   # DELETE /neighborhood_associations/1
   def destroy
     @neighborhood_association.destroy!
-    redirect_to neighborhood_associations_path, deleted: I18n.t("neighborhood_association.message.destroyed"), status: :see_other, format: :html
+    redirect_to neighborhood_associations_path, deleted: I18n.t("neighborhood_associations.flash.destroyed"), status: :see_other, format: :html
   end
 
   private

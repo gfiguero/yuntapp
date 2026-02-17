@@ -45,7 +45,7 @@ module Superadmin
       @country = Country.new(country_params)
 
       if @country.save
-        redirect_to superadmin_country_path(@country), notice: I18n.t("country.message.created")
+        redirect_to superadmin_country_path(@country), notice: I18n.t("superadmin.countries.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Superadmin
     # PATCH/PUT /admin/countries/1
     def update
       if @country.update(country_params)
-        redirect_to superadmin_country_path(@country), notice: I18n.t("country.message.updated"), status: :see_other
+        redirect_to superadmin_country_path(@country), notice: I18n.t("superadmin.countries.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Superadmin
     # DELETE /admin/countries/1
     def destroy
       @country.destroy!
-      redirect_to superadmin_countries_path, notice: I18n.t("country.message.destroyed"), status: :see_other, format: :html
+      redirect_to superadmin_countries_path, notice: I18n.t("superadmin.countries.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

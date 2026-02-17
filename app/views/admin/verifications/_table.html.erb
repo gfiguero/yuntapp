@@ -2,16 +2,16 @@
   <table class="table">
     <thead>
       <tr>
-        <th><%= I18n.t('attributes.persona.id') %></th>
-        <th><%= I18n.t('attributes.persona.name') %></th>
-        <th><%= I18n.t('attributes.persona.run') %></th>
-        <th><%= I18n.t('attributes.persona.verification_status') %></th>
-        <th><%= I18n.t('views.headers.actions') %></th>
+        <th><%= I18n.t('activerecord.attributes.verified_identity.id') %></th>
+        <th><%= I18n.t('activerecord.attributes.verified_identity.name') %></th>
+        <th><%= I18n.t('activerecord.attributes.verified_identity.run') %></th>
+        <th><%= I18n.t('activerecord.attributes.verified_identity.verification_status') %></th>
+        <th><%= I18n.t('shared.table.actions') %></th>
       </tr>
     </thead>
     <tbody>
-      <% personas.each do |persona| %>
-        <%= render "persona_row", persona: persona %>
+      <% verified_identities.each do |verified_identity| %>
+        <%= render "verified_identity_row", verified_identity: verified_identity %>
       <% end %>
     </tbody>
   </table>

@@ -12,17 +12,17 @@
 
           <div class="grid gap-4">
             <div>
-              <%= label_tag :id, I18n.t('attributes.board_member.id'), class: "label" %>
+              <%= label_tag :id, I18n.t('activerecord.attributes.board_member.id'), class: "label" %>
               <%= text_field_tag :id, params[:id], class: "input", autocomplete: "off" %>
             </div>
 
             <div>
-              <%= label_tag :position, I18n.t('attributes.board_member.position'), class: "label" %>
+              <%= label_tag :position, I18n.t('activerecord.attributes.board_member.position'), class: "label" %>
               <%= select_tag :position, options_for_select(BoardMember::POSITIONS.map { |p| [p.capitalize, p] }, params[:position]), { prompt: "Todos", class: "select w-full" } %>
             </div>
 
             <div>
-              <%= label_tag :active, I18n.t('attributes.board_member.active'), class: "label" %>
+              <%= label_tag :active, I18n.t('activerecord.attributes.board_member.active'), class: "label" %>
               <%= select_tag :active, options_for_select([["Sí", true], ["No", false]], params[:active]), { prompt: "Todos", class: "select w-full" } %>
             </div>
 

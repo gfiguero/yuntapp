@@ -12,6 +12,134 @@ es:
       long: "%d de %B de %Y %H:%M"
 
   activerecord:
+    models:
+      user: Usuario
+      verified_identity: Identidad Verificada
+      member: Socio
+      household_unit: Domicilio
+      neighborhood_association: Junta de Vecinos
+      neighborhood_delegation: Delegación Vecinal
+      board_member: Directivo
+      residence_certificate: Certificado de Residencia
+      listing: Publicación
+      category: Categoría
+      tag: Etiqueta
+      country: País
+      region: Región
+      commune: Comuna
+      onboarding_request: Solicitud de Acreditación
+      identity_verification_request: Solicitud de Verificación de Identidad
+      residence_verification_request: Solicitud de Verificación de Residencia
+    attributes:
+      user:
+        id: ID
+        first_name: Nombre
+        last_name: Apellido
+        email: Email
+        admin: Es Admin
+        password: Contraseña
+        password_confirmation: Confirmar Contraseña
+      category:
+        id: ID
+        name: Nombre
+      neighborhood_association:
+        id: ID
+        name: Nombre
+        commune: Comuna
+      neighborhood_delegation:
+        id: ID
+        name: Nombre (Calle)
+        neighborhood_association: Junta de Vecinos
+      tag:
+        id: ID
+        name: Nombre
+      listing:
+        id: ID
+        name: Nombre
+        price: Precio
+        description: Descripción
+        active: Activo
+      household_unit:
+        id: ID
+        number: Numeración
+        neighborhood_delegation: Delegación Vecinal (Calle)
+        address_line_1: Calle
+        address_line_2: Detalle (Depto, Casa, Piso, etc.) - Opcional
+        city: Ciudad
+        region: Región
+        country: País
+        postal_code: Código Postal
+        commune: Comuna
+      verified_identity:
+        id: ID
+        first_name: Nombre
+        last_name: Apellido
+        name: Nombre Completo
+        run: RUN
+        phone: Teléfono
+        email: Email
+        identity_document: Documento de Identidad (CI)
+        verification_status: Estado de Verificación
+      member:
+        id: ID
+        name: Nombre Completo
+        first_name: Nombre
+        last_name: Apellido
+        run: RUN
+        phone: Teléfono
+        email: Email
+        household_unit: Domicilio
+        status: Estado
+        household_admin: Administrador de Domicilio
+        requested_by: Solicitado Por
+        approved_by: Aprobado Por
+        approved_at: Fecha de Aprobación
+        rejection_reason: Motivo de Rechazo
+        documents: Documentos
+      country:
+        id: ID
+        name: Nombre
+        iso_code: Código ISO
+      region:
+        id: ID
+        name: Nombre
+        country: País
+      commune:
+        id: ID
+        name: Nombre
+        region: Región
+      board_member:
+        id: ID
+        member: Socio
+        position: Cargo
+        start_date: Fecha Inicio
+        end_date: Fecha Término
+        active: Activo
+      residence_certificate:
+        id: ID
+        folio: Folio
+        status: Estado
+        member: Socio
+        household_unit: Domicilio
+        purpose: Motivo
+        notes: Notas
+        approved_by: Aprobado Por
+        issue_date: Fecha Emisión
+        expiration_date: Fecha Vencimiento
+        created_at: Fecha Solicitud
+      "verified_identity/verification_status":
+        pending: Pendiente
+        verified: Verificada
+        rejected: Rechazada
+      "member/status":
+        pending: Pendiente
+        approved: Aprobado
+        rejected: Rechazado
+      "residence_certificate/status":
+        pending: Pendiente
+        approved: Aprobado
+        rejected: Rechazado
+        issued: Emitido
     errors:
       messages:
         record_invalid: "La validación falló: %{errors}"
@@ -33,7 +161,7 @@ es:
               invalid_phone_format: debe ser un número de celular válido (+569...)
             identity_document:
               blank: debes adjuntar una foto de tu cédula
-        persona:
+        verified_identity:
           attributes:
             run:
               invalid_rut_format: no tiene un formato de RUT válido
@@ -41,40 +169,33 @@ es:
             phone:
               invalid_phone_format: debe ser un número de celular válido (+569...)
 
-  views:
-    title:
-      listings: Publicaciones
-      categories: Categorías
-      neighborhood_associations: Juntas de Vecinos
-      tags: Etiquetas
-      users: Usuarios
-      board_members: Directiva
-      residence_certificates: Certificados de Residencia
-      accreditation: Acreditación
-      verification: Verificación de Identidad
-      household_members: Socios del Domicilio
-    headers:
-      actions: Acciones
-      new: Nuevo Registro
-    identifier:
-      listing: "Publicación ID: %{id}"
-      category: "Categoría ID: %{id}"
-      neighborhood_association: "Junta de Vecinos ID: %{id}"
-      neighborhood_delegation: "Delegación Vecinal ID: %{id}"
-      household_unit: "Domicilio ID: %{id}"
-      member: "Socio ID: %{id}"
-      tag: "Etiqueta ID: %{id}"
-      user: "Usuario ID: %{id}"
-      board_member: "Directivo ID: %{id}"
-      residence_certificate: "Certificado ID: %{id}"
-    count:
-      listings: "%{count} publicaciones"
-      neighborhood_associations: "%{count} juntas de vecinos"
-      neighborhood_delegations: "%{count} delegaciones vecinales"
-      household_units: "%{count} domicilios"
-      members: "%{count} socios"
-      board_members: "%{count} directivos"
-      residence_certificates: "%{count} certificados"
+  errors:
+    messages:
+      accepted: debe ser aceptado
+      blank: no puede estar en blanco
+      confirmation: no coincide
+      empty: no puede estar vacío
+      equal_to: debe ser igual a %{count}
+      even: debe ser un número par
+      exclusion: está reservado
+      greater_than: debe ser mayor que %{count}
+      greater_than_or_equal_to: debe ser mayor o igual que %{count}
+      in: debe estar en %{count}
+      inclusion: no está incluido en la lista
+      invalid: no es válido
+      less_than: debe ser menor que %{count}
+      less_than_or_equal_to: debe ser menor o igual que %{count}
+      model_invalid: "La validación falló: %{errors}"
+      not_a_number: no es un número
+      not_an_integer: debe ser un número entero
+      odd: debe ser un número impar
+      other_than: debe ser diferente de %{count}
+      present: debe estar en blanco
+      required: debe existir
+      taken: ya ha sido tomado
+      too_long: es demasiado largo (máximo %{count} caracteres)
+      too_short: es demasiado corto (mínimo %{count} caracteres)
+      wrong_length: longitud incorrecta (debe ser de %{count} caracteres)
 
   actions:
     index: Listar
@@ -95,253 +216,298 @@ es:
     archive: Archivar
     restore: Restaurar
     restart: Reestablecer
+    approve: Aprobar
+    reject: Rechazar
+    resubmit: Reenviar
+    verify: Verificar Identidad
+    reset: Resetear Cuenta
+    issue: Emitir
 
-  attributes:
-    user:
-      id: ID
-      first_name: Nombre
-      last_name: Apellido
-      email: Email
-      admin: Es Admin
-      password: Contraseña
-      password_confirmation: Confirmar Contraseña
-    category:
-      id: ID
-      name: Nombre
-    neighborhood_association:
-      id: ID
-      name: Nombre
-      commune: Comuna
-    neighborhood_delegation:
-      id: ID
-      name: Nombre (Calle)
-      neighborhood_association: Junta de Vecinos
-    tag:
-      id: ID
-      name: Nombre
-    listing:
-      id: ID
-      name: Nombre
-      price: Precio
-      description: Descripción
-      active: Activo
-    household_unit:
-      id: ID
-      number: Numeración
-      neighborhood_delegation: Delegación Vecinal (Calle)
-      address_line_1: Calle
-      address_line_2: Detalle (Depto, Casa, Piso, etc.) - Opcional
-      city: Ciudad
-      region: Región
-      country: País
-      postal_code: Código Postal
-      commune: Comuna
-    persona:
-      id: ID
-      first_name: Nombre
-      last_name: Apellido
-      name: Nombre Completo
-      run: RUN
-      phone: Teléfono
-      email: Email
-      identity_document: Documento de Identidad (CI)
-      verification_status: Estado de Verificación
-    member:
-      id: ID
-      name: Nombre Completo
-      first_name: Nombre
-      last_name: Apellido
-      run: RUN
-      phone: Teléfono
-      email: Email
-      household_unit: Domicilio
-      status: Estado
-      household_admin: Administrador de Domicilio
-      requested_by: Solicitado Por
-      approved_by: Aprobado Por
-      approved_at: Fecha de Aprobación
-      rejection_reason: Motivo de Rechazo
-      documents: Documentos
-    country:
-      id: ID
-      name: Nombre
-      iso_code: Código ISO
-    region:
-      id: ID
-      name: Nombre
-      country: País
-    commune:
-      id: ID
-      name: Nombre
-      region: Región
-    board_member:
-      id: ID
-      member: Socio
-      position: Cargo
-      start_date: Fecha Inicio
-      end_date: Fecha Término
-      active: Activo
-    residence_certificate:
-      id: ID
-      folio: Folio
-      status: Estado
-      member: Socio
-      household_unit: Domicilio
-      purpose: Motivo
-      notes: Notas
-      approved_by: Aprobado Por
-      issue_date: Fecha Emisión
-      expiration_date: Fecha Vencimiento
-      created_at: Fecha Solicitud
+  shared:
+    table:
+      actions: Acciones
+    headers:
+      new_record: Nuevo Registro
 
-  category:
-    message:
+  admin:
+    members:
+      index:
+        title: Socios
+        count: "%{count} socios"
+      show:
+        identifier: "Socio ID: %{id}"
+      flash:
+        created: Socio creado exitosamente.
+        updated: Socio actualizado exitosamente.
+        destroyed: Socio eliminado exitosamente.
+        approved: Socio aprobado exitosamente.
+        rejected: Socio rechazado exitosamente.
+    board_members:
+      index:
+        title: Directiva
+        count: "%{count} directivos"
+      show:
+        identifier: "Directivo ID: %{id}"
+      flash:
+        created: Directivo creado exitosamente.
+        updated: Directivo actualizado exitosamente.
+        destroyed: Directivo eliminado exitosamente.
+    household_units:
+      index:
+        title: Domicilios
+        count: "%{count} domicilios"
+      show:
+        identifier: "Domicilio ID: %{id}"
+      flash:
+        created: Domicilio creado exitosamente.
+        updated: Domicilio actualizado exitosamente.
+        destroyed: Domicilio eliminado exitosamente.
+    neighborhood_delegations:
+      index:
+        title: Delegaciones Vecinales
+        count: "%{count} delegaciones vecinales"
+      show:
+        identifier: "Delegación Vecinal ID: %{id}"
+      flash:
+        created: Delegación Vecinal creada exitosamente.
+        updated: Delegación Vecinal actualizada exitosamente.
+        destroyed: Delegación Vecinal eliminada exitosamente.
+    listings:
+      index:
+        title: Publicaciones
+        count: "%{count} publicaciones"
+      show:
+        identifier: "Publicación ID: %{id}"
+      flash:
+        created: Publicación creada exitosamente.
+        updated: Publicación actualizada exitosamente.
+        destroyed: Publicación eliminada exitosamente.
+    users:
+      index:
+        title: Usuarios
+        count: "%{count} usuarios"
+      show:
+        identifier: "Usuario ID: %{id}"
+      flash:
+        created: Usuario creado exitosamente.
+        updated: Usuario actualizado exitosamente.
+        destroyed: Usuario eliminado exitosamente.
+    residence_certificates:
+      index:
+        title: Certificados de Residencia
+        count: "%{count} certificados"
+      show:
+        identifier: "Certificado ID: %{id}"
+      flash:
+        created: Certificado creado exitosamente.
+        updated: Certificado actualizado exitosamente.
+        destroyed: Certificado eliminado exitosamente.
+        approved: Certificado aprobado exitosamente.
+        rejected: Certificado rechazado exitosamente.
+        issued: Certificado emitido exitosamente.
+    verifications:
+      index:
+        title: Verificación de Identidad
+      flash:
+        approved: Verificación de identidad aprobada exitosamente.
+        rejected: Verificación de identidad rechazada.
+
+  panel:
+    verification:
+      index:
+        title: Verificación de Identidad
+      subtitle:
+        verify_identity: Verifica tu identidad
+        your_identity: Tu Identidad
+      help:
+        verification_info: Para verificar tu identidad, sube una foto de tu Cédula de Identidad e ingresa tus datos.
+        upload_ci: Sube una foto clara de tu Cédula de Identidad.
+        pending_review: Tu verificación está siendo revisada por un administrador.
+        not_verified: Aún no has verificado tu identidad.
+      flash:
+        submitted: Solicitud de verificación enviada. Un administrador revisará tu documento.
+        run_already_claimed: Este RUN ya está vinculado a otra cuenta de usuario.
+        must_verify_first: Debes verificar tu identidad antes de solicitar acreditación.
+    accreditations:
+      index:
+        title: Acreditación
+      subtitle:
+        your_identity: Tu Identidad
+      flash:
+        requested: Solicitud de acreditación enviada exitosamente.
+        resubmitted: Solicitud de acreditación reenviada exitosamente.
+        run_not_found_no_household: No se encontró un socio con ese RUN. Debes crear un domicilio primero para solicitar acreditación.
+        linked: Tu cuenta ha sido vinculada exitosamente a tu registro de socio existente.
+    members:
+      index:
+        title: Socios del Domicilio
+      flash:
+        requested: Solicitud de acreditación enviada exitosamente.
+        resubmitted: Solicitud de acreditación reenviada exitosamente.
+    listings:
+      index:
+        title: Publicaciones
+        count: "%{count} publicaciones"
+      show:
+        identifier: "Publicación ID: %{id}"
+      flash:
+        created: Publicación creada exitosamente.
+        updated: Publicación actualizada exitosamente.
+        destroyed: Publicación eliminada exitosamente.
+    residence_certificates:
+      index:
+        title: Certificados de Residencia
+        count: "%{count} certificados"
+      show:
+        identifier: "Certificado ID: %{id}"
+      flash:
+        requested: Certificado solicitado exitosamente.
+    account_resets:
+      flash:
+        completed: Tu cuenta ha sido restablecida exitosamente.
+      confirm: "¿Estás seguro? Se eliminarán todos tus datos (identidad, domicilio, acreditación). Esta acción no se puede deshacer."
+    onboarding:
+      title: Acreditación
+      subtitle: Completa tu solicitud de acreditación paso a paso
+      flash:
+        completed: Solicitud de acreditación enviada exitosamente. La directiva revisará tu solicitud.
+      steps:
+        neighborhood: Junta de Vecinos
+        household: Domicilio
+        identity: Identidad
+        confirm: Confirmar
+      step1:
+        title: Selecciona tu Junta de Vecinos
+        description: Elige la junta de vecinos a la que deseas acreditarte.
+        region_label: Región
+        commune_label: Comuna
+        association_label: Junta de Vecinos
+        select_region: Selecciona una región
+        select_commune: Selecciona una comuna
+        select_association: Selecciona una junta de vecinos
+      step2:
+        title: Verifica tu Identidad
+        description: Ingresa tus datos personales y sube una foto de tu Cédula de Identidad.
+        already_verified: Tu identidad ya fue verificada.
+      step3:
+        title: Define tu Domicilio
+        description: Ingresa los datos de tu domicilio dentro de la junta de vecinos.
+        manual_address_option: "Mi dirección no aparece en la lista / Ingresar manualmente"
+        manual_address_hint: "Ingresa el nombre de tu calle o pasaje si no se encuentra en el listado oficial."
+      step4:
+        title: Revisa y Confirma
+        description: Revisa cuidadosamente todos los datos de tu solicitud antes de enviarla.
+        association_label: Junta de Vecinos
+        identity_label: Identidad
+        household_label: Domicilio
+        edit: Editar
+        legal_notice: "Importante: Al enviar esta solicitud, declaras bajo responsabilidad que toda la información proporcionada es verídica y corresponde a datos reales de identidad y residencia, conforme a la normativa vigente."
+        terms_checkbox: "Declaro que los datos ingresados son verídicos y acepto la responsabilidad legal sobre la veracidad de esta información."
+        terms_required: "Debes aceptar la declaración de veracidad para enviar tu solicitud."
+        submit: Enviar Solicitud
+
+  superadmin:
+    categories:
+      index:
+        title: Categorías
+        count: "%{count} categorías"
+      show:
+        identifier: "Categoría ID: %{id}"
+      flash:
+        created: Categoría creada exitosamente.
+        updated: Categoría actualizada exitosamente.
+        destroyed: Categoría eliminada exitosamente.
+    tags:
+      index:
+        title: Etiquetas
+        count: "%{count} etiquetas"
+      show:
+        identifier: "Etiqueta ID: %{id}"
+      flash:
+        created: Etiqueta creada exitosamente.
+        updated: Etiqueta actualizada exitosamente.
+        destroyed: Etiqueta eliminada exitosamente.
+    countries:
+      index:
+        title: Países
+        count: "%{count} países"
+      show:
+        identifier: "País ID: %{id}"
+      flash:
+        created: País creado exitosamente.
+        updated: País actualizado exitosamente.
+        destroyed: País eliminado exitosamente.
+    regions:
+      index:
+        title: Regiones
+        count: "%{count} regiones"
+      show:
+        identifier: "Región ID: %{id}"
+      flash:
+        created: Región creada exitosamente.
+        updated: Región actualizada exitosamente.
+        destroyed: Región eliminada exitosamente.
+    communes:
+      index:
+        title: Comunas
+        count: "%{count} comunas"
+      show:
+        identifier: "Comuna ID: %{id}"
+      flash:
+        created: Comuna creada exitosamente.
+        updated: Comuna actualizada exitosamente.
+        destroyed: Comuna eliminada exitosamente.
+    neighborhood_associations:
+      index:
+        title: Juntas de Vecinos
+        count: "%{count} juntas de vecinos"
+      show:
+        identifier: "Junta de Vecinos ID: %{id}"
+      flash:
+        created: Junta de Vecinos creada exitosamente.
+        updated: Junta de Vecinos actualizada exitosamente.
+        destroyed: Junta de Vecinos eliminada exitosamente.
+
+  categories:
+    index:
+      title: Categorías
+      count: "%{count} categorías"
+    show:
+      identifier: "Categoría ID: %{id}"
+    flash:
       created: Categoría creada exitosamente.
       updated: Categoría actualizada exitosamente.
       destroyed: Categoría eliminada exitosamente.
 
-  neighborhood_association:
-    message:
-      created: Junta de Vecinos creada exitosamente.
-      updated: Junta de Vecinos actualizada exitosamente.
-      destroyed: Junta de Vecinos eliminada exitosamente.
-
-  neighborhood_delegation:
-    message:
-      created: Delegación Vecinal creada exitosamente.
-      updated: Delegación Vecinal actualizada exitosamente.
-      destroyed: Delegación Vecinal eliminada exitosamente.
-
-  household_unit:
-    message:
-      created: Domicilio creado exitosamente.
-      updated: Domicilio actualizado exitosamente.
-      destroyed: Domicilio eliminado exitosamente.
-
-  member:
-    message:
-      created: Socio creado exitosamente.
-      updated: Socio actualizado exitosamente.
-      destroyed: Socio eliminado exitosamente.
-      approved: Socio aprobado exitosamente.
-      rejected: Socio rechazado exitosamente.
-      requested: Solicitud de acreditación enviada exitosamente.
-      resubmitted: Solicitud de acreditación reenviada exitosamente.
-      linked: Tu cuenta ha sido vinculada exitosamente a tu registro de socio existente.
-      run_not_found_no_household: No se encontró un socio con ese RUN. Debes crear un domicilio primero para solicitar acreditación.
-    actions:
-      approve: Aprobar
-      reject: Rechazar
-      resubmit: Reenviar
-    statuses:
-      pending: Pendiente
-      approved: Aprobado
-      rejected: Rechazado
-
-  persona:
-    message:
-      submitted: Solicitud de verificación enviada. Un administrador revisará tu documento.
-      approved: Verificación de identidad aprobada exitosamente.
-      rejected: Verificación de identidad rechazada.
-      must_verify_first: Debes verificar tu identidad antes de solicitar acreditación.
-      run_already_claimed: Este RUN ya está vinculado a otra cuenta de usuario.
-    subtitle:
-      verify_identity: Verifica tu identidad
-      your_identity: Tu Identidad
-    help:
-      verification_info: Para verificar tu identidad, sube una foto de tu Cédula de Identidad e ingresa tus datos.
-      upload_ci: Sube una foto clara de tu Cédula de Identidad.
-      pending_review: Tu verificación está siendo revisada por un administrador.
-      not_verified: Aún no has verificado tu identidad.
-    actions:
-      verify: Verificar Identidad
-    statuses:
-      pending: Pendiente
-      verified: Verificada
-      rejected: Rechazada
-
-  tag:
-    message:
-      created: Etiqueta creada exitosamente.
-      updated: Etiqueta actualizada exitosamente.
-      destroyed: Etiqueta eliminada exitosamente.
-
-  listing:
-    message:
+  listings:
+    index:
+      title: Publicaciones
+      count: "%{count} publicaciones"
+    show:
+      identifier: "Publicación ID: %{id}"
+    flash:
       created: Publicación creada exitosamente.
       updated: Publicación actualizada exitosamente.
       destroyed: Publicación eliminada exitosamente.
 
-  user:
-    message:
-      created: Usuario creado exitosamente.
-      updated: Usuario actualizado exitosamente.
-      destroyed: Usuario eliminado exitosamente.
+  neighborhood_associations:
+    index:
+      title: Juntas de Vecinos
+      count: "%{count} juntas de vecinos"
+    show:
+      identifier: "Junta de Vecinos ID: %{id}"
+    flash:
+      created: Junta de Vecinos creada exitosamente.
+      updated: Junta de Vecinos actualizada exitosamente.
+      destroyed: Junta de Vecinos eliminada exitosamente.
 
-  board_member:
-    message:
-      created: Directivo creado exitosamente.
-      updated: Directivo actualizado exitosamente.
-      destroyed: Directivo eliminado exitosamente.
-
-  account_reset:
-    message:
-      completed: Tu cuenta ha sido restablecida exitosamente.
-    actions:
-      reset: Resetear Cuenta
-    confirm: "¿Estás seguro? Se eliminarán todos tus datos (identidad, domicilio, acreditación). Esta acción no se puede deshacer."
-
-  onboarding:
-    title: Acreditación
-    subtitle: Completa tu solicitud de acreditación paso a paso
-    message:
-      completed: Solicitud de acreditación enviada exitosamente. La directiva revisará tu solicitud.
-    steps:
-      neighborhood: Junta de Vecinos
-      household: Domicilio
-      identity: Identidad
-      confirm: Confirmar
-    step1:
-      title: Selecciona tu Junta de Vecinos
-      description: Elige la junta de vecinos a la que deseas acreditarte.
-      region_label: Región
-      commune_label: Comuna
-      association_label: Junta de Vecinos
-      select_region: Selecciona una región
-      select_commune: Selecciona una comuna
-      select_association: Selecciona una junta de vecinos
-    step2:
-      title: Verifica tu Identidad
-      description: Ingresa tus datos personales y sube una foto de tu Cédula de Identidad.
-      already_verified: Tu identidad ya fue verificada.
-    step3:
-      title: Define tu Domicilio
-      description: Ingresa los datos de tu domicilio dentro de la junta de vecinos.
-      manual_address_option: "Mi dirección no aparece en la lista / Ingresar manualmente"
-      manual_address_hint: "Ingresa el nombre de tu calle o pasaje si no se encuentra en el listado oficial."
-    step4:
-      title: Revisa y Confirma
-      description: Revisa los datos de tu solicitud antes de enviarla.
-      association_label: Junta de Vecinos
-      household_label: Domicilio
-      identity_label: Identidad
-      submit: Enviar Solicitud
-
-  residence_certificate:
-    message:
-      created: Certificado creado exitosamente.
-      updated: Certificado actualizado exitosamente.
-      destroyed: Certificado eliminado exitosamente.
-      approved: Certificado aprobado exitosamente.
-      rejected: Certificado rechazado exitosamente.
-      issued: Certificado emitido exitosamente.
-      requested: Certificado solicitado exitosamente.
-    actions:
-      approve: Aprobar
-      reject: Rechazar
-      issue: Emitir
-    statuses:
-      pending: Pendiente
-      approved: Aprobado
-      rejected: Rechazado
-      issued: Emitido
+  tags:
+    index:
+      title: Etiquetas
+      count: "%{count} etiquetas"
+    show:
+      identifier: "Etiqueta ID: %{id}"
+    flash:
+      created: Etiqueta creada exitosamente.
+      updated: Etiqueta actualizada exitosamente.
+      destroyed: Etiqueta eliminada exitosamente.

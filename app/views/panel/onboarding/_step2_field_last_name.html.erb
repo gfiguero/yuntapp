@@ -2,9 +2,9 @@
     <%= turbo_frame_tag "field_last_name" do %>
       <%= form_with(model: identity_request, url: panel_onboarding_step2_path, method: :patch, data: { controller: "autosave", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
         <% invalid = identity_request.errors.include?(:last_name) %>
-        <%= form.label :last_name, I18n.t('attributes.persona.last_name'), class: "floating-label" do %>
-          <%= form.text_field :last_name, class: "input w-full #{input_class(identity_request, :last_name)}", required: true, placeholder: I18n.t('attributes.persona.last_name'), data: { action: "input->autosave#submit" } %>
-          <span><%= I18n.t('attributes.persona.last_name') %></span>
+        <%= form.label :last_name, I18n.t('activerecord.attributes.verified_identity.last_name'), class: "floating-label" do %>
+          <%= form.text_field :last_name, class: "input w-full #{input_class(identity_request, :last_name)}", required: true, placeholder: I18n.t('activerecord.attributes.verified_identity.last_name'), data: { action: "input->autosave#submit" } %>
+          <span><%= I18n.t('activerecord.attributes.verified_identity.last_name') %></span>
         <% end %>
         <%= raw(error_message(invalid, identity_request.errors.full_messages_for(:last_name))) %>
       <% end %>

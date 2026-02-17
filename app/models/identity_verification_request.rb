@@ -1,6 +1,5 @@
 class IdentityVerificationRequest < ApplicationRecord
   belongs_to :user
-  belongs_to :neighborhood_association
   belongs_to :onboarding_request, optional: true
 
   has_many_attached :identity_documents

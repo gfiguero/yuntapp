@@ -45,7 +45,7 @@ module Superadmin
       @neighborhood_association = NeighborhoodAssociation.new(neighborhood_association_params)
 
       if @neighborhood_association.save
-        redirect_to superadmin_neighborhood_association_path(@neighborhood_association), notice: I18n.t("neighborhood_association.message.created")
+        redirect_to superadmin_neighborhood_association_path(@neighborhood_association), notice: I18n.t("superadmin.neighborhood_associations.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Superadmin
     # PATCH/PUT /admin/neighborhood_associations/1
     def update
       if @neighborhood_association.update(neighborhood_association_params)
-        redirect_to superadmin_neighborhood_association_path(@neighborhood_association), notice: I18n.t("neighborhood_association.message.updated"), status: :see_other
+        redirect_to superadmin_neighborhood_association_path(@neighborhood_association), notice: I18n.t("superadmin.neighborhood_associations.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -72,7 +72,7 @@ module Superadmin
     # DELETE /admin/neighborhood_associations/1
     def destroy
       @neighborhood_association.destroy!
-      redirect_to superadmin_neighborhood_associations_path, notice: I18n.t("neighborhood_association.message.destroyed"), status: :see_other, format: :html
+      redirect_to superadmin_neighborhood_associations_path, notice: I18n.t("superadmin.neighborhood_associations.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

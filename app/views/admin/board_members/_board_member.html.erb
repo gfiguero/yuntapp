@@ -1,27 +1,27 @@
 <div id="<%= dom_id board_member %>">
   <dl class="mb-4 divide-y divide-gray-400 w-1/3">
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.board_member.id') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.board_member.id') %></dt>
       <dd><%= board_member.id %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.board_member.member') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.board_member.member') %></dt>
       <dd><%= board_member.member.name %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.board_member.position') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.board_member.position') %></dt>
       <dd><%= board_member.position.capitalize %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.board_member.start_date') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.board_member.start_date') %></dt>
       <dd><%= board_member.start_date %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.board_member.end_date') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.board_member.end_date') %></dt>
       <dd><%= board_member.end_date %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.board_member.active') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.board_member.active') %></dt>
       <dd><%= board_member.active? ? "Sí" : "No" %></dd>
     </div>
   </dl>

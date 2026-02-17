@@ -45,7 +45,7 @@ module Superadmin
       @tag = Tag.new(tag_params)
 
       if @tag.save
-        redirect_to superadmin_tag_path(@tag), notice: I18n.t("tag.message.created")
+        redirect_to superadmin_tag_path(@tag), notice: I18n.t("superadmin.tags.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Superadmin
     # PATCH/PUT /admin/tags/1
     def update
       if @tag.update(tag_params)
-        redirect_to superadmin_tag_path(@tag), notice: I18n.t("tag.message.updated"), status: :see_other
+        redirect_to superadmin_tag_path(@tag), notice: I18n.t("superadmin.tags.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Superadmin
     # DELETE /admin/tags/1
     def destroy
       @tag.destroy!
-      redirect_to superadmin_tags_path, notice: I18n.t("tag.message.destroyed"), status: :see_other, format: :html
+      redirect_to superadmin_tags_path, notice: I18n.t("superadmin.tags.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

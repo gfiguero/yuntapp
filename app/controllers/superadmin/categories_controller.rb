@@ -45,7 +45,7 @@ module Superadmin
       @category = Category.new(category_params)
 
       if @category.save
-        redirect_to superadmin_category_path(@category), notice: I18n.t("category.message.created")
+        redirect_to superadmin_category_path(@category), notice: I18n.t("superadmin.categories.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Superadmin
     # PATCH/PUT /admin/categories/1
     def update
       if @category.update(category_params)
-        redirect_to superadmin_category_path(@category), notice: I18n.t("category.message.updated"), status: :see_other
+        redirect_to superadmin_category_path(@category), notice: I18n.t("superadmin.categories.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Superadmin
     # DELETE /admin/categories/1
     def destroy
       @category.destroy!
-      redirect_to superadmin_categories_path, notice: I18n.t("category.message.destroyed"), status: :see_other, format: :html
+      redirect_to superadmin_categories_path, notice: I18n.t("superadmin.categories.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

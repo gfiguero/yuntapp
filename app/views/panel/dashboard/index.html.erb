@@ -6,22 +6,22 @@
     <%# Verificación de Identidad %>
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
-        <h2 class="card-title"><%= I18n.t('views.title.verification') %></h2>
-        <% if current_user.persona&.verified? %>
-          <div class="badge badge-success"><%= I18n.t('persona.statuses.verified') %></div>
-          <p class="text-sm mt-2"><%= current_user.persona.name %> &mdash; <%= current_user.persona.run %></p>
-        <% elsif current_user.persona&.pending_verification? %>
-          <div class="badge badge-warning"><%= I18n.t('persona.statuses.pending') %></div>
-          <p class="text-sm mt-2"><%= I18n.t('persona.help.pending_review') %></p>
-        <% elsif current_user.persona&.rejected_verification? %>
-          <div class="badge badge-error"><%= I18n.t('persona.statuses.rejected') %></div>
+        <h2 class="card-title"><%= I18n.t('panel.verification.index.title') %></h2>
+        <% if current_user.verified_identity&.verified? %>
+          <div class="badge badge-success"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.verified') %></div>
+          <p class="text-sm mt-2"><%= current_user.verified_identity.name %> &mdash; <%= current_user.verified_identity.run %></p>
+        <% elsif current_user.verified_identity&.pending_verification? %>
+          <div class="badge badge-warning"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.pending') %></div>
+          <p class="text-sm mt-2"><%= I18n.t('panel.verification.help.pending_review') %></p>
+        <% elsif current_user.verified_identity&.rejected_verification? %>
+          <div class="badge badge-error"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.rejected') %></div>
         <% else %>
-          <p class="text-sm"><%= I18n.t('persona.help.not_verified') %></p>
+          <p class="text-sm"><%= I18n.t('panel.verification.help.not_verified') %></p>
           <div class="card-actions justify-end mt-2">
-            <%= link_to I18n.t('persona.actions.verify'), new_panel_verification_path, class: "btn btn-sm btn-primary" %>
+            <%= link_to I18n.t('actions.verify'), new_panel_verification_path, class: "btn btn-sm btn-primary" %>
           </div>
         <% end %>
-        <% if current_user.persona %>
+        <% if current_user.verified_identity %>
           <div class="card-actions justify-end mt-2">
             <%= link_to "Ver detalle", panel_verification_path, class: "btn btn-sm btn-soft" %>
           </div>
@@ -35,13 +35,13 @@
         <h2 class="card-title">Acreditación</h2>
         <% if current_user.member %>
           <% if current_user.member.approved? %>
-            <div class="badge badge-success"><%= I18n.t("member.statuses.approved") %></div>
+            <div class="badge badge-success"><%= I18n.t("activerecord.attributes.member/status.approved") %></div>
             <p class="text-sm mt-2"><%= current_user.member.name %> &mdash; <%= current_user.member.run %></p>
           <% elsif current_user.member.pending? %>
-            <div class="badge badge-warning"><%= I18n.t("member.statuses.pending") %></div>
+            <div class="badge badge-warning"><%= I18n.t("activerecord.attributes.member/status.pending") %></div>
             <p class="text-sm mt-2">Tu solicitud está siendo revisada.</p>
           <% elsif current_user.member.rejected? %>
-            <div class="badge badge-error"><%= I18n.t("member.statuses.rejected") %></div>
+            <div class="badge badge-error"><%= I18n.t("activerecord.attributes.member/status.rejected") %></div>
             <p class="text-sm mt-2">Tu solicitud fue rechazada. Puedes reenviarla.</p>
           <% end %>
           <div class="card-actions justify-end mt-2">

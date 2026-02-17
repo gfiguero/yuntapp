@@ -3,11 +3,11 @@
   <td><%= member.run %></td>
   <td>
     <% if member.pending? %>
-      <span class="badge badge-warning badge-sm"><%= I18n.t('member.statuses.pending') %></span>
+      <span class="badge badge-warning badge-sm"><%= I18n.t('activerecord.attributes.member/status.pending') %></span>
     <% elsif member.approved? %>
-      <span class="badge badge-success badge-sm"><%= I18n.t('member.statuses.approved') %></span>
+      <span class="badge badge-success badge-sm"><%= I18n.t('activerecord.attributes.member/status.approved') %></span>
     <% elsif member.rejected? %>
-      <span class="badge badge-error badge-sm"><%= I18n.t('member.statuses.rejected') %></span>
+      <span class="badge badge-error badge-sm"><%= I18n.t('activerecord.attributes.member/status.rejected') %></span>
     <% end %>
   </td>
   <td>

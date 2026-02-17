@@ -6,9 +6,9 @@
         
         <%# Grupo de Delegación (Select) %>
         <div data-manual-address-target="selectGroup">
-          <%= form.label :neighborhood_delegation_id, I18n.t('attributes.household_unit.neighborhood_delegation'), class: "floating-label" do %>
+          <%= form.label :neighborhood_delegation_id, I18n.t('activerecord.attributes.household_unit.neighborhood_delegation'), class: "floating-label" do %>
             <%= form.collection_select :neighborhood_delegation_id, delegations, :id, :name, { include_blank: I18n.t('helpers.select.prompt') }, { class: "select w-full #{input_class(residence_request, :neighborhood_delegation_id)}", data: { manual_address_target: "select", action: "change->autosave#submit" } } %>
-            <span><%= I18n.t('attributes.household_unit.neighborhood_delegation') %></span>
+            <span><%= I18n.t('activerecord.attributes.household_unit.neighborhood_delegation') %></span>
           <% end %>
           <%= raw(error_message(invalid, residence_request.errors.full_messages_for(:neighborhood_delegation_id))) %>
         </div>
@@ -21,19 +21,19 @@
                 Debemos asegurarnos que el valor del modelo (true/false) se refleje en 'checked'.
             %>
             <%= form.check_box :manual_address, { class: "checkbox", data: { action: "change->manual-address#toggle", manual_address_target: "checkbox" } }, "true", "false" %>
-            <span class="label-text"><%= I18n.t('onboarding.step3.manual_address_option') %></span>
+            <span class="label-text"><%= I18n.t('panel.onboarding.step3.manual_address_option') %></span>
           </label>
         </div>
 
         <%# Grupo de Dirección Manual (Input) %>
         <div class="hidden" data-manual-address-target="inputGroup">
           <% invalid_manual = residence_request.errors.include?(:address_line_1) %>
-          <%= form.label :address_line_1, I18n.t('attributes.household_unit.address_line_1'), class: "floating-label" do %>
-            <%= form.text_field :address_line_1, class: "input w-full #{input_class(residence_request, :address_line_1)}", placeholder: I18n.t('attributes.household_unit.address_line_1'), data: { manual_address_target: "input", action: "input->autosave#submit" } %>
-            <span><%= I18n.t('attributes.household_unit.address_line_1') %></span>
+          <%= form.label :address_line_1, I18n.t('activerecord.attributes.household_unit.address_line_1'), class: "floating-label" do %>
+            <%= form.text_field :address_line_1, class: "input w-full #{input_class(residence_request, :address_line_1)}", placeholder: I18n.t('activerecord.attributes.household_unit.address_line_1'), data: { manual_address_target: "input", action: "input->autosave#submit" } %>
+            <span><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></span>
           <% end %>
           <%= raw(error_message(invalid_manual, residence_request.errors.full_messages_for(:address_line_1))) %>
-          <p class="text-xs text-base-content/60 mt-1"><%= I18n.t('onboarding.step3.manual_address_hint') %></p>
+          <p class="text-xs text-base-content/60 mt-1"><%= I18n.t('panel.onboarding.step3.manual_address_hint') %></p>
         </div>
 
       <% end %>

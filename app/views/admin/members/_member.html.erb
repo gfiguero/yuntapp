@@ -1,66 +1,66 @@
 <div id="<%= dom_id member %>">
   <dl class="mb-4 divide-y divide-gray-400 w-1/3">
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.id') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.id') %></dt>
       <dd><%= member.id %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.name') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.name') %></dt>
       <dd><%= member.name %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.run') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.run') %></dt>
       <dd><%= member.run %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.phone') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.phone') %></dt>
       <dd><%= member.phone || "—" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.email') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.email') %></dt>
       <dd><%= member.email || "—" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.status') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.status') %></dt>
       <dd>
         <% if member.pending? %>
-          <span class="badge badge-warning"><%= I18n.t('member.statuses.pending') %></span>
+          <span class="badge badge-warning"><%= I18n.t('activerecord.attributes.member/status.pending') %></span>
         <% elsif member.approved? %>
-          <span class="badge badge-success"><%= I18n.t('member.statuses.approved') %></span>
+          <span class="badge badge-success"><%= I18n.t('activerecord.attributes.member/status.approved') %></span>
         <% elsif member.rejected? %>
-          <span class="badge badge-error"><%= I18n.t('member.statuses.rejected') %></span>
+          <span class="badge badge-error"><%= I18n.t('activerecord.attributes.member/status.rejected') %></span>
         <% end %>
       </dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.household_admin') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.household_admin') %></dt>
       <dd><%= member.household_admin? ? "Sí" : "No" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.member.household_unit') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.household_unit') %></dt>
       <dd><%= member.household_unit.number %></dd>
     </div>
     <% if member.approved_by %>
       <div class="p-2 grid gap-2">
-        <dt class="font-medium"><%= I18n.t('attributes.member.approved_by') %></dt>
+        <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.approved_by') %></dt>
         <dd><%= member.approved_by.email %></dd>
       </div>
     <% end %>
     <% if member.approved_at %>
       <div class="p-2 grid gap-2">
-        <dt class="font-medium"><%= I18n.t('attributes.member.approved_at') %></dt>
+        <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.approved_at') %></dt>
         <dd><%= member.approved_at.strftime("%d/%m/%Y") %></dd>
       </div>
     <% end %>
     <% if member.rejected? && member.rejection_reason.present? %>
       <div class="p-2 grid gap-2">
-        <dt class="font-medium"><%= I18n.t('attributes.member.rejection_reason') %></dt>
+        <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.rejection_reason') %></dt>
         <dd class="text-error"><%= member.rejection_reason %></dd>
       </div>
     <% end %>
     <% if member.documents.attached? %>
       <div class="p-2 grid gap-2">
-        <dt class="font-medium"><%= I18n.t('attributes.member.documents') %></dt>
+        <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.documents') %></dt>
         <dd>
           <ul class="list-disc pl-4">
             <% member.documents.each do |doc| %>

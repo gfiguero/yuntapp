@@ -11,10 +11,10 @@
         <label class="floating-label">
           <%= form.select :region_id, 
               options_for_select(cascading_data.map { |r| [r[:name], r[:id]] }, selected_region_id), 
-              { prompt: I18n.t('onboarding.step1.select_region') },
+              { prompt: I18n.t('panel.onboarding.step1.select_region') },
               { class: "select w-full #{select_class(selected_region_id)}", onchange: "this.form.requestSubmit()" } 
           %>
-          <span><%= I18n.t('onboarding.step1.region_label') %></span>
+          <span><%= I18n.t('panel.onboarding.step1.region_label') %></span>
         </label>
       <% end %>
     <% end %>

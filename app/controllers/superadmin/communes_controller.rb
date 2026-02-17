@@ -45,7 +45,7 @@ module Superadmin
       @commune = Commune.new(commune_params)
 
       if @commune.save
-        redirect_to superadmin_commune_path(@commune), notice: I18n.t("commune.message.created")
+        redirect_to superadmin_commune_path(@commune), notice: I18n.t("superadmin.communes.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Superadmin
     # PATCH/PUT /admin/communes/1
     def update
       if @commune.update(commune_params)
-        redirect_to superadmin_commune_path(@commune), notice: I18n.t("commune.message.updated"), status: :see_other
+        redirect_to superadmin_commune_path(@commune), notice: I18n.t("superadmin.communes.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Superadmin
     # DELETE /admin/communes/1
     def destroy
       @commune.destroy!
-      redirect_to superadmin_communes_path, notice: I18n.t("commune.message.destroyed"), status: :see_other, format: :html
+      redirect_to superadmin_communes_path, notice: I18n.t("superadmin.communes.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

@@ -3,8 +3,8 @@
       <%= form_with(model: identity_request, url: panel_onboarding_step2_path, method: :patch, data: { controller: "autosave", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
         <% invalid = identity_request.errors.include?(:identity_documents) %>
         <div>
-          <%= form.label :identity_documents, I18n.t('attributes.persona.identity_document'), class: "label" %>
-          <p class="text-sm text-base-content/60 mb-1"><%= I18n.t('persona.help.upload_ci') %></p>
+          <%= form.label :identity_documents, I18n.t('activerecord.attributes.verified_identity.identity_document'), class: "label" %>
+          <p class="text-sm text-base-content/60 mb-1"><%= I18n.t('panel.verification.help.upload_ci') %></p>
           
           <%= form.file_field :identity_documents, multiple: true, class: "file-input w-full #{input_class(identity_request, :identity_documents)}", data: { action: "change->autosave#submit" } %>
           

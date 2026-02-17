@@ -1,15 +1,15 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.residence_certificates') %>
+  <%= I18n.t('panel.residence_certificates.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= link_to I18n.t('views.title.residence_certificates'), panel_residence_certificates_path %></li>
+  <li><%= link_to I18n.t('panel.residence_certificates.index.title'), panel_residence_certificates_path %></li>
   <li><%= @residence_certificate.id %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.residence_certificates') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.residence_certificate', id: @residence_certificate.id) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.residence_certificates.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('panel.residence_certificates.show.identifier', id: @residence_certificate.id) %></h3>
 
   <div class="flex flex-row gap-2 mb-4">
     <%= link_to raw(icon('list') + I18n.t('actions.index')), panel_residence_certificates_path, class: "btn btn-soft" %>
@@ -17,35 +17,35 @@
 
   <dl class="mb-4 divide-y divide-gray-400 w-1/3">
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.folio') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.folio') %></dt>
       <dd><%= @residence_certificate.folio || "—" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.member') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.member') %></dt>
       <dd><%= @residence_certificate.member.name %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.status') %></dt>
-      <dd><%= I18n.t("residence_certificate.statuses.#{@residence_certificate.status}") %></dd>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.status') %></dt>
+      <dd><%= I18n.t("activerecord.attributes.residence_certificate/status.#{@residence_certificate.status}") %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.purpose') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.purpose') %></dt>
       <dd><%= @residence_certificate.purpose %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.issue_date') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.issue_date') %></dt>
       <dd><%= @residence_certificate.issue_date || "—" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.expiration_date') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.expiration_date') %></dt>
       <dd><%= @residence_certificate.expiration_date || "—" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.notes') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.notes') %></dt>
       <dd><%= @residence_certificate.notes || "—" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('attributes.residence_certificate.created_at') %></dt>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.created_at') %></dt>
       <dd><%= @residence_certificate.created_at.strftime("%d/%m/%Y") %></dd>
     </div>
   </dl>

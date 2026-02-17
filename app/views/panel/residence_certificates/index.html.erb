@@ -1,13 +1,13 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.residence_certificates') %>
+  <%= I18n.t('panel.residence_certificates.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= I18n.t('views.title.residence_certificates') %></li>
+  <li><%= I18n.t('panel.residence_certificates.index.title') %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.residence_certificates') %></h1>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.residence_certificates.index.title') %></h1>
 
   <div class="flex flex-row gap-2 mb-4">
     <%= link_to raw(icon('new') + I18n.t('actions.new')), new_panel_residence_certificate_path, class: "btn btn-soft btn-primary" %>
@@ -17,12 +17,12 @@
     <table class="table">
       <thead>
         <tr>
-          <th><%= I18n.t('attributes.residence_certificate.folio') %></th>
-          <th><%= I18n.t('attributes.residence_certificate.member') %></th>
-          <th><%= I18n.t('attributes.residence_certificate.status') %></th>
-          <th><%= I18n.t('attributes.residence_certificate.purpose') %></th>
-          <th><%= I18n.t('attributes.residence_certificate.created_at') %></th>
-          <th class="w-20"><%= I18n.t('views.headers.actions') %></th>
+          <th><%= I18n.t('activerecord.attributes.residence_certificate.folio') %></th>
+          <th><%= I18n.t('activerecord.attributes.residence_certificate.member') %></th>
+          <th><%= I18n.t('activerecord.attributes.residence_certificate.status') %></th>
+          <th><%= I18n.t('activerecord.attributes.residence_certificate.purpose') %></th>
+          <th><%= I18n.t('activerecord.attributes.residence_certificate.created_at') %></th>
+          <th class="w-20"><%= I18n.t('shared.table.actions') %></th>
         </tr>
       </thead>
       <tbody>
@@ -30,7 +30,7 @@
         <tr class="hover:bg-base-300">
           <td><%= certificate.folio || "—" %></td>
           <td><%= certificate.member.name %></td>
-          <td><%= I18n.t("residence_certificate.statuses.#{certificate.status}") %></td>
+          <td><%= I18n.t("activerecord.attributes.residence_certificate/status.#{certificate.status}") %></td>
           <td><%= truncate(certificate.purpose, length: 50) %></td>
           <td><%= certificate.created_at.strftime("%d/%m/%Y") %></td>
           <td>

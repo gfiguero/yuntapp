@@ -45,7 +45,7 @@ module Admin
       @residence_certificate = ResidenceCertificate.new(residence_certificate_params)
 
       if @residence_certificate.save
-        redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("residence_certificate.message.created")
+        redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Admin
     # PATCH/PUT /admin/residence_certificates/1
     def update
       if @residence_certificate.update(residence_certificate_params)
-        redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("residence_certificate.message.updated"), status: :see_other
+        redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,26 +67,26 @@ module Admin
     # DELETE /admin/residence_certificates/1
     def destroy
       @residence_certificate.destroy!
-      redirect_to admin_residence_certificates_path, notice: I18n.t("residence_certificate.message.destroyed"), status: :see_other, format: :html
+      redirect_to admin_residence_certificates_path, notice: I18n.t("admin.residence_certificates.flash.destroyed"), status: :see_other, format: :html
     end
 
     # PATCH /admin/residence_certificates/1/approve
     def approve
       @residence_certificate.update!(status: "approved", approved_by: current_user)
-      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("residence_certificate.message.approved"), status: :see_other
+      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.approved"), status: :see_other
     end
 
     # PATCH /admin/residence_certificates/1/reject
     def reject
       @residence_certificate.update!(status: "rejected", approved_by: current_user, notes: params[:notes])
-      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("residence_certificate.message.rejected"), status: :see_other
+      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.rejected"), status: :see_other
     end
 
     # PATCH /admin/residence_certificates/1/issue
     def issue
       @residence_certificate.generate_folio!
       @residence_certificate.update!(status: "issued", issue_date: Date.current, expiration_date: 6.months.from_now.to_date)
-      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("residence_certificate.message.issued"), status: :see_other
+      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.issued"), status: :see_other
     end
 
     private

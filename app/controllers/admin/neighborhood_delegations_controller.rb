@@ -45,7 +45,7 @@ module Admin
       @neighborhood_delegation = NeighborhoodDelegation.new(neighborhood_delegation_params)
 
       if @neighborhood_delegation.save
-        redirect_to admin_neighborhood_delegation_path(@neighborhood_delegation), notice: I18n.t("neighborhood_delegation.message.created")
+        redirect_to admin_neighborhood_delegation_path(@neighborhood_delegation), notice: I18n.t("admin.neighborhood_delegations.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Admin
     # PATCH/PUT /admin/neighborhood_delegations/1
     def update
       if @neighborhood_delegation.update(neighborhood_delegation_params)
-        redirect_to admin_neighborhood_delegation_path(@neighborhood_delegation), notice: I18n.t("neighborhood_delegation.message.updated"), status: :see_other
+        redirect_to admin_neighborhood_delegation_path(@neighborhood_delegation), notice: I18n.t("admin.neighborhood_delegations.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Admin
     # DELETE /admin/neighborhood_delegations/1
     def destroy
       @neighborhood_delegation.destroy!
-      redirect_to admin_neighborhood_delegations_path, notice: I18n.t("neighborhood_delegation.message.destroyed"), status: :see_other, format: :html
+      redirect_to admin_neighborhood_delegations_path, notice: I18n.t("admin.neighborhood_delegations.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

@@ -41,7 +41,7 @@ module Panel
 
       get new_panel_accreditation_url
       assert_redirected_to new_panel_verification_url
-      assert_equal I18n.t("persona.message.must_verify_first"), flash[:alert]
+      assert_equal I18n.t("panel.verification.flash.must_verify_first"), flash[:alert]
     end
 
     test "unverified user is redirected to verification on create" do
@@ -96,7 +96,7 @@ module Panel
       end
 
       assert_redirected_to panel_accreditation_url
-      assert_equal I18n.t("member.message.requested"), flash[:notice]
+      assert_equal I18n.t("panel.accreditations.flash.requested"), flash[:notice]
 
       new_member = Member.last
       assert_equal "pending", new_member.status
@@ -119,7 +119,7 @@ module Panel
       end
 
       assert_redirected_to new_panel_household_unit_url
-      assert_equal I18n.t("member.message.run_not_found_no_household"), flash[:alert]
+      assert_equal I18n.t("panel.accreditations.flash.run_not_found_no_household"), flash[:alert]
     end
 
     # --- new action accessible for verified user ---

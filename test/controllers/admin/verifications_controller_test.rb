@@ -7,12 +7,12 @@ module Admin
     setup do
       @selendis = users(:selendis)
       @rohana = users(:rohana)
-      @rohana_persona = personas(:rohana_persona)
+      @rohana_verified_identity = verified_identities(:rohana_persona)
 
       # Link rohana to the same neighborhood association as selendis
       @rohana.update!(
         neighborhood_association: @selendis.neighborhood_association,
-        persona: @rohana_persona
+        verified_identity: @rohana_verified_identity
       )
     end
 
@@ -34,7 +34,7 @@ module Admin
 
     test "admin can view verification detail" do
       sign_in @selendis
-      get admin_verification_url(@rohana_persona)
+      get admin_verification_url(@rohana_verified_identity)
       assert_response :success
     end
 
@@ -43,13 +43,13 @@ module Admin
     test "admin can approve a pending verification" do
       sign_in @selendis
 
-      assert @rohana_persona.pending_verification?
+      assert @rohana_verified_identity.pending_verification?
 
-      patch approve_admin_verification_url(@rohana_persona)
+      patch approve_admin_verification_url(@rohana_verified_identity)
 
-      assert_redirected_to admin_verification_url(@rohana_persona)
-      @rohana_persona.reload
-      assert @rohana_persona.verified?
+      assert_redirected_to admin_verification_url(@rohana_verified_identity)
+      @rohana_verified_identity.reload
+      assert @rohana_verified_identity.verified?
     end
 
     # --- reject ---
@@ -57,33 +57,33 @@ module Admin
     test "admin can reject a pending verification" do
       sign_in @selendis
 
-      patch reject_admin_verification_url(@rohana_persona)
+      patch reject_admin_verification_url(@rohana_verified_identity)
 
-      assert_redirected_to admin_verification_url(@rohana_persona)
-      @rohana_persona.reload
-      assert @rohana_persona.rejected_verification?
+      assert_redirected_to admin_verification_url(@rohana_verified_identity)
+      @rohana_verified_identity.reload
+      assert @rohana_verified_identity.rejected_verification?
     end
 
     # --- auto-link on approve ---
 
-    test "approving persona makes user automatically see their member" do
+    test "approving verified identity makes user automatically see their member" do
       sign_in @selendis
 
-      # Create a member linked to rohana's persona
+      # Create a member linked to rohana's verified identity
       member = Member.create!(
         household_unit: household_units(:selendis_household),
-        persona: @rohana_persona,
+        verified_identity: @rohana_verified_identity,
         status: "approved"
       )
 
-      # Before approve, rohana's persona is pending — user still sees member via persona
+      # Before approve, rohana's verified identity is pending — user still sees member via verified_identity
       assert_equal member, @rohana.member
 
-      patch approve_admin_verification_url(@rohana_persona)
+      patch approve_admin_verification_url(@rohana_verified_identity)
 
-      @rohana_persona.reload
-      assert @rohana_persona.verified?
-      # Member is accessible via persona
+      @rohana_verified_identity.reload
+      assert @rohana_verified_identity.verified?
+      # Member is accessible via verified_identity
       assert_equal member, @rohana.reload.member
     end
   end

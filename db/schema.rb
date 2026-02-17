@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_16_035216) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_17_012207) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -93,7 +93,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_16_035216) do
     t.datetime "created_at", null: false
     t.string "first_name"
     t.string "last_name"
-    t.integer "neighborhood_association_id", null: false
     t.integer "onboarding_request_id"
     t.string "phone"
     t.text "rejection_reason"
@@ -101,7 +100,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_16_035216) do
     t.string "status", default: "draft", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["neighborhood_association_id"], name: "idx_on_neighborhood_association_id_0ecb910a99"
     t.index ["onboarding_request_id"], name: "index_identity_verification_requests_on_onboarding_request_id"
     t.index ["user_id"], name: "index_identity_verification_requests_on_user_id"
   end
@@ -160,6 +158,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_16_035216) do
     t.integer "region_id"
     t.text "rejection_reason"
     t.string "status", default: "draft", null: false
+    t.datetime "terms_accepted_at"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["commune_id"], name: "index_onboarding_requests_on_commune_id"
@@ -265,7 +264,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_16_035216) do
   add_foreign_key "communes", "regions"
   add_foreign_key "household_units", "communes"
   add_foreign_key "household_units", "neighborhood_delegations"
-  add_foreign_key "identity_verification_requests", "neighborhood_associations"
   add_foreign_key "identity_verification_requests", "onboarding_requests"
   add_foreign_key "identity_verification_requests", "users"
   add_foreign_key "listings", "categories"

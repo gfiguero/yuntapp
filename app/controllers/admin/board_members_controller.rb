@@ -45,7 +45,7 @@ module Admin
       @board_member = BoardMember.new(board_member_params)
 
       if @board_member.save
-        redirect_to admin_board_member_path(@board_member), notice: I18n.t("board_member.message.created")
+        redirect_to admin_board_member_path(@board_member), notice: I18n.t("admin.board_members.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Admin
     # PATCH/PUT /admin/board_members/1
     def update
       if @board_member.update(board_member_params)
-        redirect_to admin_board_member_path(@board_member), notice: I18n.t("board_member.message.updated"), status: :see_other
+        redirect_to admin_board_member_path(@board_member), notice: I18n.t("admin.board_members.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Admin
     # DELETE /admin/board_members/1
     def destroy
       @board_member.destroy!
-      redirect_to admin_board_members_path, notice: I18n.t("board_member.message.destroyed"), status: :see_other, format: :html
+      redirect_to admin_board_members_path, notice: I18n.t("admin.board_members.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

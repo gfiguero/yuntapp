@@ -1,50 +1,50 @@
 <%= form_with(model: [:panel, member], class: "grid gap-4 w-1/3") do |form| %>
 
   <% invalid = member.errors.include?(:first_name) %>
-  <%= form.label :first_name, I18n.t('attributes.member.first_name'), class: "floating-label" do %>
-    <%= form.text_field :first_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.member.first_name') %>
-    <span><%= I18n.t('attributes.member.first_name') %></span>
+  <%= form.label :first_name, I18n.t('activerecord.attributes.member.first_name'), class: "floating-label" do %>
+    <%= form.text_field :first_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.member.first_name') %>
+    <span><%= I18n.t('activerecord.attributes.member.first_name') %></span>
   <% end %>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:first_name))) %>
 
   <% invalid = member.errors.include?(:last_name) %>
-  <%= form.label :last_name, I18n.t('attributes.member.last_name'), class: "floating-label" do %>
-    <%= form.text_field :last_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.member.last_name') %>
-    <span><%= I18n.t('attributes.member.last_name') %></span>
+  <%= form.label :last_name, I18n.t('activerecord.attributes.member.last_name'), class: "floating-label" do %>
+    <%= form.text_field :last_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.member.last_name') %>
+    <span><%= I18n.t('activerecord.attributes.member.last_name') %></span>
   <% end %>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:last_name))) %>
 
   <% invalid = member.errors.include?(:run) %>
-  <%= form.label :run, I18n.t('attributes.member.run'), class: "floating-label" do %>
-    <%= form.text_field :run, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.member.run') %>
-    <span><%= I18n.t('attributes.member.run') %></span>
+  <%= form.label :run, I18n.t('activerecord.attributes.member.run'), class: "floating-label" do %>
+    <%= form.text_field :run, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.member.run') %>
+    <span><%= I18n.t('activerecord.attributes.member.run') %></span>
   <% end %>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:run))) %>
 
   <% invalid = member.errors.include?(:phone) %>
-  <%= form.label :phone, I18n.t('attributes.member.phone'), class: "floating-label" do %>
-    <%= form.text_field :phone, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.member.phone') %>
-    <span><%= I18n.t('attributes.member.phone') %></span>
+  <%= form.label :phone, I18n.t('activerecord.attributes.member.phone'), class: "floating-label" do %>
+    <%= form.text_field :phone, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.member.phone') %>
+    <span><%= I18n.t('activerecord.attributes.member.phone') %></span>
   <% end %>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:phone))) %>
 
   <% invalid = member.errors.include?(:email) %>
-  <%= form.label :email, I18n.t('attributes.member.email'), class: "floating-label" do %>
-    <%= form.email_field :email, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.member.email') %>
-    <span><%= I18n.t('attributes.member.email') %></span>
+  <%= form.label :email, I18n.t('activerecord.attributes.member.email'), class: "floating-label" do %>
+    <%= form.email_field :email, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.member.email') %>
+    <span><%= I18n.t('activerecord.attributes.member.email') %></span>
   <% end %>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:email))) %>
 
   <% invalid = member.errors.include?(:documents) %>
   <div>
-    <%= form.label :documents, I18n.t('attributes.member.documents'), class: "label" %>
+    <%= form.label :documents, I18n.t('activerecord.attributes.member.documents'), class: "label" %>
     <%= form.file_field :documents, multiple: true, class: "file-input w-full #{'input-error' if invalid}" %>
   </div>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:documents))) %>
 
   <% if member.persisted? && member.documents.attached? %>
     <div>
-      <p class="label"><%= I18n.t('attributes.member.documents') %> actuales:</p>
+      <p class="label"><%= I18n.t('activerecord.attributes.member.documents') %> actuales:</p>
       <ul class="list-disc pl-4">
         <% member.documents.each do |doc| %>
           <li><%= link_to doc.filename, rails_blob_path(doc, disposition: "attachment"), class: "link link-primary" %></li>

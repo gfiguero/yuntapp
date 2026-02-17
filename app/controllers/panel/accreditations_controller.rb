@@ -27,19 +27,19 @@ module Panel
 
       household_unit = resolve_household_unit
       unless household_unit
-        redirect_to new_panel_household_unit_path, alert: I18n.t("member.message.run_not_found_no_household")
+        redirect_to new_panel_household_unit_path, alert: I18n.t("panel.accreditations.flash.run_not_found_no_household")
         return
       end
 
       @member = Member.new(member_params)
-      @member.persona = current_user.persona
+      @member.verified_identity = current_user.verified_identity
       @member.requested_by = current_user
       @member.household_unit = household_unit
       @member.status = "pending"
 
       if @member.save
         session.delete(:pending_household_unit_id)
-        redirect_to panel_accreditation_path, notice: I18n.t("member.message.requested")
+        redirect_to panel_accreditation_path, notice: I18n.t("panel.accreditations.flash.requested")
       else
         render :new, status: :unprocessable_content
       end
@@ -64,7 +64,7 @@ module Panel
       @member.rejection_reason = nil
 
       if @member.save
-        redirect_to panel_accreditation_path, notice: I18n.t("member.message.resubmitted")
+        redirect_to panel_accreditation_path, notice: I18n.t("panel.accreditations.flash.resubmitted")
       else
         render :edit, status: :unprocessable_content
       end
@@ -74,7 +74,7 @@ module Panel
 
     def ensure_verified!
       unless current_user.verified?
-        redirect_to new_panel_verification_path, alert: I18n.t("persona.message.must_verify_first")
+        redirect_to new_panel_verification_path, alert: I18n.t("panel.verification.flash.must_verify_first")
       end
     end
 

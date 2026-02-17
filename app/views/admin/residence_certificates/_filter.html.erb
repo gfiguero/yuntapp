@@ -12,17 +12,17 @@
 
           <div class="grid gap-4">
             <div>
-              <%= label_tag :id, I18n.t('attributes.residence_certificate.id'), class: "label" %>
+              <%= label_tag :id, I18n.t('activerecord.attributes.residence_certificate.id'), class: "label" %>
               <%= text_field_tag :id, params[:id], class: "input", autocomplete: "off" %>
             </div>
 
             <div>
-              <%= label_tag :status, I18n.t('attributes.residence_certificate.status'), class: "label" %>
-              <%= select_tag :status, options_for_select(ResidenceCertificate::STATUSES.map { |s| [I18n.t("residence_certificate.statuses.#{s}"), s] }, params[:status]), { prompt: "Todos", class: "select w-full" } %>
+              <%= label_tag :status, I18n.t('activerecord.attributes.residence_certificate.status'), class: "label" %>
+              <%= select_tag :status, options_for_select(ResidenceCertificate::STATUSES.map { |s| [I18n.t("activerecord.attributes.residence_certificate/status.#{s}"), s] }, params[:status]), { prompt: "Todos", class: "select w-full" } %>
             </div>
 
             <div>
-              <%= label_tag :folio, I18n.t('attributes.residence_certificate.folio'), class: "label" %>
+              <%= label_tag :folio, I18n.t('activerecord.attributes.residence_certificate.folio'), class: "label" %>
               <%= text_field_tag :folio, params[:folio], class: "input", autocomplete: "off" %>
             </div>
 

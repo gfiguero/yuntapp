@@ -1,5 +1,5 @@
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.household_members') %></h1>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.members.index.title') %></h1>
 
   <div class="flex flex-row gap-2 mb-4">
     <%= link_to raw(icon('new') + I18n.t('actions.new')), new_panel_member_path, class: "btn btn-soft btn-primary" %>
@@ -9,10 +9,10 @@
     <table class="table">
       <thead>
         <tr>
-          <th><%= I18n.t('attributes.member.name') %></th>
-          <th><%= I18n.t('attributes.member.run') %></th>
-          <th><%= I18n.t('attributes.member.status') %></th>
-          <th class="w-20"><%= I18n.t('views.headers.actions') %></th>
+          <th><%= I18n.t('activerecord.attributes.member.name') %></th>
+          <th><%= I18n.t('activerecord.attributes.member.run') %></th>
+          <th><%= I18n.t('activerecord.attributes.member.status') %></th>
+          <th class="w-20"><%= I18n.t('shared.table.actions') %></th>
         </tr>
       </thead>
       <tbody>
@@ -22,11 +22,11 @@
           <td><%= member.run %></td>
           <td>
             <% if member.pending? %>
-              <span class="badge badge-warning badge-sm"><%= I18n.t('member.statuses.pending') %></span>
+              <span class="badge badge-warning badge-sm"><%= I18n.t('activerecord.attributes.member/status.pending') %></span>
             <% elsif member.approved? %>
-              <span class="badge badge-success badge-sm"><%= I18n.t('member.statuses.approved') %></span>
+              <span class="badge badge-success badge-sm"><%= I18n.t('activerecord.attributes.member/status.approved') %></span>
             <% elsif member.rejected? %>
-              <span class="badge badge-error badge-sm"><%= I18n.t('member.statuses.rejected') %></span>
+              <span class="badge badge-error badge-sm"><%= I18n.t('activerecord.attributes.member/status.rejected') %></span>
             <% end %>
           </td>
           <td>

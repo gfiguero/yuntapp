@@ -42,24 +42,24 @@ module Admin
 
     # POST /admin/members
     def create
-      run = normalize_run(persona_params[:run])
-      persona = Persona.find_or_initialize_by(run: run)
-      persona.assign_attributes(persona_params.except(:run))
-      persona.run = run
-      persona.verification_status ||= "pending"
+      run = normalize_run(verified_identity_params[:run])
+      verified_identity = VerifiedIdentity.find_or_initialize_by(run: run)
+      verified_identity.assign_attributes(verified_identity_params.except(:run))
+      verified_identity.run = run
+      verified_identity.verification_status ||= "pending"
 
-      unless persona.save
+      unless verified_identity.save
         @member = Member.new
-        @member.errors.merge!(persona.errors)
+        @member.errors.merge!(verified_identity.errors)
         render :new, status: :unprocessable_content
         return
       end
 
       @member = Member.new(household_unit_id: params.dig(:member, :household_unit_id))
-      @member.persona = persona
+      @member.verified_identity = verified_identity
 
       if @member.save
-        redirect_to admin_member_path(@member), notice: I18n.t("member.message.created")
+        redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -67,9 +67,9 @@ module Admin
 
     # PATCH/PUT /admin/members/1
     def update
-      @member.persona.update!(persona_params)
+      @member.verified_identity.update!(verified_identity_params)
       if @member.update(household_unit_id: params.dig(:member, :household_unit_id))
-        redirect_to admin_member_path(@member), notice: I18n.t("member.message.updated"), status: :see_other
+        redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -82,7 +82,7 @@ module Admin
     # DELETE /admin/members/1
     def destroy
       @member.destroy!
-      redirect_to admin_members_path, notice: I18n.t("member.message.destroyed"), status: :see_other, format: :html
+      redirect_to admin_members_path, notice: I18n.t("admin.members.flash.destroyed"), status: :see_other, format: :html
     end
 
     # PATCH /admin/members/1/approve
@@ -93,13 +93,13 @@ module Admin
         approved_at: Time.current,
         household_admin: @member.user.present? && @member.household_unit.household_admin.nil?
       )
-      redirect_to admin_member_path(@member), notice: I18n.t("member.message.approved"), status: :see_other
+      redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.approved"), status: :see_other
     end
 
     # PATCH /admin/members/1/reject
     def reject
       @member.update!(status: "rejected", approved_by: current_user, rejection_reason: params[:rejection_reason])
-      redirect_to admin_member_path(@member), notice: I18n.t("member.message.rejected"), status: :see_other
+      redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.rejected"), status: :see_other
     end
 
     private
@@ -118,7 +118,7 @@ module Admin
       end
     end
 
-    def persona_params
+    def verified_identity_params
       params.require(:member).permit(:first_name, :last_name, :run, :phone, :email)
     end
 

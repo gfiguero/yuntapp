@@ -1,37 +1,37 @@
 <%= form_with(model: [:admin, board_member], class: "grid gap-4 w-1/3") do |form| %>
 
   <% invalid = board_member.errors.include?(:member_id) %>
-  <%= form.label :member_id, I18n.t('attributes.board_member.member'), class: "floating-label" do %>
+  <%= form.label :member_id, I18n.t('activerecord.attributes.board_member.member'), class: "floating-label" do %>
     <%= form.collection_select :member_id, current_neighborhood_association.members, :id, :name, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
-    <span><%= I18n.t('attributes.board_member.member') %></span>
+    <span><%= I18n.t('activerecord.attributes.board_member.member') %></span>
   <% end %>
   <%= raw(error_message(invalid, board_member.errors.full_messages_for(:member_id))) %>
 
   <% invalid = board_member.errors.include?(:position) %>
-  <%= form.label :position, I18n.t('attributes.board_member.position'), class: "floating-label" do %>
+  <%= form.label :position, I18n.t('activerecord.attributes.board_member.position'), class: "floating-label" do %>
     <%= form.select :position, BoardMember::POSITIONS.map { |p| [p.capitalize, p] }, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
-    <span><%= I18n.t('attributes.board_member.position') %></span>
+    <span><%= I18n.t('activerecord.attributes.board_member.position') %></span>
   <% end %>
   <%= raw(error_message(invalid, board_member.errors.full_messages_for(:position))) %>
 
   <% invalid = board_member.errors.include?(:start_date) %>
-  <%= form.label :start_date, I18n.t('attributes.board_member.start_date'), class: "floating-label" do %>
+  <%= form.label :start_date, I18n.t('activerecord.attributes.board_member.start_date'), class: "floating-label" do %>
     <%= form.date_field :start_date, class: "input w-full validator #{'input-error' if invalid}", required: true %>
-    <span><%= I18n.t('attributes.board_member.start_date') %></span>
+    <span><%= I18n.t('activerecord.attributes.board_member.start_date') %></span>
   <% end %>
   <%= raw(error_message(invalid, board_member.errors.full_messages_for(:start_date))) %>
 
   <% invalid = board_member.errors.include?(:end_date) %>
-  <%= form.label :end_date, I18n.t('attributes.board_member.end_date'), class: "floating-label" do %>
+  <%= form.label :end_date, I18n.t('activerecord.attributes.board_member.end_date'), class: "floating-label" do %>
     <%= form.date_field :end_date, class: "input w-full validator #{'input-error' if invalid}" %>
-    <span><%= I18n.t('attributes.board_member.end_date') %></span>
+    <span><%= I18n.t('activerecord.attributes.board_member.end_date') %></span>
   <% end %>
   <%= raw(error_message(invalid, board_member.errors.full_messages_for(:end_date))) %>
 
   <div class="form-control">
     <label class="label cursor-pointer justify-start gap-4">
       <%= form.check_box :active, class: "checkbox" %>
-      <span class="label-text"><%= I18n.t('attributes.board_member.active') %></span>
+      <span class="label-text"><%= I18n.t('activerecord.attributes.board_member.active') %></span>
     </label>
   </div>
 

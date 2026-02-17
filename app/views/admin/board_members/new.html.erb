@@ -1,15 +1,15 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.board_members') %>
+  <%= I18n.t('admin.board_members.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= link_to I18n.t('views.title.board_members'), admin_board_members_path %></li>
+  <li><%= link_to I18n.t('admin.board_members.index.title'), admin_board_members_path %></li>
   <li><%= I18n.t('actions.new') %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.board_members') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.headers.new') %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.board_members.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('shared.headers.new_record') %></h3>
   <%= render "buttons" %>
   <%= render "form", board_member: @board_member %>
 </div>

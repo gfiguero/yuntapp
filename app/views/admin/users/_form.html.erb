@@ -1,45 +1,45 @@
 <%= form_with(model: [:admin, user], class: "grid gap-4 w-1/2") do |form| %>
 
   <% invalid = user.errors.include?(:first_name) %>
-  <%= form.label :first_name, I18n.t('attributes.user.first_name'), class: "floating-label" do %>
-    <%= form.text_field :first_name, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.user.first_name') %>
-    <span><%= I18n.t('attributes.user.first_name') %></span>
+  <%= form.label :first_name, I18n.t('activerecord.attributes.user.first_name'), class: "floating-label" do %>
+    <%= form.text_field :first_name, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.user.first_name') %>
+    <span><%= I18n.t('activerecord.attributes.user.first_name') %></span>
   <% end %>
   <%= raw(error_message(invalid, user.errors.full_messages_for(:first_name))) %>
 
   <% invalid = user.errors.include?(:last_name) %>
-  <%= form.label :last_name, I18n.t('attributes.user.last_name'), class: "floating-label" do %>
-    <%= form.text_field :last_name, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.user.last_name') %>
-    <span><%= I18n.t('attributes.user.last_name') %></span>
+  <%= form.label :last_name, I18n.t('activerecord.attributes.user.last_name'), class: "floating-label" do %>
+    <%= form.text_field :last_name, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.user.last_name') %>
+    <span><%= I18n.t('activerecord.attributes.user.last_name') %></span>
   <% end %>
   <%= raw(error_message(invalid, user.errors.full_messages_for(:last_name))) %>
 
   <% invalid = user.errors.include?(:email) %>
-  <%= form.label :email, I18n.t('attributes.user.email'), class: "floating-label" do %>
-    <%= form.email_field :email, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.user.email') %>
-    <span><%= I18n.t('attributes.user.email') %></span>
+  <%= form.label :email, I18n.t('activerecord.attributes.user.email'), class: "floating-label" do %>
+    <%= form.email_field :email, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.user.email') %>
+    <span><%= I18n.t('activerecord.attributes.user.email') %></span>
   <% end %>
   <%= raw(error_message(invalid, user.errors.full_messages_for(:email))) %>
 
   <% if user.new_record? %>
     <% invalid = user.errors.include?(:password) %>
-    <%= form.label :password, I18n.t('attributes.user.password'), class: "floating-label" do %>
-      <%= form.password_field :password, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.user.password') %>
-      <span><%= I18n.t('attributes.user.password') %></span>
+    <%= form.label :password, I18n.t('activerecord.attributes.user.password'), class: "floating-label" do %>
+      <%= form.password_field :password, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.user.password') %>
+      <span><%= I18n.t('activerecord.attributes.user.password') %></span>
     <% end %>
     <%= raw(error_message(invalid, user.errors.full_messages_for(:password))) %>
 
     <% invalid = user.errors.include?(:password_confirmation) %>
-    <%= form.label :password_confirmation, I18n.t('attributes.user.password_confirmation'), class: "floating-label" do %>
-      <%= form.password_field :password_confirmation, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.user.password_confirmation') %>
-      <span><%= I18n.t('attributes.user.password_confirmation') %></span>
+    <%= form.label :password_confirmation, I18n.t('activerecord.attributes.user.password_confirmation'), class: "floating-label" do %>
+      <%= form.password_field :password_confirmation, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.user.password_confirmation') %>
+      <span><%= I18n.t('activerecord.attributes.user.password_confirmation') %></span>
     <% end %>
     <%= raw(error_message(invalid, user.errors.full_messages_for(:password_confirmation))) %>
   <% end %>
 
   <div class="form-control">
     <label class="label cursor-pointer justify-start gap-4">
-      <span class="label-text"><%= I18n.t('attributes.user.admin') %></span>
+      <span class="label-text"><%= I18n.t('activerecord.attributes.user.admin') %></span>
       <%= form.check_box :admin, class: "checkbox checkbox-primary" %>
     </label>
   </div>

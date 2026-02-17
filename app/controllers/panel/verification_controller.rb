@@ -4,42 +4,42 @@ module Panel
     before_action :authenticate_user!
 
     def show
-      @persona = current_user.persona
-      redirect_to new_panel_verification_path unless @persona
+      @verified_identity = current_user.verified_identity
+      redirect_to new_panel_verification_path unless @verified_identity
     end
 
     def new
-      if current_user.persona&.verified?
+      if current_user.verified_identity&.verified?
         redirect_to panel_verification_path
         return
       end
 
-      @persona = current_user.persona || Persona.new
+      @verified_identity = current_user.verified_identity || VerifiedIdentity.new
     end
 
     def create
-      if current_user.persona&.verified?
+      if current_user.verified_identity&.verified?
         redirect_to panel_verification_path
         return
       end
 
-      run = normalize_run(params[:persona][:run])
-      @persona = Persona.find_by(run: run)
+      run = normalize_run(params[:verified_identity][:run])
+      @verified_identity = VerifiedIdentity.find_by(run: run)
 
-      if @persona.present? && @persona.user.present? && @persona.user != current_user
-        redirect_to new_panel_verification_path, alert: I18n.t("persona.message.run_already_claimed")
+      if @verified_identity.present? && @verified_identity.users.any? && @verified_identity.users.exclude?(current_user)
+        redirect_to new_panel_verification_path, alert: I18n.t("panel.verification.flash.run_already_claimed")
         return
       end
 
-      @persona ||= Persona.new
+      @verified_identity ||= VerifiedIdentity.new
 
-      @persona.assign_attributes(verification_params)
-      @persona.verification_status = "pending"
+      @verified_identity.assign_attributes(verification_params)
+      @verified_identity.verification_status = "pending"
 
-      if @persona.save
-        @persona.identity_document.attach(params[:persona][:identity_document]) if params[:persona][:identity_document].present?
-        current_user.update!(persona: @persona)
-        redirect_to panel_verification_path, notice: I18n.t("persona.message.submitted")
+      if @verified_identity.save
+        @verified_identity.identity_document.attach(params[:verified_identity][:identity_document]) if params[:verified_identity][:identity_document].present?
+        current_user.update!(verified_identity: @verified_identity)
+        redirect_to panel_verification_path, notice: I18n.t("panel.verification.flash.submitted")
       else
         render :new, status: :unprocessable_content
       end
@@ -57,7 +57,7 @@ module Panel
     end
 
     def verification_params
-      params.require(:persona).permit(:first_name, :last_name, :run, :phone)
+      params.require(:verified_identity).permit(:first_name, :last_name, :run, :phone)
     end
   end
 end

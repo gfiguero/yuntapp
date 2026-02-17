@@ -12,10 +12,10 @@
         <label class="floating-label">
           <%= form.select :commune_id,
               options_for_select(communes.map { |c| [c[:name], c[:id]] }, selected_commune_id),
-              { prompt: I18n.t('onboarding.step1.select_commune') },
+              { prompt: I18n.t('panel.onboarding.step1.select_commune') },
               { class: "select w-full #{select_class(selected_commune_id)}", disabled: communes.empty?, onchange: "this.form.requestSubmit()" }
           %>
-          <span><%= I18n.t('onboarding.step1.commune_label') %></span>
+          <span><%= I18n.t('panel.onboarding.step1.commune_label') %></span>
         </label>
         <%= hidden_field_tag :region_id, selected_region_id %>
       <% end %>

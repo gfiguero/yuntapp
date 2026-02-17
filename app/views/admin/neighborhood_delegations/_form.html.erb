@@ -1,16 +1,16 @@
 <%= form_with(model: [:admin, neighborhood_delegation], class: "grid gap-4 w-1/3") do |form| %>
 
   <% invalid = neighborhood_delegation.errors.include?(:neighborhood_association_id) %>
-  <%= form.label :neighborhood_association_id, I18n.t('attributes.neighborhood_delegation.neighborhood_association'), class: "floating-label" do %>
+  <%= form.label :neighborhood_association_id, I18n.t('activerecord.attributes.neighborhood_delegation.neighborhood_association'), class: "floating-label" do %>
     <%= form.collection_select :neighborhood_association_id, NeighborhoodAssociation.all, :id, :name, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
-    <span><%= I18n.t('attributes.neighborhood_delegation.neighborhood_association') %></span>
+    <span><%= I18n.t('activerecord.attributes.neighborhood_delegation.neighborhood_association') %></span>
   <% end %>
   <%= raw(error_message(invalid, neighborhood_delegation.errors.full_messages_for(:neighborhood_association_id))) %>
 
   <% invalid = neighborhood_delegation.errors.include?(:name) %>
-  <%= form.label :name, I18n.t('attributes.neighborhood_delegation.name'), class: "floating-label" do %>
-    <%= form.text_field :name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.neighborhood_delegation.name') %>
-    <span><%= I18n.t('attributes.neighborhood_delegation.name') %></span>
+  <%= form.label :name, I18n.t('activerecord.attributes.neighborhood_delegation.name'), class: "floating-label" do %>
+    <%= form.text_field :name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.neighborhood_delegation.name') %>
+    <span><%= I18n.t('activerecord.attributes.neighborhood_delegation.name') %></span>
   <% end %>
   <%= raw(error_message(invalid, neighborhood_delegation.errors.full_messages_for(:name))) %>
 

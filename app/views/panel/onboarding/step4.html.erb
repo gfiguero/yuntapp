@@ -1,54 +1,131 @@
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('onboarding.title') %></h1>
-  <p class="text-base-content/60 mb-4"><%= I18n.t('onboarding.subtitle') %></p>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.onboarding.title') %></h1>
+  <p class="text-base-content/60 mb-4"><%= I18n.t('panel.onboarding.subtitle') %></p>
 
   <%= render "steps", current_step: 4 %>
 
-  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step4.title') %></h2>
-  <p class="text-base-content/60 mb-6"><%= I18n.t('onboarding.step4.description') %></p>
+  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('panel.onboarding.step4.title') %></h2>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('panel.onboarding.step4.description') %></p>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+  <div class="grid grid-cols-1 gap-4 mb-6">
     <%# Junta de Vecinos %>
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
-        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.association_label') %></h3>
-        <p><%= @neighborhood_association.name %></p>
-        <% if @neighborhood_association.commune %>
-          <p class="text-sm text-base-content/60"><%= @neighborhood_association.commune.name %></p>
-        <% end %>
+        <div class="flex justify-between items-center">
+          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.step4.association_label') %></h3>
+          <%= link_to I18n.t('panel.onboarding.step4.edit'), panel_onboarding_step1_path, class: "btn btn-ghost btn-xs" %>
+        </div>
+        <dl class="mt-2 space-y-1">
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.neighborhood_association.name') %></dt>
+            <dd class="font-medium"><%= @neighborhood_association.name %></dd>
+          </div>
+          <% if @neighborhood_association.commune %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.neighborhood_association.commune') %></dt>
+              <dd><%= @neighborhood_association.commune.name %></dd>
+            </div>
+          <% end %>
+        </dl>
       </div>
     </div>
 
     <%# Identidad %>
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
-        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.identity_label') %></h3>
-        <p><%= @identity_request.full_name %></p>
-        <p><%= @identity_request.run %></p>
-        <% if @identity_request.phone.present? %>
-          <p class="text-sm text-base-content/60"><%= @identity_request.phone %></p>
-        <% end %>
-        <% if @identity_request.identity_documents.attached? %>
-          <div class="badge badge-success badge-sm mt-1"><%= I18n.t('attributes.persona.identity_document') %></div>
-        <% end %>
+        <div class="flex justify-between items-center">
+          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.step4.identity_label') %></h3>
+          <%= link_to I18n.t('panel.onboarding.step4.edit'), panel_onboarding_step2_path, class: "btn btn-ghost btn-xs" %>
+        </div>
+        <dl class="mt-2 space-y-1">
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.name') %></dt>
+            <dd class="font-medium"><%= @identity_request.full_name %></dd>
+          </div>
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.run') %></dt>
+            <dd><%= @identity_request.run %></dd>
+          </div>
+          <% if @identity_request.phone.present? %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.phone') %></dt>
+              <dd><%= @identity_request.phone %></dd>
+            </div>
+          <% end %>
+          <% if @identity_request.identity_documents.attached? %>
+            <div class="mt-1">
+              <span class="badge badge-success badge-sm"><%= I18n.t('activerecord.attributes.verified_identity.identity_document') %></span>
+            </div>
+          <% end %>
+        </dl>
       </div>
     </div>
 
     <%# Domicilio %>
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
-        <h3 class="card-title text-base"><%= I18n.t('onboarding.step4.household_label') %></h3>
-        <p><%= @residence_request.neighborhood_delegation&.name %></p>
-        <p><%= @residence_request.number %></p>
-        <% if @residence_request.address_line_1.present? %>
-          <p class="text-sm text-base-content/60"><%= @residence_request.address_line_1 %></p>
-        <% end %>
+        <div class="flex justify-between items-center">
+          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.step4.household_label') %></h3>
+          <%= link_to I18n.t('panel.onboarding.step4.edit'), panel_onboarding_step3_path, class: "btn btn-ghost btn-xs" %>
+        </div>
+        <dl class="mt-2 space-y-1">
+          <% if @residence_request.neighborhood_delegation.present? %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.neighborhood_delegation') %></dt>
+              <dd class="font-medium"><%= @residence_request.neighborhood_delegation.name %></dd>
+            </div>
+          <% end %>
+          <% if @residence_request.address_line_1.present? %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></dt>
+              <dd class="font-medium"><%= @residence_request.address_line_1 %></dd>
+            </div>
+          <% end %>
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.number') %></dt>
+            <dd><%= @residence_request.number %></dd>
+          </div>
+          <% if @residence_request.address_line_2.present? %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></dt>
+              <dd><%= @residence_request.address_line_2 %></dd>
+            </div>
+          <% end %>
+        </dl>
       </div>
     </div>
   </div>
 
-  <div class="flex gap-2">
-    <%= link_to I18n.t('actions.back'), panel_onboarding_step3_path, class: "btn btn-soft" %>
-    <%= button_to I18n.t('onboarding.step4.submit'), panel_onboarding_submit_path, method: :post, class: "btn btn-primary" %>
+  <%# Aviso legal %>
+  <div class="alert alert-warning mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+    <span><%= I18n.t('panel.onboarding.step4.legal_notice') %></span>
+  </div>
+
+  <%# Formulario con checkbox y botón %>
+  <div data-controller="terms-acceptance">
+    <%= form_with url: panel_onboarding_submit_path, method: :post, class: "space-y-4" do |f| %>
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input type="checkbox"
+               name="terms_accepted"
+               value="1"
+               class="checkbox checkbox-primary mt-0.5"
+               data-terms-acceptance-target="checkbox"
+               data-action="change->terms-acceptance#toggle">
+        <span class="text-sm"><%= I18n.t('panel.onboarding.step4.terms_checkbox') %></span>
+      </label>
+
+      <div class="flex gap-2">
+        <%= link_to I18n.t('actions.back'), panel_onboarding_step3_path, class: "btn btn-soft" %>
+        <button type="submit"
+                class="btn btn-primary"
+                data-terms-acceptance-target="submit"
+                disabled>
+          <%= I18n.t('panel.onboarding.step4.submit') %>
+        </button>
+      </div>
+    <% end %>
   </div>
 </div>

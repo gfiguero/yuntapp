@@ -1,8 +1,8 @@
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.verification') %></h1>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.verifications.index.title') %></h1>
 
-  <% if @personas.any? %>
-    <%= render "table", personas: @personas %>
+  <% if @verified_identities.any? %>
+    <%= render "table", verified_identities: @verified_identities %>
   <% else %>
     <p class="text-sm text-base-content/60">No hay verificaciones pendientes.</p>
   <% end %>

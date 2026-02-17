@@ -2,9 +2,9 @@
     <%= turbo_frame_tag "field_number" do %>
       <%= form_with(model: residence_request, url: panel_onboarding_step3_path, method: :patch, data: { controller: "autosave", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
         <% invalid = residence_request.errors.include?(:number) %>
-        <%= form.label :number, I18n.t('attributes.household_unit.number'), class: "floating-label" do %>
-          <%= form.text_field :number, class: "input w-full #{input_class(residence_request, :number)}", required: true, placeholder: I18n.t('attributes.household_unit.number'), data: { action: "input->autosave#submit" } %>
-          <span><%= I18n.t('attributes.household_unit.number') %></span>
+        <%= form.label :number, I18n.t('activerecord.attributes.household_unit.number'), class: "floating-label" do %>
+          <%= form.text_field :number, class: "input w-full #{input_class(residence_request, :number)}", required: true, placeholder: I18n.t('activerecord.attributes.household_unit.number'), data: { action: "input->autosave#submit" } %>
+          <span><%= I18n.t('activerecord.attributes.household_unit.number') %></span>
         <% end %>
         <%= raw(error_message(invalid, residence_request.errors.full_messages_for(:number))) %>
       <% end %>

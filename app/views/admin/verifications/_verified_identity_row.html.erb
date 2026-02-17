@@ -1,0 +1,17 @@
+<tr>
+  <td><%= verified_identity.id %></td>
+  <td><%= verified_identity.name %></td>
+  <td><%= verified_identity.run %></td>
+  <td>
+    <% if verified_identity.pending_verification? %>
+      <span class="badge badge-warning"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.pending') %></span>
+    <% elsif verified_identity.verified? %>
+      <span class="badge badge-success"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.verified') %></span>
+    <% elsif verified_identity.rejected_verification? %>
+      <span class="badge badge-error"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.rejected') %></span>
+    <% end %>
+  </td>
+  <td>
+    <%= link_to I18n.t('actions.show'), admin_verification_path(verified_identity), class: "btn btn-sm btn-soft" %>
+  </td>
+</tr>

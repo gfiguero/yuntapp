@@ -2,11 +2,11 @@ module Panel
   class OnboardingController < ApplicationController
     layout "panel"
     before_action :authenticate_user!
-    before_action :redirect_if_onboarded!, except: [ :restart ]
-    before_action :ensure_step1!, only: [ :step2, :update_step2, :step3, :update_step3, :step4, :submit ]
-    before_action :ensure_step2!, only: [ :step3, :update_step3, :step4, :submit ]
-    before_action :ensure_step3!, only: [ :step4, :submit ]
-    before_action :ensure_step4!, only: [ :step4, :submit ]
+    before_action :redirect_if_onboarded!, except: [:restart]
+    before_action :ensure_step1!, only: [:step2, :update_step2, :step3, :update_step3, :step4, :submit]
+    before_action :ensure_step2!, only: [:step3, :update_step3, :step4, :submit]
+    before_action :ensure_step3!, only: [:step4, :submit]
+    before_action :ensure_step4!, only: [:step4, :submit]
 
     def restart
       # 1. Eliminar datos de sesión
@@ -123,16 +123,16 @@ module Panel
           streams = []
 
           # Siempre actualizamos el selector de región (para feedback visual de selección)
-          streams << turbo_stream.replace("field_region", partial: "panel/onboarding/step1_field_region", locals: { cascading_data: @cascading_data, selected_region_id: @selected_region_id })
+          streams << turbo_stream.replace("field_region", partial: "panel/onboarding/step1_field_region", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id})
 
           # Actualizamos selector de comuna (contenido cambia según región)
-          streams << turbo_stream.replace("field_commune", partial: "panel/onboarding/step1_field_commune", locals: { cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id })
+          streams << turbo_stream.replace("field_commune", partial: "panel/onboarding/step1_field_commune", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id})
 
           # Actualizamos selector de asociación (contenido cambia según comuna)
-          streams << turbo_stream.replace("field_association", partial: "panel/onboarding/step1_field_association", locals: { cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id, selected_association_id: @selected_association_id })
+          streams << turbo_stream.replace("field_association", partial: "panel/onboarding/step1_field_association", locals: {cascading_data: @cascading_data, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id, selected_association_id: @selected_association_id})
 
           # Actualizamos botón submit (habilitar/deshabilitar)
-          streams << turbo_stream.replace("step1_submit_button", partial: "panel/onboarding/step1_submit_button", locals: { selected_association_id: @selected_association_id, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id })
+          streams << turbo_stream.replace("step1_submit_button", partial: "panel/onboarding/step1_submit_button", locals: {selected_association_id: @selected_association_id, selected_region_id: @selected_region_id, selected_commune_id: @selected_commune_id})
 
           render turbo_stream: streams
         end
@@ -150,14 +150,13 @@ module Panel
         @identity_request = @onboarding_request.identity_verification_request
       else
         # Si no, intentamos pre-llenar con datos anteriores o creamos una nueva
-        last_request = current_user.identity_verification_requests.last
+        current_user.identity_verification_requests.last
 
         # CREAMOS la solicitud inmediatamente en estado draft
         # NO pre-llenamos datos (limpieza de proceso de revalidación)
 
         @identity_request = IdentityVerificationRequest.new(
           user: current_user,
-          neighborhood_association_id: @onboarding_request.neighborhood_association_id,
           onboarding_request: @onboarding_request,
           status: "draft"
         )
@@ -168,7 +167,7 @@ module Panel
         else
           # Si falla al crear (ej: validaciones de unicidad u otros), manejamos el error
           # Probablemente redirigir a step1 o mostrar un error
-          flash[:alert] = "No se pudo iniciar el paso de identidad: #{@identity_request.errors.full_messages.join(', ')}"
+          flash[:alert] = "No se pudo iniciar el paso de identidad: #{@identity_request.errors.full_messages.join(", ")}"
           redirect_to panel_onboarding_step1_path
         end
       end
@@ -184,7 +183,6 @@ module Panel
       if @identity_request.nil?
         @identity_request = IdentityVerificationRequest.new(
           user: current_user,
-          neighborhood_association_id: @onboarding_request.neighborhood_association_id,
           onboarding_request: @onboarding_request,
           status: "draft"
         )
@@ -212,7 +210,7 @@ module Panel
             @identity_request.errors.add(:base, "Debes completar todos los campos obligatorios para continuar.")
             # Forzamos validación de presencia para mostrar errores en la vista
             # Agregamos errores manualmente a los campos vacíos para que se iluminen
-            [ :first_name, :last_name, :run, :phone ].each do |attr|
+            [:first_name, :last_name, :run, :phone].each do |attr|
               @identity_request.errors.add(attr, :blank) if @identity_request.send(attr).blank?
             end
             @identity_request.errors.add(:identity_documents, :blank) unless @identity_request.identity_documents.attached?
@@ -257,10 +255,10 @@ module Panel
                 # Vamos a usar una técnica de "Self-Replacement" usando `render_to_string` y Nokogiri? No, muy lento.
                 # Mejor refactorizar la vista para usar partials por campo.
 
-                turbo_stream.replace("field_#{field_name}", partial: "panel/onboarding/step2_field_#{field_name}", locals: { identity_request: @identity_request }),
+                turbo_stream.replace("field_#{field_name}", partial: "panel/onboarding/step2_field_#{field_name}", locals: {identity_request: @identity_request}),
 
                 # Actualizamos el botón
-                turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: { identity_request: @identity_request })
+                turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: {identity_request: @identity_request})
               ]
             end
             # Fallback para navegadores sin JS
@@ -299,8 +297,8 @@ module Panel
         format.html { redirect_to panel_onboarding_step2_path }
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.replace("field_identity_documents", partial: "panel/onboarding/step2_field_identity_documents", locals: { identity_request: @identity_request }),
-            turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: { identity_request: @identity_request })
+            turbo_stream.replace("field_identity_documents", partial: "panel/onboarding/step2_field_identity_documents", locals: {identity_request: @identity_request}),
+            turbo_stream.replace("step2_submit_button", partial: "panel/onboarding/step2_submit_button", locals: {identity_request: @identity_request})
           ]
         end
       end
@@ -322,15 +320,16 @@ module Panel
         @residence_request = ResidenceVerificationRequest.new(
           user: current_user,
           neighborhood_association_id: @onboarding_request.neighborhood_association_id,
+          commune_id: @onboarding_request.commune_id,
           onboarding_request: @onboarding_request,
           status: "draft"
         )
-        
+
         # Guardamos inmediatamente en draft para tener ID y persistencia
         if @residence_request.save
           session[:onboarding]["residence_request_id"] = @residence_request.id
         else
-          flash[:alert] = "No se pudo iniciar el paso de residencia: #{@residence_request.errors.full_messages.join(', ')}"
+          flash[:alert] = "No se pudo iniciar el paso de residencia: #{@residence_request.errors.full_messages.join(", ")}"
           redirect_to panel_onboarding_step2_path
         end
       end
@@ -341,15 +340,16 @@ module Panel
       @delegations = @neighborhood_association.neighborhood_delegations.order(:name)
 
       @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
-      
+
       # Recuperamos la solicitud existente asociada al onboarding request
       @residence_request = @onboarding_request.residence_verification_request
-      
+
       # Fallback por si no existiera (aunque debería por step3)
       if @residence_request.nil?
-         @residence_request = ResidenceVerificationRequest.new(
+        @residence_request = ResidenceVerificationRequest.new(
           user: current_user,
           neighborhood_association_id: @onboarding_request.neighborhood_association_id,
+          commune_id: @onboarding_request.commune_id,
           onboarding_request: @onboarding_request,
           status: "draft"
         )
@@ -391,24 +391,24 @@ module Panel
 
               # Si se envió delegación, dirección manual o checkbox manual
               if params[:residence_verification_request].key?(:neighborhood_delegation_id) ||
-                 params[:residence_verification_request].key?(:address_line_1) ||
-                 params[:residence_verification_request].key?(:manual_address)
+                  params[:residence_verification_request].key?(:address_line_1) ||
+                  params[:residence_verification_request].key?(:manual_address)
 
-                 streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: { residence_request: @residence_request, delegations: @delegations })
+                streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: {residence_request: @residence_request, delegations: @delegations})
               end
 
               # Si se envió número
               if params[:residence_verification_request].key?(:number)
-                streams << turbo_stream.replace("field_number", partial: "panel/onboarding/step3_field_number", locals: { residence_request: @residence_request })
+                streams << turbo_stream.replace("field_number", partial: "panel/onboarding/step3_field_number", locals: {residence_request: @residence_request})
               end
 
               # Si se envió detalle
               if params[:residence_verification_request].key?(:address_line_2)
-                streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: { residence_request: @residence_request })
+                streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: {residence_request: @residence_request})
               end
 
               # Siempre actualizamos el botón de continuar
-              streams << turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: { residence_request: @residence_request })
+              streams << turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: {residence_request: @residence_request})
 
               render turbo_stream: streams
             end
@@ -420,13 +420,13 @@ module Panel
         respond_to do |format|
           format.html { render :step3, status: :unprocessable_content }
           format.turbo_stream do
-             # Renderizamos los mismos streams para mostrar errores
-             streams = []
-             streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: { residence_request: @residence_request, delegations: @delegations })
-             streams << turbo_stream.replace("field_number", partial: "panel/onboarding/step3_field_number", locals: { residence_request: @residence_request })
-             streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: { residence_request: @residence_request })
-             streams << turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: { residence_request: @residence_request })
-             render turbo_stream: streams
+            # Renderizamos los mismos streams para mostrar errores
+            streams = []
+            streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: {residence_request: @residence_request, delegations: @delegations})
+            streams << turbo_stream.replace("field_number", partial: "panel/onboarding/step3_field_number", locals: {residence_request: @residence_request})
+            streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: {residence_request: @residence_request})
+            streams << turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: {residence_request: @residence_request})
+            render turbo_stream: streams
           end
         end
       end
@@ -434,7 +434,7 @@ module Panel
 
     def step4
       @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
-      
+
       # Si no encontramos la solicitud principal, algo anda mal con la sesión
       if @onboarding_request.nil?
         redirect_to panel_onboarding_step1_path
@@ -454,16 +454,22 @@ module Panel
     end
 
     def submit
-      # El proceso finaliza cambiando el estado a "pending" para que sea revisado
       @onboarding_request = OnboardingRequest.find(session.dig(:onboarding, "onboarding_request_id"))
-      @onboarding_request.update!(status: "pending")
+
+      unless params[:terms_accepted] == "1"
+        redirect_to panel_onboarding_step4_path, alert: I18n.t("panel.onboarding.step4.terms_required")
+        return
+      end
+
+      # El proceso finaliza cambiando el estado a "pending" para que sea revisado
+      @onboarding_request.update!(status: "pending", terms_accepted_at: Time.current)
 
       # También pasamos las solicitudes hijas a pending
       @onboarding_request.identity_verification_request&.update!(status: "pending")
       @onboarding_request.residence_verification_request&.update!(status: "pending")
 
       session.delete(:onboarding)
-      redirect_to panel_root_path, notice: "Solicitud de incorporación enviada exitosamente. Te notificaremos cuando sea aprobada."
+      redirect_to panel_root_path, notice: I18n.t("panel.onboarding.flash.completed")
     end
 
     private
@@ -473,15 +479,25 @@ module Panel
     end
 
     def ensure_step1!
-      # Solo verificamos que no tenga un onboarding request pendiente
-      # Pero el step 1 es donde comienza, así que no hay prerrequisitos de sesión, solo que no tenga ya un proceso terminado.
+      onboarding_request_id = session.dig(:onboarding, "onboarding_request_id")
+
+      unless onboarding_request_id.present?
+        redirect_to panel_onboarding_step1_path, alert: "Debes completar el paso 1 primero."
+        return
+      end
+
+      onboarding_request = OnboardingRequest.find_by(id: onboarding_request_id)
+
+      unless onboarding_request&.neighborhood_association_id.present?
+        redirect_to panel_onboarding_step1_path, alert: "Debes seleccionar una asociación vecinal para continuar."
+      end
     end
 
     def ensure_step2!
-      # Debe existir una solicitud de onboarding en sesión (creada en step 1)
-      # Y también el registro en base de datos. Si no existe, volvemos a step 1.
-      unless session.dig(:onboarding, "onboarding_request_id").present? && OnboardingRequest.exists?(session.dig(:onboarding, "onboarding_request_id"))
-        redirect_to panel_onboarding_step1_path
+      onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
+
+      unless onboarding_request&.identity_verification_request.present?
+        redirect_to panel_onboarding_step2_path, alert: "Debes completar el paso de identidad primero."
       end
     end
 
@@ -537,7 +553,7 @@ module Panel
               id: commune.id,
               name: commune.name,
               associations: (associations_by_commune[commune.id] || []).map do |assoc|
-                { id: assoc.id, name: assoc.name }
+                {id: assoc.id, name: assoc.name}
               end
             }
           end

@@ -1,15 +1,15 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.members') %>
+  <%= I18n.t('admin.members.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= link_to I18n.t('views.title.members'), admin_members_path %></li>
+  <li><%= link_to I18n.t('admin.members.index.title'), admin_members_path %></li>
   <li><%= @member.id %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.members') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.member', id: @member.id) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.members.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('admin.members.show.identifier', id: @member.id) %></h3>
   <%= render "buttons" %>
   <%= render @member %>
 </div>

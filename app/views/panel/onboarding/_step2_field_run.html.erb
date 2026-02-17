@@ -2,9 +2,9 @@
     <%= turbo_frame_tag "field_run" do %>
       <%= form_with(model: identity_request, url: panel_onboarding_step2_path, method: :patch, data: { controller: "autosave", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
         <% invalid = identity_request.errors.include?(:run) %>
-        <%= form.label :run, I18n.t('attributes.persona.run'), class: "floating-label" do %>
-          <%= form.text_field :run, class: "input w-full #{input_class(identity_request, :run)}", required: true, placeholder: I18n.t('attributes.persona.run'), data: { action: "input->autosave#submit" } %>
-          <span><%= I18n.t('attributes.persona.run') %></span>
+        <%= form.label :run, I18n.t('activerecord.attributes.verified_identity.run'), class: "floating-label" do %>
+          <%= form.text_field :run, class: "input w-full #{input_class(identity_request, :run)}", required: true, placeholder: I18n.t('activerecord.attributes.verified_identity.run'), data: { action: "input->autosave#submit" } %>
+          <span><%= I18n.t('activerecord.attributes.verified_identity.run') %></span>
         <% end %>
         <%= raw(error_message(invalid, identity_request.errors.full_messages_for(:run))) %>
       <% end %>

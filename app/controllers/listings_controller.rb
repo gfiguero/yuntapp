@@ -44,7 +44,7 @@ class ListingsController < ApplicationController
     @listing = Listing.new(listing_params)
 
     if @listing.save
-      redirect_to @listing, created: I18n.t("listing.message.created")
+      redirect_to @listing, created: I18n.t("listings.flash.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -53,7 +53,7 @@ class ListingsController < ApplicationController
   # PATCH/PUT /listings/1
   def update
     if @listing.update(listing_params)
-      redirect_to @listing, updated: I18n.t("listing.message.updated"), status: :see_other
+      redirect_to @listing, updated: I18n.t("listings.flash.updated"), status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -66,7 +66,7 @@ class ListingsController < ApplicationController
   # DELETE /listings/1
   def destroy
     @listing.destroy!
-    redirect_to listings_path, deleted: I18n.t("listing.message.destroyed"), status: :see_other, format: :html
+    redirect_to listings_path, deleted: I18n.t("listings.flash.destroyed"), status: :see_other, format: :html
   end
 
   private

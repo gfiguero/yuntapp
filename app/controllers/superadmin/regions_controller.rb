@@ -45,7 +45,7 @@ module Superadmin
       @region = Region.new(region_params)
 
       if @region.save
-        redirect_to superadmin_region_path(@region), notice: I18n.t("region.message.created")
+        redirect_to superadmin_region_path(@region), notice: I18n.t("superadmin.regions.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Superadmin
     # PATCH/PUT /admin/regions/1
     def update
       if @region.update(region_params)
-        redirect_to superadmin_region_path(@region), notice: I18n.t("region.message.updated"), status: :see_other
+        redirect_to superadmin_region_path(@region), notice: I18n.t("superadmin.regions.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Superadmin
     # DELETE /admin/regions/1
     def destroy
       @region.destroy!
-      redirect_to superadmin_regions_path, notice: I18n.t("region.message.destroyed"), status: :see_other, format: :html
+      redirect_to superadmin_regions_path, notice: I18n.t("superadmin.regions.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

@@ -45,7 +45,7 @@ module Admin
       @household_unit = HouseholdUnit.new(household_unit_params)
 
       if @household_unit.save
-        redirect_to admin_household_unit_path(@household_unit), notice: I18n.t("household_unit.message.created")
+        redirect_to admin_household_unit_path(@household_unit), notice: I18n.t("admin.household_units.flash.created")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Admin
     # PATCH/PUT /admin/household_units/1
     def update
       if @household_unit.update(household_unit_params)
-        redirect_to admin_household_unit_path(@household_unit), notice: I18n.t("household_unit.message.updated"), status: :see_other
+        redirect_to admin_household_unit_path(@household_unit), notice: I18n.t("admin.household_units.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Admin
     # DELETE /admin/household_units/1
     def destroy
       @household_unit.destroy!
-      redirect_to admin_household_units_path, notice: I18n.t("household_unit.message.destroyed"), status: :see_other, format: :html
+      redirect_to admin_household_units_path, notice: I18n.t("admin.household_units.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

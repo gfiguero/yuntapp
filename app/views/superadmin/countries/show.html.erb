@@ -1,15 +1,15 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.countries') %>
+  <%= I18n.t('superadmin.countries.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= link_to I18n.t('views.title.countries'), superadmin_countries_path %></li>
+  <li><%= link_to I18n.t('superadmin.countries.index.title'), superadmin_countries_path %></li>
   <li><%= @country.id %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.countries') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.identifier.country', id: @country.id) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.countries.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.countries.show.identifier', id: @country.id) %></h3>
   <%= render "buttons" %>
   <%= render @country %>
 </div>

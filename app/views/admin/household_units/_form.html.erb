@@ -1,58 +1,58 @@
 <%= form_with(model: [:admin, household_unit], class: "grid gap-4 w-1/3") do |form| %>
 
   <% invalid = household_unit.errors.include?(:neighborhood_delegation_id) %>
-  <%= form.label :neighborhood_delegation_id, I18n.t('attributes.household_unit.neighborhood_delegation'), class: "floating-label" do %>
+  <%= form.label :neighborhood_delegation_id, I18n.t('activerecord.attributes.household_unit.neighborhood_delegation'), class: "floating-label" do %>
     <%= form.collection_select :neighborhood_delegation_id, NeighborhoodDelegation.all, :id, :name, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
-    <span><%= I18n.t('attributes.household_unit.neighborhood_delegation') %></span>
+    <span><%= I18n.t('activerecord.attributes.household_unit.neighborhood_delegation') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:neighborhood_delegation_id))) %>
 
   <% invalid = household_unit.errors.include?(:number) %>
-  <%= form.label :number, I18n.t('attributes.household_unit.number'), class: "floating-label" do %>
-    <%= form.text_field :number, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('attributes.household_unit.number') %>
-    <span><%= I18n.t('attributes.household_unit.number') %></span>
+  <%= form.label :number, I18n.t('activerecord.attributes.household_unit.number'), class: "floating-label" do %>
+    <%= form.text_field :number, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.household_unit.number') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.number') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:number))) %>
 
   <% invalid = household_unit.errors.include?(:address_line_1) %>
-  <%= form.label :address_line_1, I18n.t('attributes.household_unit.address_line_1'), class: "floating-label" do %>
-    <%= form.text_field :address_line_1, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.address_line_1') %>
-    <span><%= I18n.t('attributes.household_unit.address_line_1') %></span>
+  <%= form.label :address_line_1, I18n.t('activerecord.attributes.household_unit.address_line_1'), class: "floating-label" do %>
+    <%= form.text_field :address_line_1, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.address_line_1') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:address_line_1))) %>
 
   <% invalid = household_unit.errors.include?(:address_line_2) %>
-  <%= form.label :address_line_2, I18n.t('attributes.household_unit.address_line_2'), class: "floating-label" do %>
-    <%= form.text_field :address_line_2, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.address_line_2') %>
-    <span><%= I18n.t('attributes.household_unit.address_line_2') %></span>
+  <%= form.label :address_line_2, I18n.t('activerecord.attributes.household_unit.address_line_2'), class: "floating-label" do %>
+    <%= form.text_field :address_line_2, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.address_line_2') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:address_line_2))) %>
 
   <% invalid = household_unit.errors.include?(:city) %>
-  <%= form.label :city, I18n.t('attributes.household_unit.city'), class: "floating-label" do %>
-    <%= form.text_field :city, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.city') %>
-    <span><%= I18n.t('attributes.household_unit.city') %></span>
+  <%= form.label :city, I18n.t('activerecord.attributes.household_unit.city'), class: "floating-label" do %>
+    <%= form.text_field :city, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.city') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.city') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:city))) %>
 
   <% invalid = household_unit.errors.include?(:region) %>
-  <%= form.label :region, I18n.t('attributes.household_unit.region'), class: "floating-label" do %>
-    <%= form.text_field :region, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.region') %>
-    <span><%= I18n.t('attributes.household_unit.region') %></span>
+  <%= form.label :region, I18n.t('activerecord.attributes.household_unit.region'), class: "floating-label" do %>
+    <%= form.text_field :region, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.region') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.region') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:region))) %>
 
   <% invalid = household_unit.errors.include?(:country) %>
-  <%= form.label :country, I18n.t('attributes.household_unit.country'), class: "floating-label" do %>
-    <%= form.text_field :country, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.country') %>
-    <span><%= I18n.t('attributes.household_unit.country') %></span>
+  <%= form.label :country, I18n.t('activerecord.attributes.household_unit.country'), class: "floating-label" do %>
+    <%= form.text_field :country, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.country') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.country') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:country))) %>
 
   <% invalid = household_unit.errors.include?(:postal_code) %>
-  <%= form.label :postal_code, I18n.t('attributes.household_unit.postal_code'), class: "floating-label" do %>
-    <%= form.text_field :postal_code, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('attributes.household_unit.postal_code') %>
-    <span><%= I18n.t('attributes.household_unit.postal_code') %></span>
+  <%= form.label :postal_code, I18n.t('activerecord.attributes.household_unit.postal_code'), class: "floating-label" do %>
+    <%= form.text_field :postal_code, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.postal_code') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.postal_code') %></span>
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:postal_code))) %>
 

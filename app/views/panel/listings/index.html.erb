@@ -1,14 +1,14 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.listings') %>
+  <%= I18n.t('panel.listings.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= I18n.t('views.title.listings') %></li>
+  <li><%= I18n.t('panel.listings.index.title') %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.listings') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.count.listings', count: @pagy.count) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.listings.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('panel.listings.index.count', count: @pagy.count) %></h3>
   <%= render "buttons" %>
   <%= render "table" %>
   <%= render "filter" %>

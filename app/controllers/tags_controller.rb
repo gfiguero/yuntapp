@@ -44,7 +44,7 @@ class TagsController < ApplicationController
     @tag = Tag.new(tag_params)
 
     if @tag.save
-      redirect_to @tag, created: I18n.t("tag.message.created")
+      redirect_to @tag, created: I18n.t("tags.flash.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -53,7 +53,7 @@ class TagsController < ApplicationController
   # PATCH/PUT /tags/1
   def update
     if @tag.update(tag_params)
-      redirect_to @tag, updated: I18n.t("tag.message.updated"), status: :see_other
+      redirect_to @tag, updated: I18n.t("tags.flash.updated"), status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
@@ -66,7 +66,7 @@ class TagsController < ApplicationController
   # DELETE /tags/1
   def destroy
     @tag.destroy!
-    redirect_to tags_path, deleted: I18n.t("tag.message.destroyed"), status: :see_other, format: :html
+    redirect_to tags_path, deleted: I18n.t("tags.flash.destroyed"), status: :see_other, format: :html
   end
 
   private

@@ -45,7 +45,7 @@ module Admin
       @user = User.new(user_params)
 
       if @user.save
-        redirect_to admin_user_path(@user), notice: I18n.t("user.message.created", default: "User created successfully")
+        redirect_to admin_user_path(@user), notice: I18n.t("admin.users.flash.created", default: "User created successfully")
       else
         render :new, status: :unprocessable_content
       end
@@ -54,7 +54,7 @@ module Admin
     # PATCH/PUT /admin/users/1
     def update
       if @user.update(user_params)
-        redirect_to admin_user_path(@user), notice: I18n.t("user.message.updated", default: "User updated successfully"), status: :see_other
+        redirect_to admin_user_path(@user), notice: I18n.t("admin.users.flash.updated", default: "User updated successfully"), status: :see_other
       else
         render :edit, status: :unprocessable_content
       end
@@ -67,7 +67,7 @@ module Admin
     # DELETE /admin/users/1
     def destroy
       @user.destroy!
-      redirect_to admin_users_path, notice: I18n.t("user.message.destroyed", default: "User destroyed successfully"), status: :see_other, format: :html
+      redirect_to admin_users_path, notice: I18n.t("admin.users.flash.destroyed", default: "User destroyed successfully"), status: :see_other, format: :html
     end
 
     private

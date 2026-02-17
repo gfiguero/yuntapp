@@ -1,14 +1,14 @@
 <% content_for :title do %>
-  <%= I18n.t('views.title.countries') %>
+  <%= I18n.t('superadmin.countries.index.title') %>
 <% end %>
 
 <% content_for :breadcrumb do %>
-  <li><%= I18n.t('views.title.countries') %></li>
+  <li><%= I18n.t('superadmin.countries.index.title') %></li>
 <% end %>
 
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('views.title.countries') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('views.count.countries', count: @pagy.count) %></h3>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.countries.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.countries.index.count', count: @pagy.count) %></h3>
   <%= render "buttons" %>
   <%= render "table" %>
   <%= render "filter" %>

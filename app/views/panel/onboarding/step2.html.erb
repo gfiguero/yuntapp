@@ -1,11 +1,11 @@
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('onboarding.title') %></h1>
-  <p class="text-base-content/60 mb-4"><%= I18n.t('onboarding.subtitle') %></p>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.onboarding.title') %></h1>
+  <p class="text-base-content/60 mb-4"><%= I18n.t('panel.onboarding.subtitle') %></p>
 
   <%= render "steps", current_step: 2 %>
 
-  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('onboarding.step2.title') %></h2>
-  <p class="text-base-content/60 mb-6"><%= I18n.t('onboarding.step2.description') %></p>
+  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('panel.onboarding.step2.title') %></h2>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('panel.onboarding.step2.description') %></p>
 
   <% if current_user.verified_identity %>
     <div class="alert alert-info mb-4">

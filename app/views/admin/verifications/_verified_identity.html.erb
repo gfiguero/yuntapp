@@ -1,0 +1,46 @@
+<div id="<%= dom_id verified_identity %>">
+  <div class="mb-4">
+    <% if verified_identity.pending_verification? %>
+      <div class="badge badge-warning badge-lg"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.pending') %></div>
+    <% elsif verified_identity.verified? %>
+      <div class="badge badge-success badge-lg"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.verified') %></div>
+    <% elsif verified_identity.rejected_verification? %>
+      <div class="badge badge-error badge-lg"><%= I18n.t('activerecord.attributes.verified_identity/verification_status.rejected') %></div>
+    <% end %>
+  </div>
+
+  <dl class="mb-4 divide-y divide-gray-400 w-1/3">
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.verified_identity.id') %></dt>
+      <dd><%= verified_identity.id %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.verified_identity.name') %></dt>
+      <dd><%= verified_identity.name %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.verified_identity.run') %></dt>
+      <dd><%= verified_identity.run %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.verified_identity.phone') %></dt>
+      <dd><%= verified_identity.phone || "—" %></dd>
+    </div>
+    <div class="p-2 grid gap-2">
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.verified_identity.email') %></dt>
+      <dd><%= verified_identity.users.first&.email || "—" %></dd>
+    </div>
+    <% if verified_identity.identity_document.attached? %>
+      <div class="p-2 grid gap-2">
+        <dt class="font-medium"><%= I18n.t('activerecord.attributes.verified_identity.identity_document') %></dt>
+        <dd>
+          <% if verified_identity.identity_document.image? %>
+            <%= image_tag rails_blob_path(verified_identity.identity_document, disposition: "inline"), class: "max-w-md rounded-lg" %>
+          <% else %>
+            <%= link_to verified_identity.identity_document.filename, rails_blob_path(verified_identity.identity_document, disposition: "attachment"), class: "link link-primary" %>
+          <% end %>
+        </dd>
+      </div>
+    <% end %>
+  </dl>
+</div>

@@ -1,6 +1,5 @@
 one:
   user: artanis
-  neighborhood_association: association_0
   run: "12345678-5"
   first_name: "Artanis"
   last_name: "Hierarch"
@@ -9,7 +8,6 @@ one:
 
 two:
   user: karass
-  neighborhood_association: association_0
   run: "87654321-9"
   first_name: "Karass"
   last_name: "Templar"
