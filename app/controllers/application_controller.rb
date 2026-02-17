@@ -12,8 +12,8 @@ class ApplicationController < ActionController::Base
   private
 
   def after_sign_in_path_for(resource)
-    if resource.is_a?(User) && !resource.superadmin?
-      panel_root_path
+    if resource.is_a?(User)
+      resource.superadmin? ? superadmin_root_path : panel_root_path
     else
       super
     end
