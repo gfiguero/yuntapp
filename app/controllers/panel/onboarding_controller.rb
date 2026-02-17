@@ -188,15 +188,15 @@ module Panel
         )
       end
 
-      # Actualizamos atributos
+      # Actualizamos atributos (sin documentos, se manejan aparte para no reemplazar existentes)
       @identity_request.assign_attributes(verification_params)
 
-      # Intentamos guardar (en draft no valida campos obligatorios, pero sí formatos si los hay)
-      # Forzamos validación para ver si hay errores de formato, pero permitimos guardar si es draft
+      # Intentamos guardar
       if @identity_request.save
-        # La adjunción de documentos ya se manejó automáticamente mediante assign_attributes(verification_params)
-        # al inicio del método, ya que verification_params incluye :identity_documents.
-        # No es necesario llamar a attach manualmente.
+        # Adjuntamos documentos nuevos SIN reemplazar los existentes
+        if params.dig(:identity_verification_request, :identity_documents).present?
+          @identity_request.identity_documents.attach(params[:identity_verification_request][:identity_documents])
+        end
 
         # Guardamos el ID de la solicitud en sesión
         session[:onboarding]["identity_request_id"] = @identity_request.id
@@ -523,7 +523,7 @@ module Panel
     def verification_params
       # Permitimos parámetros vacíos si vienen del botón continuar (dummy)
       if params[:identity_verification_request].present?
-        params.fetch(:identity_verification_request, {}).permit(:first_name, :last_name, :run, :phone, :email, identity_documents: [])
+        params.fetch(:identity_verification_request, {}).permit(:first_name, :last_name, :run, :phone, :email)
       else
         {}
       end

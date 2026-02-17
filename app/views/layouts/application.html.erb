@@ -23,7 +23,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="min-h-screen flex flex-col">
     <%= render "shared/flash" %>
     <nav class="navbar bg-base-100 shadow-sm">
       <div class="container mx-auto px-1 flex flex-row">
@@ -90,5 +90,6 @@
     <main class="container mx-auto mt-2 mb-5 px-5 flex flex-col">
       <%= yield %>
     </main>
+    <%= render "shared/footer" %>
   </body>
 </html>

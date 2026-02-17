@@ -1,15 +1,26 @@
     <%# CAMPO: Identity Document (Multiple) %>
     <%= turbo_frame_tag "field_identity_documents" do %>
-      <%= form_with(model: identity_request, url: panel_onboarding_step2_path, method: :patch, data: { controller: "autosave", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
+      <%= form_with(model: identity_request, url: panel_onboarding_step2_path, method: :patch, data: { controller: "file-upload" }, html: { novalidate: true }) do |form| %>
         <% invalid = identity_request.errors.include?(:identity_documents) %>
         <div>
           <%= form.label :identity_documents, I18n.t('activerecord.attributes.verified_identity.identity_document'), class: "label" %>
           <p class="text-sm text-base-content/60 mb-1"><%= I18n.t('panel.verification.help.upload_ci') %></p>
-          
-          <%= form.file_field :identity_documents, multiple: true, class: "file-input w-full #{input_class(identity_request, :identity_documents)}", data: { action: "change->autosave#submit" } %>
-          
+
+          <%= form.file_field :identity_documents, multiple: true, class: "file-input w-full #{input_class(identity_request, :identity_documents)}", data: { file_upload_target: "input", action: "change->file-upload#upload" } %>
+
+          <%# Loading indicator - hidden by default, shown by Stimulus during upload %>
+          <div class="hidden mt-3" data-file-upload-target="loading">
+            <div class="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
+              <span class="loading loading-spinner loading-sm text-primary"></span>
+              <div class="flex-1">
+                <p class="text-sm font-medium">Subiendo archivos...</p>
+                <progress class="progress progress-primary w-full"></progress>
+              </div>
+            </div>
+          </div>
+
           <% if identity_request.identity_documents.attached? %>
-            <div class="mt-4 grid grid-cols-2 gap-4">
+            <div class="mt-4 grid grid-cols-2 gap-4" data-file-upload-target="preview">
               <% identity_request.identity_documents.each do |doc| %>
                 <div class="relative group">
                   <% if doc.image? %>
@@ -20,8 +31,8 @@
                       <span class="text-xs text-center p-2"><%= doc.filename %></span>
                     </div>
                   <% end %>
-                  
-                  <%= link_to panel_onboarding_delete_document_path(doc.id), 
+
+                  <%= link_to panel_onboarding_delete_document_path(doc.id),
                       class: "absolute top-1 right-1 btn btn-circle btn-xs btn-error text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-md",
                       data: { turbo_method: :delete } do %>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
