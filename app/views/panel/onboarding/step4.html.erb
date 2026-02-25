@@ -12,7 +12,7 @@
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
         <div class="flex justify-between items-center">
-          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.step4.association_label') %></h3>
+          <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.step4.association_label') %></h3>
           <%= link_to I18n.t('panel.onboarding.step4.edit'), panel_onboarding_step1_path, class: "btn btn-ghost btn-xs" %>
         </div>
         <dl class="mt-2 space-y-1">
@@ -34,7 +34,7 @@
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
         <div class="flex justify-between items-center">
-          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.step4.identity_label') %></h3>
+          <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.step4.identity_label') %></h3>
           <%= link_to I18n.t('panel.onboarding.step4.edit'), panel_onboarding_step2_path, class: "btn btn-ghost btn-xs" %>
         </div>
         <dl class="mt-2 space-y-1">
@@ -53,8 +53,34 @@
             </div>
           <% end %>
           <% if @identity_request.identity_documents.attached? %>
-            <div class="mt-1">
-              <span class="badge badge-success badge-sm"><%= I18n.t('activerecord.attributes.verified_identity.identity_document') %></span>
+            <% doc_urls = @identity_request.identity_documents.map { |doc| url_for(doc) } %>
+            <div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= doc_urls.to_json %>">
+              <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.verified_identity.identity_document') %></dt>
+              <div class="flex flex-wrap gap-2">
+                <% @identity_request.identity_documents.each_with_index do |doc, i| %>
+                  <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
+                    <%= image_tag doc.representation(resize_to_limit: [120, 120]), class: "rounded-lg border border-base-300 w-20 h-20 object-cover hover:opacity-80 transition-opacity" %>
+                  </button>
+                <% end %>
+              </div>
+              <dialog class="modal" data-image-modal-target="dialog" data-action="click->image-modal#close keydown->image-modal#keydown">
+                <div class="modal-box max-w-5xl max-h-[90vh] p-2 bg-base-100" data-action="click->image-modal#close:stop">
+                  <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">✕</button>
+                  </form>
+                  <img src="" alt="" class="max-w-full max-h-[80vh] object-contain mx-auto rounded-lg" data-image-modal-target="image">
+                  <% if doc_urls.size > 1 %>
+                    <div class="flex items-center justify-between mt-2">
+                      <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#prev">❮</button>
+                      <span class="text-sm text-base-content/60" data-image-modal-target="counter"></span>
+                      <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#next">❯</button>
+                    </div>
+                  <% end %>
+                </div>
+                <form method="dialog" class="modal-backdrop">
+                  <button>close</button>
+                </form>
+              </dialog>
             </div>
           <% end %>
         </dl>
@@ -65,7 +91,7 @@
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
         <div class="flex justify-between items-center">
-          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.step4.household_label') %></h3>
+          <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.step4.household_label') %></h3>
           <%= link_to I18n.t('panel.onboarding.step4.edit'), panel_onboarding_step3_path, class: "btn btn-ghost btn-xs" %>
         </div>
         <dl class="mt-2 space-y-1">
@@ -89,6 +115,37 @@
             <div>
               <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></dt>
               <dd><%= @residence_request.address_line_2 %></dd>
+            </div>
+          <% end %>
+          <% if @residence_request.residence_documents.attached? %>
+            <% res_doc_urls = @residence_request.residence_documents.map { |doc| url_for(doc) } %>
+            <div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= res_doc_urls.to_json %>">
+              <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.residence_verification_request.residence_documents') %></dt>
+              <div class="flex flex-wrap gap-2">
+                <% @residence_request.residence_documents.each_with_index do |doc, i| %>
+                  <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
+                    <%= image_tag doc.representation(resize_to_limit: [120, 120]), class: "rounded-lg border border-base-300 w-20 h-20 object-cover hover:opacity-80 transition-opacity" %>
+                  </button>
+                <% end %>
+              </div>
+              <dialog class="modal" data-image-modal-target="dialog" data-action="click->image-modal#close keydown->image-modal#keydown">
+                <div class="modal-box max-w-5xl max-h-[90vh] p-2 bg-base-100" data-action="click->image-modal#close:stop">
+                  <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">✕</button>
+                  </form>
+                  <img src="" alt="" class="max-w-full max-h-[80vh] object-contain mx-auto rounded-lg" data-image-modal-target="image">
+                  <% if res_doc_urls.size > 1 %>
+                    <div class="flex items-center justify-between mt-2">
+                      <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#prev">❮</button>
+                      <span class="text-sm text-base-content/60" data-image-modal-target="counter"></span>
+                      <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#next">❯</button>
+                    </div>
+                  <% end %>
+                </div>
+                <form method="dialog" class="modal-backdrop">
+                  <button>close</button>
+                </form>
+              </dialog>
             </div>
           <% end %>
         </dl>

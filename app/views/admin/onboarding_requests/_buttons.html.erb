@@ -1,0 +1,11 @@
+<div class="flex flex-row gap-2 mb-4">
+
+  <% if %w[index].include? action_name %>
+    <%= label_tag :filter, raw(icon('filter') + I18n.t('actions.filter')), class: "btn btn-soft" %>
+  <% end %>
+
+  <% unless %w[index].include? action_name %>
+    <%= link_to raw(icon('list') + I18n.t('actions.index')), admin_onboarding_requests_path, class: "btn btn-soft" %>
+  <% end %>
+
+</div>

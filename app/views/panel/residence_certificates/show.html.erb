@@ -46,7 +46,7 @@
     </div>
     <div class="p-2 grid gap-2">
       <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.created_at') %></dt>
-      <dd><%= @residence_certificate.created_at.strftime("%d/%m/%Y") %></dd>
+      <dd><%= l(@residence_certificate.created_at.to_date) %></dd>
     </div>
   </dl>
 </div>

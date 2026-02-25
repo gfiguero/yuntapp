@@ -1,0 +1,44 @@
+    <%# CAMPO: Residence Documents (Multiple) %>
+    <%= turbo_frame_tag "field_residence_documents" do %>
+      <%= form_with(model: residence_request, url: panel_onboarding_step3_path, method: :patch, data: { controller: "file-upload" }, html: { novalidate: true }) do |form| %>
+        <div>
+          <%= form.label :residence_documents, I18n.t('activerecord.attributes.residence_verification_request.residence_documents'), class: "label" %>
+          <p class="text-sm text-base-content/60 mb-1"><%= I18n.t('panel.onboarding.step3.upload_hint') %></p>
+
+          <%= form.file_field :residence_documents, multiple: true, class: "file-input w-full", data: { file_upload_target: "input", action: "change->file-upload#upload" } %>
+
+          <%# Loading indicator %>
+          <div class="hidden mt-3" data-file-upload-target="loading">
+            <div class="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
+              <span class="loading loading-spinner loading-sm text-primary"></span>
+              <div class="flex-1">
+                <p class="text-sm font-medium">Subiendo archivos...</p>
+                <progress class="progress progress-primary w-full"></progress>
+              </div>
+            </div>
+          </div>
+
+          <% if residence_request.residence_documents.attached? %>
+            <div class="mt-4 grid grid-cols-2 gap-4" data-file-upload-target="preview">
+              <% residence_request.residence_documents.each do |doc| %>
+                <div class="relative group">
+                  <% if doc.image? %>
+                    <%= image_tag doc, class: "w-full h-32 object-cover rounded-lg border" %>
+                  <% else %>
+                    <div class="w-full h-32 bg-base-200 rounded-lg flex items-center justify-center border">
+                      <span class="text-xs text-center p-2"><%= doc.filename %></span>
+                    </div>
+                  <% end %>
+
+                  <%= link_to panel_onboarding_delete_residence_document_path(doc.id),
+                      class: "absolute top-1 right-1 btn btn-circle btn-xs btn-error text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-md",
+                      data: { turbo_method: :delete } do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>

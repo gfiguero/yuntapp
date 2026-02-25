@@ -1,6 +1,14 @@
+<% step_paths = [panel_onboarding_step1_path, panel_onboarding_step2_path, panel_onboarding_step3_path, panel_onboarding_step4_path] %>
+<% step_labels = %w[neighborhood identity household confirm].map { |k| I18n.t("panel.onboarding.steps.#{k}") } %>
 <ul class="steps steps-horizontal w-full mb-8">
-  <li class="step <%= 'step-primary' if current_step >= 1 %>"><%= I18n.t('panel.onboarding.steps.neighborhood') %></li>
-  <li class="step <%= 'step-primary' if current_step >= 2 %>"><%= I18n.t('panel.onboarding.steps.identity') %></li>
-  <li class="step <%= 'step-primary' if current_step >= 3 %>"><%= I18n.t('panel.onboarding.steps.household') %></li>
-  <li class="step <%= 'step-primary' if current_step >= 4 %>"><%= I18n.t('panel.onboarding.steps.confirm') %></li>
+  <% step_labels.each_with_index do |label, i| %>
+    <% step_num = i + 1 %>
+    <li class="step <%= 'step-primary' if current_step >= step_num %>">
+      <% if step_num < current_step %>
+        <%= link_to label, step_paths[i], class: "link link-hover", data: { turbo_frame: "_top" } %>
+      <% else %>
+        <%= label %>
+      <% end %>
+    </li>
+  <% end %>
 </ul>

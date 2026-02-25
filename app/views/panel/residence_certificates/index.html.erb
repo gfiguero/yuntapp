@@ -32,7 +32,7 @@
           <td><%= certificate.member.name %></td>
           <td><%= I18n.t("activerecord.attributes.residence_certificate/status.#{certificate.status}") %></td>
           <td><%= truncate(certificate.purpose, length: 50) %></td>
-          <td><%= certificate.created_at.strftime("%d/%m/%Y") %></td>
+          <td><%= l(certificate.created_at.to_date) %></td>
           <td>
             <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
               <%= link_to icon('show'), panel_residence_certificate_path(certificate), class: "btn btn-sm btn-soft btn-info" %>

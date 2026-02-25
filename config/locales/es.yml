@@ -1,15 +1,67 @@
 es:
   date:
+    abbr_day_names:
+      - dom
+      - lun
+      - mar
+      - mié
+      - jue
+      - vie
+      - sáb
+    abbr_month_names:
+      -
+      - ene
+      - feb
+      - mar
+      - abr
+      - may
+      - jun
+      - jul
+      - ago
+      - sep
+      - oct
+      - nov
+      - dic
+    day_names:
+      - domingo
+      - lunes
+      - martes
+      - miércoles
+      - jueves
+      - viernes
+      - sábado
+    month_names:
+      -
+      - enero
+      - febrero
+      - marzo
+      - abril
+      - mayo
+      - junio
+      - julio
+      - agosto
+      - septiembre
+      - octubre
+      - noviembre
+      - diciembre
     formats:
       default: "%d/%m/%Y"
       short: "%d de %b"
       long: "%d de %B de %Y"
+    order:
+      - :day
+      - :month
+      - :year
 
   time:
     formats:
       default: "%a, %d de %b de %Y %H:%M:%S %z"
       short: "%d de %b %H:%M"
       long: "%d de %B de %Y %H:%M"
+
+  helpers:
+    select:
+      prompt: "Selecciona una opción"
 
   activerecord:
     models:
@@ -139,6 +191,7 @@ es:
         status: Estado
         rejection_reason: Motivo de rechazo
         manual_address: Dirección manual
+        residence_documents: Comprobantes de Domicilio
         created_at: Fecha de creación
       board_member:
         id: ID
@@ -337,6 +390,12 @@ es:
         approved: Certificado aprobado exitosamente.
         rejected: Certificado rechazado exitosamente.
         issued: Certificado emitido exitosamente.
+    onboarding_requests:
+      index:
+        title: Solicitudes de Acreditación
+        count: "%{count} solicitudes"
+      show:
+        identifier: "Solicitud #%{id}"
     verifications:
       index:
         title: Verificación de Identidad
@@ -440,6 +499,7 @@ es:
         description: Ingresa los datos de tu domicilio dentro de la junta de vecinos.
         manual_address_option: "Mi dirección no aparece en la lista / Ingresar manualmente"
         manual_address_hint: "Ingresa el nombre de tu calle o pasaje si no se encuentra en el listado oficial."
+        upload_hint: "Sube fotos de boletas de servicios, contrato de arriendo u otro documento que acredite tu domicilio."
       step4:
         title: Revisa y Confirma
         description: Revisa cuidadosamente todos los datos de tu solicitud antes de enviarla.

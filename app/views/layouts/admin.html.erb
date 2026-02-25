@@ -2,6 +2,8 @@
 <html data-theme="light">
   <head>
     <title><%= content_for(:title) || "Yuntapp Admin" %></title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -36,7 +38,7 @@
             <% end %>
 
             <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">Administración</h1>
+                <h1 class="text-2xl font-bold">Administración &mdash; <%= current_neighborhood_association&.name %></h1>
                 <%= link_to "Volver a la App", root_path, class: "btn btn-sm btn-outline" %>
             </div>
             <%= yield %>
@@ -51,6 +53,15 @@
           <li><%= link_to "Dashboard", admin_root_path, class: ("active" if current_page?(admin_root_path)) %></li>
 
           <li class="menu-title mt-4">Entidades</li>
+          <li>
+            <%= link_to admin_onboarding_requests_path, class: ("active" if controller_name == "onboarding_requests") do %>
+              Solicitudes
+              <% pending_requests = current_neighborhood_association ? current_neighborhood_association.onboarding_requests.where(status: "pending").count : 0 %>
+              <% if pending_requests > 0 %>
+                <span class="badge badge-warning badge-sm"><%= pending_requests %></span>
+              <% end %>
+            <% end %>
+          </li>
           <li><%= link_to "Delegaciones Vecinales", admin_neighborhood_delegations_path, class: ("active" if controller_name == "neighborhood_delegations") %></li>
           <li><%= link_to "Domicilios", admin_household_units_path, class: ("active" if controller_name == "household_units") %></li>
           <li>

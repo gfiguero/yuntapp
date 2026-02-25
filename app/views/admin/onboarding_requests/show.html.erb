@@ -1,59 +1,68 @@
+<% content_for :title do %>
+  <%= I18n.t('admin.onboarding_requests.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('admin.onboarding_requests.index.title'), admin_onboarding_requests_path %></li>
+  <li><%= @onboarding_request.id %></li>
+<% end %>
+
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.onboarding.status.title') %></h1>
-  <p class="text-base-content/60 mb-6"><%= I18n.t('panel.onboarding.status.description') %></p>
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.onboarding_requests.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('admin.onboarding_requests.show.identifier', id: @onboarding_request.id) %></h3>
+  <%= render "buttons" %>
 
   <div class="grid grid-cols-1 gap-4">
-    <%# Junta de Vecinos %>
+    <%# Información General %>
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
         <div class="flex justify-between items-center">
-          <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.status.association_label') %></h3>
+          <h3 class="card-title text-xl">Datos de la Solicitud</h3>
           <%= status_badge(@onboarding_request.status) %>
         </div>
         <dl class="mt-2 space-y-1">
           <div>
-            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.neighborhood_association.name') %></dt>
-            <dd class="font-medium"><%= @neighborhood_association&.name %></dd>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.onboarding_request.user') %></dt>
+            <dd class="font-medium"><%= @onboarding_request.user.email %></dd>
           </div>
-          <% if @neighborhood_association&.commune %>
-            <div>
-              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.neighborhood_association.commune') %></dt>
-              <dd><%= @neighborhood_association.commune.name %></dd>
-            </div>
-          <% end %>
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.onboarding_request.created_at') %></dt>
+            <dd><%= l(@onboarding_request.created_at, format: :long) %></dd>
+          </div>
         </dl>
       </div>
     </div>
 
-    <%# Verificación de Identidad %>
-    <% if @identity_request %>
+    <%# Identidad %>
+    <% if @onboarding_request.identity_verification_request %>
+      <% identity = @onboarding_request.identity_verification_request %>
       <div class="card bg-base-200 shadow-sm">
         <div class="card-body">
           <div class="flex justify-between items-center">
-            <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.status.identity_label') %></h3>
-            <%= status_badge(@identity_request.status) %>
+            <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.status.identity_label') %></h3>
+            <%= status_badge(identity.status) %>
           </div>
           <dl class="mt-2 space-y-1">
             <div>
               <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.name') %></dt>
-              <dd class="font-medium"><%= @identity_request.full_name %></dd>
+              <dd class="font-medium"><%= identity.full_name %></dd>
             </div>
             <div>
               <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.run') %></dt>
-              <dd><%= @identity_request.run %></dd>
+              <dd><%= identity.run %></dd>
             </div>
-            <% if @identity_request.phone.present? %>
+            <% if identity.phone.present? %>
               <div>
                 <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.phone') %></dt>
-                <dd><%= @identity_request.phone %></dd>
+                <dd><%= identity.phone %></dd>
               </div>
             <% end %>
-            <% if @identity_request.identity_documents.attached? %>
-              <% id_doc_urls = @identity_request.identity_documents.map { |doc| url_for(doc) } %>
+            <% if identity.identity_documents.attached? %>
+              <% id_doc_urls = identity.identity_documents.map { |doc| url_for(doc) } %>
               <div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= id_doc_urls.to_json %>">
                 <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.verified_identity.identity_document') %></dt>
                 <div class="flex flex-wrap gap-2">
-                  <% @identity_request.identity_documents.each_with_index do |doc, i| %>
+                  <% identity.identity_documents.each_with_index do |doc, i| %>
                     <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
                       <%= image_tag doc.representation(resize_to_limit: [120, 120]), class: "rounded-lg border border-base-300 w-20 h-20 object-cover hover:opacity-80 transition-opacity" %>
                     </button>
@@ -84,43 +93,44 @@
       </div>
     <% end %>
 
-    <%# Verificación de Residencia %>
-    <% if @residence_request %>
+    <%# Residencia %>
+    <% if @onboarding_request.residence_verification_request %>
+      <% residence = @onboarding_request.residence_verification_request %>
       <div class="card bg-base-200 shadow-sm">
         <div class="card-body">
           <div class="flex justify-between items-center">
-            <h3 class="card-title text-base"><%= I18n.t('panel.onboarding.status.residence_label') %></h3>
-            <%= status_badge(@residence_request.status) %>
+            <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.status.residence_label') %></h3>
+            <%= status_badge(residence.status) %>
           </div>
           <dl class="mt-2 space-y-1">
-            <% if @residence_request.neighborhood_delegation.present? %>
+            <% if residence.neighborhood_delegation.present? %>
               <div>
                 <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.neighborhood_delegation') %></dt>
-                <dd class="font-medium"><%= @residence_request.neighborhood_delegation.name %></dd>
+                <dd class="font-medium"><%= residence.neighborhood_delegation.name %></dd>
               </div>
             <% end %>
-            <% if @residence_request.address_line_1.present? %>
+            <% if residence.address_line_1.present? %>
               <div>
                 <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></dt>
-                <dd class="font-medium"><%= @residence_request.address_line_1 %></dd>
+                <dd class="font-medium"><%= residence.address_line_1 %></dd>
               </div>
             <% end %>
             <div>
               <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.number') %></dt>
-              <dd><%= @residence_request.number %></dd>
+              <dd><%= residence.number %></dd>
             </div>
-            <% if @residence_request.address_line_2.present? %>
+            <% if residence.address_line_2.present? %>
               <div>
                 <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></dt>
-                <dd><%= @residence_request.address_line_2 %></dd>
+                <dd><%= residence.address_line_2 %></dd>
               </div>
             <% end %>
-            <% if @residence_request.residence_documents.attached? %>
-              <% res_doc_urls = @residence_request.residence_documents.map { |doc| url_for(doc) } %>
+            <% if residence.residence_documents.attached? %>
+              <% res_doc_urls = residence.residence_documents.map { |doc| url_for(doc) } %>
               <div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= res_doc_urls.to_json %>">
                 <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.residence_verification_request.residence_documents') %></dt>
                 <div class="flex flex-wrap gap-2">
-                  <% @residence_request.residence_documents.each_with_index do |doc, i| %>
+                  <% residence.residence_documents.each_with_index do |doc, i| %>
                     <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
                       <%= image_tag doc.representation(resize_to_limit: [120, 120]), class: "rounded-lg border border-base-300 w-20 h-20 object-cover hover:opacity-80 transition-opacity" %>
                     </button>

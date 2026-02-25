@@ -13,7 +13,13 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     if resource.is_a?(User)
-      resource.superadmin? ? superadmin_root_path : panel_root_path
+      if resource.superadmin?
+        superadmin_root_path
+      elsif resource.admin?
+        admin_root_path
+      else
+        panel_root_path
+      end
     else
       super
     end

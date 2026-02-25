@@ -73,8 +73,9 @@ module Superadmin
     end
 
     test "should destroy neighborhood_association" do
+      deletable = NeighborhoodAssociation.create!(name: "Deletable Association")
       assert_difference("NeighborhoodAssociation.count", -1) do
-        delete superadmin_neighborhood_association_url(@neighborhood_association)
+        delete superadmin_neighborhood_association_url(deletable)
       end
 
       assert_redirected_to superadmin_neighborhood_associations_url

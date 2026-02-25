@@ -49,7 +49,7 @@
     <% if member.approved_at %>
       <div class="p-2 grid gap-2">
         <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.approved_at') %></dt>
-        <dd><%= member.approved_at.strftime("%d/%m/%Y") %></dd>
+        <dd><%= l(member.approved_at.to_date) %></dd>
       </div>
     <% end %>
     <% if member.rejected? && member.rejection_reason.present? %>

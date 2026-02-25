@@ -2,6 +2,8 @@
 <html data-theme="light">
   <head>
     <title><%= content_for(:title) || "Yuntapp Panel" %></title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -15,7 +17,7 @@
   <body>
     <%= render "shared/flash" %>
     <div class="drawer lg:drawer-open">
-      <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+      <input id="my-drawer-2" type="checkbox" class="drawer-toggle">
       <div class="drawer-content flex flex-col items-center justify-start min-h-screen">
         <!-- Page content here -->
         <div class="w-full navbar bg-base-100 lg:hidden shadow-sm mb-4">
@@ -34,9 +36,9 @@
             <%= yield %>
         </main>
         <%= render "shared/footer" %>
-      </div> 
+      </div>
       <div class="drawer-side h-full">
-        <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label> 
+        <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content h-full">
           <!-- Sidebar content here -->
           <li class="mb-4 text-xl font-bold px-4">Yuntapp Panel</li>
@@ -67,7 +69,7 @@
           <li><%= link_to I18n.t('actions.reset'), panel_reset_account_path, data: { turbo_method: :delete, turbo_confirm: I18n.t('panel.account_resets.confirm') }, class: "text-error" %></li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
         </ul>
-      
+
       </div>
     </div>
     <%= yield :filter_drawer %>

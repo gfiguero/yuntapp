@@ -5,6 +5,8 @@ class ResidenceVerificationRequest < ApplicationRecord
   belongs_to :commune
   belongs_to :onboarding_request, optional: true
 
+  has_many_attached :residence_documents
+
   STATUSES = %w[draft pending approved rejected].freeze
 
   validates :number, presence: true, allow_blank: true

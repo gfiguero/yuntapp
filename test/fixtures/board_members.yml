@@ -1,0 +1,6 @@
+selendis_board_member:
+  neighborhood_association: manios_de_buin
+  member: selendis_member
+  position: "presidente"
+  start_date: <%= Date.new(2025, 1, 1) %>
+  active: true

@@ -72,8 +72,9 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy neighborhood_association" do
+    deletable = NeighborhoodAssociation.create!(name: "Deletable Association")
     assert_difference("NeighborhoodAssociation.count", -1) do
-      delete neighborhood_association_url(@neighborhood_association)
+      delete neighborhood_association_url(deletable)
     end
 
     assert_redirected_to neighborhood_associations_url

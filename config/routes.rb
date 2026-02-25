@@ -80,6 +80,7 @@ Rails.application.routes.draw do
       delete "step2/document/:attachment_id", to: "onboarding#delete_document", as: :onboarding_delete_document
       get "step3", to: "onboarding#step3", as: :onboarding_step3
       patch "step3", to: "onboarding#update_step3"
+      delete "step3/document/:attachment_id", to: "onboarding#delete_residence_document", as: :onboarding_delete_residence_document
       get "step4", to: "onboarding#step4", as: :onboarding_step4
       post "submit", to: "onboarding#submit", as: :onboarding_submit
     end
@@ -175,6 +176,11 @@ Rails.application.routes.draw do
       end
       member do
         get :delete
+      end
+    end
+    resources :onboarding_requests, only: [:index, :show] do
+      collection do
+        get :search
       end
     end
     resources :verifications, only: [ :index, :show ] do

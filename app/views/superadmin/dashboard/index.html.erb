@@ -3,12 +3,12 @@
     <div class="max-w-md">
       <h1 class="text-5xl font-bold">Panel Superadmin</h1>
       <p class="py-6">Bienvenido al panel de administración global del sistema. Desde aquí puedes gestionar las entidades maestras.</p>
-      
+
       <div class="grid grid-cols-2 gap-4">
         <%= link_to superadmin_neighborhood_associations_path, class: "btn btn-primary" do %>
           <%= icon("home", class: "w-5 h-5") %> Juntas de Vecinos
         <% end %>
-        
+
         <%= link_to superadmin_users_path, class: "btn btn-secondary" do %>
           <%= icon("users", class: "w-5 h-5") %> Usuarios
         <% end %>

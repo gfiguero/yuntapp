@@ -1,6 +1,6 @@
 <div class="toast toast-end toast-top z-50">
   <% flash.each do |key, message| %>
-    <% 
+    <%
       # Mapeo de tipos de flash a clases de alerta de DaisyUI
       alert_class = case key.to_s
       when "notice", "success" then "alert-success"
@@ -10,11 +10,11 @@
       else "alert-info"
       end
     %>
-    <div class="alert <%= alert_class %> shadow-lg" 
-         data-controller="flash" 
+    <div class="alert <%= alert_class %> shadow-lg"
+         data-controller="flash"
          data-action="animationend->flash#remove"
          role="alert">
-      
+
       <%# Icono según tipo %>
       <% case key.to_s %>
       <% when "notice", "success" %>
@@ -28,7 +28,7 @@
       <% end %>
 
       <span><%= message %></span>
-      
+
       <button class="btn btn-sm btn-ghost btn-circle" onclick="this.parentElement.remove()">✕</button>
     </div>
   <% end %>

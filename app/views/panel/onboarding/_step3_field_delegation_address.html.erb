@@ -1,9 +1,10 @@
     <%# CAMPO: Delegación / Calle Manual %>
     <%= turbo_frame_tag "field_delegation_address" do %>
       <%= form_with(model: residence_request, url: panel_onboarding_step3_path, method: :patch, data: { controller: "autosave manual-address", autosave_delay_value: "2000" }, html: { novalidate: true }) do |form| %>
-        
+        <div class="grid gap-4">
+
         <% invalid = residence_request.errors.include?(:neighborhood_delegation_id) %>
-        
+
         <%# Grupo de Delegación (Select) %>
         <div data-manual-address-target="selectGroup">
           <%= form.label :neighborhood_delegation_id, I18n.t('activerecord.attributes.household_unit.neighborhood_delegation'), class: "floating-label" do %>
@@ -16,10 +17,9 @@
         <%# Checkbox para alternar modo %>
         <div class="form-control">
           <label class="label cursor-pointer justify-start gap-2">
-            <%# Checkbox vinculado al modelo manual_address 
+            <%# Checkbox vinculado al modelo manual_address
                 Rails genera un hidden input "0" automáticamente antes del checkbox.
-                Debemos asegurarnos que el valor del modelo (true/false) se refleje en 'checked'.
-            %>
+                Debemos asegurarnos que el valor del modelo (true/false) se refleje en 'checked'. %>
             <%= form.check_box :manual_address, { class: "checkbox", data: { action: "change->manual-address#toggle", manual_address_target: "checkbox" } }, "true", "false" %>
             <span class="label-text"><%= I18n.t('panel.onboarding.step3.manual_address_option') %></span>
           </label>
@@ -36,5 +36,6 @@
           <p class="text-xs text-base-content/60 mt-1"><%= I18n.t('panel.onboarding.step3.manual_address_hint') %></p>
         </div>
 
+        </div>
       <% end %>
     <% end %>

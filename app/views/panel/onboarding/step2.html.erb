@@ -14,12 +14,12 @@
     </div>
   <% end %>
 
-  <% 
+  <%
     # Helper para determinar clase de validación
     def input_class(model, attribute)
       # Si hay errores en este atributo, siempre es rojo
       return "input-error" if model.errors.include?(attribute)
-      
+
       # Si tiene valor y no tiene errores, PODRÍA ser verde, pero debemos tener cuidado.
       # En este caso, asumimos que si llega aquí desde el servidor, es el estado "final" validado.
       return "input-success" if model.send(attribute).present? && !model.errors.include?(attribute)
@@ -29,7 +29,7 @@
 
   <%# Contenedor principal sin form global para los campos individuales %>
   <div class="grid gap-4 w-full max-w-md">
-    
+
     <%# CAMPO: First Name %>
     <%= render "step2_field_first_name", identity_request: @identity_request %>
 
@@ -50,7 +50,7 @@
   <%# Botones de navegación (Formulario separado para el submit final) %>
   <div class="mt-6 flex gap-2">
     <%= link_to I18n.t('actions.back'), panel_onboarding_step1_path, class: "btn btn-soft", data: { turbo_frame: "_top" } %>
-    
+
     <%= render "step2_submit_button", identity_request: @identity_request %>
   </div>
 </div>

@@ -2,7 +2,7 @@
   <td><%= residence_certificate.folio || "—" %></td>
   <td><%= residence_certificate.member.name %></td>
   <td><%= I18n.t("activerecord.attributes.residence_certificate/status.#{residence_certificate.status}") %></td>
-  <td><%= residence_certificate.created_at.strftime("%d/%m/%Y") %></td>
+  <td><%= l(residence_certificate.created_at.to_date) %></td>
   <td>
     <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
       <%= link_to icon('show'), [:admin, residence_certificate], class: "btn btn-sm btn-soft btn-info" %>

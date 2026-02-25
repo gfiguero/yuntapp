@@ -1,5 +1,5 @@
     <%= turbo_frame_tag "step3_submit_button" do %>
-      <% 
+      <%
          # Validación básica para habilitar botón
          # Debe tener número Y (delegación O calle manual)
          has_location = residence_request.neighborhood_delegation_id.present? || residence_request.address_line_1.present?

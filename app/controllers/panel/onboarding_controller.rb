@@ -3,6 +3,7 @@ module Panel
     layout "panel"
     before_action :authenticate_user!
     before_action :redirect_if_onboarded!, except: [:restart, :status]
+    before_action :ensure_draft!, only: [:update_step1, :update_step2, :update_step3, :delete_document, :delete_residence_document, :submit]
     before_action :ensure_step1!, only: [:step2, :update_step2, :step3, :update_step3, :step4, :submit]
     before_action :ensure_step2!, only: [:step3, :update_step3, :step4, :submit]
     before_action :ensure_step3!, only: [:step4, :submit]
@@ -304,6 +305,26 @@ module Panel
       end
     end
 
+    def delete_residence_document
+      @onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
+      @residence_request = @onboarding_request&.residence_verification_request
+
+      if @residence_request
+        attachment = @residence_request.residence_documents.find_by(id: params[:attachment_id])
+        attachment&.purge
+      end
+
+      respond_to do |format|
+        format.html { redirect_to panel_onboarding_step3_path }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace("field_residence_documents", partial: "panel/onboarding/step3_field_residence_documents", locals: {residence_request: @residence_request}),
+            turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: {residence_request: @residence_request})
+          ]
+        end
+      end
+    end
+
     # STEP 3: Confirmación (Antes Step 4)
     def step3
       @neighborhood_association = NeighborhoodAssociation.find(session.dig(:onboarding, "neighborhood_association_id"))
@@ -360,6 +381,11 @@ module Panel
 
       # Intentamos guardar
       if @residence_request.save
+        # Adjuntamos documentos nuevos SIN reemplazar los existentes
+        if params.dig(:residence_verification_request, :residence_documents).present?
+          @residence_request.residence_documents.attach(params[:residence_verification_request][:residence_documents])
+        end
+
         session[:onboarding]["residence_request_id"] = @residence_request.id
 
         # Si se hizo clic en continuar
@@ -405,6 +431,11 @@ module Panel
               # Si se envió detalle
               if params[:residence_verification_request].key?(:address_line_2)
                 streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: {residence_request: @residence_request})
+              end
+
+              # Si se enviaron documentos de residencia
+              if params[:residence_verification_request]&.key?(:residence_documents)
+                streams << turbo_stream.replace("field_residence_documents", partial: "panel/onboarding/step3_field_residence_documents", locals: {residence_request: @residence_request})
               end
 
               # Siempre actualizamos el botón de continuar
@@ -496,6 +527,13 @@ module Panel
       onboarding_request = current_user.current_onboarding_request
       if onboarding_request.present? && !onboarding_request.draft?
         redirect_to panel_root_path, notice: I18n.t("panel.onboarding.flash.pending")
+      end
+    end
+
+    def ensure_draft!
+      onboarding_request = current_user.current_onboarding_request
+      if onboarding_request.present? && !onboarding_request.draft?
+        redirect_to panel_onboarding_status_path, alert: I18n.t("panel.onboarding.flash.pending")
       end
     end
 
