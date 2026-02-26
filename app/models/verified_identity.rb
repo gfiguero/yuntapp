@@ -1,10 +1,11 @@
 class VerifiedIdentity < ApplicationRecord
   self.table_name = "verified_identities"
 
-  VERIFICATION_STATUSES = %w[pending verified rejected].freeze
+  belongs_to :identity_verification_request, optional: true
 
   has_many :users
   has_many :members
+  has_many :residencies
   has_one_attached :identity_document
 
   before_validation :normalize_run_field
@@ -14,7 +15,6 @@ class VerifiedIdentity < ApplicationRecord
   validates :first_name, :last_name, :run, presence: true
   validates :run, uniqueness: true, run: true, if: -> { run.present? }
   validates :phone, phone: true, if: -> { phone.present? }
-  validates :verification_status, presence: true, inclusion: {in: VERIFICATION_STATUSES}
 
   def normalize_phone
     return if phone.blank?
@@ -28,13 +28,7 @@ class VerifiedIdentity < ApplicationRecord
     end
   end
 
-  scope :verified, -> { where(verification_status: "verified") }
-  scope :pending, -> { where(verification_status: "pending") }
-
   def name = "#{first_name} #{last_name}"
-  def verified? = verification_status == "verified"
-  def pending_verification? = verification_status == "pending"
-  def rejected_verification? = verification_status == "rejected"
 
   private
 

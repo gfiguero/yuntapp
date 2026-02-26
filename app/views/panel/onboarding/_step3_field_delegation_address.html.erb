@@ -27,12 +27,12 @@
 
         <%# Grupo de Dirección Manual (Input) %>
         <div class="hidden" data-manual-address-target="inputGroup">
-          <% invalid_manual = residence_request.errors.include?(:address_line_1) %>
-          <%= form.label :address_line_1, I18n.t('activerecord.attributes.household_unit.address_line_1'), class: "floating-label" do %>
-            <%= form.text_field :address_line_1, class: "input w-full #{input_class(residence_request, :address_line_1)}", placeholder: I18n.t('activerecord.attributes.household_unit.address_line_1'), data: { manual_address_target: "input", action: "input->autosave#submit" } %>
-            <span><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></span>
+          <% invalid_manual = residence_request.errors.include?(:street_name) %>
+          <%= form.label :street_name, I18n.t('activerecord.attributes.household_unit.street_name'), class: "floating-label" do %>
+            <%= form.text_field :street_name, class: "input w-full #{input_class(residence_request, :street_name)}", placeholder: I18n.t('activerecord.attributes.household_unit.street_name'), data: { manual_address_target: "input", action: "input->autosave#submit" } %>
+            <span><%= I18n.t('activerecord.attributes.household_unit.street_name') %></span>
           <% end %>
-          <%= raw(error_message(invalid_manual, residence_request.errors.full_messages_for(:address_line_1))) %>
+          <%= raw(error_message(invalid_manual, residence_request.errors.full_messages_for(:street_name))) %>
           <p class="text-xs text-base-content/60 mt-1"><%= I18n.t('panel.onboarding.step3.manual_address_hint') %></p>
         </div>
 

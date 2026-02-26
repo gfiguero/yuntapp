@@ -90,36 +90,6 @@ class VerifiedIdentityTest < ActiveSupport::TestCase
     assert persona.errors[:run].any?
   end
 
-  # --- Verification status ---
-
-  test "verification_status defaults to pending" do
-    persona = VerifiedIdentity.new(first_name: "Test", last_name: "User", run: "99999999-9")
-    assert_equal "pending", persona.verification_status
-  end
-
-  test "verified? returns true when verification_status is verified" do
-    persona = verified_identities(:selendis_persona)
-    assert persona.verified?
-  end
-
-  test "pending_verification? returns true when verification_status is pending" do
-    persona = verified_identities(:rohana_persona)
-    assert persona.pending_verification?
-  end
-
-  test "rejected_verification? returns true when verification_status is rejected" do
-    persona = verified_identities(:selendis_persona)
-    persona.verification_status = "rejected"
-    assert persona.rejected_verification?
-  end
-
-  test "rejects invalid verification_status" do
-    persona = verified_identities(:selendis_persona)
-    persona.verification_status = "invalid"
-    assert_not persona.valid?
-    assert persona.errors[:verification_status].any?
-  end
-
   # --- Name ---
 
   test "name returns full name" do
@@ -155,15 +125,4 @@ class VerifiedIdentityTest < ActiveSupport::TestCase
     assert_equal "Pérez", persona.last_name
   end
 
-  # --- Scopes ---
-
-  test "verified scope returns only verified personas" do
-    verified = VerifiedIdentity.verified
-    assert verified.all?(&:verified?)
-  end
-
-  test "pending scope returns only pending personas" do
-    pending_personas = VerifiedIdentity.pending
-    assert pending_personas.all?(&:pending_verification?)
-  end
 end

@@ -93,7 +93,7 @@
             <%= icon("check-circle", class: "w-6 h-6") %>
             <div>
               <h3 class="font-bold">Vinculado a Junta de Vecinos</h3>
-              <div class="text-xs">Estás registrado en <%= @user.member.household_unit.neighborhood_delegation.neighborhood_association.name %></div>
+              <div class="text-xs">Estás registrado en <%= @user.member.neighborhood_association.name %></div>
             </div>
           </div>
         <% else %>

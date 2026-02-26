@@ -46,7 +46,6 @@ module Admin
       verified_identity = VerifiedIdentity.find_or_initialize_by(run: run)
       verified_identity.assign_attributes(verified_identity_params.except(:run))
       verified_identity.run = run
-      verified_identity.verification_status ||= "pending"
 
       unless verified_identity.save
         @member = Member.new
@@ -55,7 +54,7 @@ module Admin
         return
       end
 
-      @member = Member.new(household_unit_id: params.dig(:member, :household_unit_id))
+      @member = Member.new(neighborhood_association: current_neighborhood_association)
       @member.verified_identity = verified_identity
 
       if @member.save
@@ -68,7 +67,7 @@ module Admin
     # PATCH/PUT /admin/members/1
     def update
       @member.verified_identity.update!(verified_identity_params)
-      if @member.update(household_unit_id: params.dig(:member, :household_unit_id))
+      if @member.save
         redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content
@@ -90,8 +89,7 @@ module Admin
       @member.update!(
         status: "approved",
         approved_by: current_user,
-        approved_at: Time.current,
-        household_admin: @member.user.present? && @member.household_unit.household_admin.nil?
+        approved_at: Time.current
       )
       redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.approved"), status: :see_other
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_26_025242) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -74,8 +74,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
   end
 
   create_table "household_units", force: :cascade do |t|
-    t.string "address_line_1"
-    t.string "address_line_2"
+    t.string "address_detail"
     t.string "city"
     t.integer "commune_id"
     t.string "country"
@@ -84,9 +83,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
     t.string "number"
     t.string "postal_code"
     t.string "region"
+    t.string "street_name"
     t.datetime "updated_at", null: false
+    t.integer "verified_residence_id"
     t.index ["commune_id"], name: "index_household_units_on_commune_id"
     t.index ["neighborhood_delegation_id"], name: "index_household_units_on_neighborhood_delegation_id"
+    t.index ["verified_residence_id"], name: "index_household_units_on_verified_residence_id"
   end
 
   create_table "identity_verification_requests", force: :cascade do |t|
@@ -121,15 +123,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
     t.datetime "approved_at"
     t.integer "approved_by_id"
     t.datetime "created_at", null: false
-    t.boolean "household_admin", default: false
-    t.integer "household_unit_id", null: false
+    t.integer "neighborhood_association_id", null: false
     t.text "rejection_reason"
     t.integer "requested_by_id"
     t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.integer "verified_identity_id", null: false
     t.index ["approved_by_id"], name: "index_members_on_approved_by_id"
-    t.index ["household_unit_id"], name: "index_members_on_household_unit_id"
+    t.index ["neighborhood_association_id"], name: "index_members_on_neighborhood_association_id"
     t.index ["requested_by_id"], name: "index_members_on_requested_by_id"
     t.index ["status"], name: "index_members_on_status"
     t.index ["verified_identity_id"], name: "index_members_on_verified_identity_id"
@@ -196,8 +197,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
   end
 
   create_table "residence_verification_requests", force: :cascade do |t|
-    t.string "address_line_1"
-    t.string "address_line_2"
+    t.string "address_detail"
     t.integer "commune_id", null: false
     t.datetime "created_at", null: false
     t.boolean "manual_address", default: false, null: false
@@ -207,6 +207,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
     t.integer "onboarding_request_id"
     t.text "rejection_reason"
     t.string "status", default: "pending", null: false
+    t.string "street_name"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["commune_id"], name: "index_residence_verification_requests_on_commune_id"
@@ -214,6 +215,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
     t.index ["neighborhood_delegation_id"], name: "idx_on_neighborhood_delegation_id_53d3fd92d5"
     t.index ["onboarding_request_id"], name: "index_residence_verification_requests_on_onboarding_request_id"
     t.index ["user_id"], name: "index_residence_verification_requests_on_user_id"
+  end
+
+  create_table "residencies", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "household_admin", default: false
+    t.integer "household_unit_id", null: false
+    t.string "status", default: "approved", null: false
+    t.datetime "updated_at", null: false
+    t.integer "verified_identity_id", null: false
+    t.integer "verified_residence_id", null: false
+    t.index ["household_unit_id"], name: "index_residencies_on_household_unit_id"
+    t.index ["verified_identity_id", "household_unit_id"], name: "index_residencies_on_identity_and_unit", unique: true
+    t.index ["verified_identity_id"], name: "index_residencies_on_verified_identity_id"
+    t.index ["verified_residence_id"], name: "index_residencies_on_verified_residence_id"
   end
 
   create_table "tags", force: :cascade do |t|
@@ -244,13 +259,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
     t.datetime "created_at", null: false
     t.string "email"
     t.string "first_name", null: false
+    t.integer "identity_verification_request_id"
     t.string "last_name", null: false
     t.string "phone"
     t.string "run", null: false
     t.datetime "updated_at", null: false
-    t.string "verification_status", default: "pending", null: false
+    t.index ["identity_verification_request_id"], name: "index_verified_identities_on_identity_verification_request_id"
     t.index ["run"], name: "index_verified_identities_on_run", unique: true
-    t.index ["verification_status"], name: "index_verified_identities_on_verification_status"
+  end
+
+  create_table "verified_residences", force: :cascade do |t|
+    t.string "address_detail"
+    t.integer "commune_id"
+    t.datetime "created_at", null: false
+    t.boolean "manual_address", default: false
+    t.integer "neighborhood_association_id", null: false
+    t.integer "neighborhood_delegation_id"
+    t.string "number"
+    t.integer "residence_verification_request_id"
+    t.string "street_name"
+    t.datetime "updated_at", null: false
+    t.index ["commune_id"], name: "index_verified_residences_on_commune_id"
+    t.index ["neighborhood_association_id"], name: "index_verified_residences_on_neighborhood_association_id"
+    t.index ["neighborhood_delegation_id"], name: "index_verified_residences_on_neighborhood_delegation_id"
+    t.index ["residence_verification_request_id"], name: "index_verified_residences_on_residence_verification_request_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -260,11 +292,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
   add_foreign_key "communes", "regions"
   add_foreign_key "household_units", "communes"
   add_foreign_key "household_units", "neighborhood_delegations"
+  add_foreign_key "household_units", "verified_residences"
   add_foreign_key "identity_verification_requests", "onboarding_requests"
   add_foreign_key "identity_verification_requests", "users"
   add_foreign_key "listings", "categories"
   add_foreign_key "listings", "users"
-  add_foreign_key "members", "household_units"
+  add_foreign_key "members", "neighborhood_associations"
   add_foreign_key "members", "users", column: "approved_by_id"
   add_foreign_key "members", "users", column: "requested_by_id"
   add_foreign_key "members", "verified_identities"
@@ -284,6 +317,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_020706) do
   add_foreign_key "residence_verification_requests", "neighborhood_delegations"
   add_foreign_key "residence_verification_requests", "onboarding_requests"
   add_foreign_key "residence_verification_requests", "users"
+  add_foreign_key "residencies", "household_units"
+  add_foreign_key "residencies", "verified_identities"
+  add_foreign_key "residencies", "verified_residences"
   add_foreign_key "users", "neighborhood_associations"
   add_foreign_key "users", "verified_identities"
+  add_foreign_key "verified_identities", "identity_verification_requests"
+  add_foreign_key "verified_residences", "communes"
+  add_foreign_key "verified_residences", "neighborhood_associations"
+  add_foreign_key "verified_residences", "neighborhood_delegations"
+  add_foreign_key "verified_residences", "residence_verification_requests"
 end

@@ -24,8 +24,8 @@
         <div class="card-body">
           <h2 class="card-title">Socios del Domicilio</h2>
           <p class="text-sm">
-            <%= current_user.household_unit.members.approved.count %> aprobados,
-            <%= current_user.household_unit.members.pending.count %> pendientes
+            <%= current_user.household_unit.approved_residencies.count %> aprobados,
+            <%= current_user.household_unit.residencies.where(status: "pending").count %> pendientes
           </p>
           <div class="card-actions justify-end mt-2">
             <%= link_to "Gestionar", panel_members_path, class: "btn btn-sm btn-soft" %>

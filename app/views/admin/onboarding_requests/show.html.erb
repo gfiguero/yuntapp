@@ -12,6 +12,20 @@
   <h3 class="font-bold text-xl mb-4"><%= I18n.t('admin.onboarding_requests.show.identifier', id: @onboarding_request.id) %></h3>
   <%= render "buttons" %>
 
+  <% if @onboarding_request.pending? %>
+    <div class="alert alert-info mb-4">
+      <span><%= I18n.t('admin.onboarding_reviews.show.pending_review_message') %></span>
+      <% review_path = if @onboarding_request.identity_verification_request&.approved? && @onboarding_request.residence_verification_request&.approved?
+          review_step3_admin_onboarding_request_path(@onboarding_request)
+        elsif @onboarding_request.identity_verification_request&.approved?
+          review_step2_admin_onboarding_request_path(@onboarding_request)
+        else
+          review_step1_admin_onboarding_request_path(@onboarding_request)
+        end %>
+      <%= link_to I18n.t('admin.onboarding_reviews.show.start_review'), review_path, class: "btn btn-primary btn-sm" %>
+    </div>
+  <% end %>
+
   <div class="grid grid-cols-1 gap-4">
     <%# Información General %>
     <div class="card bg-base-200 shadow-sm">
@@ -109,20 +123,20 @@
                 <dd class="font-medium"><%= residence.neighborhood_delegation.name %></dd>
               </div>
             <% end %>
-            <% if residence.address_line_1.present? %>
+            <% if residence.street_name.present? %>
               <div>
-                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></dt>
-                <dd class="font-medium"><%= residence.address_line_1 %></dd>
+                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.street_name') %></dt>
+                <dd class="font-medium"><%= residence.street_name %></dd>
               </div>
             <% end %>
             <div>
               <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.number') %></dt>
               <dd><%= residence.number %></dd>
             </div>
-            <% if residence.address_line_2.present? %>
+            <% if residence.address_detail.present? %>
               <div>
-                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></dt>
-                <dd><%= residence.address_line_2 %></dd>
+                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_detail') %></dt>
+                <dd><%= residence.address_detail %></dd>
               </div>
             <% end %>
             <% if residence.residence_documents.attached? %>

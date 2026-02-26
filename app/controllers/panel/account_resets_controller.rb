@@ -7,6 +7,7 @@ module Panel
       verified_identity = current_user.verified_identity
 
       if verified_identity
+        verified_identity.residencies.each(&:destroy)
         verified_identity.members.each(&:destroy)
         current_user.update!(verified_identity: nil, admin: false, neighborhood_association: nil)
         verified_identity.destroy

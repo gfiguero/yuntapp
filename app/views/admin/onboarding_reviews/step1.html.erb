@@ -1,0 +1,109 @@
+<% content_for :title do %>
+  <%= I18n.t('admin.onboarding_reviews.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('admin.onboarding_requests.index.title'), admin_onboarding_requests_path %></li>
+  <li><%= link_to I18n.t('admin.onboarding_requests.show.identifier', id: @onboarding_request.id), admin_onboarding_request_path(@onboarding_request) %></li>
+  <li><%= I18n.t('admin.onboarding_reviews.steps.identity') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.onboarding_reviews.title') %></h1>
+  <h3 class="font-bold text-xl mb-2"><%= I18n.t('admin.onboarding_requests.show.identifier', id: @onboarding_request.id) %></h3>
+
+  <%= render "review_steps", current_step: 1 %>
+
+  <h2 class="font-bold text-2xl mb-2"><%= I18n.t('admin.onboarding_reviews.step1.title') %></h2>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('admin.onboarding_reviews.step1.description') %></p>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <%# Left: Identity Data %>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title"><%= I18n.t('admin.onboarding_reviews.step1.data_title') %></h3>
+        <dl class="mt-2 space-y-3">
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.first_name') %></dt>
+            <dd class="font-medium text-lg"><%= @identity_request.first_name %></dd>
+          </div>
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.last_name') %></dt>
+            <dd class="font-medium text-lg"><%= @identity_request.last_name %></dd>
+          </div>
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.run') %></dt>
+            <dd class="font-medium text-lg"><%= @identity_request.run %></dd>
+          </div>
+          <% if @identity_request.phone.present? %>
+            <div>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.phone') %></dt>
+              <dd class="font-medium text-lg"><%= @identity_request.phone %></dd>
+            </div>
+          <% end %>
+          <div>
+            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.user.email') %></dt>
+            <dd class="font-medium text-lg"><%= @onboarding_request.user.email %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <%# Right: Identity Documents %>
+    <div class="card bg-base-200 shadow-sm">
+      <div class="card-body">
+        <h3 class="card-title"><%= I18n.t('admin.onboarding_reviews.step1.documents_title') %></h3>
+        <% if @identity_request.identity_documents.attached? %>
+          <% id_doc_urls = @identity_request.identity_documents.map { |doc| url_for(doc) } %>
+          <div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= id_doc_urls.to_json %>">
+            <div class="grid grid-cols-1 gap-3">
+              <% @identity_request.identity_documents.each_with_index do |doc, i| %>
+                <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
+                  <%= image_tag doc.representation(resize_to_limit: [400, 400]), class: "rounded-lg border border-base-300 w-full object-cover hover:opacity-80 transition-opacity" %>
+                </button>
+              <% end %>
+            </div>
+            <dialog class="modal" data-image-modal-target="dialog" data-action="click->image-modal#close keydown->image-modal#keydown">
+              <div class="modal-box max-w-5xl max-h-[90vh] p-2 bg-base-100" data-action="click->image-modal#close:stop">
+                <form method="dialog">
+                  <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">&#10005;</button>
+                </form>
+                <img src="" alt="" class="max-w-full max-h-[80vh] object-contain mx-auto rounded-lg" data-image-modal-target="image">
+                <% if id_doc_urls.size > 1 %>
+                  <div class="flex items-center justify-between mt-2">
+                    <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#prev">&#10094;</button>
+                    <span class="text-sm text-base-content/60" data-image-modal-target="counter"></span>
+                    <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#next">&#10095;</button>
+                  </div>
+                <% end %>
+              </div>
+              <form method="dialog" class="modal-backdrop">
+                <button>close</button>
+              </form>
+            </dialog>
+          </div>
+        <% else %>
+          <p class="text-base-content/40 mt-2"><%= I18n.t('admin.onboarding_reviews.no_documents') %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Certification checkbox + navigation %>
+  <div class="mt-6 space-y-4" data-controller="terms-acceptance">
+    <label class="flex gap-3 cursor-pointer">
+      <input type="checkbox" class="checkbox checkbox-primary"
+             data-terms-acceptance-target="checkbox"
+             data-action="change->terms-acceptance#toggle">
+      <span class="text-sm"><%= I18n.t('admin.onboarding_reviews.certification_checkbox') %></span>
+    </label>
+    <div class="flex gap-2">
+      <%= link_to I18n.t('actions.back'), admin_onboarding_request_path(@onboarding_request), class: "btn btn-soft" %>
+      <%= link_to I18n.t('admin.onboarding_reviews.step1.continue_button'),
+            review_step2_admin_onboarding_request_path(@onboarding_request),
+            class: "btn btn-primary btn-disabled",
+            aria: { disabled: true },
+            data: { terms_acceptance_target: "submit" } %>
+    </div>
+  </div>
+</div>

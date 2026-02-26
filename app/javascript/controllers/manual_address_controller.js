@@ -8,7 +8,7 @@ export default class extends Controller {
     // o lo hacemos sin disparar eventos para evitar bucle al cargar la página
     
     // Verificamos si hay un valor en el input manual al iniciar
-    // Si manual_address es true O si hay algo escrito en address_line_1, activamos modo manual visualmente
+    // Si manual_address es true O si hay algo escrito en street_name, activamos modo manual visualmente
     // PERO respetamos el estado del checkbox si ya viene renderizado checked por Rails
     
     // El checkbox ya debería venir con 'checked' si el modelo tiene manual_address: true

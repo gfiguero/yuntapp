@@ -3,12 +3,16 @@ class HouseholdUnit < ApplicationRecord
 
   belongs_to :neighborhood_delegation
   belongs_to :commune, optional: true
-  has_many :members, dependent: :destroy
-  has_many :approved_members, -> { where(status: "approved") }, class_name: "Member"
+  belongs_to :verified_residence, optional: true
+  has_many :residencies, dependent: :destroy
+  has_many :approved_residencies, -> { where(status: "approved") }, class_name: "Residency"
 
   validates :number, presence: true
 
+  scope :filter_by_number, ->(number) { where.like(number: "%#{number}%") }
+  scope :filter_by_neighborhood_delegation_id, ->(id) { where(neighborhood_delegation_id: id) }
+
   def household_admin
-    members.find_by(household_admin: true)
+    residencies.find_by(household_admin: true)
   end
 end

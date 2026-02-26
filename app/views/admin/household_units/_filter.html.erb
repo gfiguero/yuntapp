@@ -12,13 +12,16 @@
 
           <div class="grid gap-4">
             <div>
-              <%= label_tag :id, I18n.t('activerecord.attributes.household_unit.id'), class: "label" %>
-              <%= text_field_tag :id, params[:id], class: "input", autocomplete: "off" %>
+              <%= label_tag :neighborhood_delegation_id, I18n.t('activerecord.attributes.household_unit.neighborhood_delegation'), class: "label" %>
+              <%= select_tag :neighborhood_delegation_id,
+                    options_from_collection_for_select(current_neighborhood_association.neighborhood_delegations.order(:name), :id, :name, params[:neighborhood_delegation_id]),
+                    include_blank: I18n.t('helpers.select.prompt'),
+                    class: "select select-bordered w-full" %>
             </div>
 
             <div>
-              <%= label_tag :name, I18n.t('activerecord.attributes.household_unit.name'), class: "label" %>
-              <%= text_field_tag :name, params[:name], class: "input", autocomplete: "off" %>
+              <%= label_tag :number, I18n.t('activerecord.attributes.household_unit.number'), class: "label" %>
+              <%= text_field_tag :number, params[:number], class: "input", autocomplete: "off" %>
             </div>
 
             <%= button_tag raw(icon('filter') + I18n.t('actions.filter')), type: 'submit', class: "btn btn-info" %>

@@ -6,7 +6,8 @@ class NeighborhoodAssociation < ApplicationRecord
   belongs_to :commune, optional: true
   has_many :neighborhood_delegations, dependent: :destroy
   has_many :household_units, through: :neighborhood_delegations
-  has_many :members, through: :household_units
+  has_many :residencies, through: :household_units
+  has_many :members
   has_many :users
   has_many :identity_verification_requests
   has_many :residence_verification_requests

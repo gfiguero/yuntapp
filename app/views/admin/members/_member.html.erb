@@ -32,14 +32,6 @@
         <% end %>
       </dd>
     </div>
-    <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.household_admin') %></dt>
-      <dd><%= member.household_admin? ? "Sí" : "No" %></dd>
-    </div>
-    <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.household_unit') %></dt>
-      <dd><%= member.household_unit.number %></dd>
-    </div>
     <% if member.approved_by %>
       <div class="p-2 grid gap-2">
         <dt class="font-medium"><%= I18n.t('activerecord.attributes.member.approved_by') %></dt>

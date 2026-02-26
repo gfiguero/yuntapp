@@ -17,8 +17,8 @@
       <dd><%= residence_verification_request.neighborhood_delegation&.name || "-" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.address_line_1') %></dt>
-      <dd><%= residence_verification_request.address_line_1 || "-" %></dd>
+      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.street_name') %></dt>
+      <dd><%= residence_verification_request.street_name || "-" %></dd>
     </div>
     <div class="p-2 grid gap-2">
       <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_verification_request.number') %></dt>

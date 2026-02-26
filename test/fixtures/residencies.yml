@@ -1,0 +1,10 @@
+# Residencies are created dynamically during onboarding approval.
+# Most test scenarios create them in setup helpers.
+# Named residencies only for fixtures that need them pre-existing.
+
+selendis_residency:
+  verified_identity: selendis_persona
+  verified_residence: selendis_verified_residence
+  household_unit: selendis_household
+  household_admin: true
+  status: "approved"

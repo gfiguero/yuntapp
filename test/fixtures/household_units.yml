@@ -10,8 +10,8 @@ regions = ["Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5"]
 household_unit_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
   number: "<%= housing_types.sample %> #<%= house_index + 1 %>-<%= (65 + rand(26)).chr %>"
   neighborhood_delegation: neighborhood_delegation_<%= assoc_index %>_<%= unit_index %>
-  address_line_1: "<%= rand(100..999) %> <%= ['Main St', 'Minerals Rd', 'Vespene Ave', 'Zergling Way'].sample %>"
-  address_line_2: "Apt <%= rand(1..100) %>"
+  street_name: "<%= rand(100..999) %> <%= ['Main St', 'Minerals Rd', 'Vespene Ave', 'Zergling Way'].sample %>"
+  address_detail: "Apt <%= rand(1..100) %>"
   city: "<%= planets.sample %> City"
   region: "<%= regions.sample %>"
   country: "Koprulu Sector"
@@ -21,12 +21,19 @@ household_unit_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
   <% end %>
 <% end %>
 
+matching_karax_household:
+  number: "42"
+  neighborhood_delegation: manios_delegation_0
+  street_name: "742 Aiur Boulevard"
+  commune: commune_0_0_39
+
 selendis_household:
   number: "Nexus #1-A"
   neighborhood_delegation: manios_delegation_0
-  address_line_1: "742 Aiur Boulevard"
+  street_name: "742 Aiur Boulevard"
   city: "Buin"
   region: "Región Metropolitana"
   country: "Chile"
   postal_code: "9500000"
   commune: commune_0_0_39
+  verified_residence: selendis_verified_residence

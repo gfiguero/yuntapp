@@ -4,8 +4,8 @@
   <table class="table">
     <thead>
       <tr>
-        <th><%= sort_link('admin_household_units_path', I18n.t('activerecord.attributes.household_unit.number'), 'number') %></th>
         <th><%= sort_link('admin_household_units_path', I18n.t('activerecord.attributes.household_unit.neighborhood_delegation'), 'neighborhood_delegation_id') %></th>
+        <th><%= sort_link('admin_household_units_path', I18n.t('activerecord.attributes.household_unit.number'), 'number') %></th>
         <th class="w-46"><%= I18n.t('shared.table.actions') %></th>
       </tr>
     </thead>

@@ -10,8 +10,8 @@ class ResidenceVerificationRequest < ApplicationRecord
   STATUSES = %w[draft pending approved rejected].freeze
 
   validates :number, presence: true, allow_blank: true
-  validates :neighborhood_delegation_id, presence: true, if: -> { address_line_1.blank? }, allow_blank: true
-  validates :address_line_1, presence: true, if: -> { neighborhood_delegation_id.blank? }, allow_blank: true
+  validates :neighborhood_delegation_id, presence: true, if: -> { street_name.blank? }, allow_blank: true
+  validates :street_name, presence: true, if: -> { neighborhood_delegation_id.blank? }, allow_blank: true
   validates :status, inclusion: {in: STATUSES}
 
   scope :draft, -> { where(status: "draft") }

@@ -13,8 +13,6 @@ class User < ApplicationRecord
   # La solicitud actual es cualquiera que esté en borrador o pendiente
   has_one :current_onboarding_request, -> { where(status: ["draft", "pending"]) }, class_name: "OnboardingRequest"
 
-  has_one :member
-  has_one :household_unit, through: :member
   has_many :listings
   has_many :approved_certificates, class_name: "ResidenceCertificate", foreign_key: :approved_by_id
   has_many :requested_members, class_name: "Member", foreign_key: :requested_by_id
@@ -25,22 +23,22 @@ class User < ApplicationRecord
   end
 
   def member
-    verified_identity&.members&.first
+    verified_identity&.members&.find_by(neighborhood_association: neighborhood_association)
+  end
+
+  def residency
+    verified_identity&.residencies&.approved&.order(created_at: :desc)&.first
   end
 
   def household_unit
-    member&.household_unit
+    residency&.household_unit
   end
 
   def household_admin?
-    member&.household_admin? || false
+    residency&.household_admin? || false
   end
 
   def verified?
-    verified_identity&.verified? || false
-  end
-
-  def pending_verification?
-    verified_identity&.pending_verification? || false
+    verified_identity.present?
   end
 end

@@ -4,7 +4,16 @@ one:
   user: artanis
   neighborhood_association: association_0
   neighborhood_delegation: neighborhood_delegation_0_0
-  address_line_1: "Calle Falsa 123"
+  street_name: "Calle Falsa 123"
   number: "123"
   commune: commune_0_0_0
+  status: "pending"
+
+karax_residence:
+  user: karax
+  onboarding_request: karax_pending
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_0
+  number: "42"
+  commune: commune_0_0_39
   status: "pending"

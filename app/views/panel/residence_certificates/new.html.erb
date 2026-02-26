@@ -19,7 +19,7 @@
 
     <% invalid = @residence_certificate.errors.include?(:member_id) %>
     <%= form.label :member_id, I18n.t('activerecord.attributes.residence_certificate.member'), class: "floating-label" do %>
-      <%= form.collection_select :member_id, @approved_members, :id, :name, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
+      <%= form.collection_select :member_id, @approved_residencies, :id, :name, { prompt: true }, { class: "select w-full validator #{'input-error' if invalid}", required: true } %>
       <span><%= I18n.t('activerecord.attributes.residence_certificate.member') %></span>
     <% end %>
     <%= raw(error_message(invalid, @residence_certificate.errors.full_messages_for(:member_id))) if invalid %>

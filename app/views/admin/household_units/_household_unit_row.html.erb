@@ -1,6 +1,6 @@
 <tr class="hover:bg-base-300">
-  <td><%= household_unit.number %></td>
   <td><%= household_unit.neighborhood_delegation.name %></td>
+  <td><%= household_unit.number %></td>
   <td>
     <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
       <%= link_to icon('show'), [:admin, household_unit], class: "btn btn-sm btn-soft btn-info" %>

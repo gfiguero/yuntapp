@@ -25,7 +25,6 @@ persona_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>:
   run: "<%= body %>-<%= compute_rut_dv(body) %>"
   phone: "+569<%= (assoc_index * 100_000 + unit_index * 1_000 + house_index + 10_000_000).to_s.ljust(8, '0') %>"
   email: "member_<%= assoc_index %>_<%= unit_index %>_<%= house_index %>@koprulu.sector"
-  verification_status: "verified"
     <% end %>
   <% end %>
 <% end %>
@@ -36,7 +35,6 @@ selendis_persona:
   run: "11111111-1"
   phone: "+56912345678"
   email: "selendis@daelaam.io"
-  verification_status: "verified"
 
 karass_persona:
   first_name: "Karass"
@@ -44,21 +42,18 @@ karass_persona:
   run: "22222222-2"
   phone: "+56987654321"
   email: "karass@daelaam.io"
-  verification_status: "verified"
 
 vorazun_persona:
   first_name: "Vorazun"
   last_name: "Nerazim"
   run: "33333333-3"
   phone: "+56911112222"
-  verification_status: "verified"
 
 fenix_persona:
   first_name: "Fenix"
   last_name: "Purifier"
   run: "44444444-4"
   phone: "+56933334444"
-  verification_status: "verified"
 
 rohana_persona:
   first_name: "Rohana"
@@ -66,12 +61,4 @@ rohana_persona:
   run: "55555555-5"
   phone: "+56955556666"
   email: "rohana@daelaam.io"
-  verification_status: "pending"
 
-karax_persona:
-  first_name: "Karax"
-  last_name: "Khalai"
-  run: "66666666-6"
-  phone: "+56977778888"
-  email: "karax@daelaam.io"
-  verification_status: "pending"

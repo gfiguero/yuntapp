@@ -9,3 +9,8 @@
 @plugin "./daisyui-theme.mjs"{
   /* custom theme here */
 }
+
+/* Align DaisyUI checkboxes vertically with adjacent text */
+label:has(> .checkbox) {
+  align-items: center;
+}

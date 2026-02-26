@@ -113,10 +113,11 @@ es:
         active: Activo
       household_unit:
         id: ID
+        name: Nombre
         number: Numeración
         neighborhood_delegation: Delegación Vecinal (Calle)
-        address_line_1: Calle
-        address_line_2: Detalle (Depto, Casa, Piso, etc.) - Opcional
+        street_name: Calle o pasaje
+        address_detail: Detalle (Depto, Casa, Piso, etc.) - Opcional
         city: Ciudad
         region: Región
         country: País
@@ -186,7 +187,7 @@ es:
         neighborhood_association: Junta de Vecinos
         neighborhood_delegation: Delegación Vecinal
         commune: Comuna
-        address_line_1: Dirección
+        street_name: Calle o pasaje
         number: Número
         status: Estado
         rejection_reason: Motivo de rechazo
@@ -396,6 +397,61 @@ es:
         count: "%{count} solicitudes"
       show:
         identifier: "Solicitud #%{id}"
+    onboarding_reviews:
+      title: Revisión de Solicitud
+      no_documents: No se adjuntaron documentos.
+      certification_checkbox: "Declaro haber revisado los documentos adjuntos y confirmo que los datos ingresados por el solicitante coinciden con la información presentada en ellos."
+      show:
+        pending_review_message: Esta solicitud está pendiente de revisión.
+        start_review: Revisar Solicitud
+      steps:
+        identity: Identidad
+        residence: Residencia
+        approval: Aprobación
+      step1:
+        title: Revisión de Identidad
+        description: Compara los datos ingresados con los documentos adjuntos para verificar la identidad del solicitante.
+        data_title: Datos del Solicitante
+        documents_title: Documentos de Identidad
+        continue_button: Continuar
+      step2:
+        title: Revisión de Residencia
+        description: Compara los datos de domicilio con los comprobantes adjuntos para verificar la residencia del solicitante.
+        data_title: Datos de Domicilio
+        documents_title: Comprobantes de Domicilio
+        continue_button: Continuar
+      step3:
+        title: Aprobación Final
+        description: Revisa el resumen completo de la solicitud antes de aprobarla o rechazarla.
+        existing_identity_found: "Se encontró una identidad verificada existente con el mismo RUN. Al aprobar, se actualizarán los datos indicados a continuación."
+        new_identity_info: "Al aprobar esta solicitud, se crearán los registros de identidad y residencia indicados a continuación."
+        identity_transition: Transición de identidad
+        current_data: Datos actuales
+        resulting_data: Datos resultantes
+        no_current_identity: Sin registro de identidad
+        match: Se mantiene
+        will_update: Se actualizará
+        will_create: Nuevo
+        residence_transition: Transición de residencia
+        current_residence: Residencia actual
+        new_residence: Nueva residencia (solicitada)
+        no_current_residence: Sin residencia registrada
+        household_admin: Admin. domicilio
+        approve_warning: "Al aprobar esta solicitud, se creará automáticamente el domicilio y la membresía del solicitante."
+        matching_units_found: "Se encontraron domicilios existentes que coinciden por dirección o por registros previos de esta identidad. Puedes vincular al solicitante a un domicilio existente o crear uno nuevo."
+        association: Junta de vecinos
+        current_members: "Miembros actuales"
+        no_members: "Sin miembros"
+        create_new_unit: "Crear nuevo domicilio"
+        create_new_unit_description: "Se creará un nuevo domicilio con los datos de la solicitud."
+        approve_button: Aprobar Solicitud
+        reject_title: Rechazar Solicitud
+        reject_button: Rechazar Solicitud
+        rejection_reason_placeholder: "Motivo del rechazo (opcional)..."
+      flash:
+        approved: Solicitud de acreditación aprobada exitosamente. Se ha creado la membresía del solicitante.
+        rejected: Solicitud de acreditación rechazada.
+        not_pending: Esta solicitud no está pendiente de revisión.
     verifications:
       index:
         title: Verificación de Identidad

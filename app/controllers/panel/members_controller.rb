@@ -3,17 +3,17 @@ module Panel
     layout "panel"
     before_action :authenticate_user!
     before_action :ensure_household_admin!
-    before_action :set_member, only: [:show, :edit, :update]
+    before_action :set_residency, only: [:show, :edit, :update]
 
     def index
-      @members = current_user.household_unit.members.where.not(id: current_user.member&.id)
+      @residencies = current_user.household_unit.residencies.where.not(verified_identity: current_user.verified_identity)
     end
 
     def show
     end
 
     def new
-      @member = Member.new
+      @residency = Residency.new
     end
 
     def create
@@ -21,46 +21,44 @@ module Panel
       verified_identity = VerifiedIdentity.find_or_initialize_by(run: run)
       verified_identity.assign_attributes(verified_identity_params.except(:run))
       verified_identity.run = run
-      verified_identity.verification_status ||= "pending"
-
       unless verified_identity.save
-        @member = Member.new
-        @member.errors.merge!(verified_identity.errors)
+        @residency = Residency.new
+        @residency.errors.merge!(verified_identity.errors)
         render :new, status: :unprocessable_content
         return
       end
 
-      @member = Member.new(documents: params.dig(:member, :documents))
-      @member.verified_identity = verified_identity
-      @member.household_unit = current_user.household_unit
-      @member.requested_by = current_user
-      @member.status = "pending"
+      household_unit = current_user.household_unit
+      @residency = Residency.new(documents: params.dig(:member, :documents))
+      @residency.verified_identity = verified_identity
+      @residency.household_unit = household_unit
+      @residency.verified_residence = household_unit.verified_residence
+      @residency.status = "pending"
 
-      if @member.save
-        redirect_to panel_member_path(@member), notice: I18n.t("panel.members.flash.requested")
+      if @residency.save
+        redirect_to panel_member_path(@residency), notice: I18n.t("panel.members.flash.requested")
       else
         render :new, status: :unprocessable_content
       end
     end
 
     def edit
-      unless @member.rejected?
-        redirect_to panel_member_path(@member)
+      unless @residency.rejected?
+        redirect_to panel_member_path(@residency)
       end
     end
 
     def update
-      unless @member.rejected?
-        redirect_to panel_member_path(@member)
+      unless @residency.rejected?
+        redirect_to panel_member_path(@residency)
         return
       end
 
-      @member.verified_identity.update!(verified_identity_params)
-      @member.status = "pending"
-      @member.rejection_reason = nil
+      @residency.verified_identity.update!(verified_identity_params)
+      @residency.status = "pending"
 
-      if @member.save
-        redirect_to panel_member_path(@member), notice: I18n.t("panel.members.flash.resubmitted")
+      if @residency.save
+        redirect_to panel_member_path(@residency), notice: I18n.t("panel.members.flash.resubmitted")
       else
         render :edit, status: :unprocessable_content
       end
@@ -74,8 +72,8 @@ module Panel
       end
     end
 
-    def set_member
-      @member = current_user.household_unit.members.find(params[:id])
+    def set_residency
+      @residency = current_user.household_unit.residencies.find(params[:id])
     end
 
     def normalize_run(value)

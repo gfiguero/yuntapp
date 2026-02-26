@@ -3,9 +3,6 @@
 
   <div class="flex flex-row gap-2 mb-4">
     <%= link_to raw(icon('back') + I18n.t('actions.back')), admin_verifications_path, class: "btn btn-soft" %>
-    <% if @verified_identity.pending_verification? %>
-      <%= render "buttons", verified_identity: @verified_identity %>
-    <% end %>
   </div>
 
   <%= render "verified_identity", verified_identity: @verified_identity %>

@@ -79,7 +79,7 @@ module Admin
 
     # Only allow a list of trusted parameters through.
     def household_unit_params
-      params.require(:household_unit).permit(:number, :neighborhood_delegation_id, :address_line_1, :address_line_2, :city, :region, :country, :postal_code, :commune_id)
+      params.require(:household_unit).permit(:number, :neighborhood_delegation_id, :street_name, :address_detail, :city, :region, :country, :postal_code, :commune_id)
     end
 
     def set_household_units
@@ -93,7 +93,7 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :number).reject { |key, value| value.blank? }
+      params.permit(:id, :number, :neighborhood_delegation_id).reject { |key, value| value.blank? }
     end
 
     def disabled_pagination

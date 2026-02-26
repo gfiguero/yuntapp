@@ -1,7 +1,7 @@
 <tr class="hover:bg-base-300">
   <td><%= residence_verification_request.id %></td>
   <td><%= residence_verification_request.user&.email %></td>
-  <td><%= residence_verification_request.neighborhood_delegation&.name || residence_verification_request.address_line_1 %></td>
+  <td><%= residence_verification_request.neighborhood_delegation&.name || residence_verification_request.street_name %></td>
   <td><%= residence_verification_request.commune&.name %></td>
   <td><%= status_badge(residence_verification_request.status) %></td>
   <td><%= l(residence_verification_request.created_at, format: :short) if residence_verification_request.created_at %></td>

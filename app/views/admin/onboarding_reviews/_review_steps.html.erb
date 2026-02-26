@@ -1,0 +1,22 @@
+<% step_paths = [
+  review_step1_admin_onboarding_request_path(@onboarding_request),
+  review_step2_admin_onboarding_request_path(@onboarding_request),
+  review_step3_admin_onboarding_request_path(@onboarding_request)
+] %>
+<% step_labels = [
+  I18n.t("admin.onboarding_reviews.steps.identity"),
+  I18n.t("admin.onboarding_reviews.steps.residence"),
+  I18n.t("admin.onboarding_reviews.steps.approval")
+] %>
+<ul class="steps steps-horizontal w-full mb-8">
+  <% step_labels.each_with_index do |label, i| %>
+    <% step_num = i + 1 %>
+    <li class="step <%= 'step-primary' if current_step >= step_num %>">
+      <% if step_num < current_step %>
+        <%= link_to label, step_paths[i], class: "link link-hover" %>
+      <% else %>
+        <%= label %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

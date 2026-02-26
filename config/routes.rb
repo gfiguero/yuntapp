@@ -182,6 +182,15 @@ Rails.application.routes.draw do
       collection do
         get :search
       end
+      member do
+        scope :review do
+          get "step1", to: "onboarding_reviews#step1", as: :review_step1
+          get "step2", to: "onboarding_reviews#step2", as: :review_step2
+          get "step3", to: "onboarding_reviews#step3", as: :review_step3
+          patch "step3", to: "onboarding_reviews#approve_step3"
+          patch "reject", to: "onboarding_reviews#reject", as: :review_reject
+        end
+      end
     end
     resources :verifications, only: [ :index, :show ] do
       member do

@@ -52,9 +52,9 @@
           <li class="mb-4 text-xl font-bold px-4">Yuntapp Admin</li>
           <li><%= link_to "Dashboard", admin_root_path, class: ("active" if current_page?(admin_root_path)) %></li>
 
-          <li class="menu-title mt-4">Entidades</li>
+          <li class="menu-title mt-4">Procesos</li>
           <li>
-            <%= link_to admin_onboarding_requests_path, class: ("active" if controller_name == "onboarding_requests") do %>
+            <%= link_to admin_onboarding_requests_path, class: ("active" if controller_name.in?(%w[onboarding_requests onboarding_reviews])) do %>
               Solicitudes
               <% pending_requests = current_neighborhood_association ? current_neighborhood_association.onboarding_requests.where(status: "pending").count : 0 %>
               <% if pending_requests > 0 %>
@@ -62,17 +62,10 @@
               <% end %>
             <% end %>
           </li>
-          <li><%= link_to "Delegaciones Vecinales", admin_neighborhood_delegations_path, class: ("active" if controller_name == "neighborhood_delegations") %></li>
+          <li><%= link_to "Certificados", admin_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
+
+          <li class="menu-title mt-4">Registros</li>
           <li><%= link_to "Domicilios", admin_household_units_path, class: ("active" if controller_name == "household_units") %></li>
-          <li>
-            <%= link_to admin_verifications_path, class: ("active" if controller_name == "verifications") do %>
-              Verificaciones
-              <% pending_verifications = current_neighborhood_association ? VerifiedIdentity.pending.joins(:users).where(users: { neighborhood_association_id: current_neighborhood_association.id }).count : 0 %>
-              <% if pending_verifications > 0 %>
-                <span class="badge badge-warning badge-sm"><%= pending_verifications %></span>
-              <% end %>
-            <% end %>
-          </li>
           <li>
             <%= link_to admin_members_path, class: ("active" if controller_name == "members") do %>
               Socios
@@ -82,9 +75,10 @@
               <% end %>
             <% end %>
           </li>
+
+          <li class="menu-title mt-4">Configuración</li>
           <li><%= link_to "Directiva", admin_board_members_path, class: ("active" if controller_name == "board_members") %></li>
-          <li><%= link_to "Certificados", admin_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
-          <li><%= link_to "Publicaciones", admin_listings_path, class: ("active" if controller_name == "listings") %></li>
+          <li><%= link_to "Delegaciones Vecinales", admin_neighborhood_delegations_path, class: ("active" if controller_name == "neighborhood_delegations") %></li>
 
           <li class="menu-title mt-4">Sistema</li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>

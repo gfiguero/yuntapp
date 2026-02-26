@@ -391,7 +391,7 @@ module Panel
         # Si se hizo clic en continuar
         if params[:commit_continue].present?
           # Validamos completitud
-          has_location = @residence_request.neighborhood_delegation_id.present? || @residence_request.address_line_1.present?
+          has_location = @residence_request.neighborhood_delegation_id.present? || @residence_request.street_name.present?
           if @residence_request.number.present? && has_location
             redirect_to panel_onboarding_step4_path
           else
@@ -399,8 +399,8 @@ module Panel
             # Forzamos errores visuales
             @residence_request.errors.add(:number, :blank) if @residence_request.number.blank?
             unless has_location
-              @residence_request.errors.add(:neighborhood_delegation_id, :blank) if @residence_request.address_line_1.blank?
-              @residence_request.errors.add(:address_line_1, :blank) if @residence_request.neighborhood_delegation_id.blank?
+              @residence_request.errors.add(:neighborhood_delegation_id, :blank) if @residence_request.street_name.blank?
+              @residence_request.errors.add(:street_name, :blank) if @residence_request.neighborhood_delegation_id.blank?
             end
 
             respond_to do |format|
@@ -417,7 +417,7 @@ module Panel
 
               # Si se envió delegación, dirección manual o checkbox manual
               if params[:residence_verification_request].key?(:neighborhood_delegation_id) ||
-                  params[:residence_verification_request].key?(:address_line_1) ||
+                  params[:residence_verification_request].key?(:street_name) ||
                   params[:residence_verification_request].key?(:manual_address)
 
                 streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: {residence_request: @residence_request, delegations: @delegations})
@@ -429,8 +429,8 @@ module Panel
               end
 
               # Si se envió detalle
-              if params[:residence_verification_request].key?(:address_line_2)
-                streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: {residence_request: @residence_request})
+              if params[:residence_verification_request].key?(:address_detail)
+                streams << turbo_stream.replace("field_address_detail", partial: "panel/onboarding/step3_field_address_detail", locals: {residence_request: @residence_request})
               end
 
               # Si se enviaron documentos de residencia
@@ -455,7 +455,7 @@ module Panel
             streams = []
             streams << turbo_stream.replace("field_delegation_address", partial: "panel/onboarding/step3_field_delegation_address", locals: {residence_request: @residence_request, delegations: @delegations})
             streams << turbo_stream.replace("field_number", partial: "panel/onboarding/step3_field_number", locals: {residence_request: @residence_request})
-            streams << turbo_stream.replace("field_address_line_2", partial: "panel/onboarding/step3_field_address_line_2", locals: {residence_request: @residence_request})
+            streams << turbo_stream.replace("field_address_detail", partial: "panel/onboarding/step3_field_address_detail", locals: {residence_request: @residence_request})
             streams << turbo_stream.replace("step3_submit_button", partial: "panel/onboarding/step3_submit_button", locals: {residence_request: @residence_request})
             render turbo_stream: streams
           end
@@ -592,7 +592,7 @@ module Panel
       # Permitimos parámetros vacíos si vienen del botón continuar (dummy)
       # Pero si vienen datos reales, los procesamos.
       if params[:residence_verification_request].present?
-        params.require(:residence_verification_request).permit(:number, :address_line_1, :address_line_2, :neighborhood_delegation_id, :manual_address)
+        params.require(:residence_verification_request).permit(:number, :street_name, :address_detail, :neighborhood_delegation_id, :manual_address)
       else
         {}
       end

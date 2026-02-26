@@ -101,20 +101,20 @@
               <dd class="font-medium"><%= @residence_request.neighborhood_delegation.name %></dd>
             </div>
           <% end %>
-          <% if @residence_request.address_line_1.present? %>
+          <% if @residence_request.street_name.present? %>
             <div>
-              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></dt>
-              <dd class="font-medium"><%= @residence_request.address_line_1 %></dd>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.street_name') %></dt>
+              <dd class="font-medium"><%= @residence_request.street_name %></dd>
             </div>
           <% end %>
           <div>
             <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.number') %></dt>
             <dd><%= @residence_request.number %></dd>
           </div>
-          <% if @residence_request.address_line_2.present? %>
+          <% if @residence_request.address_detail.present? %>
             <div>
-              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></dt>
-              <dd><%= @residence_request.address_line_2 %></dd>
+              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_detail') %></dt>
+              <dd><%= @residence_request.address_detail %></dd>
             </div>
           <% end %>
           <% if @residence_request.residence_documents.attached? %>
@@ -164,11 +164,11 @@
   <%# Formulario con checkbox y botón %>
   <div data-controller="terms-acceptance">
     <%= form_with url: panel_onboarding_submit_path, method: :post, class: "space-y-4" do |f| %>
-      <label class="flex items-start gap-3 cursor-pointer">
+      <label class="flex gap-3 cursor-pointer">
         <input type="checkbox"
                name="terms_accepted"
                value="1"
-               class="checkbox checkbox-primary mt-0.5"
+               class="checkbox checkbox-primary"
                data-terms-acceptance-target="checkbox"
                data-action="change->terms-acceptance#toggle">
         <span class="text-sm"><%= I18n.t('panel.onboarding.step4.terms_checkbox') %></span>

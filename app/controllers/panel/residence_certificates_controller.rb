@@ -19,12 +19,13 @@ module Panel
     # GET /panel/residence_certificates/new
     def new
       @residence_certificate = ResidenceCertificate.new
-      @approved_members = current_user.household_unit.approved_members
+      @approved_residencies = current_user.household_unit.approved_residencies
     end
 
     # POST /panel/residence_certificates
     def create
-      member = current_user.household_unit.approved_members.find(params[:residence_certificate][:member_id])
+      residency = current_user.household_unit.approved_residencies.find(params[:residence_certificate][:member_id])
+      member = residency.verified_identity.members.find_by(neighborhood_association: current_user.neighborhood_association)
 
       @residence_certificate = ResidenceCertificate.new(
         member: member,
@@ -36,7 +37,7 @@ module Panel
       if @residence_certificate.save
         redirect_to panel_residence_certificate_path(@residence_certificate), notice: I18n.t("panel.residence_certificates.flash.requested")
       else
-        @approved_members = current_user.household_unit.approved_members
+        @approved_residencies = current_user.household_unit.approved_residencies
         render :new, status: :unprocessable_content
       end
     end

@@ -2,7 +2,7 @@
       <%
          # Validación básica para habilitar botón
          # Debe tener número Y (delegación O calle manual)
-         has_location = residence_request.neighborhood_delegation_id.present? || residence_request.address_line_1.present?
+         has_location = residence_request.neighborhood_delegation_id.present? || residence_request.street_name.present?
          can_continue = residence_request.number.present? && has_location
       %>
       <%= form_with(url: panel_onboarding_step3_path, method: :patch, data: { turbo: false }) do |form| %>

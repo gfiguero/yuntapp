@@ -14,19 +14,19 @@
   <% end %>
   <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:number))) %>
 
-  <% invalid = household_unit.errors.include?(:address_line_1) %>
-  <%= form.label :address_line_1, I18n.t('activerecord.attributes.household_unit.address_line_1'), class: "floating-label" do %>
-    <%= form.text_field :address_line_1, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.address_line_1') %>
-    <span><%= I18n.t('activerecord.attributes.household_unit.address_line_1') %></span>
+  <% invalid = household_unit.errors.include?(:street_name) %>
+  <%= form.label :street_name, I18n.t('activerecord.attributes.household_unit.street_name'), class: "floating-label" do %>
+    <%= form.text_field :street_name, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.street_name') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.street_name') %></span>
   <% end %>
-  <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:address_line_1))) %>
+  <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:street_name))) %>
 
-  <% invalid = household_unit.errors.include?(:address_line_2) %>
-  <%= form.label :address_line_2, I18n.t('activerecord.attributes.household_unit.address_line_2'), class: "floating-label" do %>
-    <%= form.text_field :address_line_2, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.address_line_2') %>
-    <span><%= I18n.t('activerecord.attributes.household_unit.address_line_2') %></span>
+  <% invalid = household_unit.errors.include?(:address_detail) %>
+  <%= form.label :address_detail, I18n.t('activerecord.attributes.household_unit.address_detail'), class: "floating-label" do %>
+    <%= form.text_field :address_detail, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('activerecord.attributes.household_unit.address_detail') %>
+    <span><%= I18n.t('activerecord.attributes.household_unit.address_detail') %></span>
   <% end %>
-  <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:address_line_2))) %>
+  <%= raw(error_message(invalid, household_unit.errors.full_messages_for(:address_detail))) %>
 
   <% invalid = household_unit.errors.include?(:city) %>
   <%= form.label :city, I18n.t('activerecord.attributes.household_unit.city'), class: "floating-label" do %>
