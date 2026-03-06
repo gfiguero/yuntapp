@@ -9,6 +9,15 @@ one:
   commune: commune_0_0_0
   status: "pending"
 
+karass_residence:
+  user: karass
+  onboarding_request: karass_pending
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_1
+  number: "15"
+  commune: commune_0_0_39
+  status: "pending"
+
 karax_residence:
   user: karax
   onboarding_request: karax_pending

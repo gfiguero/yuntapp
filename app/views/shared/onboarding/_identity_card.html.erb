@@ -1,0 +1,26 @@
+<%# locals: (identity_request:) %>
+<div class="card bg-base-200 shadow-sm">
+  <div class="card-body">
+    <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.status.identity_label') %></h3>
+    <dl class="mt-2 space-y-1">
+      <div>
+        <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.name') %></dt>
+        <dd class="font-medium"><%= identity_request.full_name %></dd>
+      </div>
+      <div>
+        <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.run') %></dt>
+        <dd><%= identity_request.run %></dd>
+      </div>
+      <% if identity_request.phone.present? %>
+        <div>
+          <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.phone') %></dt>
+          <dd><%= identity_request.phone %></dd>
+        </div>
+      <% end %>
+      <% if identity_request.identity_documents.attached? %>
+        <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.verified_identity.identity_document') %></dt>
+        <%= render "shared/onboarding/image_gallery", documents: identity_request.identity_documents %>
+      <% end %>
+    </dl>
+  </div>
+</div>

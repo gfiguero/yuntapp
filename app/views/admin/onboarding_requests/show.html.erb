@@ -27,152 +27,15 @@
   <% end %>
 
   <div class="grid grid-cols-1 gap-4">
-    <%# Información General %>
-    <div class="card bg-base-200 shadow-sm">
-      <div class="card-body">
-        <div class="flex justify-between items-center">
-          <h3 class="card-title text-xl">Datos de la Solicitud</h3>
-          <%= status_badge(@onboarding_request.status) %>
-        </div>
-        <dl class="mt-2 space-y-1">
-          <div>
-            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.onboarding_request.user') %></dt>
-            <dd class="font-medium"><%= @onboarding_request.user.email %></dd>
-          </div>
-          <div>
-            <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.onboarding_request.created_at') %></dt>
-            <dd><%= l(@onboarding_request.created_at, format: :long) %></dd>
-          </div>
-        </dl>
-      </div>
-    </div>
+    <%= render "shared/onboarding/onboarding_data_card", onboarding_request: @onboarding_request %>
+    <%= render "shared/onboarding/association_card", onboarding_request: @onboarding_request %>
 
-    <%# Identidad %>
     <% if @onboarding_request.identity_verification_request %>
-      <% identity = @onboarding_request.identity_verification_request %>
-      <div class="card bg-base-200 shadow-sm">
-        <div class="card-body">
-          <div class="flex justify-between items-center">
-            <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.status.identity_label') %></h3>
-            <%= status_badge(identity.status) %>
-          </div>
-          <dl class="mt-2 space-y-1">
-            <div>
-              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.name') %></dt>
-              <dd class="font-medium"><%= identity.full_name %></dd>
-            </div>
-            <div>
-              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.run') %></dt>
-              <dd><%= identity.run %></dd>
-            </div>
-            <% if identity.phone.present? %>
-              <div>
-                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.verified_identity.phone') %></dt>
-                <dd><%= identity.phone %></dd>
-              </div>
-            <% end %>
-            <% if identity.identity_documents.attached? %>
-              <% id_doc_urls = identity.identity_documents.map { |doc| url_for(doc) } %>
-              <div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= id_doc_urls.to_json %>">
-                <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.verified_identity.identity_document') %></dt>
-                <div class="flex flex-wrap gap-2">
-                  <% identity.identity_documents.each_with_index do |doc, i| %>
-                    <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
-                      <%= image_tag doc.representation(resize_to_limit: [120, 120]), class: "rounded-lg border border-base-300 w-20 h-20 object-cover hover:opacity-80 transition-opacity" %>
-                    </button>
-                  <% end %>
-                </div>
-                <dialog class="modal" data-image-modal-target="dialog" data-action="click->image-modal#close keydown->image-modal#keydown">
-                  <div class="modal-box max-w-5xl max-h-[90vh] p-2 bg-base-100" data-action="click->image-modal#close:stop">
-                    <form method="dialog">
-                      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">✕</button>
-                    </form>
-                    <img src="" alt="" class="max-w-full max-h-[80vh] object-contain mx-auto rounded-lg" data-image-modal-target="image">
-                    <% if id_doc_urls.size > 1 %>
-                      <div class="flex items-center justify-between mt-2">
-                        <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#prev">❮</button>
-                        <span class="text-sm text-base-content/60" data-image-modal-target="counter"></span>
-                        <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#next">❯</button>
-                      </div>
-                    <% end %>
-                  </div>
-                  <form method="dialog" class="modal-backdrop">
-                    <button>close</button>
-                  </form>
-                </dialog>
-              </div>
-            <% end %>
-          </dl>
-        </div>
-      </div>
+      <%= render "shared/onboarding/identity_card", identity_request: @onboarding_request.identity_verification_request %>
     <% end %>
 
-    <%# Residencia %>
     <% if @onboarding_request.residence_verification_request %>
-      <% residence = @onboarding_request.residence_verification_request %>
-      <div class="card bg-base-200 shadow-sm">
-        <div class="card-body">
-          <div class="flex justify-between items-center">
-            <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.status.residence_label') %></h3>
-            <%= status_badge(residence.status) %>
-          </div>
-          <dl class="mt-2 space-y-1">
-            <% if residence.neighborhood_delegation.present? %>
-              <div>
-                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.neighborhood_delegation') %></dt>
-                <dd class="font-medium"><%= residence.neighborhood_delegation.name %></dd>
-              </div>
-            <% end %>
-            <% if residence.street_name.present? %>
-              <div>
-                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.street_name') %></dt>
-                <dd class="font-medium"><%= residence.street_name %></dd>
-              </div>
-            <% end %>
-            <div>
-              <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.number') %></dt>
-              <dd><%= residence.number %></dd>
-            </div>
-            <% if residence.address_detail.present? %>
-              <div>
-                <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_detail') %></dt>
-                <dd><%= residence.address_detail %></dd>
-              </div>
-            <% end %>
-            <% if residence.residence_documents.attached? %>
-              <% res_doc_urls = residence.residence_documents.map { |doc| url_for(doc) } %>
-              <div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= res_doc_urls.to_json %>">
-                <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.residence_verification_request.residence_documents') %></dt>
-                <div class="flex flex-wrap gap-2">
-                  <% residence.residence_documents.each_with_index do |doc, i| %>
-                    <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
-                      <%= image_tag doc.representation(resize_to_limit: [120, 120]), class: "rounded-lg border border-base-300 w-20 h-20 object-cover hover:opacity-80 transition-opacity" %>
-                    </button>
-                  <% end %>
-                </div>
-                <dialog class="modal" data-image-modal-target="dialog" data-action="click->image-modal#close keydown->image-modal#keydown">
-                  <div class="modal-box max-w-5xl max-h-[90vh] p-2 bg-base-100" data-action="click->image-modal#close:stop">
-                    <form method="dialog">
-                      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">✕</button>
-                    </form>
-                    <img src="" alt="" class="max-w-full max-h-[80vh] object-contain mx-auto rounded-lg" data-image-modal-target="image">
-                    <% if res_doc_urls.size > 1 %>
-                      <div class="flex items-center justify-between mt-2">
-                        <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#prev">❮</button>
-                        <span class="text-sm text-base-content/60" data-image-modal-target="counter"></span>
-                        <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#next">❯</button>
-                      </div>
-                    <% end %>
-                  </div>
-                  <form method="dialog" class="modal-backdrop">
-                    <button>close</button>
-                  </form>
-                </dialog>
-              </div>
-            <% end %>
-          </dl>
-        </div>
-      </div>
+      <%= render "shared/onboarding/residence_card", residence_request: @onboarding_request.residence_verification_request %>
     <% end %>
   </div>
 </div>

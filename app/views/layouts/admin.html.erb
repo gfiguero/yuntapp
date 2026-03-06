@@ -45,9 +45,9 @@
         </main>
         <%= render "shared/footer" %>
       </div>
-      <div class="drawer-side h-full">
+      <div class="drawer-side h-screen">
         <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content h-full">
+        <ul class="menu p-4 w-80 bg-base-200 text-base-content h-full flex flex-col overflow-y-auto">
           <!-- Sidebar content here -->
           <li class="mb-4 text-xl font-bold px-4">Yuntapp Admin</li>
           <li><%= link_to "Dashboard", admin_root_path, class: ("active" if current_page?(admin_root_path)) %></li>

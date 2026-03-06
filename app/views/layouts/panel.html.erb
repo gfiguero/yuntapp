@@ -37,9 +37,9 @@
         </main>
         <%= render "shared/footer" %>
       </div>
-      <div class="drawer-side h-full">
+      <div class="drawer-side h-screen">
         <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content h-full">
+        <ul class="menu p-4 w-80 bg-base-200 text-base-content h-full flex flex-col overflow-y-auto">
           <!-- Sidebar content here -->
           <li class="mb-4 text-xl font-bold px-4">Yuntapp Panel</li>
           <li><%= link_to "Dashboard", panel_root_path, class: ("active" if current_page?(panel_root_path)) %></li>
@@ -64,7 +64,10 @@
             <li><%= link_to "Certificados", panel_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
           <% end %>
 
-          <li class="menu-title mt-4">Sistema</li>
+          <li class="mt-auto pt-4 border-t border-base-300">
+            <div class="text-xs text-base-content/60 truncate px-2"><%= current_user.email %></div>
+          </li>
+          <li class="menu-title">Sistema</li>
           <li><%= link_to "Reiniciar Onboarding", panel_onboarding_restart_path, data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro? Esto eliminará tu progreso actual y podrás registrarte en otra junta." }, class: "text-warning" %></li>
           <li><%= link_to I18n.t('actions.reset'), panel_reset_account_path, data: { turbo_method: :delete, turbo_confirm: I18n.t('panel.account_resets.confirm') }, class: "text-error" %></li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>

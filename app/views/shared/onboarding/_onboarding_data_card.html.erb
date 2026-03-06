@@ -1,0 +1,19 @@
+<%# locals: (onboarding_request:) %>
+<div class="card bg-base-200 shadow-sm">
+  <div class="card-body">
+    <div class="flex justify-between items-center">
+      <h3 class="card-title text-xl">Datos de la Solicitud</h3>
+      <%= status_badge(onboarding_request.status) %>
+    </div>
+    <dl class="mt-2 space-y-1">
+      <div>
+        <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.onboarding_request.user') %></dt>
+        <dd class="font-medium"><%= onboarding_request.user.email %></dd>
+      </div>
+      <div>
+        <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.onboarding_request.created_at') %></dt>
+        <dd><%= l(onboarding_request.created_at, format: :long) %></dd>
+      </div>
+    </dl>
+  </div>
+</div>

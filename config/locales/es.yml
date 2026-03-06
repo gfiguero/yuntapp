@@ -98,6 +98,7 @@ es:
         id: ID
         name: Nombre
         commune: Comuna
+        region: Región
       neighborhood_delegation:
         id: ID
         name: Nombre (Calle)

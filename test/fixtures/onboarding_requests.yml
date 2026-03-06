@@ -5,6 +5,14 @@ one:
   neighborhood_association: association_0
   status: "draft"
 
+karass_pending:
+  user: karass
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "pending"
+  terms_accepted_at: <%= Time.zone.now %>
+
 karax_pending:
   user: karax
   neighborhood_association: manios_de_buin

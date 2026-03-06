@@ -11,5 +11,17 @@
   <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.onboarding_requests.index.title') %></h1>
   <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.onboarding_requests.show.identifier', id: @onboarding_request.id) %></h3>
   <%= render "buttons" %>
-  <%= render @onboarding_request %>
+
+  <div class="grid grid-cols-1 gap-4">
+    <%= render "shared/onboarding/onboarding_data_card", onboarding_request: @onboarding_request %>
+    <%= render "shared/onboarding/association_card", onboarding_request: @onboarding_request %>
+
+    <% if @onboarding_request.identity_verification_request %>
+      <%= render "shared/onboarding/identity_card", identity_request: @onboarding_request.identity_verification_request %>
+    <% end %>
+
+    <% if @onboarding_request.residence_verification_request %>
+      <%= render "shared/onboarding/residence_card", residence_request: @onboarding_request.residence_verification_request %>
+    <% end %>
+  </div>
 </div>

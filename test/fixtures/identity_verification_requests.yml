@@ -6,6 +6,15 @@ one:
   phone: "+56912345678"
   status: "draft"
 
+karass_identity:
+  user: karass
+  onboarding_request: karass_pending
+  first_name: "Karass"
+  last_name: "Templar"
+  run: "22222222-2"
+  phone: "+56987654321"
+  status: "pending"
+
 karax_identity:
   user: karax
   onboarding_request: karax_pending

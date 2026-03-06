@@ -26,9 +26,9 @@ class MemberTest < ActiveSupport::TestCase
   end
 
   test "first_name and last_name delegate to verified_identity" do
-    member = members(:karass_dependent)
-    assert_equal "Karass", member.first_name
-    assert_equal "Templar", member.last_name
+    member = members(:selendis_member)
+    assert_equal "Selendis", member.first_name
+    assert_equal "Daelaam", member.last_name
   end
 
   test "filter_by_name searches verified_identity fields" do

@@ -1,0 +1,49 @@
+karass_id_doc_blob_1:
+  key: "fixture_karass_id_doc_1"
+  filename: "id_placeholder.png"
+  content_type: "image/png"
+  metadata: '{"identified":true}'
+  byte_size: 48167
+  checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
+  service_name: "local"
+  created_at: <%= Time.zone.now %>
+
+karass_id_doc_blob_2:
+  key: "fixture_karass_id_doc_2"
+  filename: "id_placeholder.png"
+  content_type: "image/png"
+  metadata: '{"identified":true}'
+  byte_size: 48167
+  checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
+  service_name: "local"
+  created_at: <%= Time.zone.now %>
+
+karass_residence_doc_blob:
+  key: "fixture_karass_residence_doc"
+  filename: "id_placeholder.png"
+  content_type: "image/png"
+  metadata: '{"identified":true}'
+  byte_size: 48167
+  checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
+  service_name: "local"
+  created_at: <%= Time.zone.now %>
+
+karax_id_doc_blob:
+  key: "fixture_karax_id_doc"
+  filename: "id_placeholder.png"
+  content_type: "image/png"
+  metadata: '{"identified":true}'
+  byte_size: 48167
+  checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
+  service_name: "local"
+  created_at: <%= Time.zone.now %>
+
+karax_residence_doc_blob:
+  key: "fixture_karax_residence_doc"
+  filename: "id_placeholder.png"
+  content_type: "image/png"
+  metadata: '{"identified":true}'
+  byte_size: 48167
+  checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
+  service_name: "local"
+  created_at: <%= Time.zone.now %>

@@ -1,0 +1,34 @@
+karass_id_doc_attachment_1:
+  name: "identity_documents"
+  record_type: "IdentityVerificationRequest"
+  record: karass_identity (IdentityVerificationRequest)
+  blob: karass_id_doc_blob_1
+  created_at: <%= Time.zone.now %>
+
+karass_id_doc_attachment_2:
+  name: "identity_documents"
+  record_type: "IdentityVerificationRequest"
+  record: karass_identity (IdentityVerificationRequest)
+  blob: karass_id_doc_blob_2
+  created_at: <%= Time.zone.now %>
+
+karass_residence_doc_attachment:
+  name: "residence_documents"
+  record_type: "ResidenceVerificationRequest"
+  record: karass_residence (ResidenceVerificationRequest)
+  blob: karass_residence_doc_blob
+  created_at: <%= Time.zone.now %>
+
+karax_id_doc_attachment:
+  name: "identity_documents"
+  record_type: "IdentityVerificationRequest"
+  record: karax_identity (IdentityVerificationRequest)
+  blob: karax_id_doc_blob
+  created_at: <%= Time.zone.now %>
+
+karax_residence_doc_attachment:
+  name: "residence_documents"
+  record_type: "ResidenceVerificationRequest"
+  record: karax_residence (ResidenceVerificationRequest)
+  blob: karax_residence_doc_blob
+  created_at: <%= Time.zone.now %>

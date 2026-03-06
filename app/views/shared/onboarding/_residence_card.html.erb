@@ -1,0 +1,34 @@
+<%# locals: (residence_request:) %>
+<div class="card bg-base-200 shadow-sm">
+  <div class="card-body">
+    <h3 class="card-title text-xl"><%= I18n.t('panel.onboarding.status.residence_label') %></h3>
+    <dl class="mt-2 space-y-1">
+      <% if residence_request.neighborhood_delegation.present? %>
+        <div>
+          <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.neighborhood_delegation') %></dt>
+          <dd class="font-medium"><%= residence_request.neighborhood_delegation.name %></dd>
+        </div>
+      <% end %>
+      <% if residence_request.street_name.present? %>
+        <div>
+          <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.street_name') %></dt>
+          <dd class="font-medium"><%= residence_request.street_name %></dd>
+        </div>
+      <% end %>
+      <div>
+        <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.number') %></dt>
+        <dd><%= residence_request.number %></dd>
+      </div>
+      <% if residence_request.address_detail.present? %>
+        <div>
+          <dt class="text-xs text-base-content/50"><%= I18n.t('activerecord.attributes.household_unit.address_detail') %></dt>
+          <dd><%= residence_request.address_detail %></dd>
+        </div>
+      <% end %>
+      <% if residence_request.residence_documents.attached? %>
+        <dt class="text-xs text-base-content/50 mb-1"><%= I18n.t('activerecord.attributes.residence_verification_request.residence_documents') %></dt>
+        <%= render "shared/onboarding/image_gallery", documents: residence_request.residence_documents %>
+      <% end %>
+    </dl>
+  </div>
+</div>

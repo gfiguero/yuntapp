@@ -1,0 +1,39 @@
+<%# locals: (documents:, variant: :thumbnail) %>
+<% doc_urls = documents.map { |doc| url_for(doc) } %>
+<div class="mt-2" data-controller="image-modal" data-image-modal-urls-value="<%= doc_urls.to_json %>">
+  <% if variant == :large %>
+    <div class="grid grid-cols-1 gap-3">
+      <% documents.each_with_index do |doc, i| %>
+        <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
+          <%= image_tag doc.representation(resize_to_limit: [400, 400]), class: "rounded-lg border border-base-300 w-full object-cover hover:opacity-80 transition-opacity" %>
+        </button>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="flex flex-wrap gap-2">
+      <% documents.each_with_index do |doc, i| %>
+        <button type="button" class="cursor-zoom-in" data-action="click->image-modal#open" data-index="<%= i %>">
+          <%= image_tag doc.representation(resize_to_limit: [120, 120]), class: "rounded-lg border border-base-300 w-20 h-20 object-cover hover:opacity-80 transition-opacity" %>
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+  <dialog class="modal" data-image-modal-target="dialog" data-action="click->image-modal#close keydown->image-modal#keydown">
+    <div class="modal-box max-w-5xl max-h-[90vh] p-2 bg-base-100" data-action="click->image-modal#close:stop">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-10">✕</button>
+      </form>
+      <img src="" alt="" class="max-w-full max-h-[80vh] object-contain mx-auto rounded-lg" data-image-modal-target="image">
+      <% if doc_urls.size > 1 %>
+        <div class="flex items-center justify-between mt-2">
+          <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#prev">❮</button>
+          <span class="text-sm text-base-content/60" data-image-modal-target="counter"></span>
+          <button type="button" class="btn btn-circle btn-ghost" data-action="click->image-modal#next">❯</button>
+        </div>
+      <% end %>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
+</div>
