@@ -5,7 +5,7 @@ karass_id_doc_blob_1:
   metadata: '{"identified":true}'
   byte_size: 48167
   checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
-  service_name: "local"
+  service_name: "test"
   created_at: <%= Time.zone.now %>
 
 karass_id_doc_blob_2:
@@ -15,7 +15,7 @@ karass_id_doc_blob_2:
   metadata: '{"identified":true}'
   byte_size: 48167
   checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
-  service_name: "local"
+  service_name: "test"
   created_at: <%= Time.zone.now %>
 
 karass_residence_doc_blob:
@@ -25,7 +25,7 @@ karass_residence_doc_blob:
   metadata: '{"identified":true}'
   byte_size: 48167
   checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
-  service_name: "local"
+  service_name: "test"
   created_at: <%= Time.zone.now %>
 
 karax_id_doc_blob:
@@ -35,7 +35,7 @@ karax_id_doc_blob:
   metadata: '{"identified":true}'
   byte_size: 48167
   checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
-  service_name: "local"
+  service_name: "test"
   created_at: <%= Time.zone.now %>
 
 karax_residence_doc_blob:
@@ -45,5 +45,5 @@ karax_residence_doc_blob:
   metadata: '{"identified":true}'
   byte_size: 48167
   checksum: "ewPMaph8Co3qO/Bq4d0dvQ=="
-  service_name: "local"
+  service_name: "test"
   created_at: <%= Time.zone.now %>
