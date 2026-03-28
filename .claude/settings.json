@@ -1,0 +1,8 @@
+{
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "everything-claude-code@everything-claude-code": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "claude-mem@thedotmack": true
+  }
+}
