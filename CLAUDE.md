@@ -243,3 +243,75 @@ kamal deploy                     # Deploy con Kamal
 ## Idioma
 
 La aplicacion esta primariamente en espanol (interfaz, mensajes flash, labels de formularios). Los archivos i18n estan en `config/locales/es.yml` y `config/locales/en.yml`. Las vistas del admin, panel y onboarding usan traducciones i18n extensivamente.
+
+## Agent Team Configuration
+
+> **OBLIGATORIO:** Para cualquier tarea de codigo (feature, fix, refactor, UI), seguir este workflow sin que el usuario lo pida.
+
+### Archivos compartidos (`.claude/team/`)
+
+```
+backlog.md                 # Tareas pendientes
+current-sprint.md          # Sprint actual
+architecture/decisions.md  # ADRs
+reviews/pending.md         # PRs en revision
+bugs/active.md             # Bugs activos
+```
+
+### Roles
+
+| Rol | Responsabilidad |
+|-----|----------------|
+| Arquitecto | Diseno, ADRs, sprint planning |
+| Desarrollador | Implementacion |
+| Tester | Tests |
+| Reviewer | Code review |
+| Documentador | Docs, CLAUDE.md |
+
+Indicar rol al inicio: `Como [DESARROLLADOR]: Implementando...`
+
+### Worktrees — Aislamiento por Sesion
+
+Crear un worktree al inicio de **cada sesion de codigo**:
+
+```
+EnterWorktree(name: "{tipo}-{slug}")
+```
+
+| Tipo | Prefijo | Ejemplo |
+|------|---------|---------|
+| Feature | `feat-` | `feat-filtros-socios` |
+| Bug fix | `fix-` | `fix-onboarding-crash` |
+| Refactor | `refactor-` | `refactor-service-objects` |
+| UI | `ui-` | `ui-admin-dashboard` |
+| Tests | `test-` | `test-residence-certificate` |
+
+**Flujo completo por sesion**:
+```
+1. EnterWorktree(name: "fix-mi-tarea")
+2. Leer .claude/team/ → registrar en current-sprint.md
+3. Implementar cambios
+4. Actualizar reviews/pending.md con el PR
+5. git add / commit / push
+6. gh pr create
+7. ExitWorktree(action: "keep")    # "remove" si se abandona sin cambios
+```
+
+**Reglas**:
+1. Siempre `EnterWorktree` antes de escribir codigo
+2. Los archivos compartidos son la fuente de verdad
+3. Leer estado actual antes de actuar
+4. Documentar decisiones en `decisions.md`
+5. Usar IDs unicos: `BUG-XXX`, `ADR-XXX`, `#XXX`
+
+### Skills disponibles
+
+| Skill | Descripcion |
+|-------|-------------|
+| `/dev` | Pipeline autonomo: clasifica prompt → branch → implementa → review → PR |
+| `/feature` | Feature completa con planning, mini-audit y actualizacion de equipo |
+| `/fix-issues` | Resuelve GitHub issues creando un PR por cada uno |
+| `/audit` | Auditoria integral del codebase |
+| `/audit-to-issues` | Convierte hallazgos de auditoria en GitHub issues |
+| `/merge-pr` | Mezcla PRs aprobados con squash merge |
+| `/check-code` | Ejecuta todas las validaciones de calidad |
