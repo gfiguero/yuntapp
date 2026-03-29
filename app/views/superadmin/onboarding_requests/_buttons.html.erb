@@ -17,7 +17,7 @@
   <% end %>
 
   <% if %w[ show edit update ].include? action_name %>
-    <%= link_to raw(icon('delete') + I18n.t('actions.delete')), delete_superadmin_onboarding_request_path(@onboarding_request), class: "btn btn-soft btn-warning" %>
+    <%= link_to raw(icon('delete') + I18n.t('actions.delete')), delete_superadmin_onboarding_request_path(@onboarding_request), class: "btn btn-soft btn-error" %>
   <% end %>
 
   <% if %w[ delete ].include? action_name %>

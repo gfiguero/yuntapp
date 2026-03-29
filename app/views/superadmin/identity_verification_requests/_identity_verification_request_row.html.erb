@@ -1,4 +1,4 @@
-<tr class="hover:bg-base-300">
+<tr class="hover:bg-base-200/50">
   <td><%= identity_verification_request.id %></td>
   <td><%= identity_verification_request.first_name %></td>
   <td><%= identity_verification_request.last_name %></td>
@@ -8,13 +8,13 @@
   <td><%= l(identity_verification_request.created_at, format: :short) if identity_verification_request.created_at %></td>
   <td>
     <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), [:superadmin, identity_verification_request], class: "btn btn-sm btn-soft btn-info" %>
+      <%= link_to icon('show'), [:superadmin, identity_verification_request], class: "btn btn-sm btn-soft btn-info", aria: { label: "#{I18n.t('actions.show')} solicitud ##{identity_verification_request.id}" } %>
     </div>
     <div class="tooltip" data-tip="<%= I18n.t('actions.edit') %>">
-      <%= link_to icon('edit'), edit_superadmin_identity_verification_request_path(identity_verification_request), class: "btn btn-sm btn-soft btn-success" %>
+      <%= link_to icon('edit'), edit_superadmin_identity_verification_request_path(identity_verification_request), class: "btn btn-sm btn-soft btn-success", aria: { label: "#{I18n.t('actions.edit')} solicitud ##{identity_verification_request.id}" } %>
     </div>
     <div class="tooltip" data-tip="<%= I18n.t('actions.delete') %>">
-      <%= link_to icon('delete'), delete_superadmin_identity_verification_request_path(identity_verification_request), class: "btn btn-sm btn-soft btn-warning" %>
+      <%= link_to icon('delete'), delete_superadmin_identity_verification_request_path(identity_verification_request), class: "btn btn-sm btn-soft btn-error", aria: { label: "#{I18n.t('actions.delete')} solicitud ##{identity_verification_request.id}" } %>
     </div>
   </td>
 </tr>

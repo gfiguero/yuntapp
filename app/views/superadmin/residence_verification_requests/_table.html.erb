@@ -1,7 +1,7 @@
 <div class="my-4"><%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-  <table class="table">
+  <table class="table table-zebra">
     <thead>
       <tr>
         <th><%= sort_link('superadmin_residence_verification_requests_path', I18n.t('activerecord.attributes.residence_verification_request.id'), 'id') %></th>
@@ -14,8 +14,16 @@
       </tr>
     </thead>
     <tbody>
-    <% @residence_verification_requests.each do |residence_verification_request| %>
-      <%= render partial: "residence_verification_request_row", locals: { residence_verification_request: residence_verification_request } %>
+    <% if @residence_verification_requests.empty? %>
+      <tr>
+        <td colspan="7" class="text-center py-8 text-base-content/40">
+          No hay solicitudes de verificación de residencia.
+        </td>
+      </tr>
+    <% else %>
+      <% @residence_verification_requests.each do |residence_verification_request| %>
+        <%= render partial: "residence_verification_request_row", locals: { residence_verification_request: residence_verification_request } %>
+      <% end %>
     <% end %>
     </tbody>
   </table>

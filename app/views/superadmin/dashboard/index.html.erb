@@ -1,18 +1,93 @@
-<div class="hero min-h-[50vh] bg-base-200 rounded-box">
-  <div class="hero-content text-center">
-    <div class="max-w-md">
-      <h1 class="text-5xl font-bold">Panel Superadmin</h1>
-      <p class="py-6">Bienvenido al panel de administración global del sistema. Desde aquí puedes gestionar las entidades maestras.</p>
+<% content_for :title do %>Dashboard<% end %>
 
-      <div class="grid grid-cols-2 gap-4">
-        <%= link_to superadmin_neighborhood_associations_path, class: "btn btn-primary" do %>
-          <%= icon("home", class: "w-5 h-5") %> Juntas de Vecinos
-        <% end %>
+<div class="mb-6">
+  <h1 class="text-2xl font-bold text-base-content">Panel de Control</h1>
+  <p class="text-sm text-base-content/60 mt-1">Resumen global del sistema Yuntapp</p>
+</div>
 
-        <%= link_to superadmin_users_path, class: "btn btn-secondary" do %>
-          <%= icon("users", class: "w-5 h-5") %> Usuarios
-        <% end %>
+<!-- Stat Cards -->
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="card-body p-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-1">Juntas de Vecinos</div>
+          <div class="text-3xl font-extrabold text-primary"><%= @stats[:neighborhood_associations] %></div>
+        </div>
+        <div class="text-primary opacity-20"><%= icon("users", class: "w-8 h-8") %></div>
       </div>
+      <%= link_to "Ver todas", superadmin_neighborhood_associations_path, class: "text-xs text-primary hover:underline mt-2 block" %>
     </div>
+  </div>
+
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="card-body p-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-1">Onboarding Pendientes</div>
+          <div class="text-3xl font-extrabold <%= @stats[:onboarding_pending] > 0 ? 'text-warning' : 'text-base-content/40' %>"><%= @stats[:onboarding_pending] %></div>
+        </div>
+        <div class="text-warning opacity-20"><%= icon("list", class: "w-8 h-8") %></div>
+      </div>
+      <%= link_to "Revisar", superadmin_onboarding_requests_path, class: "text-xs text-primary hover:underline mt-2 block" %>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="card-body p-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-1">Identidad Pendientes</div>
+          <div class="text-3xl font-extrabold <%= @stats[:identity_pending] > 0 ? 'text-warning' : 'text-base-content/40' %>"><%= @stats[:identity_pending] %></div>
+        </div>
+        <div class="text-warning opacity-20"><%= icon("id", class: "w-8 h-8") %></div>
+      </div>
+      <%= link_to "Revisar", superadmin_identity_verification_requests_path, class: "text-xs text-primary hover:underline mt-2 block" %>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="card-body p-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-1">Residencia Pendientes</div>
+          <div class="text-3xl font-extrabold <%= @stats[:residence_pending] > 0 ? 'text-warning' : 'text-base-content/40' %>"><%= @stats[:residence_pending] %></div>
+        </div>
+        <div class="text-warning opacity-20"><%= icon("home", class: "w-8 h-8") %></div>
+      </div>
+      <%= link_to "Revisar", superadmin_residence_verification_requests_path, class: "text-xs text-primary hover:underline mt-2 block" %>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 border border-base-200 shadow-sm">
+    <div class="card-body p-4">
+      <div class="flex items-start justify-between">
+        <div>
+          <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-1">Usuarios Totales</div>
+          <div class="text-3xl font-extrabold text-base-content"><%= @stats[:users_total] %></div>
+        </div>
+        <div class="text-base-content opacity-10"><%= icon("users", class: "w-8 h-8") %></div>
+      </div>
+      <%= link_to "Ver todos", superadmin_users_path, class: "text-xs text-primary hover:underline mt-2 block" %>
+    </div>
+  </div>
+</div>
+
+<!-- Accesos rápidos -->
+<div class="mb-2">
+  <h2 class="text-sm font-semibold text-base-content/60 uppercase tracking-wider mb-3">Accesos Rápidos</h2>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <%= link_to superadmin_neighborhood_associations_path, class: "btn btn-outline btn-sm justify-start gap-2" do %>
+      <%= icon("users", class: "w-4 h-4") %> Juntas de Vecinos
+    <% end %>
+    <%= link_to new_superadmin_neighborhood_association_path, class: "btn btn-primary btn-sm justify-start gap-2" do %>
+      <%= icon("new", class: "w-4 h-4") %> Nueva Junta
+    <% end %>
+    <%= link_to superadmin_regions_path, class: "btn btn-outline btn-sm justify-start gap-2" do %>
+      <%= icon("map-pin", class: "w-4 h-4") %> Regiones
+    <% end %>
+    <%= link_to superadmin_users_path, class: "btn btn-outline btn-sm justify-start gap-2" do %>
+      <%= icon("user", class: "w-4 h-4") %> Usuarios
+    <% end %>
   </div>
 </div>

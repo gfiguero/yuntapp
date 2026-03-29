@@ -1,7 +1,7 @@
 <div class="my-4"><%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-  <table class="table">
+  <table class="table table-zebra">
     <thead>
       <tr>
         <th><%= sort_link('superadmin_communes_path', I18n.t('activerecord.attributes.commune.name'), 'name') %></th>
@@ -10,8 +10,16 @@
       </tr>
     </thead>
     <tbody>
-    <% @communes.each.with_index do |commune| %>
-      <%= render partial: "commune_row", locals: { commune: commune } %>
+    <% if @communes.empty? %>
+      <tr>
+        <td colspan="3" class="text-center py-8 text-base-content/40">
+          No hay comunas registradas.
+        </td>
+      </tr>
+    <% else %>
+      <% @communes.each do |commune| %>
+        <%= render partial: "commune_row", locals: { commune: commune } %>
+      <% end %>
     <% end %>
     </tbody>
   </table>

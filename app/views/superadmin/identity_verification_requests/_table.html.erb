@@ -1,7 +1,7 @@
 <div class="my-4"><%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-  <table class="table">
+  <table class="table table-zebra">
     <thead>
       <tr>
         <th><%= sort_link('superadmin_identity_verification_requests_path', I18n.t('activerecord.attributes.identity_verification_request.id'), 'id') %></th>
@@ -15,8 +15,16 @@
       </tr>
     </thead>
     <tbody>
-    <% @identity_verification_requests.each do |identity_verification_request| %>
-      <%= render partial: "identity_verification_request_row", locals: { identity_verification_request: identity_verification_request } %>
+    <% if @identity_verification_requests.empty? %>
+      <tr>
+        <td colspan="8" class="text-center py-8 text-base-content/40">
+          No hay solicitudes de verificación de identidad.
+        </td>
+      </tr>
+    <% else %>
+      <% @identity_verification_requests.each do |identity_verification_request| %>
+        <%= render partial: "identity_verification_request_row", locals: { identity_verification_request: identity_verification_request } %>
+      <% end %>
     <% end %>
     </tbody>
   </table>

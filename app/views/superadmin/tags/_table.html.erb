@@ -1,7 +1,7 @@
 <div class="my-4"><%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-  <table class="table">
+  <table class="table table-zebra">
     <thead>
       <tr>
         <th><%= sort_link('tags_path', I18n.t('activerecord.attributes.tag.name'), 'name') %></th>
@@ -9,8 +9,16 @@
       </tr>
     </thead>
     <tbody>
-    <% @tags.each.with_index do |tag| %>
-      <%= render partial: "tag_row", locals: { tag: tag } %>
+    <% if @tags.empty? %>
+      <tr>
+        <td colspan="2" class="text-center py-8 text-base-content/40">
+          No hay etiquetas registradas.
+        </td>
+      </tr>
+    <% else %>
+      <% @tags.each do |tag| %>
+        <%= render partial: "tag_row", locals: { tag: tag } %>
+      <% end %>
     <% end %>
     </tbody>
   </table>

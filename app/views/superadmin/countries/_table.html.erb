@@ -1,7 +1,7 @@
 <div class="my-4"><%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-  <table class="table">
+  <table class="table table-zebra">
     <thead>
       <tr>
         <th><%= sort_link('superadmin_countries_path', I18n.t('activerecord.attributes.country.name'), 'name') %></th>
@@ -9,8 +9,16 @@
       </tr>
     </thead>
     <tbody>
-    <% @countries.each.with_index do |country| %>
-      <%= render partial: "country_row", locals: { country: country } %>
+    <% if @countries.empty? %>
+      <tr>
+        <td colspan="2" class="text-center py-8 text-base-content/40">
+          No hay países registrados.
+        </td>
+      </tr>
+    <% else %>
+      <% @countries.each do |country| %>
+        <%= render partial: "country_row", locals: { country: country } %>
+      <% end %>
     <% end %>
     </tbody>
   </table>
