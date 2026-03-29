@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html data-theme="light">
   <head>
-    <title><%= content_for(:title) || "Yuntapp Admin" %></title>
+    <title><%= content_for(:title) || "Yuntapp Superadmin" %></title>
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -18,53 +18,154 @@
     <div class="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" class="drawer-toggle">
       <div class="drawer-content flex flex-col items-center justify-start min-h-screen">
-        <!-- Page content here -->
-        <div class="w-full navbar bg-base-100 lg:hidden shadow-sm mb-4">
-            <div class="flex-none">
-                <label for="my-drawer-2" class="btn btn-square btn-ghost drawer-button lg:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </label>
-            </div>
-            <div class="flex-1 px-2 mx-2 font-bold text-xl">Admin Panel</div>
+
+        <!-- Top bar: hamburger (mobile) + breadcrumbs -->
+        <div class="w-full bg-base-100 border-b border-base-200 px-4 py-3 flex items-center gap-3">
+          <label for="my-drawer-2" class="btn btn-square btn-ghost btn-sm drawer-button lg:hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </label>
+          <div class="text-sm breadcrumbs flex-1">
+            <ul>
+              <li><%= link_to "Superadmin", superadmin_root_path, class: "text-base-content/60 hover:text-base-content" %></li>
+              <%= yield :breadcrumb %>
+            </ul>
+          </div>
         </div>
 
-        <main class="container mx-auto mt-2 mb-5 px-5 flex flex-col w-full">
-            <div class="flex justify-between items-center mb-4">
-                <h1 class="text-2xl font-bold">Administración</h1>
-                <%= link_to "Volver a la App", root_path, class: "btn btn-sm btn-outline" %>
-            </div>
-            <%= yield %>
+        <main class="container mx-auto mt-4 mb-8 px-5 flex flex-col w-full">
+          <%= yield %>
         </main>
+
         <%= render "shared/footer" %>
       </div>
-      <div class="drawer-side h-screen">
+
+      <!-- Sidebar -->
+      <div class="drawer-side h-screen z-50">
         <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu p-4 w-80 bg-base-200 text-base-content h-full flex flex-col overflow-y-auto">
-          <!-- Sidebar content here -->
-          <li class="mb-4 text-xl font-bold px-4">Yuntapp Admin</li>
-          <li><%= link_to "Dashboard", admin_root_path, class: ("active" if current_page?(admin_root_path)) %></li>
+        <div class="flex flex-col w-72 bg-base-100 border-r border-base-200 h-full overflow-y-auto">
 
-          <li class="menu-title mt-4">Gestión Global</li>
-          <li><%= link_to "Juntas de Vecinos", superadmin_neighborhood_associations_path, class: ("active" if controller_name == "neighborhood_associations") %></li>
+          <!-- Brand -->
+          <div class="px-4 py-5 border-b border-base-200">
+            <div class="flex items-center gap-2">
+              <%= icon("home", class: "w-6 h-6 text-primary") %>
+              <span class="font-bold text-lg text-base-content">Yuntapp</span>
+              <span class="badge badge-primary badge-sm ml-auto">Superadmin</span>
+            </div>
+          </div>
 
-          <li class="menu-title mt-4">Solicitudes</li>
-          <li><%= link_to "Onboarding", superadmin_onboarding_requests_path, class: ("active" if controller_name == "onboarding_requests") %></li>
-          <li><%= link_to "Identidad", superadmin_identity_verification_requests_path, class: ("active" if controller_name == "identity_verification_requests") %></li>
-          <li><%= link_to "Residencia", superadmin_residence_verification_requests_path, class: ("active" if controller_name == "residence_verification_requests") %></li>
+          <!-- Navigation -->
+          <ul class="menu menu-sm p-3 flex-1 gap-1">
+            <li>
+              <%= link_to superadmin_root_path,
+                    class: "flex items-center gap-2 #{current_page?(superadmin_root_path) ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("home", class: "w-4 h-4") %>
+                Dashboard
+              <% end %>
+            </li>
 
-          <li class="menu-title mt-4">Geografía</li>
-          <li><%= link_to "Países", superadmin_countries_path, class: ("active" if controller_name == "countries") %></li>
-          <li><%= link_to "Regiones", superadmin_regions_path, class: ("active" if controller_name == "regions") %></li>
-          <li><%= link_to "Comunas", superadmin_communes_path, class: ("active" if controller_name == "communes") %></li>
+            <li class="menu-title text-xs uppercase tracking-wider mt-3">Gestión Global</li>
+            <li>
+              <%= link_to superadmin_neighborhood_associations_path,
+                    class: "flex items-center gap-2 #{controller_name == 'neighborhood_associations' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("users", class: "w-4 h-4") %>
+                Juntas de Vecinos
+              <% end %>
+            </li>
+            <li>
+              <%= link_to superadmin_users_path,
+                    class: "flex items-center gap-2 #{controller_name == 'users' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("user", class: "w-4 h-4") %>
+                Usuarios
+              <% end %>
+            </li>
 
-          <li class="menu-title mt-4">Sistema</li>
-          <li><%= link_to "Categorías", superadmin_categories_path, class: ("active" if controller_name == "categories") %></li>
-          <li><%= link_to "Etiquetas", superadmin_tags_path, class: ("active" if controller_name == "tags") %></li>
+            <li class="menu-title text-xs uppercase tracking-wider mt-3">Solicitudes</li>
+            <li>
+              <%= link_to superadmin_onboarding_requests_path,
+                    class: "flex items-center gap-2 #{controller_name == 'onboarding_requests' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("list", class: "w-4 h-4") %>
+                Onboarding
+              <% end %>
+            </li>
+            <li>
+              <%= link_to superadmin_identity_verification_requests_path,
+                    class: "flex items-center gap-2 #{controller_name == 'identity_verification_requests' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("id", class: "w-4 h-4") %>
+                Identidad
+              <% end %>
+            </li>
+            <li>
+              <%= link_to superadmin_residence_verification_requests_path,
+                    class: "flex items-center gap-2 #{controller_name == 'residence_verification_requests' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("home", class: "w-4 h-4") %>
+                Residencia
+              <% end %>
+            </li>
 
-          <li class="menu-title mt-4">Sistema</li>
-          <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
-        </ul>
+            <li class="menu-title text-xs uppercase tracking-wider mt-3">Geografía</li>
+            <li>
+              <%= link_to superadmin_countries_path,
+                    class: "flex items-center gap-2 #{controller_name == 'countries' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("map-pin", class: "w-4 h-4") %>
+                Países
+              <% end %>
+            </li>
+            <li>
+              <%= link_to superadmin_regions_path,
+                    class: "flex items-center gap-2 #{controller_name == 'regions' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("map-pin", class: "w-4 h-4") %>
+                Regiones
+              <% end %>
+            </li>
+            <li>
+              <%= link_to superadmin_communes_path,
+                    class: "flex items-center gap-2 #{controller_name == 'communes' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("map-pin", class: "w-4 h-4") %>
+                Comunas
+              <% end %>
+            </li>
 
+            <li class="menu-title text-xs uppercase tracking-wider mt-3">Configuración</li>
+            <li>
+              <%= link_to superadmin_categories_path,
+                    class: "flex items-center gap-2 #{controller_name == 'categories' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("archive", class: "w-4 h-4") %>
+                Categorías
+              <% end %>
+            </li>
+            <li>
+              <%= link_to superadmin_tags_path,
+                    class: "flex items-center gap-2 #{controller_name == 'tags' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("filter", class: "w-4 h-4") %>
+                Etiquetas
+              <% end %>
+            </li>
+          </ul>
+
+          <!-- Footer: user info + logout -->
+          <div class="border-t border-base-200 p-4">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="avatar placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-8">
+                  <span class="text-xs"><%= current_user.email.first.upcase %></span>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="text-xs font-medium truncate"><%= current_user.email %></div>
+                <div class="text-xs text-base-content/50">Superadmin</div>
+              </div>
+            </div>
+            <%= link_to destroy_user_session_path,
+                  data: { turbo_method: :delete },
+                  class: "btn btn-sm btn-ghost btn-block justify-start gap-2 text-error hover:bg-error/10" do %>
+              <%= icon("restart", class: "w-4 h-4") %>
+              Cerrar Sesión
+            <% end %>
+          </div>
+
+        </div>
       </div>
     </div>
     <%= yield :filter_drawer %>

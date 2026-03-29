@@ -1,7 +1,7 @@
 <div class="my-4"><%== @pagy.series_nav() %></div>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-  <table class="table">
+  <table class="table table-zebra">
     <thead>
       <tr>
         <th><%= sort_link('superadmin_categories_path', I18n.t('activerecord.attributes.category.name'), 'name') %></th>
@@ -9,8 +9,16 @@
       </tr>
     </thead>
     <tbody>
-    <% @categories.each.with_index do |category| %>
-      <%= render partial: "category_row", locals: { category: category } %>
+    <% if @categories.empty? %>
+      <tr>
+        <td colspan="2" class="text-center py-8 text-base-content/40">
+          No hay categorías registradas.
+        </td>
+      </tr>
+    <% else %>
+      <% @categories.each do |category| %>
+        <%= render partial: "category_row", locals: { category: category } %>
+      <% end %>
     <% end %>
     </tbody>
   </table>

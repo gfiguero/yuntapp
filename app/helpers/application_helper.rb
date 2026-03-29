@@ -58,6 +58,8 @@ module ApplicationHelper
     when "pending" then "badge-warning"
     when "rejected" then "badge-error"
     when "draft" then "badge-ghost"
+    when "issued" then "badge-info"
+    when "verified" then "badge-primary"
     else "badge-ghost"
     end
 
