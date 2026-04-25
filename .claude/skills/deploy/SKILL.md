@@ -71,9 +71,11 @@ git log main..HEAD      # debe estar sincronizado con origin/main
 bundle exec standardrb
 bundle exec erb_lint --lint-all
 bin/rails test
+bundle exec brakeman --no-pager -q
+bundle exec bundler-audit check --update
 ```
 
-Las tres deben pasar. Si alguna falla, NO deployar.
+Las cinco deben pasar. Si alguna falla, NO deployar. Brakeman y bundler-audit bloquean el deploy si encuentran vulnerabilidades de severidad alta.
 
 ### 1.3 Verificar migraciones pendientes
 

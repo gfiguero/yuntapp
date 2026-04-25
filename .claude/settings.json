@@ -32,6 +32,8 @@
       "Bash(bundle exec rubocop*)",
       "Bash(bundle exec erb_lint*)",
       "Bash(bundle exec standardrb*)",
+      "Bash(bundle exec brakeman*)",
+      "Bash(bundle exec bundler-audit*)",
       "Bash(ls*)",
       "Bash(find . *)",
       "Bash(grep*)",

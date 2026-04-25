@@ -17,6 +17,9 @@ allowed-tools:
   - Bash(bin/rails generate*)
   - Bash(bundle exec rubocop*)
   - Bash(bundle exec erb_lint*)
+  - Bash(bundle exec standardrb*)
+  - Bash(bundle exec brakeman*)
+  - Bash(bundle exec bundler-audit*)
 ---
 
 # Fix Issues Skill
@@ -118,7 +121,7 @@ git commit -m "$(cat <<'EOF'
 
 Closes #<issue-number>
 
-Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
 EOF
 )"
 ```

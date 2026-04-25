@@ -8,6 +8,8 @@ allowed-tools:
   - Glob
   - Bash(bundle exec standardrb*)
   - Bash(bundle exec erb_lint*)
+  - Bash(bundle exec brakeman*)
+  - Bash(bundle exec bundler-audit*)
   - Bash(grep*)
   - Bash(ls*)
 ---
@@ -201,12 +203,31 @@ end
 ## Ejecucion de analisis estatico
 
 ```bash
-bundle exec standardrb         # detecta algunos problemas de seguridad
-bundle exec erb_lint --lint-all # verifica vistas ERB
-grep -rn "<%==" app/views/     # buscar raw output en vistas
-grep -rn "raw(" app/views/     # buscar raw() en vistas
-grep -rn "\.where(\"" app/     # buscar SQL string interpolation riesgo
+bundle exec standardrb                  # detecta algunos problemas de seguridad
+bundle exec erb_lint --lint-all         # verifica vistas ERB
+bundle exec brakeman --no-pager -q      # analisis estatico de seguridad Rails
+bundle exec bundler-audit check --update # CVEs conocidos en gems
+grep -rn "<%==" app/views/             # buscar raw output en vistas
+grep -rn "raw(" app/views/             # buscar raw() en vistas
+grep -rn "\.where(\"" app/             # buscar SQL string interpolation riesgo
 ```
+
+### Interpretar resultados de Brakeman
+
+Brakeman clasifica warnings por confianza: High, Medium, Weak.
+
+- **High**: Corregir antes del PR, sin excepciones
+- **Medium**: Evaluar y corregir si es un riesgo real (no falso positivo)
+- **Weak**: Informativo — reportar al usuario, no bloquear
+
+Si un warning es falso positivo, documentar en `.brakeman.ignore` con justificacion.
+
+### Interpretar resultados de bundler-audit
+
+Si encuentra una CVE:
+1. Verificar si la vulnerabilidad es explotable en este contexto
+2. Actualizar la gem afectada: `bundle update <gem>`
+3. Si no hay version corregida disponible: reportar al usuario y agregar a `.bundler-audit.yml` con justificacion
 
 ## Reporte
 
