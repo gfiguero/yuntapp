@@ -219,7 +219,7 @@ git add <archivos-modificados>
 git commit -m "$(cat <<'EOF'
 <descripcion-concisa-de-la-feature>
 
-Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
 EOF
 )"
 ```

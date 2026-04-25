@@ -2,7 +2,236 @@
 
 ## Descripcion General
 
-Yuntapp es una plataforma web de gestion para juntas de vecinos chilenas. Permite a las asociaciones de vecinos administrar socios, verificar identidades y residencias, emitir certificados de residencia, gestionar directivas y publicar anuncios en un marketplace comunitario. La aplicacion sigue un flujo de onboarding por pasos donde los usuarios verifican su identidad (RUN chileno) y residencia antes de convertirse en socios.
+Yuntapp es una plataforma web que digitaliza el certificado de residencia chileno, un trámite que actualmente solo existe de forma presencial en municipalidades. Permite a los residentes solicitar, pagar y descargar su certificado 100% online, mientras las juntas de vecinos verifican identidad y residencia de forma remota antes de emitirlo. El certificado incluye QR, código alfanumérico y URL de verificación pública. Las juntas definen su precio (mínimo $1.000 CLP) y Yuntapp retiene un 10% de comisión por operación. Además incluye gestión de socios, directiva y un marketplace comunitario.
+
+## Objetivo del Producto y Propuesta de Valor
+
+Yuntapp digitaliza el certificado de residencia, un trámite que hoy **solo existe de forma presencial** en las municipalidades de Chile. La propuesta de valor central es:
+
+> **Cualquier residente puede solicitar, pagar y descargar su certificado de residencia desde internet, sin ir a ninguna oficina.**
+
+Las juntas de vecinos son el ente emisor oficial reconocido. El certificado emitido por Yuntapp tiene la misma validez que el presencial porque la junta verifica la identidad y residencia del solicitante antes de aprobar y emitir el documento.
+
+### Diferenciadores clave
+- **100% remoto**: Solicitud, pago y descarga sin desplazamiento físico.
+- **Verificación documental online**: Los adminsitradores de la junta revisan los documentos de identidad y residencia enviados digitalmente antes de emitir.
+- **Certificado con múltiples canales de validación**: El PDF incluye QR code, código alfanumérico y URL pública para verificar autenticidad.
+- **Modelo SaaS para juntas**: Cada junta define su precio, Yuntapp opera como plataforma.
+
+---
+
+## Modelo de Negocio
+
+### Precios
+- Cada junta de vecinos define libremente el precio de su certificado de residencia.
+- **Precio mínimo**: $1.000 CLP por certificado.
+- No hay precio máximo definido, pero debe ser razonable para el contexto vecinal chileno.
+
+### Comisión de Yuntapp
+- Yuntapp retiene el **10%** del precio cobrado en cada certificado emitido.
+- El 90% restante es para la junta de vecinos.
+- La comisión cubre los gastos operacionales de la plataforma (hosting, pasarela de pago, soporte).
+
+### Pasarela de Pago
+- **MercadoPago** es la pasarela de pago elegida (aún no implementada).
+- El pago debe completarse **antes** de que el admin de la junta revise y emita el certificado.
+- Si el pago falla o es rechazado, la solicitud permanece en estado `pending_payment` y no avanza.
+
+---
+
+## Flujo Principal: Certificado de Residencia
+
+Este es el flujo de negocio más importante de la aplicación. Claude Code debe proteger su integridad en todo cambio de código.
+
+```
+Socio aprobado
+    │
+    ▼
+Solicita certificado (panel)
+    │  Crea ResidenceCertificate con status: pending_payment
+    ▼
+Paga con MercadoPago
+    │  status → paid (webhook de MercadoPago confirma)
+    ▼
+Admin de junta revisa solicitud + documentos
+    │  status → approved  (o rejected con motivo)
+    ▼
+Sistema genera PDF con folio único + código de validación
+    │  status → issued
+    ▼
+Socio descarga el PDF desde su panel
+```
+
+### Estados de ResidenceCertificate
+| Estado | Descripción |
+|--------|-------------|
+| `pending_payment` | Solicitud creada, esperando pago |
+| `paid` | Pago confirmado por MercadoPago, en cola para revisión |
+| `approved` | Admin aprobó, sistema emite el PDF |
+| `rejected` | Admin rechazó con motivo. El socio puede volver a intentar |
+| `issued` | PDF generado y disponible para descarga |
+
+> **REGLA CRÍTICA**: Nunca emitir un certificado sin que el pago esté confirmado (`paid`). El admin no debe ver la solicitud hasta que el pago sea exitoso.
+
+### Código de Validación del Certificado
+El PDF del certificado debe incluir **tres canales de validación simultáneos**:
+1. **QR Code**: Apunta a la URL pública de verificación.
+2. **Código alfanumérico**: Código único legible (ej: `CR-00042-X7K9`), útil para verificación telefónica.
+3. **URL pública**: `https://yuntapp.cl/verify/{token}` — página accesible sin login que muestra la validez del certificado.
+
+La URL pública muestra: nombre del titular, RUN, dirección, junta emisora, fecha de emisión, fecha de vencimiento y estado (válido/inválido/vencido).
+
+---
+
+## Casos de Uso
+
+Cada caso de uso documenta el flujo ideal (happy path). Claude Code debe respetar estas precondiciones y postcondiciones al implementar cualquier feature relacionada. Agregar nuevos casos de uso con el siguiente ID disponible (`UC-XXX`).
+
+---
+
+### UC-001 · Registro de residente
+**Actor**: Visitante sin cuenta
+**Precondición**: Ninguna
+
+| # | Paso |
+|---|------|
+| 1 | El visitante accede a la página de registro |
+| 2 | Ingresa email y contraseña |
+| 3 | Confirma su email mediante el enlace enviado |
+| 4 | Es redirigido al panel con instrucciones para iniciar el onboarding |
+
+**Postcondición**: Usuario con cuenta activa, sin asociación ni identidad verificada.
+
+---
+
+### UC-002 · Onboarding: convertirse en socio
+**Actor**: Usuario registrado sin socio activo
+**Precondición**: UC-001 completado
+
+| # | Paso |
+|---|------|
+| 1 | Selecciona región, comuna y junta de vecinos |
+| 2 | Ingresa nombre, apellido, RUN y teléfono; sube documentos de identidad |
+| 3 | Selecciona su delegación vecinal o ingresa dirección manual |
+| 4 | Revisa el resumen y envía la solicitud |
+| 5 | El admin de la junta recibe la solicitud en su panel |
+| 6 | El admin verifica los documentos y aprueba la solicitud |
+| 7 | El sistema crea el `Member` activo y notifica al residente |
+
+**Postcondición**: Usuario con `OnboardingRequest` en estado `approved` y `Member` activo vinculado a una `HouseholdUnit`.
+
+---
+
+### UC-003 · Solicitud de certificado de residencia
+**Actor**: Socio aprobado (residente con `Member` activo)
+**Precondición**: UC-002 completado — `OnboardingRequest` en `approved`
+
+| # | Paso |
+|---|------|
+| 1 | El socio accede a "Solicitar certificado" en su panel |
+| 2 | Selecciona el propósito del certificado (ej: trámite bancario, arriendo) |
+| 3 | El sistema muestra el precio definido por la junta y la descripción del certificado |
+| 4 | El socio confirma la solicitud |
+| 5 | El sistema crea el `ResidenceCertificate` en estado `pending_payment` |
+| 6 | El socio es redirigido al flujo de pago (UC-004) |
+
+**Postcondición**: `ResidenceCertificate` creado en estado `pending_payment`.
+
+---
+
+### UC-004 · Pago del certificado
+**Actor**: Socio aprobado con solicitud en `pending_payment`
+**Precondición**: UC-003 completado
+
+| # | Paso |
+|---|------|
+| 1 | El socio es redirigido a MercadoPago con el monto del certificado |
+| 2 | Completa el pago con su medio de pago preferido |
+| 3 | MercadoPago envía webhook de confirmación a Yuntapp |
+| 4 | El sistema actualiza el `ResidenceCertificate` a estado `paid` |
+| 5 | El sistema registra el `payment_id`, el `amount` pagado y calcula la `platform_fee` (10%) |
+| 6 | El admin de la junta recibe notificación de nueva solicitud pagada para revisar |
+
+**Postcondición**: `ResidenceCertificate` en estado `paid`, visible para el admin de la junta.
+
+---
+
+### UC-005 · Revisión y emisión del certificado
+**Actor**: Admin de junta
+**Precondición**: UC-004 completado — certificado en estado `paid`
+
+| # | Paso |
+|---|------|
+| 1 | El admin ve la solicitud en su panel de certificados pendientes |
+| 2 | Revisa los datos del solicitante: identidad, domicilio y propósito |
+| 3 | Aprueba la solicitud |
+| 4 | El sistema genera el folio único (`CR-{association_id}-{sequence}`) |
+| 5 | El sistema genera el `validation_token` (UUID) y el `validation_code` (alfanumérico legible) |
+| 6 | El sistema genera el PDF con los datos del certificado, QR, código y URL de verificación |
+| 7 | El certificado pasa a estado `issued` y el socio recibe notificación |
+
+**Postcondición**: `ResidenceCertificate` en estado `issued` con PDF generado y código de validación activo.
+
+---
+
+### UC-006 · Descarga del certificado
+**Actor**: Socio aprobado con certificado emitido
+**Precondición**: UC-005 completado — certificado en estado `issued`
+
+| # | Paso |
+|---|------|
+| 1 | El socio accede a "Mis certificados" en su panel |
+| 2 | Ve el certificado emitido con folio, fecha de emisión y fecha de vencimiento |
+| 3 | Descarga el PDF |
+| 4 | El PDF contiene: datos del titular, junta emisora, propósito, QR, código alfanumérico y URL de verificación |
+
+**Postcondición**: El socio tiene el PDF descargado. El certificado permanece disponible para descargas futuras.
+
+---
+
+### UC-007 · Verificación pública del certificado
+**Actor**: Cualquier persona (sin login requerido)
+**Precondición**: Tener el código alfanumérico, QR, o URL del certificado
+
+| # | Paso |
+|---|------|
+| 1 | El verificador accede a `yuntapp.cl/verify/{token}` o escanea el QR o ingresa el código alfanumérico |
+| 2 | El sistema busca el certificado por token o código |
+| 3 | Muestra: nombre del titular, RUN (parcialmente oculto), junta emisora, propósito, fecha de emisión, fecha de vencimiento y estado |
+| 4 | El estado se muestra como: **Válido**, **Vencido**, o **Anulado** |
+
+**Postcondición**: El verificador obtiene confirmación de la autenticidad del certificado sin necesidad de contactar a la junta.
+
+---
+
+## Reglas de Negocio
+
+Estas reglas deben respetarse en cualquier implementación. Si una tarea entra en conflicto con alguna de ellas, consultar antes de implementar.
+
+Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde una nueva regla durante el desarrollo. Usar el siguiente ID disponible en la categoría correspondiente. No renumerar reglas existentes; si una regla queda obsoleta, marcarla como `[RETIRADA]` en la descripción.
+
+| ID | Categoría | Regla |
+|----|-----------|-------|
+| BR-001 | Acceso | Solo socios con `onboarding_request` en estado `approved` y `member` activo pueden solicitar certificados |
+| BR-002 | Pagos | No mostrar la solicitud al admin hasta que MercadoPago confirme el pago (status `paid`) |
+| BR-003 | Pagos | Si el pago falla o es rechazado, la solicitud permanece en `pending_payment` sin avanzar |
+| BR-004 | Comisión | Yuntapp retiene el 10% de cada certificado emitido. Esta comisión es invariable y no puede modificarse por asociación |
+| BR-005 | Precios | El precio mínimo por certificado es $1.000 CLP. Validar en modelo y en UI |
+| BR-006 | Integridad | El folio `CR-{association_id}-{sequence}` no puede cambiar de formato. Es el identificador oficial |
+| BR-007 | Multi-tenant | Un admin solo puede ver y gestionar datos de su propia junta. El superadmin puede ver todo |
+| BR-008 | Integridad | Una vez en estado `issued`, el certificado es inmutable. Para corregir errores: rechazar y emitir uno nuevo |
+| BR-009 | Validación | La URL pública de verificación debe responder indefinidamente, incluso para certificados vencidos (mostrar "vencido", no 404) |
+
+### Categorías disponibles
+- **Acceso**: quién puede hacer qué
+- **Pagos**: flujo y estados del pago
+- **Comisión**: reglas de la tarifa de Yuntapp
+- **Precios**: restricciones de precio para las juntas
+- **Integridad**: invariantes del modelo de datos
+- **Multi-tenant**: aislamiento entre asociaciones
+- **Validación**: comportamiento del sistema de verificación de certificados
+
+---
 
 ## Stack Tecnologico
 
@@ -135,9 +364,11 @@ Country -> Region -> Commune -> NeighborhoodAssociation -> NeighborhoodDelegatio
 - Campos de direccion completos
 
 #### ResidenceCertificate
-- Status: pending | approved | rejected | issued
+- Status: pending_payment | paid | approved | rejected | issued
 - Campos: `folio` (unico por asociacion), `issue_date`, `expiration_date`, `purpose`, `notes`
+- Campos pendientes de implementar: `amount` (precio cobrado en CLP), `platform_fee` (10% de amount), `payment_id` (referencia MercadoPago), `validation_token` (UUID para URL publica), `validation_code` (codigo alfanumerico legible)
 - `generate_folio!`: formato "CR-{association_id}-{sequence}"
+- Regla: solo avanza de `paid` a `approved`/`rejected` el admin de la junta correspondiente
 
 #### BoardMember
 - Posiciones: presidente | secretario | tesorero | director
@@ -310,6 +541,11 @@ EnterWorktree(name: "{tipo}-{slug}")
 |-------|-------------|
 | `/dev` | Pipeline autonomo: clasifica prompt → branch → implementa → review → PR |
 | `/feature` | Feature completa con planning, mini-audit y actualizacion de equipo |
+| `/review` | Revisa branch actual: seguridad, N+1, tests, veredicto APROBADO/CAMBIOS/BLOQUEADO |
+| `/security` | Revision de seguridad Rails: strong params, autorizacion entre asociaciones, XSS, SQL injection |
+| `/tdd` | Workflow TDD con Minitest y fixtures: tests primero, patron Arrange-Act-Assert |
+| `/deploy` | Deploy con Kamal: pre-checklist, migraciones, health checks y rollback |
+| `/db-migrate` | Crea y aplica migraciones Rails con checklist de indices, null constraints, expand-contract y batch |
 | `/fix-issues` | Resuelve GitHub issues creando un PR por cada uno |
 | `/audit` | Auditoria integral del codebase |
 | `/audit-to-issues` | Convierte hallazgos de auditoria en GitHub issues |

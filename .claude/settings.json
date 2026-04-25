@@ -4,5 +4,51 @@
     "everything-claude-code@everything-claude-code": true,
     "ui-ux-pro-max@ui-ux-pro-max-skill": true,
     "claude-mem@thedotmack": true
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git log*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git checkout*)",
+      "Bash(git push*)",
+      "Bash(git pull*)",
+      "Bash(git fetch*)",
+      "Bash(git branch*)",
+      "Bash(git stash*)",
+      "Bash(git show*)",
+      "Bash(git worktree*)",
+      "Bash(gh pr*)",
+      "Bash(gh issue*)",
+      "Bash(gh label*)",
+      "Bash(gh api*)",
+      "Bash(bin/rails test*)",
+      "Bash(bin/rails db:*)",
+      "Bash(bin/rails generate*)",
+      "Bash(bin/rails routes*)",
+      "Bash(bin/dev*)",
+      "Bash(bundle exec rubocop*)",
+      "Bash(bundle exec erb_lint*)",
+      "Bash(bundle exec standardrb*)",
+      "Bash(ls*)",
+      "Bash(find . *)",
+      "Bash(grep*)",
+      "Bash(mkdir*)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '' && echo '=== Sesion terminada ===' && git status --short 2>/dev/null | head -10 && echo '--- En progreso ---' && grep -F '- [ ]' .claude/team/current-sprint.md 2>/dev/null | head -5 || true"
+          }
+        ]
+      }
+    ]
   }
 }

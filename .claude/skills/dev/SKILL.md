@@ -303,7 +303,7 @@ git add <files>
 git commit -m "$(cat <<'EOF'
 <concise description>
 
-Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 4.7 <noreply@anthropic.com>
 EOF
 )"
 git push -u origin <branch>
