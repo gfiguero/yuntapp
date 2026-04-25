@@ -221,15 +221,41 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-007 | Multi-tenant | Un admin solo puede ver y gestionar datos de su propia junta. El superadmin puede ver todo |
 | BR-008 | Integridad | Una vez en estado `issued`, el certificado es inmutable. Para corregir errores: rechazar y emitir uno nuevo |
 | BR-009 | Validación | La URL pública de verificación debe responder indefinidamente, incluso para certificados vencidos (mostrar "vencido", no 404) |
+| BR-010 | Normalización | El RUN se normaliza antes de validar: eliminar puntos y espacios, convertir a mayúsculas, insertar guión antes del dígito verificador (ej: `12.345.678-k` → `12345678-K`) |
+| BR-011 | Identidad | El dígito verificador del RUN debe ser válido según el algoritmo módulo 11 chileno. Rechazar RUN con dígito incorrecto |
+| BR-012 | Identidad | El RUN es único en `verified_identities`. No pueden existir dos identidades verificadas con el mismo RUN |
+| BR-013 | Normalización | El teléfono se normaliza a formato `+569XXXXXXXX`. Si ingresa `9XXXXXXXX` (9 dígitos), se agrega `+56` automáticamente |
+| BR-014 | Normalización | Los nombres se normalizan: primera letra de cada palabra en mayúscula, resto en minúsculas, sin espacios extras |
+| BR-015 | Onboarding | El socio debe aceptar los términos (`terms_accepted_at` presente) para enviar la solicitud de onboarding |
+| BR-016 | Onboarding | Al cambiar de región se resetean comarca y asociación. Al cambiar de comuna se resetea la asociación (cascada) |
+| BR-017 | Onboarding | El envío de onboarding es atómico: `OnboardingRequest`, `IdentityVerificationRequest` y `ResidenceVerificationRequest` pasan a `pending` juntos o ninguno |
+| BR-018 | Onboarding | Al reiniciar el onboarding se elimina el `Member` activo y se cancela la solicitud pendiente. Es una acción destructiva |
+| BR-019 | Residencia | Para completar el paso de domicilio: se requiere `neighborhood_delegation_id` O `street_name`, no pueden ambos estar vacíos |
+| BR-020 | Residencia | El número de vivienda (`number`) es siempre obligatorio en el domicilio |
+| BR-021 | Residencia | El primer residente aprobado de un domicilio recibe `household_admin: true` en su `Residency`. Los siguientes no |
+| BR-022 | Acceso | Solo el `household_admin` del domicilio puede solicitar certificados y agregar nuevos miembros al hogar |
+| BR-023 | Certificados | Los certificados vencen 6 meses después de la fecha de emisión (`issue_date + 6.months`) |
+| BR-024 | Integridad | La aprobación del onboarding es transaccional: crea `VerifiedIdentity`, `VerifiedResidence`, `HouseholdUnit`, `Residency` y `Member` en una sola transacción. Si algo falla, se revierte todo |
+| BR-025 | Integridad | Al rechazar un `OnboardingRequest`, se rechazan en cascada su `IdentityVerificationRequest` y `ResidenceVerificationRequest` |
+| BR-026 | Acceso | Un `Member` rechazado puede re-enviar su solicitud cambiando el estado de vuelta a `pending` |
+| BR-027 | Certificados | Un certificado de residencia se vincula obligatoriamente a un `Member` + `HouseholdUnit` + `NeighborhoodAssociation` |
+| BR-028 | Multi-tenant | El admin solo ve solicitudes de onboarding en estado `pending` o posterior. Las solicitudes en `draft` son invisibles para el admin |
+| BR-029 | Acceso | Un usuario solo puede ser socio activo de una junta a la vez. Al unirse a una nueva junta, el `Member` anterior pasa a estado `inactive` (nunca se destruye). El historial de certificados e identidad se conserva |
+| BR-030 | Integridad | El estado `inactive` en `Member` indica que el socio ya no pertenece activamente a esa junta, pero sus registros históricos (certificados, residencias) permanecen intactos y auditables |
 
 ### Categorías disponibles
-- **Acceso**: quién puede hacer qué
-- **Pagos**: flujo y estados del pago
+- **Acceso**: quién puede hacer qué y condiciones de autorización
+- **Pagos**: flujo y estados del pago con MercadoPago
 - **Comisión**: reglas de la tarifa de Yuntapp
 - **Precios**: restricciones de precio para las juntas
-- **Integridad**: invariantes del modelo de datos
-- **Multi-tenant**: aislamiento entre asociaciones
+- **Integridad**: invariantes del modelo de datos y transacciones
+- **Multi-tenant**: aislamiento entre asociaciones vecinales
 - **Validación**: comportamiento del sistema de verificación de certificados
+- **Normalización**: transformaciones automáticas de datos de entrada
+- **Identidad**: reglas sobre `VerifiedIdentity` y el RUN chileno
+- **Residencia**: reglas sobre domicilios y `HouseholdUnit`
+- **Onboarding**: reglas del flujo de solicitud de membresía
+- **Certificados**: reglas sobre `ResidenceCertificate` y su ciclo de vida
 
 ---
 
