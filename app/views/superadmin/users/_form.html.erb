@@ -1,0 +1,23 @@
+<%= form_with(model: [:superadmin, user], class: "grid gap-4 w-full max-w-sm") do |form| %>
+
+  <div class="form-control">
+    <%= form.label :admin, "Admin", class: "label cursor-pointer justify-start gap-3" %>
+    <%= form.check_box :admin, class: "checkbox checkbox-primary" %>
+  </div>
+
+  <div class="form-control">
+    <%= form.label :superadmin, "Superadmin", class: "label cursor-pointer justify-start gap-3" %>
+    <%= form.check_box :superadmin, class: "checkbox checkbox-warning" %>
+  </div>
+
+  <div class="form-control">
+    <%= form.label :neighborhood_association_id, I18n.t('activerecord.attributes.user.neighborhood_association'), class: "label" %>
+    <%= form.collection_select :neighborhood_association_id,
+          NeighborhoodAssociation.order(:name),
+          :id, :name,
+          { include_blank: "Sin junta de vecinos" },
+          class: "select select-bordered w-full" %>
+  </div>
+
+  <%= form.submit I18n.t('actions.save'), class: "btn btn-success" %>
+<% end %>

@@ -1,0 +1,23 @@
+<% content_for :title do %>
+  <%= I18n.t('superadmin.users.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('superadmin.users.index.title'), superadmin_users_path %></li>
+  <li><%= link_to I18n.t('superadmin.users.show.identifier', id: @user.id), superadmin_user_path(@user) %></li>
+  <li><%= I18n.t('actions.delete') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.users.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.users.show.identifier', id: @user.id) %></h3>
+  <%= render "buttons" %>
+  <%= render @user %>
+  <div class="alert alert-warning mt-4 max-w-lg">
+    <p>Esta acción eliminará permanentemente el usuario <strong><%= @user.email %></strong>. Esta acción no se puede deshacer.</p>
+  </div>
+  <%= button_to I18n.t('actions.destroy'), superadmin_user_path(@user),
+        method: :delete,
+        class: "btn btn-error mt-4",
+        data: { turbo_confirm: "¿Estás seguro de eliminar este usuario?" } %>
+</div>

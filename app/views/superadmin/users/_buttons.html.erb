@@ -1,0 +1,7 @@
+<div class="flex gap-2 mb-4">
+  <%= link_to I18n.t('actions.back'), superadmin_users_path, class: "btn btn-ghost btn-sm" %>
+  <% if @user %>
+    <%= link_to I18n.t('actions.edit'), edit_superadmin_user_path(@user), class: "btn btn-primary btn-sm" %>
+    <%= link_to I18n.t('actions.delete'), delete_superadmin_user_path(@user), class: "btn btn-error btn-outline btn-sm" %>
+  <% end %>
+</div>

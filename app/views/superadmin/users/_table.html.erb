@@ -1,0 +1,26 @@
+<div class="overflow-x-auto">
+  <table class="table table-zebra w-full">
+    <thead>
+      <tr>
+        <th><%= sort_link("id", I18n.t('activerecord.attributes.user.id'), params) %></th>
+        <th><%= I18n.t('activerecord.attributes.user.email') %></th>
+        <th><%= I18n.t('activerecord.attributes.user.admin') %></th>
+        <th><%= I18n.t('activerecord.attributes.user.superadmin') %></th>
+        <th><%= I18n.t('activerecord.attributes.user.neighborhood_association') %></th>
+        <th><%= sort_link("created_at", I18n.t('activerecord.attributes.user.created_at'), params) %></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @users.any? %>
+        <%= render partial: "user_row", collection: @users, as: :user %>
+      <% else %>
+        <tr>
+          <td colspan="7" class="text-center text-base-content/50 py-8">No hay usuarios registrados.</td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="my-4"><%== @pagy.series_nav() %></div>

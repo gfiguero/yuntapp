@@ -1,0 +1,12 @@
+<%= form_with url: superadmin_users_path, method: :get, class: "flex flex-wrap gap-2 mb-4 items-end" do |form| %>
+  <div>
+    <%= form.label :email, "Email", class: "label" %>
+    <%= form.text_field :email, value: params[:email], class: "input input-bordered input-sm", placeholder: "Filtrar por email" %>
+  </div>
+  <div>
+    <%= form.label :id, I18n.t('activerecord.attributes.user.id'), class: "label" %>
+    <%= form.text_field :id, value: params[:id], class: "input input-bordered input-sm", placeholder: "ID" %>
+  </div>
+  <%= form.submit I18n.t('actions.filter'), class: "btn btn-sm btn-neutral" %>
+  <%= link_to I18n.t('actions.cancel'), superadmin_users_path, class: "btn btn-sm btn-ghost" %>
+<% end %>

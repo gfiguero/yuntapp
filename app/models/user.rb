@@ -4,6 +4,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
     :recoverable, :rememberable, :validatable
 
+  scope :filter_by_email, ->(email) { where.like(email: "%#{email}%") }
+
   belongs_to :neighborhood_association, optional: true
   belongs_to :verified_identity, optional: true
   has_many :identity_verification_requests

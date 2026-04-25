@@ -1,0 +1,25 @@
+<tr>
+  <td><%= user.id %></td>
+  <td><%= user.email %></td>
+  <td>
+    <% if user.admin? %>
+      <span class="badge badge-success badge-sm">Sí</span>
+    <% else %>
+      <span class="badge badge-ghost badge-sm">No</span>
+    <% end %>
+  </td>
+  <td>
+    <% if user.superadmin? %>
+      <span class="badge badge-warning badge-sm">Sí</span>
+    <% else %>
+      <span class="badge badge-ghost badge-sm">No</span>
+    <% end %>
+  </td>
+  <td><%= user.neighborhood_association&.name || "-" %></td>
+  <td><%= l(user.created_at, format: :short) %></td>
+  <td class="flex gap-1">
+    <%= link_to I18n.t('actions.show'), superadmin_user_path(user), class: "btn btn-xs btn-ghost" %>
+    <%= link_to I18n.t('actions.edit'), edit_superadmin_user_path(user), class: "btn btn-xs btn-ghost" %>
+    <%= link_to I18n.t('actions.delete'), delete_superadmin_user_path(user), class: "btn btn-xs btn-error btn-outline" %>
+  </td>
+</tr>

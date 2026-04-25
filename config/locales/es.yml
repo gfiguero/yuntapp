@@ -88,7 +88,10 @@ es:
         first_name: Nombre
         last_name: Apellido
         email: Email
-        admin: Es Admin
+        admin: Admin
+        superadmin: Superadmin
+        neighborhood_association: Junta de Vecinos
+        created_at: Fecha de registro
         password: Contraseña
         password_confirmation: Confirmar Contraseña
       category:
@@ -657,6 +660,15 @@ es:
       flash:
         updated: Solicitud actualizada correctamente.
         destroyed: Solicitud eliminada correctamente.
+    users:
+      index:
+        title: Usuarios
+        count: "%{count} usuarios"
+      show:
+        identifier: "Usuario #%{id}"
+      flash:
+        updated: Usuario actualizado exitosamente.
+        destroyed: Usuario eliminado exitosamente.
 
   categories:
     index:

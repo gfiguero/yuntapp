@@ -1,0 +1,58 @@
+<div class="overflow-x-auto my-4">
+  <table class="table w-full max-w-lg">
+    <tbody>
+      <tr>
+        <th>ID</th>
+        <td><%= user.id %></td>
+      </tr>
+      <tr>
+        <th>Email</th>
+        <td><%= user.email %></td>
+      </tr>
+      <tr>
+        <th>Admin</th>
+        <td>
+          <% if user.admin? %>
+            <span class="badge badge-success">Sí</span>
+          <% else %>
+            <span class="badge badge-ghost">No</span>
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <th>Superadmin</th>
+        <td>
+          <% if user.superadmin? %>
+            <span class="badge badge-warning">Sí</span>
+          <% else %>
+            <span class="badge badge-ghost">No</span>
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <th><%= I18n.t('activerecord.attributes.user.neighborhood_association') %></th>
+        <td>
+          <% if user.neighborhood_association %>
+            <%= link_to user.neighborhood_association.name,
+                  superadmin_neighborhood_association_path(user.neighborhood_association),
+                  class: "link link-primary" %>
+          <% else %>
+            -
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <th>Nombre</th>
+        <td><%= user.name %></td>
+      </tr>
+      <tr>
+        <th>Creado</th>
+        <td><%= l(user.created_at, format: :long) %></td>
+      </tr>
+      <tr>
+        <th>Actualizado</th>
+        <td><%= l(user.updated_at, format: :long) %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
