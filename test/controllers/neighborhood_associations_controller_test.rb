@@ -15,7 +15,7 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get search with json format" do
-    get search_neighborhood_associations_url(format: :json), params: {items: [@neighborhood_association.id]}
+    get search_neighborhood_associations_url(format: :json), params: { items: [ @neighborhood_association.id ] }
     assert_response :success
 
     json_response = JSON.parse(response.body)
@@ -30,7 +30,7 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create neighborhood_association" do
     assert_difference("NeighborhoodAssociation.count") do
-      post neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation"}}
+      post neighborhood_associations_url, params: { neighborhood_association: { name: "New NeighborhoodAssociation" } }
     end
 
     assert_redirected_to neighborhood_association_url(NeighborhoodAssociation.last)
@@ -38,7 +38,7 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should not create neighborhood_association with invalid params" do
     assert_no_difference("NeighborhoodAssociation.count") do
-      post neighborhood_associations_url, params: {neighborhood_association: {name: ""}}
+      post neighborhood_associations_url, params: { neighborhood_association: { name: "" } }
     end
 
     assert_response :unprocessable_content
@@ -55,14 +55,14 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update neighborhood_association" do
-    patch neighborhood_association_url(@neighborhood_association), params: {neighborhood_association: {name: "Updated NeighborhoodAssociation"}}
+    patch neighborhood_association_url(@neighborhood_association), params: { neighborhood_association: { name: "Updated NeighborhoodAssociation" } }
     assert_redirected_to neighborhood_association_url(@neighborhood_association)
     @neighborhood_association.reload
     assert_equal "Updated NeighborhoodAssociation", @neighborhood_association.name
   end
 
   test "should not update neighborhood_association with invalid params" do
-    patch neighborhood_association_url(@neighborhood_association), params: {neighborhood_association: {name: ""}}
+    patch neighborhood_association_url(@neighborhood_association), params: { neighborhood_association: { name: "" } }
     assert_response :unprocessable_content
   end
 

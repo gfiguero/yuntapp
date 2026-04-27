@@ -78,7 +78,7 @@ class NeighborhoodAssociationsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def neighborhood_association_params
-    params.expect(neighborhood_association: [:name])
+    params.expect(neighborhood_association: [ :name ])
   end
 
   def set_neighborhood_associations

@@ -6,7 +6,7 @@ class IdentityVerificationRequest < ApplicationRecord
 
   STATUSES = %w[draft pending approved rejected].freeze
 
-  validates :status, inclusion: {in: STATUSES}
+  validates :status, inclusion: { in: STATUSES }
 
   # Validaciones solo si no está en borrador
   validates :first_name, :last_name, :run, :phone, presence: true, unless: -> { draft? || status == "draft" }

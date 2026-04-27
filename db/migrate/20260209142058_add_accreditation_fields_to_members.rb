@@ -2,8 +2,8 @@ class AddAccreditationFieldsToMembers < ActiveRecord::Migration[8.1]
   def up
     add_column :members, :status, :string, null: false, default: "pending"
     add_column :members, :household_admin, :boolean, default: false
-    add_reference :members, :requested_by, foreign_key: {to_table: :users}, null: true
-    add_reference :members, :approved_by, foreign_key: {to_table: :users}, null: true
+    add_reference :members, :requested_by, foreign_key: { to_table: :users }, null: true
+    add_reference :members, :approved_by, foreign_key: { to_table: :users }, null: true
     add_column :members, :approved_at, :datetime
     add_column :members, :rejection_reason, :text
     add_index :members, :status

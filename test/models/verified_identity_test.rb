@@ -124,5 +124,4 @@ class VerifiedIdentityTest < ActiveSupport::TestCase
     assert_equal "Juan Carlos", persona.first_name
     assert_equal "Pérez", persona.last_name
   end
-
 end

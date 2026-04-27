@@ -1,0 +1,24 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "548c037395764a26834246fa2de06d300bf40a6045c7885ad7700c840931564d",
+      "note": "Intencional: el superadmin necesita poder asignar roles admin/superadmin y neighborhood_association_id. Solo accesible via ensure_superadmin!"
+    },
+    {
+      "fingerprint": "6d8cf069a79068b655bfd4fa35c0395a77b7445bfe56f4db3d6d9f9de1a260e5",
+      "note": "Falso positivo: sanitize_sql_for_order es el metodo de Rails disenado exactamente para sanitizar ORDER BY. El valor ya viene sanitizado."
+    },
+    {
+      "fingerprint": "f314aad24e0cb6efe5b66b64a1290c2fd48de464e6573b11b9db8e358cd1efe6",
+      "note": "Falso positivo: sanitize_sql_for_order es el metodo de Rails disenado exactamente para sanitizar ORDER BY. El valor ya viene sanitizado."
+    },
+    {
+      "fingerprint": "6ee51a1c70d80c00f63471ff7a0921bcc2e9fcd1ba1fab551537a25ab49d32c5",
+      "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
+    },
+    {
+      "fingerprint": "6d73f31fd5e64e575d1b2fcf025ecffdf1b3ccc6488e9c109818801bf5783032",
+      "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
+    }
+  ]
+}

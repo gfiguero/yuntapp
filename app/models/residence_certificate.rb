@@ -8,9 +8,9 @@ class ResidenceCertificate < ApplicationRecord
   belongs_to :household_unit
   belongs_to :approved_by, class_name: "User", optional: true
 
-  validates :status, presence: true, inclusion: {in: STATUSES}
+  validates :status, presence: true, inclusion: { in: STATUSES }
   validates :purpose, presence: true
-  validates :folio, uniqueness: {scope: :neighborhood_association_id, allow_blank: true}
+  validates :folio, uniqueness: { scope: :neighborhood_association_id, allow_blank: true }
 
   scope :filter_by_status, ->(status) { where(status: status) }
   scope :filter_by_folio, ->(folio) { where.like(folio: "%#{folio}%") }

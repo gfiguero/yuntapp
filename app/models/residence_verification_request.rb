@@ -12,7 +12,7 @@ class ResidenceVerificationRequest < ApplicationRecord
   validates :number, presence: true, allow_blank: true
   validates :neighborhood_delegation_id, presence: true, if: -> { street_name.blank? }, allow_blank: true
   validates :street_name, presence: true, if: -> { neighborhood_delegation_id.blank? }, allow_blank: true
-  validates :status, inclusion: {in: STATUSES}
+  validates :status, inclusion: { in: STATUSES }
 
   scope :draft, -> { where(status: "draft") }
   scope :pending, -> { where(status: "pending") }

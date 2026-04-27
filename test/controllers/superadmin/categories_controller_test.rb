@@ -16,7 +16,7 @@ module Superadmin
     end
 
     test "should get search with json format" do
-      get search_superadmin_categories_url(format: :json), params: {items: [@category.id]}
+      get search_superadmin_categories_url(format: :json), params: { items: [ @category.id ] }
       assert_response :success
 
       json_response = JSON.parse(response.body)
@@ -31,7 +31,7 @@ module Superadmin
 
     test "should create category" do
       assert_difference("Category.count") do
-        post superadmin_categories_url, params: {category: {name: "New Category"}}
+        post superadmin_categories_url, params: { category: { name: "New Category" } }
       end
 
       assert_redirected_to superadmin_category_url(Category.last)
@@ -39,7 +39,7 @@ module Superadmin
 
     test "should not create category with invalid params" do
       assert_no_difference("Category.count") do
-        post superadmin_categories_url, params: {category: {name: ""}}
+        post superadmin_categories_url, params: { category: { name: "" } }
       end
 
       assert_response :unprocessable_content
@@ -56,14 +56,14 @@ module Superadmin
     end
 
     test "should update category" do
-      patch superadmin_category_url(@category), params: {category: {name: "Updated Category"}}
+      patch superadmin_category_url(@category), params: { category: { name: "Updated Category" } }
       assert_redirected_to superadmin_category_url(@category)
       @category.reload
       assert_equal "Updated Category", @category.name
     end
 
     test "should not update category with invalid params" do
-      patch superadmin_category_url(@category), params: {category: {name: ""}}
+      patch superadmin_category_url(@category), params: { category: { name: "" } }
       assert_response :unprocessable_content
     end
 

@@ -523,6 +523,7 @@ es:
       flash:
         completed: Solicitud de acreditación enviada exitosamente. La directiva revisará tu solicitud.
         pending: Tu solicitud de acreditación ya fue enviada y está siendo revisada.
+        restarted: Proceso de acreditación reiniciado. Puedes comenzar una nueva solicitud.
       status:
         title: Estado de tu Solicitud
         description: Tu solicitud de acreditación ha sido enviada. A continuación puedes ver el estado de cada parte.

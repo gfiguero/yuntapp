@@ -3,7 +3,7 @@ module Panel
     layout "panel"
     before_action :authenticate_user!
     before_action :ensure_household_admin!
-    before_action :set_residency, only: [:show, :edit, :update]
+    before_action :set_residency, only: [ :show, :edit, :update ]
 
     def index
       @residencies = current_user.household_unit.residencies.where.not(verified_identity: current_user.verified_identity)

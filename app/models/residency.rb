@@ -8,7 +8,7 @@ class Residency < ApplicationRecord
   has_many_attached :documents
 
   validates :verified_identity_id, presence: true
-  validates :status, presence: true, inclusion: {in: STATUSES}
+  validates :status, presence: true, inclusion: { in: STATUSES }
 
   scope :approved, -> { where(status: "approved") }
 

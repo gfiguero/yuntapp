@@ -6,7 +6,7 @@ class BoardMember < ApplicationRecord
   belongs_to :neighborhood_association
   belongs_to :member
 
-  validates :position, presence: true, inclusion: {in: POSITIONS}
+  validates :position, presence: true, inclusion: { in: POSITIONS }
   validates :start_date, presence: true
 
   scope :active, -> { where(active: true) }
