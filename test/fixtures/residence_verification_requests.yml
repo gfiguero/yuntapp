@@ -26,3 +26,55 @@ karax_residence:
   number: "42"
   commune: commune_0_0_39
   status: "pending"
+
+# CASO 3: Todos los pasos completados, en draft (no enviado aún)
+tassadar_residence:
+  user: tassadar
+  onboarding_request: tassadar_draft
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_4
+  number: "22"
+  commune: commune_0_0_39
+  status: "pending"
+
+# CASO 5: Solicitud de residencia rechazada en cascada con el onboarding
+alarak_residence:
+  user: alarak
+  onboarding_request: alarak_rejected
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_5
+  number: "8"
+  commune: commune_0_0_39
+  status: "rejected"
+
+# CASO 8: Nueva solicitud en manios (fenix viene de association_0)
+fenix_new_residence:
+  user: fenix
+  onboarding_request: fenix_new_pending
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_0
+  number: "55"
+  commune: commune_0_0_39
+  status: "pending"
+
+# CASO 9: Dirección manual — sin delegación vecinal (manual_address: true)
+rohana_manual_residence:
+  user: rohana
+  onboarding_request: rohana_pending
+  neighborhood_association: manios_de_buin
+  commune: commune_0_0_39
+  number: "1230"
+  street_name: "Calle Los Quillayes"
+  address_detail: "Casa B"
+  manual_address: true
+  status: "pending"
+
+# CASO 11: Mismo domicilio que selendis (segunda familia BR-043) + RUN duplicado (BR-057)
+mohandar_residence:
+  user: mohandar
+  onboarding_request: mohandar_pending
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_0
+  number: "Nexus #1-A"
+  commune: commune_0_0_39
+  status: "pending"

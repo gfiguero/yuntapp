@@ -1,2 +1,14 @@
 selendis_family_group:
   household_unit: selendis_household
+
+# CASO 7: Grupo familiar de vorazun (domicilio anterior, ahora inactivo)
+vorazun_family_group:
+  household_unit: vorazun_household
+
+# CASO 8: Grupo familiar de fenix en association_0 (junta anterior, ahora inactivo)
+fenix_old_family_group:
+  household_unit: fenix_old_household
+
+# CASO 12: Grupo familiar de tal_darim (desactivado por admin)
+tal_darim_family_group:
+  household_unit: tal_darim_household

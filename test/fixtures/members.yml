@@ -5,3 +5,27 @@ selendis_member:
   verified_identity: selendis_persona
   status: "approved"
   approved_at: <%= Time.zone.now %>
+
+# CASO 7: Miembro inactivo — reinició onboarding (cambio de dirección, misma junta manios)
+vorazun_member:
+  neighborhood_association: manios_de_buin
+  verified_identity: vorazun_persona
+  status: "inactive"
+  deactivation_reason: "Reinicio del proceso de acreditación por el socio"
+  approved_at: <%= 30.days.ago %>
+
+# CASO 8: Miembro inactivo — se cambió a otra junta (association_0 → manios_de_buin)
+fenix_old_member:
+  neighborhood_association: association_0
+  verified_identity: fenix_persona
+  status: "inactive"
+  deactivation_reason: "Cambio a otra junta de vecinos"
+  approved_at: <%= 60.days.ago %>
+
+# CASO 12: Miembro desactivado manualmente por el admin (BR-036)
+tal_darim_member:
+  neighborhood_association: manios_de_buin
+  verified_identity: tal_darim_persona
+  status: "inactive"
+  deactivation_reason: "Incumplimiento de las normas del sector"
+  approved_at: <%= 90.days.ago %>
