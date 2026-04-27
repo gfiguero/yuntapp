@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_27_022321) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_27_035758) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -71,6 +71,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_022321) do
     t.string "iso_code"
     t.string "name"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "family_groups", force: :cascade do |t|
+    t.integer "household_unit_id", null: false
+    t.index ["household_unit_id"], name: "index_family_groups_on_household_unit_id"
   end
 
   create_table "household_units", force: :cascade do |t|
@@ -220,12 +225,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_022321) do
 
   create_table "residencies", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.integer "family_group_id"
     t.boolean "household_admin", default: false
     t.integer "household_unit_id", null: false
     t.string "status", default: "approved", null: false
     t.datetime "updated_at", null: false
     t.integer "verified_identity_id", null: false
     t.integer "verified_residence_id", null: false
+    t.index ["family_group_id"], name: "index_residencies_on_family_group_id"
     t.index ["household_unit_id"], name: "index_residencies_on_household_unit_id"
     t.index ["verified_identity_id", "household_unit_id"], name: "index_residencies_on_identity_and_unit", unique: true
     t.index ["verified_identity_id"], name: "index_residencies_on_verified_identity_id"
@@ -291,6 +298,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_022321) do
   add_foreign_key "board_members", "members"
   add_foreign_key "board_members", "neighborhood_associations"
   add_foreign_key "communes", "regions"
+  add_foreign_key "family_groups", "household_units"
   add_foreign_key "household_units", "communes"
   add_foreign_key "household_units", "neighborhood_delegations"
   add_foreign_key "household_units", "verified_residences"
@@ -318,6 +326,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_022321) do
   add_foreign_key "residence_verification_requests", "neighborhood_delegations"
   add_foreign_key "residence_verification_requests", "onboarding_requests"
   add_foreign_key "residence_verification_requests", "users"
+  add_foreign_key "residencies", "family_groups"
   add_foreign_key "residencies", "household_units"
   add_foreign_key "residencies", "verified_identities"
   add_foreign_key "residencies", "verified_residences"

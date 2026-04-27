@@ -4,6 +4,7 @@ class Residency < ApplicationRecord
   belongs_to :verified_identity
   belongs_to :verified_residence
   belongs_to :household_unit
+  belongs_to :family_group, optional: true
 
   has_many_attached :documents
 
