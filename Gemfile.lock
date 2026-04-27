@@ -104,7 +104,7 @@ GEM
       smart_properties
     bigdecimal (4.1.2)
     bindex (0.8.1)
-    bootsnap (1.23.0)
+    bootsnap (1.24.0)
       msgpack (~> 1.2)
     brakeman (8.0.4)
       racc
@@ -238,7 +238,7 @@ GEM
       racc (~> 1.4)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
-    pagy (43.5.2)
+    pagy (43.5.3)
       json
       uri
       yaml
@@ -258,7 +258,7 @@ GEM
       date
       stringio
     public_suffix (7.0.5)
-    puma (8.0.0)
+    puma (8.0.1)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
