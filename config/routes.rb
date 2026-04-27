@@ -204,8 +204,10 @@ Rails.application.routes.draw do
       end
       member do
         get :delete
+        get :deactivate
         patch :approve
         patch :reject
+        patch :confirm_deactivate
       end
     end
     resources :listings do

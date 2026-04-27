@@ -2,7 +2,7 @@ module Admin
   class MembersController < Admin::ApplicationController
     include Pagy::Method
 
-    before_action :set_member, only: %i[show edit update delete destroy approve reject]
+    before_action :set_member, only: %i[show edit update delete destroy approve reject deactivate confirm_deactivate]
     before_action :set_members, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -98,6 +98,18 @@ module Admin
     def reject
       @member.update!(status: "rejected", approved_by: current_user, rejection_reason: params[:rejection_reason])
       redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.rejected"), status: :see_other
+    end
+
+    # GET /admin/members/1/deactivate
+    def deactivate
+    end
+
+    # PATCH /admin/members/1/confirm_deactivate
+    def confirm_deactivate
+      @member.deactivate!(reason: params[:deactivation_reason])
+      redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.deactivated"), status: :see_other
+    rescue ActiveRecord::RecordInvalid
+      render :deactivate, status: :unprocessable_content
     end
 
     private

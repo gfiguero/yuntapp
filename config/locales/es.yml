@@ -311,6 +311,7 @@ es:
     verify: Verificar Identidad
     reset: Resetear Cuenta
     issue: Emitir
+    deactivate: Desactivar
 
   shared:
     table:
@@ -325,12 +326,18 @@ es:
         count: "%{count} socios"
       show:
         identifier: "Socio ID: %{id}"
+      deactivate:
+        title: Desactivar Socio
+        warning: "¿Está seguro que desea desactivar al socio %{name}? Esta acción es reversible pero requiere una nueva solicitud de onboarding."
+        reason_label: Motivo de desactivación
+        confirm: Confirmar desactivación
       flash:
         created: Socio creado exitosamente.
         updated: Socio actualizado exitosamente.
         destroyed: Socio eliminado exitosamente.
         approved: Socio aprobado exitosamente.
         rejected: Socio rechazado exitosamente.
+        deactivated: Socio desactivado exitosamente.
     board_members:
       index:
         title: Directiva
@@ -517,6 +524,7 @@ es:
     onboarding:
       title: Acreditación
       subtitle: Completa tu solicitud de acreditación paso a paso
+      deactivation_reason: Reinicio del proceso de acreditación por el socio
       flash:
         completed: Solicitud de acreditación enviada exitosamente. La directiva revisará tu solicitud.
         pending: Tu solicitud de acreditación ya fue enviada y está siendo revisada.

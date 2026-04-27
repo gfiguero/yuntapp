@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_27_021404) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_27_022321) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -123,6 +123,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_021404) do
     t.datetime "approved_at"
     t.integer "approved_by_id"
     t.datetime "created_at", null: false
+    t.text "deactivation_reason"
     t.integer "neighborhood_association_id", null: false
     t.text "rejection_reason"
     t.integer "requested_by_id"

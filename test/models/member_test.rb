@@ -44,6 +44,7 @@ class MemberTest < ActiveSupport::TestCase
   test "inactive is a valid status" do
     member = members(:selendis_member)
     member.status = "inactive"
+    member.deactivation_reason = "Solicitud del socio"
     assert member.valid?
   end
 

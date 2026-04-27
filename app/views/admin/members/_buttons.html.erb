@@ -33,4 +33,8 @@
     <%= button_to I18n.t('actions.reject'), reject_admin_member_path(@member), class: "btn btn-soft btn-error", method: :patch %>
   <% end %>
 
+  <% if %w[ show ].include?(action_name) && @member.approved? %>
+    <%= link_to I18n.t('actions.deactivate'), deactivate_admin_member_path(@member), class: "btn btn-soft btn-warning" %>
+  <% end %>
+
 </div>
