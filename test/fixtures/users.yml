@@ -37,3 +37,55 @@ karax:
   encrypted_password: <%= Devise::Encryptor.digest(User, 'keeperoftradition') %>
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>
+
+# CASO 2: Onboarding en draft — paso 1 completo (junta elegida), identidad no iniciada
+zeratul:
+  email: zeratul@daelaam.io
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'thetemplar') %>
+  created_at: <%= Time.zone.now %>
+  updated_at: <%= Time.zone.now %>
+
+# CASO 3: Onboarding en draft — todos los pasos completados, aún no enviado
+tassadar:
+  email: tassadar@daelaam.io
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'ideologybeyond') %>
+  created_at: <%= Time.zone.now %>
+  updated_at: <%= Time.zone.now %>
+
+# CASO 5: Onboarding rechazado por el admin
+alarak:
+  email: alarak@daelaam.io
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'onlythestrongest') %>
+  created_at: <%= Time.zone.now %>
+  updated_at: <%= Time.zone.now %>
+
+# CASO 7: Miembro inactivo que reinició onboarding (cambio de dirección, misma junta)
+vorazun:
+  email: vorazun@daelaam.io
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'daelaamstrike') %>
+  verified_identity: vorazun_persona
+  created_at: <%= Time.zone.now %>
+  updated_at: <%= Time.zone.now %>
+
+# CASO 8: Miembro inactivo en junta antigua, pending en nueva junta (cambio de junta)
+fenix:
+  email: fenix@daelaam.io
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'nevertrulydead') %>
+  verified_identity: fenix_persona
+  created_at: <%= Time.zone.now %>
+  updated_at: <%= Time.zone.now %>
+
+# CASO 11: Pending con RUN duplicado (BR-057) + segunda familia en domicilio de selendis
+mohandar:
+  email: mohandar@daelaam.io
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'hightempler') %>
+  created_at: <%= Time.zone.now %>
+  updated_at: <%= Time.zone.now %>
+
+# CASO 12: Miembro desactivado por el admin (no por reinicio)
+tal_darim:
+  email: taldarim@daelaam.io
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'ascension') %>
+  verified_identity: tal_darim_persona
+  created_at: <%= Time.zone.now %>
+  updated_at: <%= Time.zone.now %>

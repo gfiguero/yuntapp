@@ -62,3 +62,11 @@ rohana_persona:
   phone: "+56955556666"
   email: "rohana@daelaam.io"
 
+# CASO 12: Identidad verificada del miembro desactivado por admin
+tal_darim_persona:
+  first_name: "Tal"
+  last_name: "Darim"
+  run: "77777777-7"
+  phone: "+56977777777"
+  email: "taldarim@daelaam.io"
+

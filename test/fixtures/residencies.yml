@@ -6,5 +6,33 @@ selendis_residency:
   verified_identity: selendis_persona
   verified_residence: selendis_verified_residence
   household_unit: selendis_household
+  family_group: selendis_family_group
+  household_admin: true
+  status: "approved"
+
+# CASO 7: Residencia de vorazun — aprobada, ahora miembro inactivo por reinicio
+vorazun_residency:
+  verified_identity: vorazun_persona
+  verified_residence: vorazun_verified_residence
+  household_unit: vorazun_household
+  family_group: vorazun_family_group
+  household_admin: true
+  status: "approved"
+
+# CASO 8: Residencia de fenix en association_0 — aprobada, ahora miembro inactivo por cambio de junta
+fenix_old_residency:
+  verified_identity: fenix_persona
+  verified_residence: fenix_old_verified_residence
+  household_unit: fenix_old_household
+  family_group: fenix_old_family_group
+  household_admin: true
+  status: "approved"
+
+# CASO 12: Residencia de tal_darim — aprobada, ahora inactivo por desactivación del admin
+tal_darim_residency:
+  verified_identity: tal_darim_persona
+  verified_residence: tal_darim_verified_residence
+  household_unit: tal_darim_household
+  family_group: tal_darim_family_group
   household_admin: true
   status: "approved"

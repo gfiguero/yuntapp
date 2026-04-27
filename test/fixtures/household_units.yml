@@ -37,3 +37,34 @@ selendis_household:
   postal_code: "9500000"
   commune: commune_0_0_39
   verified_residence: selendis_verified_residence
+
+# CASO 7: Domicilio anterior de vorazun en manios_de_buin
+vorazun_household:
+  number: "15B"
+  neighborhood_delegation: manios_delegation_2
+  street_name: "Calle Las Acacias"
+  city: "Buin"
+  region: "Región Metropolitana"
+  country: "Chile"
+  postal_code: "9500000"
+  commune: commune_0_0_39
+  verified_residence: vorazun_verified_residence
+
+# CASO 8: Domicilio anterior de fenix en association_0
+fenix_old_household:
+  number: "789"
+  neighborhood_delegation: neighborhood_delegation_0_0
+  street_name: "Orbital Station 1"
+  verified_residence: fenix_old_verified_residence
+
+# CASO 12: Domicilio de tal_darim en manios_de_buin
+tal_darim_household:
+  number: "30"
+  neighborhood_delegation: manios_delegation_3
+  street_name: "Pasaje Los Robles"
+  city: "Buin"
+  region: "Región Metropolitana"
+  country: "Chile"
+  postal_code: "9500000"
+  commune: commune_0_0_39
+  verified_residence: tal_darim_verified_residence

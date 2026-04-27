@@ -23,3 +23,53 @@ karax_identity:
   run: "66666666-6"
   phone: "+56977778888"
   status: "pending"
+
+# CASO 3: Todos los pasos completados, en draft (no enviado aún)
+tassadar_identity:
+  user: tassadar
+  onboarding_request: tassadar_draft
+  first_name: "Tassadar"
+  last_name: "Hierarch"
+  run: "88888888-8"
+  phone: "+56988888888"
+  status: "draft"
+
+# CASO 5: Solicitud de identidad rechazada por el admin
+alarak_identity:
+  user: alarak
+  onboarding_request: alarak_rejected
+  first_name: "Alarak"
+  last_name: "Highlord"
+  run: "99999999-9"
+  phone: "+56999999999"
+  status: "rejected"
+
+# CASO 8: Nueva solicitud de identidad en manios (fenix ya tiene RUN 44444444-4 verificado en otra junta)
+fenix_new_identity:
+  user: fenix
+  onboarding_request: fenix_new_pending
+  first_name: "Fenix"
+  last_name: "Purifier"
+  run: "44444444-4"
+  phone: "+56933334444"
+  status: "pending"
+
+# CASO 9: Solicitud pendiente con dirección manual
+rohana_identity:
+  user: rohana
+  onboarding_request: rohana_pending
+  first_name: "Rohana"
+  last_name: "Preserver"
+  run: "55555555-5"
+  phone: "+56955556666"
+  status: "pending"
+
+# CASO 11: RUN duplicado — mismo RUN que selendis (11111111-1), cuenta de usuario distinta (BR-057)
+mohandar_identity_dup_run:
+  user: mohandar
+  onboarding_request: mohandar_pending
+  first_name: "Mohandar"
+  last_name: "Aiur"
+  run: "11111111-1"
+  phone: "+56966666666"
+  status: "pending"

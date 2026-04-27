@@ -4,3 +4,26 @@ selendis_verified_residence:
   commune: commune_0_0_39
   number: "Nexus #1-A"
   street_name: "742 Aiur Boulevard"
+
+# CASO 7: Residencia anterior de vorazun en manios_de_buin (ahora inactivo por reinicio)
+vorazun_verified_residence:
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_2
+  commune: commune_0_0_39
+  number: "15B"
+  street_name: "Calle Las Acacias"
+
+# CASO 8: Residencia anterior de fenix en association_0 (ahora inactivo por cambio de junta)
+fenix_old_verified_residence:
+  neighborhood_association: association_0
+  neighborhood_delegation: neighborhood_delegation_0_0
+  number: "789"
+  street_name: "Orbital Station 1"
+
+# CASO 12: Residencia de tal_darim en manios_de_buin (ahora inactivo por desactivación admin)
+tal_darim_verified_residence:
+  neighborhood_association: manios_de_buin
+  neighborhood_delegation: manios_delegation_3
+  commune: commune_0_0_39
+  number: "30"
+  street_name: "Pasaje Los Robles"

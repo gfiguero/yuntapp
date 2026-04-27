@@ -20,3 +20,64 @@ karax_pending:
   commune: commune_0_0_39
   status: "pending"
   terms_accepted_at: <%= Time.zone.now %>
+
+# CASO 2: Draft — paso 1 completo (junta elegida), sin solicitud de identidad todavía
+zeratul_draft:
+  user: zeratul
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "draft"
+
+# CASO 3: Draft — todos los pasos completados, aún no enviado (falta submit)
+tassadar_draft:
+  user: tassadar
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "draft"
+
+# CASO 5: Rechazado por admin — documentos insuficientes
+alarak_rejected:
+  user: alarak
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "rejected"
+  terms_accepted_at: <%= Time.zone.now %>
+  rejection_reason: "Los documentos de identidad no corresponden al solicitante."
+
+# CASO 7: Nuevo draft tras reinicio — vorazun estaba aprobado en manios, cambió dirección
+vorazun_restart_draft:
+  user: vorazun
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "draft"
+
+# CASO 8: Nuevo pending en manios — fenix era miembro en association_0, se cambia de junta
+fenix_new_pending:
+  user: fenix
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "pending"
+  terms_accepted_at: <%= Time.zone.now %>
+
+# CASO 9: Pending con dirección manual (sin delegación vecinal)
+rohana_pending:
+  user: rohana
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "pending"
+  terms_accepted_at: <%= Time.zone.now %>
+
+# CASO 11: Pending con RUN duplicado (11111111-1 = mismo que selendis) + mismo domicilio
+mohandar_pending:
+  user: mohandar
+  neighborhood_association: manios_de_buin
+  region: region_0_0
+  commune: commune_0_0_39
+  status: "pending"
+  terms_accepted_at: <%= Time.zone.now %>
