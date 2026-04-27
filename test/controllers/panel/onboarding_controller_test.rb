@@ -120,7 +120,7 @@ module Panel
     end
 
     test "user with inactive member can access onboarding" do
-      members(:selendis_member).update!(status: "inactive")
+      members(:selendis_member).update!(status: "inactive", deactivation_reason: "Test deactivation")
       sign_in @selendis
       get panel_onboarding_step1_url
       assert_response :success

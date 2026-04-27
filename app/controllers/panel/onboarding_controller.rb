@@ -12,7 +12,7 @@ module Panel
     def restart
       session.delete(:onboarding)
       current_user.current_onboarding_request&.destroy
-      current_user.member&.update!(status: "inactive")
+      current_user.member&.deactivate!(reason: I18n.t("panel.onboarding.deactivation_reason"))
       redirect_to panel_onboarding_step1_path, notice: I18n.t("panel.onboarding.flash.restarted")
     end
 

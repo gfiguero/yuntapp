@@ -13,6 +13,7 @@ class Member < ApplicationRecord
 
   validates :verified_identity_id, presence: true
   validates :status, presence: true, inclusion: { in: STATUSES }
+  validates :deactivation_reason, presence: true, if: -> { inactive? }
 
   delegate :name, :run, :phone, :email, :first_name, :last_name, to: :verified_identity, allow_nil: true
 
@@ -31,4 +32,10 @@ class Member < ApplicationRecord
   def approved? = status == "approved"
   def rejected? = status == "rejected"
   def inactive? = status == "inactive"
+
+  def deactivate!(reason:)
+    self.deactivation_reason = reason
+    self.status = "inactive"
+    save!
+  end
 end

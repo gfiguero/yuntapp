@@ -1,0 +1,28 @@
+<% content_for :title do %>
+  <%= I18n.t('admin.members.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('admin.members.index.title'), admin_members_path %></li>
+  <li><%= link_to @member.id, admin_member_path(@member) %></li>
+  <li><%= I18n.t('admin.members.deactivate.title') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.members.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('admin.members.show.identifier', id: @member.id) %></h3>
+  <%= render "buttons" %>
+
+  <div class="alert alert-warning mb-4">
+    <span><%= I18n.t('admin.members.deactivate.warning', name: @member.name) %></span>
+  </div>
+
+  <%= form_with url: confirm_deactivate_admin_member_path(@member), method: :patch do |f| %>
+    <div class="form-control mb-4">
+      <%= f.label :deactivation_reason, I18n.t('admin.members.deactivate.reason_label'), class: "label" %>
+      <%= f.text_area :deactivation_reason, class: "textarea textarea-bordered w-full", rows: 3, required: true %>
+    </div>
+    <%= f.submit I18n.t('admin.members.deactivate.confirm'), class: "btn btn-error" %>
+    <%= link_to I18n.t('actions.cancel'), admin_member_path(@member), class: "btn btn-soft ml-2" %>
+  <% end %>
+</div>
