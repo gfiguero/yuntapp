@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_26_025242) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_27_021404) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -187,7 +187,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_26_025242) do
     t.integer "neighborhood_association_id", null: false
     t.text "notes"
     t.text "purpose"
-    t.string "status", default: "pending", null: false
+    t.string "status", default: "pending_payment", null: false
     t.datetime "updated_at", null: false
     t.index ["approved_by_id"], name: "index_residence_certificates_on_approved_by_id"
     t.index ["household_unit_id"], name: "index_residence_certificates_on_household_unit_id"

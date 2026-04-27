@@ -230,8 +230,6 @@ Rails.application.routes.draw do
       end
       member do
         get :delete
-        patch :approve
-        patch :reject
         patch :issue
       end
     end

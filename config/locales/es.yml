@@ -226,9 +226,8 @@ es:
         approved: Aprobado
         rejected: Rechazado
       "residence_certificate/status":
-        pending: Pendiente
-        approved: Aprobado
-        rejected: Rechazado
+        pending_payment: Pendiente de Pago
+        paid: Pagado
         issued: Emitido
     errors:
       messages:
@@ -392,8 +391,6 @@ es:
         created: Certificado creado exitosamente.
         updated: Certificado actualizado exitosamente.
         destroyed: Certificado eliminado exitosamente.
-        approved: Certificado aprobado exitosamente.
-        rejected: Certificado rechazado exitosamente.
         issued: Certificado emitido exitosamente.
     onboarding_requests:
       index:
