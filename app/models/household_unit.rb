@@ -4,6 +4,7 @@ class HouseholdUnit < ApplicationRecord
   belongs_to :neighborhood_delegation
   belongs_to :commune, optional: true
   belongs_to :verified_residence, optional: true
+  has_many :family_groups, dependent: :destroy
   has_many :residencies, dependent: :destroy
   has_many :approved_residencies, -> { where(status: "approved") }, class_name: "Residency"
 
