@@ -40,4 +40,22 @@ class MemberTest < ActiveSupport::TestCase
     results = Member.filter_by_run("11111111")
     assert_includes results, members(:selendis_member)
   end
+
+  test "inactive is a valid status" do
+    member = members(:selendis_member)
+    member.status = "inactive"
+    assert member.valid?
+  end
+
+  test "inactive? returns true when status is inactive" do
+    member = members(:selendis_member)
+    member.status = "inactive"
+    assert member.inactive?
+  end
+
+  test "approved? returns false when status is inactive" do
+    member = members(:selendis_member)
+    member.status = "inactive"
+    assert_not member.approved?
+  end
 end

@@ -1,7 +1,7 @@
 class Member < ApplicationRecord
   include Filterable
 
-  STATUSES = %w[pending approved rejected].freeze
+  STATUSES = %w[pending approved rejected inactive].freeze
 
   belongs_to :verified_identity
   belongs_to :neighborhood_association
@@ -21,6 +21,7 @@ class Member < ApplicationRecord
   scope :filter_by_run, ->(run) { joins(:verified_identity).where("verified_identities.run LIKE :q", q: "%#{run}%") }
   scope :approved, -> { where(status: "approved") }
   scope :pending, -> { where(status: "pending") }
+  scope :active, -> { where.not(status: "inactive") }
 
   def user
     requested_by || verified_identity&.users&.first
@@ -29,4 +30,5 @@ class Member < ApplicationRecord
   def pending? = status == "pending"
   def approved? = status == "approved"
   def rejected? = status == "rejected"
+  def inactive? = status == "inactive"
 end

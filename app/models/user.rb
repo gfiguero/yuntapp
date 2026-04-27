@@ -25,7 +25,7 @@ class User < ApplicationRecord
   end
 
   def member
-    verified_identity&.members&.find_by(neighborhood_association: neighborhood_association)
+    verified_identity&.members&.active&.find_by(neighborhood_association: neighborhood_association)
   end
 
   def residency

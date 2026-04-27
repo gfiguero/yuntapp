@@ -10,23 +10,10 @@ module Panel
     before_action :ensure_step4!, only: [:step4, :submit]
 
     def restart
-      # 1. Eliminar datos de sesión
       session.delete(:onboarding)
-
-      # 2. Cancelar solicitud pendiente si existe
       current_user.current_onboarding_request&.destroy
-
-      # 2. Eliminar asociación actual si existe (Member y HouseholdUnit)
-      # Nota: Esto es destructivo. Dependiendo del negocio, quizás solo se quiera "archivar"
-      # o dejar inactivo. Por ahora, eliminamos la relación actual para permitir un nuevo flujo.
-
-      current_user.member&.destroy
-
-      # Opcional: Si el usuario creó un HouseholdUnit específico para él y nadie más vive ahí,
-      # podríamos querer eliminarlo también, pero es arriesgado si hay otros miembros.
-      # Por seguridad, solo desvinculamos al usuario (eliminando su Member record).
-
-      redirect_to panel_onboarding_step1_path, notice: "Proceso de onboarding reiniciado."
+      current_user.member&.update!(status: "inactive")
+      redirect_to panel_onboarding_step1_path, notice: I18n.t("panel.onboarding.flash.restarted")
     end
 
     def step1
@@ -519,7 +506,7 @@ module Panel
     private
 
     def redirect_if_onboarded!
-      if current_user.member.present?
+      if current_user.member&.approved?
         redirect_to panel_root_path
         return
       end

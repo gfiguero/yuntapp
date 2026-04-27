@@ -113,10 +113,39 @@ module Panel
 
     # --- user with member is redirected away from onboarding ---
 
-    test "user with member is redirected from onboarding to dashboard" do
+    test "user with approved member is redirected from onboarding to dashboard" do
       sign_in @selendis
       get panel_onboarding_step1_url
       assert_redirected_to panel_root_url
+    end
+
+    test "user with inactive member can access onboarding" do
+      members(:selendis_member).update!(status: "inactive")
+      sign_in @selendis
+      get panel_onboarding_step1_url
+      assert_response :success
+    end
+
+    # --- restart sets member to inactive ---
+
+    test "restart sets member to inactive instead of destroying it" do
+      sign_in @selendis
+      member = members(:selendis_member)
+      assert member.approved?
+
+      delete panel_onboarding_restart_url
+      assert_redirected_to panel_onboarding_step1_url
+
+      assert member.reload.inactive?
+    end
+
+    test "restart preserves member record in database" do
+      sign_in @selendis
+      member_id = members(:selendis_member).id
+
+      delete panel_onboarding_restart_url
+
+      assert Member.exists?(member_id), "Member should not be destroyed"
     end
 
     private
