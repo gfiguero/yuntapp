@@ -221,8 +221,14 @@ module Panel
             end
           end
 
-          # Validamos presencia solo para el campo enviado
-          if @identity_request.send(field_name).blank?
+          # Validamos presencia solo para el campo enviado (sin send para evitar ejecucion arbitraria)
+          field_value = {
+            "first_name" => @identity_request.first_name,
+            "last_name" => @identity_request.last_name,
+            "run" => @identity_request.run,
+            "phone" => @identity_request.phone
+          }[field_name]
+          if field_value.blank?
             @identity_request.errors.add(field_name, :blank)
           end
 
