@@ -2,7 +2,7 @@ module Admin
   class ResidenceCertificatesController < ApplicationController
     include Pagy::Method
 
-    before_action :set_residence_certificate, only: %i[show edit update delete destroy approve reject issue]
+    before_action :set_residence_certificate, only: %i[show edit update delete destroy issue]
     before_action :set_residence_certificates, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -68,18 +68,6 @@ module Admin
     def destroy
       @residence_certificate.destroy!
       redirect_to admin_residence_certificates_path, notice: I18n.t("admin.residence_certificates.flash.destroyed"), status: :see_other, format: :html
-    end
-
-    # PATCH /admin/residence_certificates/1/approve
-    def approve
-      @residence_certificate.update!(status: "approved", approved_by: current_user)
-      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.approved"), status: :see_other
-    end
-
-    # PATCH /admin/residence_certificates/1/reject
-    def reject
-      @residence_certificate.update!(status: "rejected", approved_by: current_user, notes: params[:notes])
-      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.rejected"), status: :see_other
     end
 
     # PATCH /admin/residence_certificates/1/issue

@@ -1,12 +1,14 @@
 class ResidenceCertificate < ApplicationRecord
   include Filterable
 
-  STATUSES = %w[pending approved rejected issued].freeze
+  STATUSES = %w[pending_payment paid issued].freeze
 
   belongs_to :neighborhood_association
   belongs_to :member
   belongs_to :household_unit
   belongs_to :approved_by, class_name: "User", optional: true
+
+  after_initialize :set_default_status, if: :new_record?
 
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :purpose, presence: true
@@ -15,16 +17,12 @@ class ResidenceCertificate < ApplicationRecord
   scope :filter_by_status, ->(status) { where(status: status) }
   scope :filter_by_folio, ->(folio) { where.like(folio: "%#{folio}%") }
 
-  def pending?
-    status == "pending"
+  def pending_payment?
+    status == "pending_payment"
   end
 
-  def approved?
-    status == "approved"
-  end
-
-  def rejected?
-    status == "rejected"
+  def paid?
+    status == "paid"
   end
 
   def issued?
@@ -34,5 +32,11 @@ class ResidenceCertificate < ApplicationRecord
   def generate_folio!
     sequence = self.class.where(neighborhood_association_id: neighborhood_association_id).maximum(:id) || 0
     update!(folio: "CR-#{neighborhood_association_id}-#{sequence + 1}")
+  end
+
+  private
+
+  def set_default_status
+    self.status ||= "pending_payment"
   end
 end
