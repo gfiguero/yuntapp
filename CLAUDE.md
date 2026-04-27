@@ -53,25 +53,22 @@ Solicita certificado (panel)
 Paga con MercadoPago
     │  status → paid (webhook de MercadoPago confirma)
     ▼
-Admin de junta revisa solicitud + documentos
-    │  status → approved  (o rejected con motivo)
-    ▼
-Sistema genera PDF con folio único + código de validación
+Sistema genera automáticamente PDF con folio único + código de validación
     │  status → issued
     ▼
 Socio descarga el PDF desde su panel
 ```
 
+> El admin verificó la identidad y domicilio una sola vez en el onboarding. Los certificados no requieren revisión adicional — se emiten automáticamente tras el pago (BR-062).
+
 ### Estados de ResidenceCertificate
 | Estado | Descripción |
 |--------|-------------|
 | `pending_payment` | Solicitud creada, esperando pago |
-| `paid` | Pago confirmado por MercadoPago, en cola para revisión |
-| `approved` | Admin aprobó, sistema emite el PDF |
-| `rejected` | Admin rechazó con motivo. El socio puede volver a intentar |
+| `paid` | Pago confirmado por MercadoPago, emisión automática en proceso |
 | `issued` | PDF generado y disponible para descarga |
 
-> **REGLA CRÍTICA**: Nunca emitir un certificado sin que el pago esté confirmado (`paid`). El admin no debe ver la solicitud hasta que el pago sea exitoso.
+> **REGLA CRÍTICA**: Nunca emitir un certificado sin que el pago esté confirmado (`paid`). No existen estados `approved` ni `rejected` en el flujo de certificados (BR-064).
 
 ### Código de Validación del Certificado
 El PDF del certificado debe incluir **tres canales de validación simultáneos**:
@@ -156,19 +153,19 @@ Cada caso de uso documenta el flujo ideal (happy path). Claude Code debe respeta
 
 ---
 
-### UC-005 · Revisión y emisión del certificado
-**Actor**: Admin de junta
+### UC-005 · Emisión automática del certificado
+**Actor**: Sistema (automático tras confirmación de pago)
 **Precondición**: UC-004 completado — certificado en estado `paid`
 
 | # | Paso |
 |---|------|
-| 1 | El admin ve la solicitud en su panel de certificados pendientes |
-| 2 | Revisa los datos del solicitante: identidad, domicilio y propósito |
-| 3 | Aprueba la solicitud |
-| 4 | El sistema genera el folio único (`CR-{association_id}-{sequence}`) |
-| 5 | El sistema genera el `validation_token` (UUID) y el `validation_code` (alfanumérico legible) |
-| 6 | El sistema genera el PDF con los datos del certificado, QR, código y URL de verificación |
-| 7 | El certificado pasa a estado `issued` y el socio recibe notificación |
+| 1 | El sistema recibe confirmación de pago de MercadoPago |
+| 2 | Genera el folio único (`CR-{association_id}-{sequence}`) |
+| 3 | Genera el `validation_token` (UUID) y el `validation_code` (alfanumérico legible) |
+| 4 | Genera el PDF con los datos del certificado, QR, código y URL de verificación |
+| 5 | El certificado pasa a estado `issued` y el socio recibe notificación |
+
+> No interviene el admin. La identidad y domicilio ya fueron verificados en el onboarding (BR-062).
 
 **Postcondición**: `ResidenceCertificate` en estado `issued` con PDF generado y código de validación activo.
 
@@ -242,6 +239,40 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-028 | Multi-tenant | El admin solo ve solicitudes de onboarding en estado `pending` o posterior. Las solicitudes en `draft` son invisibles para el admin |
 | BR-029 | Acceso | Un usuario solo puede ser socio activo de una junta a la vez. Al unirse a una nueva junta, el `Member` anterior pasa a estado `inactive` (nunca se destruye). El historial de certificados e identidad se conserva |
 | BR-030 | Integridad | El estado `inactive` en `Member` indica que el socio ya no pertenece activamente a esa junta, pero sus registros históricos (certificados, residencias) permanecen intactos y auditables |
+| BR-031 | Onboarding | El cambio de dirección dentro de la misma junta requiere reinicio completo del onboarding. El `Member` anterior pasa a `inactive` y el socio debe completar el flujo de nuevo para que el admin verifique la nueva dirección |
+| BR-032 | Acceso | El `household_admin` es el único residente del domicilio que tiene cuenta de usuario (`User` con login). Los demás residentes del domicilio son **residentes dependientes**: registrados por el `household_admin` mediante RUN, sin cuenta propia en el sistema |
+| BR-033 | Acceso | Los residentes dependientes no pueden iniciar sesión ni solicitar certificados. Solo el `household_admin` opera en nombre del domicilio |
+| BR-034 | Residencia | Si el `household_admin` abandona el domicilio (reinicia onboarding o se va a otra junta), los residentes dependientes quedan desvinculados. No se migran automáticamente al nuevo `household_admin` |
+| BR-035 | Onboarding | Para que un domicilio tenga un nuevo `household_admin`, ese residente debe hacer su propio onboarding completo. Una vez aprobado, vuelve a registrar a los residentes dependientes del domicilio |
+| BR-036 | Acceso | El admin de la junta puede desactivar manualmente a cualquier `household_admin` o residente dependiente desde el panel de administración, registrando obligatoriamente el motivo de desactivación |
+| BR-037 | Integridad | Al desactivar un `household_admin`, todos sus residentes dependientes quedan desactivados en cascada automáticamente |
+| BR-038 | Integridad | La desactivación manual no elimina registros. El `Member` y los `Residency` pasan a estado `inactive` conservando el historial y el motivo de desactivación |
+| BR-039 | Onboarding | Tras la desactivación de un `household_admin`, cualquier nuevo residente puede hacer onboarding en ese domicilio siguiendo el flujo normal, sin pasos adicionales |
+| BR-040 | Residencia | Un `HouseholdUnit` (dirección física) puede contener múltiples `FamilyGroup`, cada uno representando un núcleo familiar distinto que convive en esa dirección (ej: dos familias en la misma casa, o un adulto mayor independiente) |
+| BR-041 | Residencia | Cada `FamilyGroup` tiene su propio `household_admin` que gestiona únicamente sus residentes dependientes. No puede editar ni ver los residentes de otro `FamilyGroup` dentro del mismo `HouseholdUnit` |
+| BR-042 | Residencia | Un `household_admin` puede visualizar qué otros `FamilyGroup` existen en su mismo `HouseholdUnit`, pero solo en modo lectura, para tener contexto de quiénes conviven en el domicilio |
+| BR-043 | Onboarding | Cuando el admin aprueba un onboarding en una dirección ya existente, vincula al solicitante al `HouseholdUnit` existente creando un nuevo `FamilyGroup` dentro de él. Si la dirección es nueva, crea tanto el `HouseholdUnit` como el `FamilyGroup` |
+| BR-056 | Integridad | `FamilyGroup` es un modelo nuevo que debe crearse. Representa un núcleo familiar dentro de un `HouseholdUnit`. `HouseholdUnit` conserva su rol como dirección física. `FamilyGroup` pertenece a `HouseholdUnit` y contiene al `household_admin` y sus residentes dependientes. Pendiente de implementar |
+| BR-044 | Identidad | Cada junta verifica los documentos de identidad de forma independiente, siempre. Que un RUN ya exista verificado en otra junta es solo informativo para el admin, no exime de la verificación |
+| BR-045 | Identidad | El sistema no controla la vigencia de los documentos de identidad. Un `Member` activo opera con normalidad aunque su carnet haya vencido. La vigencia documental queda a criterio del admin de la junta |
+| BR-046 | Identidad | Para corregir un RUN erróneo en una `VerifiedIdentity` aprobada: el admin desactiva al socio (BR-036) y el socio realiza un nuevo onboarding con el RUN correcto. No existe edición directa del RUN post-aprobación |
+| BR-047 | Onboarding | Una solicitud rechazada permanece en el historial del usuario con el motivo de rechazo visible. No se destruye ni archiva |
+| BR-048 | Onboarding | El usuario puede iniciar una nueva solicitud de onboarding tras un rechazo. Tiene la opción de "duplicar" la solicitud rechazada para pre-cargar todos sus datos y solo corregir lo necesario, sin empezar desde cero |
+| BR-049 | Onboarding | Al duplicar una solicitud rechazada, se crea una nueva `OnboardingRequest` en estado `draft` con los datos copiados. La solicitud original rechazada permanece intacta en el historial |
+| BR-050 | Onboarding | El sistema envía recordatorios automáticos por email al admin de la junta mientras tenga solicitudes en estado `pending` sin revisar. La frecuencia de recordatorios está por definir |
+| BR-051 | Onboarding | El usuario puede cancelar su solicitud en estado `pending` en cualquier momento desde su panel, quedando libre para iniciar una nueva solicitud o duplicar la cancelada |
+| BR-052 | Acceso | Una junta de vecinos puede tener múltiples usuarios admin simultáneos. Cualquiera de ellos puede revisar y gestionar todas las solicitudes pendientes de la junta |
+| BR-053 | Acceso | Al dar de baja a un admin, las solicitudes pendientes permanecen intactas y disponibles para los demás admins de la junta. El superadmin puede asignar nuevos admins en cualquier momento |
+| BR-054 | Multi-tenant | Cuando una junta se disuelve, el superadmin la marca como `inactive`. Todos sus `Member` activos pasan a `inactive` en cascada |
+| BR-055 | Multi-tenant | La disolución de una junta no migra socios automáticamente. Cada socio decide individualmente si hace onboarding en otra junta. El historial de certificados e identidad se conserva |
+| BR-057 | Identidad | Un RUN ya verificado puede aparecer en un nuevo onboarding con una cuenta de usuario distinta (ej: el residente perdió acceso a su cuenta anterior). El sistema lo permite y alerta al admin durante la revisión |
+| BR-058 | Identidad | Mientras el nuevo onboarding con un RUN duplicado no sea aprobado, la membresía anterior asociada a ese RUN permanece activa e intacta. El admin es el único que puede validar si se trata de la misma persona legítima |
+| BR-059 | Identidad | Solo cuando el admin aprueba el onboarding con un RUN duplicado, el `Member` anterior asociado a ese RUN pasa a estado `inactive`. La aprobación es el acto que transfiere la identidad verificada a la nueva cuenta |
+| BR-060 | Identidad | Si el admin rechaza un onboarding con RUN duplicado, la membresía anterior continúa activa sin ningún cambio. El admin debe registrar el motivo del rechazo, especialmente si detecta un intento de fraude |
+| BR-061 | Certificados | Un socio verificado puede solicitar tantos certificados como desee, sin restricciones por cantidad ni por estados de solicitudes previas. Certificados en `pending_payment` o pagados sin usar son responsabilidad del usuario |
+| BR-062 | Certificados | Una vez que el admin aprobó el onboarding del socio (identidad + domicilio verificados), los certificados se emiten automáticamente tras el pago confirmado. No requieren revisión ni aprobación del admin por cada solicitud |
+| BR-063 | Certificados | No existe posibilidad de rechazo de un certificado post-verificación. Por lo tanto no hay devoluciones de pago. El pago es el último paso antes de la emisión automática |
+| BR-064 | Certificados | Los estados del certificado se simplifican a: `pending_payment` → `paid` → `issued`. Los estados `approved` y `rejected` quedan eliminados del flujo de certificados |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización
@@ -385,9 +416,17 @@ Country -> Region -> Commune -> NeighborhoodAssociation -> NeighborhoodDelegatio
 - Tiene: `board_members`, `residence_certificates`, `documents` (attachments)
 
 #### HouseholdUnit
+- Representa la dirección física. Relación 1:1 con un domicilio real
+- Puede contener múltiples `FamilyGroup` (BR-040)
 - Pertenece a: `neighborhood_delegation`, `commune`
-- Tiene muchos: `members`, `approved_members`
-- Campos de direccion completos
+- Campos de dirección completos
+
+#### FamilyGroup _(modelo nuevo — BR-056)_
+- Representa un núcleo familiar dentro de un `HouseholdUnit`
+- Pertenece a: `HouseholdUnit`
+- Tiene un `household_admin` (el `Member` que gestiona el grupo)
+- Tiene muchos residentes dependientes (`Residency` con `household_admin: false`)
+- Un `household_admin` solo puede gestionar su propio `FamilyGroup`
 
 #### ResidenceCertificate
 - Status: pending_payment | paid | approved | rejected | issued
