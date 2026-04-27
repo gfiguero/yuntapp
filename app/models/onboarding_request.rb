@@ -9,7 +9,7 @@ class OnboardingRequest < ApplicationRecord
 
   STATUSES = %w[draft pending approved rejected].freeze
 
-  validates :status, inclusion: {in: STATUSES}
+  validates :status, inclusion: { in: STATUSES }
   validates :terms_accepted_at, presence: true, unless: :draft?
 
   scope :draft, -> { where(status: "draft") }

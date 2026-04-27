@@ -9,7 +9,7 @@ class CreateResidencies < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :residencies, [:verified_identity_id, :household_unit_id],
+    add_index :residencies, [ :verified_identity_id, :household_unit_id ],
       unique: true, name: "index_residencies_on_identity_and_unit"
   end
 end

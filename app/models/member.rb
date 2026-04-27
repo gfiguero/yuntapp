@@ -12,7 +12,7 @@ class Member < ApplicationRecord
   has_many :residence_certificates, dependent: :destroy
 
   validates :verified_identity_id, presence: true
-  validates :status, presence: true, inclusion: {in: STATUSES}
+  validates :status, presence: true, inclusion: { in: STATUSES }
 
   delegate :name, :run, :phone, :email, :first_name, :last_name, to: :verified_identity, allow_nil: true
 

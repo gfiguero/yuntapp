@@ -88,7 +88,7 @@ module Panel
       get panel_onboarding_step2_url
 
       patch panel_onboarding_step2_url, params: {
-        identity_verification_request: {first_name: "Test"}
+        identity_verification_request: { first_name: "Test" }
       }
       # Autosave responds with turbo_stream or html, not redirect
       assert_response :success

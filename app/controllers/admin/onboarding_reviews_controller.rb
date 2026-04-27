@@ -19,7 +19,7 @@ module Admin
       # Since steps 1-2 don't write data, a match here means the identity existed
       # before this onboarding process.
       @existing_identity = VerifiedIdentity
-        .includes(residencies: {household_unit: {neighborhood_delegation: :neighborhood_association}})
+        .includes(residencies: { household_unit: { neighborhood_delegation: :neighborhood_association } })
         .find_by(run: @identity_request.run)
 
       # Find existing household units with matching delegation + number (same association)

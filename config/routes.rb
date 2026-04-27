@@ -54,7 +54,7 @@ Rails.application.routes.draw do
 
   namespace :panel do
     root to: "dashboard#index"
-    resource :profile, only: [:show, :update], controller: "profile"
+    resource :profile, only: [ :show, :update ], controller: "profile"
     resources :members, only: [ :index, :show, :new, :create, :edit, :update ]
     resources :listings do
       collection do
@@ -64,7 +64,7 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :residence_certificates, only: [:index, :show, :new, :create]
+    resources :residence_certificates, only: [ :index, :show, :new, :create ]
 
     delete "reset_account", to: "account_resets#destroy", as: :reset_account
 
@@ -145,15 +145,15 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :onboarding_requests, except: [:new, :create] do
+    resources :onboarding_requests, except: [ :new, :create ] do
       collection { get :search }
       member { get :delete }
     end
-    resources :identity_verification_requests, except: [:new, :create] do
+    resources :identity_verification_requests, except: [ :new, :create ] do
       collection { get :search }
       member { get :delete }
     end
-    resources :residence_verification_requests, except: [:new, :create] do
+    resources :residence_verification_requests, except: [ :new, :create ] do
       collection { get :search }
       member { get :delete }
     end
@@ -178,7 +178,7 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :onboarding_requests, only: [:index, :show] do
+    resources :onboarding_requests, only: [ :index, :show ] do
       collection do
         get :search
       end

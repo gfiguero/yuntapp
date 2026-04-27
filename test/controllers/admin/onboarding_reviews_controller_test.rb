@@ -248,7 +248,7 @@ module Admin
         assert_difference -> { Residency.count }, 1 do
           assert_difference -> { Member.count }, 1 do
             patch review_step3_admin_onboarding_request_url(@onboarding_request),
-              params: {household_unit_id: existing_hu.id}
+              params: { household_unit_id: existing_hu.id }
           end
         end
       end
@@ -276,7 +276,7 @@ module Admin
       assert_difference -> { HouseholdUnit.count }, 1 do
         assert_difference -> { Member.count }, 1 do
           patch review_step3_admin_onboarding_request_url(@onboarding_request),
-            params: {household_unit_id: "new"}
+            params: { household_unit_id: "new" }
         end
       end
 
@@ -319,7 +319,7 @@ module Admin
       sign_in @admin
 
       patch review_reject_admin_onboarding_request_url(@onboarding_request),
-        params: {rejection_reason: "Documentos ilegibles"}
+        params: { rejection_reason: "Documentos ilegibles" }
 
       assert_redirected_to admin_onboarding_request_url(@onboarding_request)
 

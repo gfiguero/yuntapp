@@ -8,6 +8,6 @@ class VerifiedResidence < ApplicationRecord
   has_many_attached :residence_documents
 
   def address
-    [street_name, number, address_detail].compact_blank.join(", ")
+    [ street_name, number, address_detail ].compact_blank.join(", ")
   end
 end

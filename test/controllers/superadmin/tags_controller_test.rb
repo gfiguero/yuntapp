@@ -16,7 +16,7 @@ module Superadmin
     end
 
     test "should get search with json format" do
-      get search_superadmin_tags_url(format: :json), params: {items: [@tag.id]}
+      get search_superadmin_tags_url(format: :json), params: { items: [ @tag.id ] }
       assert_response :success
 
       json_response = JSON.parse(response.body)
@@ -31,7 +31,7 @@ module Superadmin
 
     test "should create tag" do
       assert_difference("Tag.count") do
-        post superadmin_tags_url, params: {tag: {name: "New Admin Tag"}}
+        post superadmin_tags_url, params: { tag: { name: "New Admin Tag" } }
       end
 
       assert_redirected_to superadmin_tag_url(Tag.last)
@@ -39,7 +39,7 @@ module Superadmin
 
     test "should not create tag with invalid params" do
       assert_no_difference("Tag.count") do
-        post superadmin_tags_url, params: {tag: {name: ""}}
+        post superadmin_tags_url, params: { tag: { name: "" } }
       end
 
       assert_response :unprocessable_content
@@ -56,14 +56,14 @@ module Superadmin
     end
 
     test "should update tag" do
-      patch superadmin_tag_url(@tag), params: {tag: {name: "Updated Admin Tag"}}
+      patch superadmin_tag_url(@tag), params: { tag: { name: "Updated Admin Tag" } }
       assert_redirected_to superadmin_tag_url(@tag)
       @tag.reload
       assert_equal "Updated Admin Tag", @tag.name
     end
 
     test "should not update tag with invalid params" do
-      patch superadmin_tag_url(@tag), params: {tag: {name: ""}}
+      patch superadmin_tag_url(@tag), params: { tag: { name: "" } }
       assert_response :unprocessable_content
     end
 

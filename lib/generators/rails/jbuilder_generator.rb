@@ -28,11 +28,11 @@ module Rails
       protected
 
       def attributes_names
-        [:id] + super
+        [ :id ] + super
       end
 
       def filename_with_extensions(name)
-        [name, :json, :jbuilder].join(".")
+        [ name, :json, :jbuilder ].join(".")
       end
 
       def full_attributes_list
