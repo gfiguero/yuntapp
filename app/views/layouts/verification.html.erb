@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html data-theme="light">
+  <head>
+    <title><%= content_for(:title) || I18n.t("verifications.layout.title") %></title>
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  </head>
+
+  <body class="bg-base-200 min-h-screen flex flex-col">
+    <header class="bg-base-100 border-b border-base-300">
+      <div class="container mx-auto px-6 py-4">
+        <h1 class="text-2xl font-bold">Yuntapp</h1>
+        <p class="text-xs text-base-content/60"><%= I18n.t("verifications.layout.tagline") %></p>
+      </div>
+    </header>
+
+    <main class="flex-1 container mx-auto px-6 py-12">
+      <% flash.each do |type, message| %>
+        <% alert_class = case type
+             when "notice" then "alert-success"
+             when "alert" then "alert-warning"
+             when "error" then "alert-error"
+             else "alert-info"
+           end %>
+        <div class="alert <%= alert_class %> mb-4 max-w-2xl mx-auto">
+          <span><%= message %></span>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+
+    <footer class="bg-base-100 border-t border-base-300 py-6">
+      <div class="container mx-auto px-6 text-center text-sm text-base-content/60">
+        <p><%= I18n.t("verifications.layout.footer") %></p>
+      </div>
+    </footer>
+  </body>
+</html>

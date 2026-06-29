@@ -286,6 +286,10 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-075 | Certificados | El PDF se genera una sola vez al emitir y se almacena vía Active Storage (`pdf_document`). Descargas posteriores reutilizan el archivo almacenado |
 | BR-076 | Certificados | La transición `paid → issued` se ejecuta en un job asíncrono (`IssueCertificateJob`) disparado tras confirmar el pago vía `after_commit`. Si la generación del PDF falla, el job reintenta hasta 3 veces con backoff polinomial; si todos fallan, el certificado queda en `paid` para revisión manual |
 | BR-077 | Certificados | Eliminada la acción manual `Admin::ResidenceCertificatesController#issue`. La emisión es exclusivamente automática (BR-062). El admin ya no puede forzar emisión sin pago |
+| BR-078 | Validación | El RUN del titular se muestra parcialmente oculto en la verificación pública (formato `1.XXX.XXX-K`) para proteger privacidad. La verificación pública no expone datos completos del titular |
+| BR-079 | Validación | El endpoint `/verify/:identifier` acepta el `validation_token` (UUID) o el `validation_code` (8 chars alfanumérico, case-insensitive). Ambos resuelven al mismo certificado vía `ResidenceCertificate.find_for_public_verification` |
+| BR-080 | Validación | Un certificado con `expiration_date < today` se muestra como **Vencido** con response 200 OK (cumple BR-009 — URL responde indefinidamente). Solo identificadores **inexistentes** o certificados no-`issued` retornan 404 |
+| BR-081 | Validación | La verificación pública nunca expone certificados que no estén en estado `issued`. El scope `findable_publicly` filtra automáticamente; el controller no puede ser engañado vía URL para mostrar certs en `pending_payment` o `paid` |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización

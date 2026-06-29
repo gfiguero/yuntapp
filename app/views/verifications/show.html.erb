@@ -1,0 +1,61 @@
+<%
+  status_key = @certificate.expired? ? "expired" : "valid"
+  badge_class = @certificate.expired? ? "badge-warning" : "badge-success"
+  alert_class = @certificate.expired? ? "alert-warning" : "alert-success"
+%>
+
+<div class="max-w-2xl mx-auto">
+  <div class="alert <%= alert_class %> mb-6">
+    <div class="flex flex-col gap-1">
+      <span class="font-bold text-lg"><%= I18n.t("verifications.show.status.#{status_key}_title") %></span>
+      <span class="text-sm"><%= I18n.t("verifications.show.status.#{status_key}_description") %></span>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow-sm">
+    <div class="card-body">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <p class="text-xs uppercase text-base-content/60"><%= I18n.t("verifications.show.folio") %></p>
+          <p class="font-mono text-lg font-bold"><%= @certificate.folio %></p>
+        </div>
+        <span class="badge <%= badge_class %> badge-lg"><%= I18n.t("verifications.show.status.#{status_key}_badge") %></span>
+      </div>
+
+      <div class="divider my-2"></div>
+
+      <dl class="grid gap-3">
+        <div>
+          <dt class="text-xs uppercase text-base-content/60"><%= I18n.t("verifications.show.holder_name") %></dt>
+          <dd class="font-semibold text-lg"><%= @certificate.member.name %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase text-base-content/60"><%= I18n.t("verifications.show.holder_run") %></dt>
+          <dd class="font-mono"><%= @certificate.masked_run %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase text-base-content/60"><%= I18n.t("verifications.show.issuer") %></dt>
+          <dd><%= @certificate.neighborhood_association.name %></dd>
+        </div>
+        <div>
+          <dt class="text-xs uppercase text-base-content/60"><%= I18n.t("verifications.show.purpose") %></dt>
+          <dd><%= @certificate.purpose %></dd>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <dt class="text-xs uppercase text-base-content/60"><%= I18n.t("verifications.show.issue_date") %></dt>
+            <dd><%= l(@certificate.issue_date) %></dd>
+          </div>
+          <div>
+            <dt class="text-xs uppercase text-base-content/60"><%= I18n.t("verifications.show.expiration_date") %></dt>
+            <dd><%= l(@certificate.expiration_date) %></dd>
+          </div>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="text-center mt-6">
+    <%= link_to I18n.t("verifications.show.verify_another"), verify_path, class: "btn btn-soft" %>
+  </div>
+</div>

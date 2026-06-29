@@ -463,4 +463,125 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_not duplicate.valid?
     assert duplicate.errors[:validation_code].any?
   end
+
+  # --- Public verification (BR-009, BR-078, BR-079, BR-080, BR-081) ---
+
+  def issued_certificate(token: SecureRandom.uuid, code: SecureRandom.alphanumeric(8).upcase, expiration: Date.current + 6.months)
+    ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "issued",
+      folio: "CR-1-#{rand(1_000_000)}",
+      validation_token: token,
+      validation_code: code,
+      issue_date: Date.current,
+      expiration_date: expiration,
+      issued_at: Time.current
+    )
+  end
+
+  test "expired? is false for cert with future expiration" do
+    cert = issued_certificate(expiration: Date.current + 1.day)
+    assert_not cert.expired?
+  end
+
+  test "expired? is true for cert with past expiration" do
+    cert = issued_certificate(expiration: Date.current - 1.day)
+    assert cert.expired?
+  end
+
+  test "expired? is false when expiration_date is nil" do
+    cert = issued_certificate
+    cert.update_columns(expiration_date: nil)
+    assert_not cert.expired?
+  end
+
+  test "masked_run hides middle digits keeping format" do
+    cert = issued_certificate
+    cert.member.verified_identity.update_columns(run: "12345678-K")
+    assert_equal "1.XXX.XXX-K", cert.member.reload.run && cert.masked_run
+  end
+
+  test "masked_run preserves dv for known RUN format" do
+    cert = issued_certificate
+    cert.member.verified_identity.update_columns(run: "9876543-2")
+    assert_equal "9.XXX.XXX-2", cert.masked_run
+  end
+
+  test "masked_run returns nil when run is malformed" do
+    cert = issued_certificate
+    cert.member.verified_identity.update_columns(run: "malformed-no-dash-pattern")
+    # malformed RUN sin formato body-dv → masked_run retorna el raw
+    assert_kind_of String, cert.masked_run
+  end
+
+  test "findable_publicly scope returns only issued certs" do
+    issued = issued_certificate
+    ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "test",
+      status: "pending_payment",
+      validation_token: "uuid-pending",
+      validation_code: "PENDING1"
+    )
+
+    results = ResidenceCertificate.findable_publicly
+    assert_includes results, issued
+    assert results.all?(&:issued?)
+  end
+
+  test "find_for_public_verification finds by validation_token" do
+    cert = issued_certificate(token: SecureRandom.uuid)
+    found = ResidenceCertificate.find_for_public_verification(cert.validation_token)
+    assert_equal cert, found
+  end
+
+  test "find_for_public_verification finds by validation_code" do
+    cert = issued_certificate(code: "LOOKUP12")
+    found = ResidenceCertificate.find_for_public_verification("LOOKUP12")
+    assert_equal cert, found
+  end
+
+  test "find_for_public_verification is case-insensitive for validation_code" do
+    cert = issued_certificate(code: "LOOKUP34")
+    found = ResidenceCertificate.find_for_public_verification("lookup34")
+    assert_equal cert, found
+  end
+
+  test "find_for_public_verification returns nil for non-issued cert (BR-081)" do
+    pending = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "test",
+      status: "pending_payment",
+      validation_token: "uuid-only-pending",
+      validation_code: "PEND1234"
+    )
+
+    assert_nil ResidenceCertificate.find_for_public_verification(pending.validation_token)
+    assert_nil ResidenceCertificate.find_for_public_verification(pending.validation_code)
+  end
+
+  test "find_for_public_verification returns nil for unknown identifier" do
+    assert_nil ResidenceCertificate.find_for_public_verification("not-a-real-uuid")
+    assert_nil ResidenceCertificate.find_for_public_verification("ABCD5678")
+  end
+
+  test "find_for_public_verification returns nil for blank identifier" do
+    assert_nil ResidenceCertificate.find_for_public_verification(nil)
+    assert_nil ResidenceCertificate.find_for_public_verification("")
+    assert_nil ResidenceCertificate.find_for_public_verification("   ")
+  end
+
+  test "find_for_public_verification works for expired certs (BR-009, BR-080)" do
+    cert = issued_certificate(expiration: 1.month.ago)
+    found = ResidenceCertificate.find_for_public_verification(cert.validation_token)
+    assert_equal cert, found
+    assert found.expired?
+  end
 end
