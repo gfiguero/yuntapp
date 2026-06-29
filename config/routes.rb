@@ -84,6 +84,7 @@ Rails.application.routes.draw do
     delete "reset_account", to: "account_resets#destroy", as: :reset_account
 
     delete "onboarding/restart", to: "onboarding#restart", as: :onboarding_restart
+    delete "onboarding/cancel", to: "onboarding#cancel", as: :onboarding_cancel
 
     get "onboarding/status", to: "onboarding#status", as: :onboarding_status
 

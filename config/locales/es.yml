@@ -664,9 +664,14 @@ es:
         completed: Solicitud de acreditación enviada exitosamente. La directiva revisará tu solicitud.
         pending: Tu solicitud de acreditación ya fue enviada y está siendo revisada.
         restarted: Proceso de acreditación reiniciado. Puedes comenzar una nueva solicitud.
+        cancelled: Solicitud cancelada. Puedes iniciar una nueva cuando quieras.
+        cannot_cancel: Solo puedes cancelar solicitudes pendientes de revisión.
       status:
         title: Estado de tu Solicitud
         description: Tu solicitud de acreditación ha sido enviada. A continuación puedes ver el estado de cada parte.
+        cancel_button: Cancelar mi solicitud
+        cancel_confirm: "¿Cancelar la solicitud? Tus datos se preservarán y podrás iniciar una nueva cuando quieras."
+        cancel_help: Solo está disponible mientras la solicitud está pendiente de revisión. Tras la cancelación, podrás iniciar una nueva solicitud.
         sidebar: Mi Solicitud
         association_label: Junta de Vecinos
         identity_label: Verificación de Identidad

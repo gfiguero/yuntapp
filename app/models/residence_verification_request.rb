@@ -7,7 +7,7 @@ class ResidenceVerificationRequest < ApplicationRecord
 
   has_many_attached :residence_documents
 
-  STATUSES = %w[draft pending approved rejected].freeze
+  STATUSES = %w[draft pending approved rejected cancelled].freeze
 
   validates :number, presence: true, allow_blank: true
   validates :neighborhood_delegation_id, presence: true, if: -> { street_name.blank? }, allow_blank: true

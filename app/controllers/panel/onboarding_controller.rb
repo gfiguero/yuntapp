@@ -2,7 +2,7 @@ module Panel
   class OnboardingController < ApplicationController
     layout "panel"
     before_action :authenticate_user!
-    before_action :redirect_if_onboarded!, except: [:restart, :status]
+    before_action :redirect_if_onboarded!, except: [:restart, :status, :cancel]
     before_action :ensure_draft!, only: [:update_step1, :update_step2, :update_step3, :delete_document, :delete_residence_document, :submit]
     before_action :ensure_step1!, only: [:step2, :update_step2, :step3, :update_step3, :step4, :submit]
     before_action :ensure_step2!, only: [:step3, :update_step3, :step4, :submit]
@@ -14,6 +14,20 @@ module Panel
       current_user.current_onboarding_request&.destroy
       current_user.member&.deactivate!(reason: I18n.t("panel.onboarding.deactivation_reason"))
       redirect_to panel_onboarding_step1_path, notice: I18n.t("panel.onboarding.flash.restarted")
+    end
+
+    # BR-051: cancelación de solicitud `pending` por el usuario desde el panel.
+    # Preserva los datos (no destruye); el usuario puede iniciar una nueva o
+    # duplicar la cancelada (BR-048).
+    def cancel
+      onboarding = current_user.current_onboarding_request
+      if onboarding&.pending?
+        onboarding.cancel!
+        session.delete(:onboarding)
+        redirect_to panel_root_path, notice: I18n.t("panel.onboarding.flash.cancelled")
+      else
+        redirect_to panel_root_path, alert: I18n.t("panel.onboarding.flash.cannot_cancel")
+      end
     end
 
     def step1

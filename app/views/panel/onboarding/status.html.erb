@@ -14,4 +14,15 @@
       <%= render "shared/onboarding/residence_card", residence_request: @residence_request %>
     <% end %>
   </div>
+
+  <% if @onboarding_request&.pending? %>
+    <div class="mt-6">
+      <%= button_to I18n.t('panel.onboarding.status.cancel_button'),
+            panel_onboarding_cancel_path,
+            method: :delete,
+            class: "btn btn-soft btn-warning",
+            data: { turbo_confirm: I18n.t('panel.onboarding.status.cancel_confirm') } %>
+      <p class="text-xs text-base-content/60 mt-2"><%= I18n.t('panel.onboarding.status.cancel_help') %></p>
+    </div>
+  <% end %>
 </div>

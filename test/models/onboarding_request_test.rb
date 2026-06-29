@@ -271,4 +271,58 @@ class OnboardingRequestTest < ActiveSupport::TestCase
     onboarding.reload
     assert onboarding.pending?
   end
+
+  # --- cancel! (BR-051) ---
+
+  test "cancel! transitions pending OR + IVR + RVR to cancelled atomically" do
+    onboarding = onboarding_requests(:karass_pending)
+    identity = onboarding.identity_verification_request
+    residence = onboarding.residence_verification_request
+
+    onboarding.cancel!
+
+    onboarding.reload
+    identity.reload
+    residence.reload
+    assert onboarding.cancelled?
+    assert_equal "cancelled", identity.status
+    assert_equal "cancelled", residence.status
+  end
+
+  test "cancel! raises when status is not pending" do
+    onboarding = onboarding_requests(:one)
+    assert onboarding.draft?
+    assert_raises(RuntimeError) { onboarding.cancel! }
+  end
+
+  test "cancelled? predicate returns true for cancelled status" do
+    onboarding = onboarding_requests(:karass_pending)
+    onboarding.update_columns(status: "cancelled", terms_accepted_at: nil)
+    onboarding.reload
+    assert onboarding.cancelled?
+    assert_not onboarding.pending?
+  end
+
+  test "cancelled scope returns only cancelled records" do
+    onboarding = onboarding_requests(:karass_pending)
+    onboarding.cancel!
+    assert_includes OnboardingRequest.cancelled, onboarding
+  end
+
+  test "cancelled OR does not require terms_accepted_at" do
+    onboarding = onboarding_requests(:karass_pending)
+    onboarding.cancel!
+    onboarding.reload
+    onboarding.terms_accepted_at = nil
+    assert onboarding.valid?
+  end
+
+  test "current_onboarding_request does not return cancelled requests" do
+    user = users(:karass)
+    onboarding = user.current_onboarding_request
+    assert_not_nil onboarding
+    onboarding.cancel!
+    user.reload
+    assert_nil user.current_onboarding_request
+  end
 end

@@ -7,7 +7,7 @@ class IdentityVerificationRequest < ApplicationRecord
 
   has_many_attached :identity_documents
 
-  STATUSES = %w[draft pending approved rejected].freeze
+  STATUSES = %w[draft pending approved rejected cancelled].freeze
 
   validates :status, inclusion: {in: STATUSES}
 

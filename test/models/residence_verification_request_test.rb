@@ -59,7 +59,7 @@ class ResidenceVerificationRequestTest < ActiveSupport::TestCase
 
   test "invalid with unknown status" do
     residence = residence_verification_requests(:karass_residence)
-    residence.status = "cancelled"
+    residence.status = "bogus_status_value"
     assert_not residence.valid?
     assert residence.errors[:status].any?
   end
