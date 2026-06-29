@@ -329,6 +329,19 @@ es:
       new_record: Nuevo Registro
     empty: —
 
+  residence_certificate_mailer:
+    issued:
+      subject: Tu certificado de residencia está listo
+      greeting: "Hola %{name},"
+      body_intro: "Tu certificado de residencia con folio %{folio} ha sido emitido y ya está disponible para descarga desde tu panel."
+      folio: Folio
+      issue_date: Fecha de emisión
+      expiration_date: Fecha de vencimiento
+      validation_code: Código de verificación
+      download_intro: Para descargarlo, entra a tu cuenta en Yuntapp y abre la sección "Certificados de Residencia". Si necesitas compartirlo, cualquiera puede verificar su autenticidad con el código de arriba o escaneando el QR del PDF.
+      verify_link: Verificación pública
+      signature: Equipo Yuntapp
+
   verifications:
     layout:
       title: Verificación de Certificado — Yuntapp
