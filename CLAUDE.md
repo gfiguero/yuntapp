@@ -393,7 +393,7 @@ Country -> Region -> Commune -> NeighborhoodAssociation -> NeighborhoodDelegatio
 ### Entidades Principales
 
 #### User
-- Devise: database_authenticatable, registerable, recoverable, rememberable, validatable
+- Devise: database_authenticatable, registerable, confirmable, recoverable, rememberable, validatable
 - Flags: `admin`, `superadmin`
 - Pertenece a: `neighborhood_association` (opcional), `verified_identity` (opcional)
 - Tiene: `onboarding_requests`, `identity_verification_requests`, `residence_verification_requests`, `listings`

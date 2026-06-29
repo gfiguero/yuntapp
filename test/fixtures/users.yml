@@ -1,6 +1,7 @@
 artanis:
   email: artanis@daelaam.io
   encrypted_password: <%= Devise::Encryptor.digest(User, 'fortassadar') %>
+  confirmed_at: <%= Time.zone.now %>
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>
   superadmin: true
@@ -11,29 +12,34 @@ selendis:
   neighborhood_association: manios_de_buin
   verified_identity: selendis_persona
   admin: true
+  confirmed_at: <%= Time.zone.now %>
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>
 
 karass:
   email: karass@daelaam.io
   encrypted_password: <%= Devise::Encryptor.digest(User, 'honorandduty') %>
+  confirmed_at: <%= Time.zone.now %>
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>
 
 urunis:
   email: urunis@daelaam.io
   encrypted_password: <%= Devise::Encryptor.digest(User, 'bladeofjustice') %>
+  confirmed_at: <%= Time.zone.now %>
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>
 
 rohana:
   email: rohana@daelaam.io
   encrypted_password: <%= Devise::Encryptor.digest(User, 'keeperoftradition') %>
+  confirmed_at: <%= Time.zone.now %>
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>
 
 karax:
   email: karax@daelaam.io
   encrypted_password: <%= Devise::Encryptor.digest(User, 'keeperoftradition') %>
+  confirmed_at: <%= Time.zone.now %>
   created_at: <%= Time.zone.now %>
   updated_at: <%= Time.zone.now %>

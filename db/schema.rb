@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_29_171037) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_29_213109) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -280,6 +280,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_171037) do
 
   create_table "users", force: :cascade do |t|
     t.boolean "admin"
+    t.datetime "confirmation_sent_at"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -288,8 +291,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_171037) do
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.boolean "superadmin", default: false
+    t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
     t.integer "verified_identity_id"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, where: "confirmation_token IS NOT NULL"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["neighborhood_association_id"], name: "index_users_on_neighborhood_association_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
