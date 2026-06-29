@@ -10,9 +10,10 @@ class ResidenceCertificate < ApplicationRecord
 
   after_initialize :set_default_status, if: :new_record?
 
-  validates :status, presence: true, inclusion: { in: STATUSES }
+  validates :status, presence: true, inclusion: {in: STATUSES}
+  validate :immutable_once_issued, on: :update
   validates :purpose, presence: true
-  validates :folio, uniqueness: { scope: :neighborhood_association_id, allow_blank: true }
+  validates :folio, uniqueness: {scope: :neighborhood_association_id, allow_blank: true}
 
   scope :filter_by_status, ->(status) { where(status: status) }
   scope :filter_by_folio, ->(folio) { where.like(folio: "%#{folio}%") }
@@ -38,5 +39,9 @@ class ResidenceCertificate < ApplicationRecord
 
   def set_default_status
     self.status ||= "pending_payment"
+  end
+
+  def immutable_once_issued
+    errors.add(:base, :immutable) if status_in_database == "issued"
   end
 end

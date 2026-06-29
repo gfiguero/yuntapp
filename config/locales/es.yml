@@ -257,6 +257,9 @@ es:
               invalid_rut_check_digit: tiene un dígito verificador incorrecto
             phone:
               invalid_phone_format: debe ser un número de celular válido (+569...)
+        residence_certificate:
+          base:
+            immutable: no puede modificarse una vez emitido
 
   errors:
     messages:
