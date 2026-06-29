@@ -2,10 +2,15 @@ module Admin
   class ResidenceCertificatesController < ApplicationController
     include Pagy::Method
 
-    before_action :set_residence_certificate, only: %i[show edit update delete destroy]
+    before_action :set_residence_certificate, only: :show
     before_action :set_residence_certificates, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
+
+    # BR-064 + BR-077: el flujo de certificados es exclusivamente
+    # pending_payment → paid → issued. La emisión es automática (BR-062),
+    # iniciada por el pago confirmado vía MercadoPago. El admin solo tiene
+    # acceso de lectura — no puede crear, editar ni eliminar certificados.
 
     # GET /admin/residence_certificates
     def index
@@ -31,54 +36,10 @@ module Admin
     def show
     end
 
-    # GET /admin/residence_certificates/new
-    def new
-      @residence_certificate = ResidenceCertificate.new
-    end
-
-    # GET /admin/residence_certificates/1/edit
-    def edit
-    end
-
-    # POST /admin/residence_certificates
-    def create
-      @residence_certificate = ResidenceCertificate.new(residence_certificate_params)
-
-      if @residence_certificate.save
-        redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.created")
-      else
-        render :new, status: :unprocessable_content
-      end
-    end
-
-    # PATCH/PUT /admin/residence_certificates/1
-    def update
-      if @residence_certificate.update(residence_certificate_params)
-        redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.updated"), status: :see_other
-      else
-        render :edit, status: :unprocessable_content
-      end
-    end
-
-    # GET /admin/residence_certificates/1/delete
-    def delete
-    end
-
-    # DELETE /admin/residence_certificates/1
-    def destroy
-      @residence_certificate.destroy!
-      redirect_to admin_residence_certificates_path, notice: I18n.t("admin.residence_certificates.flash.destroyed"), status: :see_other, format: :html
-    end
-
     private
 
     def set_residence_certificate
       @residence_certificate = current_neighborhood_association.residence_certificates.find(params[:id])
-    end
-
-    def residence_certificate_params
-      params.require(:residence_certificate).permit(:member_id, :household_unit_id, :purpose, :notes)
-        .merge(neighborhood_association_id: current_neighborhood_association.id)
     end
 
     def set_residence_certificates
