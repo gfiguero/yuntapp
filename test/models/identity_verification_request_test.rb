@@ -37,7 +37,7 @@ class IdentityVerificationRequestTest < ActiveSupport::TestCase
 
   test "invalid with unknown status" do
     identity = identity_verification_requests(:karass_identity)
-    identity.status = "cancelled"
+    identity.status = "bogus_status_value"
     assert_not identity.valid?
     assert identity.errors[:status].any?
   end

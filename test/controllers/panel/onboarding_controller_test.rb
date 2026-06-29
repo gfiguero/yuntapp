@@ -139,6 +139,61 @@ module Panel
       assert member.reload.inactive?
     end
 
+    # --- cancel (BR-051) ---
+
+    test "cancel transitions pending OR to cancelled and redirects to dashboard" do
+      sign_in @karass
+      onboarding = @karass.current_onboarding_request
+      assert onboarding.pending?
+
+      delete panel_onboarding_cancel_url
+
+      onboarding.reload
+      assert onboarding.cancelled?
+      assert_redirected_to panel_root_url
+      assert_equal I18n.t("panel.onboarding.flash.cancelled"), flash[:notice]
+    end
+
+    test "cancel cascades to IVR and RVR" do
+      sign_in @karass
+      onboarding = @karass.current_onboarding_request
+      identity = onboarding.identity_verification_request
+      residence = onboarding.residence_verification_request
+
+      delete panel_onboarding_cancel_url
+
+      identity.reload
+      residence.reload
+      assert_equal "cancelled", identity.status
+      assert_equal "cancelled", residence.status
+    end
+
+    test "cancel refuses when user has no pending onboarding" do
+      sign_in @urunis
+      delete panel_onboarding_cancel_url
+      assert_redirected_to panel_root_url
+      assert_equal I18n.t("panel.onboarding.flash.cannot_cancel"), flash[:alert]
+    end
+
+    test "cancel refuses when onboarding is in draft" do
+      sign_in @urunis
+      OnboardingRequest.create!(user: @urunis, status: "draft")
+      delete panel_onboarding_cancel_url
+      assert_redirected_to panel_root_url
+      assert_equal I18n.t("panel.onboarding.flash.cannot_cancel"), flash[:alert]
+    end
+
+    test "cancel allows user to start a new onboarding via step1" do
+      sign_in @karass
+      delete panel_onboarding_cancel_url
+
+      get panel_onboarding_step1_url
+      assert_response :success
+      new_onboarding = @karass.reload.current_onboarding_request
+      assert_not_nil new_onboarding
+      assert new_onboarding.draft?
+    end
+
     test "restart preserves member record in database" do
       sign_in @selendis
       member_id = members(:selendis_member).id
