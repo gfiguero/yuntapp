@@ -52,6 +52,13 @@ Rails.application.routes.draw do
   root "home#index"
   get "contact", to: "home#contact"
 
+  # Verificación pública de certificados (UC-007, BR-009).
+  # Endpoint sin autenticación: cualquiera puede verificar un certificado por
+  # validation_token (UUID) o validation_code (8 chars alfanumérico).
+  get "verify", to: "verifications#index", as: :verify
+  post "verify", to: "verifications#lookup"
+  get "verify/:identifier", to: "verifications#show", as: :verification
+
   namespace :panel do
     root to: "dashboard#index"
     resource :profile, only: [ :show, :update ], controller: "profile"

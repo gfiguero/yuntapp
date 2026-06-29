@@ -1,0 +1,18 @@
+<div class="max-w-2xl mx-auto">
+  <div class="card bg-base-100 shadow-sm">
+    <div class="card-body">
+      <h1 class="card-title text-3xl"><%= I18n.t("verifications.index.title") %></h1>
+      <p class="text-base-content/70 mb-4"><%= I18n.t("verifications.index.description") %></p>
+
+      <%= form_with(url: verify_path, method: :post, class: "grid gap-4") do |form| %>
+        <%= form.label :identifier, I18n.t("verifications.index.identifier_label"), class: "floating-label" do %>
+          <%= form.text_field :identifier, class: "input input-bordered w-full", required: true, placeholder: I18n.t("verifications.index.identifier_placeholder"), autocomplete: "off" %>
+          <span><%= I18n.t("verifications.index.identifier_label") %></span>
+        <% end %>
+        <p class="text-xs text-base-content/60"><%= I18n.t("verifications.index.identifier_help") %></p>
+
+        <%= form.submit I18n.t("verifications.index.submit"), class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+</div>

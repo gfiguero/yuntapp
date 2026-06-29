@@ -32,6 +32,22 @@ class ResidenceCertificate < ApplicationRecord
 
   scope :filter_by_status, ->(status) { where(status: status) }
   scope :filter_by_folio, ->(folio) { where.like(folio: "%#{folio}%") }
+  scope :findable_publicly, -> { where(status: "issued") }
+
+  # Busca un certificado para verificación pública aceptando token UUID o
+  # código alfanumérico de 8 caracteres. Solo retorna certificados en estado
+  # `issued` (BR-081). Case-insensitive para el código.
+  def self.find_for_public_verification(identifier)
+    return nil if identifier.blank?
+    cleaned = identifier.to_s.strip
+    return nil if cleaned.empty?
+
+    if cleaned.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)
+      findable_publicly.find_by(validation_token: cleaned.downcase)
+    elsif cleaned.match?(/\A[A-Za-z0-9]{#{VALIDATION_CODE_LENGTH}}\z/o)
+      findable_publicly.find_by(validation_code: cleaned.upcase)
+    end
+  end
 
   def pending_payment?
     status == "pending_payment"
@@ -43,6 +59,23 @@ class ResidenceCertificate < ApplicationRecord
 
   def issued?
     status == "issued"
+  end
+
+  def expired?
+    expiration_date.present? && expiration_date < Date.current
+  end
+
+  # RUN enmascarado para verificación pública (BR-078).
+  # Formato: 12.XXX.XXX-K (preserva primer dígito y dígito verificador).
+  def masked_run
+    raw = member&.run
+    return nil if raw.blank?
+
+    body, dv = raw.split("-")
+    return raw if body.nil? || dv.nil?
+
+    first_digit = body[0]
+    "#{first_digit}.XXX.XXX-#{dv}"
   end
 
   def generate_folio!

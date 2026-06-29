@@ -329,6 +329,41 @@ es:
       new_record: Nuevo Registro
     empty: —
 
+  verifications:
+    layout:
+      title: Verificación de Certificado — Yuntapp
+      tagline: Verificación pública de certificados de residencia
+      footer: Yuntapp — Verifica la autenticidad de cualquier certificado emitido por una junta de vecinos.
+    index:
+      title: Verificar certificado
+      description: Ingresa el código de verificación que aparece en el certificado para confirmar su autenticidad.
+      identifier_label: Código de verificación
+      identifier_placeholder: Código de 8 caracteres o enlace QR
+      identifier_help: Puedes ingresar el código alfanumérico (8 caracteres) o pegar el enlace completo del QR.
+      submit: Verificar
+    show:
+      folio: Folio
+      holder_name: Titular
+      holder_run: RUN
+      issuer: Junta emisora
+      purpose: Propósito declarado
+      issue_date: Fecha de emisión
+      expiration_date: Fecha de vencimiento
+      verify_another: Verificar otro certificado
+      status:
+        valid_title: Certificado válido
+        valid_description: Este certificado fue emitido por la junta y está vigente.
+        valid_badge: Vigente
+        expired_title: Certificado vencido
+        expired_description: Este certificado fue emitido oficialmente, pero ya superó su período de validez (6 meses desde la emisión).
+        expired_badge: Vencido
+    not_found:
+      title: No se encontró el certificado
+      description: El código ingresado no corresponde a ningún certificado emitido por Yuntapp. Verifica que copiaste el código correctamente.
+      try_again: Intentar de nuevo
+    flash:
+      missing_identifier: Debes ingresar un código para verificar.
+
   admin:
     members:
       index:

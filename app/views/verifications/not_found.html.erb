@@ -1,0 +1,12 @@
+<div class="max-w-2xl mx-auto">
+  <div class="alert alert-error mb-6">
+    <div class="flex flex-col gap-1">
+      <span class="font-bold text-lg"><%= I18n.t("verifications.not_found.title") %></span>
+      <span class="text-sm"><%= I18n.t("verifications.not_found.description") %></span>
+    </div>
+  </div>
+
+  <div class="text-center mt-6">
+    <%= link_to I18n.t("verifications.not_found.try_again"), verify_path, class: "btn btn-primary" %>
+  </div>
+</div>
