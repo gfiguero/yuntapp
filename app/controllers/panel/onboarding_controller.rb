@@ -498,12 +498,7 @@ module Panel
         return
       end
 
-      # El proceso finaliza cambiando el estado a "pending" para que sea revisado
-      @onboarding_request.update!(status: "pending", terms_accepted_at: Time.current)
-
-      # También pasamos las solicitudes hijas a pending
-      @onboarding_request.identity_verification_request&.update!(status: "pending")
-      @onboarding_request.residence_verification_request&.update!(status: "pending")
+      @onboarding_request.submit!
 
       session.delete(:onboarding)
       redirect_to panel_root_path, notice: I18n.t("panel.onboarding.flash.completed")

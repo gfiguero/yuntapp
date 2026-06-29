@@ -21,4 +21,17 @@ class OnboardingRequest < ApplicationRecord
   def pending? = status == "pending"
   def approved? = status == "approved"
   def rejected? = status == "rejected"
+
+  # BR-017: el envío de onboarding es atómico. OnboardingRequest +
+  # IdentityVerificationRequest + ResidenceVerificationRequest pasan a
+  # `pending` juntas. Si alguna update falla, se revierte todo y los
+  # registros quedan en su estado original.
+  def submit!(terms_accepted_at: Time.current)
+    transaction do
+      update!(status: "pending", terms_accepted_at: terms_accepted_at)
+      identity_verification_request&.update!(status: "pending")
+      residence_verification_request&.update!(status: "pending")
+    end
+    self
+  end
 end

@@ -189,4 +189,86 @@ class OnboardingRequestTest < ActiveSupport::TestCase
     results = OnboardingRequest.rejected
     assert_includes results, onboarding
   end
+
+  # --- submit! atomicity (BR-017) ---
+
+  def draft_setup
+    user = users(:urunis)
+    onboarding = OnboardingRequest.create!(
+      user: user,
+      neighborhood_association: neighborhood_associations(:manios_de_buin),
+      region: regions(:region_0_0),
+      commune: communes(:commune_0_0_39),
+      status: "draft"
+    )
+    identity = IdentityVerificationRequest.create!(
+      user: user,
+      onboarding_request: onboarding,
+      first_name: "Urunis",
+      last_name: "Test",
+      run: "12345678-5",
+      phone: "+56987654321",
+      status: "draft"
+    )
+    residence = ResidenceVerificationRequest.create!(
+      user: user,
+      onboarding_request: onboarding,
+      neighborhood_association: neighborhood_associations(:manios_de_buin),
+      commune: communes(:commune_0_0_39),
+      number: "42",
+      street_name: "Calle Test",
+      status: "pending"
+    )
+    [onboarding, identity, residence]
+  end
+
+  test "submit! transitions onboarding + identity + residence to pending atomically" do
+    onboarding, identity, residence = draft_setup
+
+    onboarding.submit!
+
+    onboarding.reload
+    identity.reload
+    residence.reload
+    assert onboarding.pending?
+    assert_not_nil onboarding.terms_accepted_at
+    assert_equal "pending", identity.status
+    assert_equal "pending", residence.status
+  end
+
+  test "submit! rolls back all changes if identity update fails (BR-017)" do
+    onboarding, identity, residence = draft_setup
+    original_residence_status = residence.status
+
+    # Forzar fallo en la transición de la identidad
+    identity.update_columns(run: "INVALID")
+
+    assert_raises(ActiveRecord::RecordInvalid) do
+      onboarding.submit!
+    end
+
+    onboarding.reload
+    identity.reload
+    residence.reload
+    assert onboarding.draft?, "OnboardingRequest debería seguir en draft tras rollback"
+    assert_nil onboarding.terms_accepted_at
+    assert_equal "draft", identity.status, "IdentityVerificationRequest debería seguir en draft"
+    assert_equal original_residence_status, residence.status
+  end
+
+  test "submit! works when there is no identity or residence request" do
+    user = users(:urunis)
+    onboarding = OnboardingRequest.create!(
+      user: user,
+      neighborhood_association: neighborhood_associations(:manios_de_buin),
+      region: regions(:region_0_0),
+      commune: communes(:commune_0_0_39),
+      status: "draft"
+    )
+
+    onboarding.submit!
+
+    onboarding.reload
+    assert onboarding.pending?
+  end
 end
