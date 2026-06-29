@@ -72,8 +72,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; [[ \"$f\" =~ \\.rb$ ]] && [ -f \"$f\" ] && bundle exec rubocop --autocorrect \"$f\" 2>/dev/null; } || true",
-            "statusMessage": "Ejecutando RuboCop..."
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; [[ \"$f\" =~ \\.rb$ ]] && [ -f \"$f\" ] && bin/standardrb --fix \"$f\" 2>/dev/null; } || true",
+            "statusMessage": "Ejecutando standardrb..."
           },
           {
             "type": "command",

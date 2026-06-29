@@ -309,7 +309,7 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 - **Cache**: Solid Cache
 - **WebSockets**: Solid Cable
 - **Tests**: Minitest con fixtures, SimpleCov para cobertura
-- **Linting**: RuboCop (rails-omakase), Standard, ERB Lint
+- **Linting**: Standard Ruby (`standardrb`), ERB Lint
 
 ## Estructura de Directorios
 
@@ -524,9 +524,9 @@ bin/rails test test/models/      # Tests de modelos
 bin/rails test test/controllers/ # Tests de controladores
 
 # Linting
-bundle exec rubocop              # RuboCop
-bundle exec erb_lint --lint-all  # ERB Lint
-bundle exec standardrb           # Standard Ruby
+bin/standardrb                   # Standard Ruby (linter principal)
+bin/standardrb --fix             # Auto-corregir estilo
+bundle exec erb_lint --lint-all  # ERB Lint (templates)
 
 # Deploy
 kamal setup                      # Setup inicial

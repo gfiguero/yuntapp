@@ -53,11 +53,11 @@ group :development, :test do
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
 
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop-rails-omakase", require: false
+  # Ruby style guide and linter (replaces rubocop-rails-omakase as the single source of truth)
+  gem "standard", ">= 1.35.1", require: false
+
   gem "simplecov"
   gem "erb_lint", require: false
-  gem "standard", ">= 1.35.1", require: false
 end
 
 group :development do
