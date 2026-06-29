@@ -181,9 +181,11 @@ module Admin
       assert_difference -> { VerifiedIdentity.count }, 1 do
         assert_difference -> { VerifiedResidence.count }, 1 do
           assert_difference -> { HouseholdUnit.count }, 1 do
-            assert_difference -> { Residency.count }, 1 do
-              assert_difference -> { Member.count }, 1 do
-                patch review_step3_admin_onboarding_request_url(@onboarding_request)
+            assert_difference -> { FamilyGroup.count }, 1 do
+              assert_difference -> { Residency.count }, 1 do
+                assert_difference -> { Member.count }, 1 do
+                  patch review_step3_admin_onboarding_request_url(@onboarding_request)
+                end
               end
             end
           end
@@ -194,6 +196,11 @@ module Admin
 
       @onboarding_request.reload
       assert @onboarding_request.approved?
+
+      # Verify FamilyGroup was created and linked to residency
+      residency = Residency.last
+      assert_not_nil residency.family_group
+      assert_equal HouseholdUnit.last, residency.family_group.household_unit
 
       # Verify identity request was approved
       @identity_request.reload
@@ -245,10 +252,12 @@ module Admin
       existing_hu = household_units(:matching_karax_household)
 
       assert_no_difference -> { HouseholdUnit.count } do
-        assert_difference -> { Residency.count }, 1 do
-          assert_difference -> { Member.count }, 1 do
-            patch review_step3_admin_onboarding_request_url(@onboarding_request),
-              params: { household_unit_id: existing_hu.id }
+        assert_difference -> { FamilyGroup.count }, 1 do
+          assert_difference -> { Residency.count }, 1 do
+            assert_difference -> { Member.count }, 1 do
+              patch review_step3_admin_onboarding_request_url(@onboarding_request),
+                params: {household_unit_id: existing_hu.id}
+            end
           end
         end
       end
@@ -274,9 +283,11 @@ module Admin
       sign_in @admin
 
       assert_difference -> { HouseholdUnit.count }, 1 do
-        assert_difference -> { Member.count }, 1 do
-          patch review_step3_admin_onboarding_request_url(@onboarding_request),
-            params: { household_unit_id: "new" }
+        assert_difference -> { FamilyGroup.count }, 1 do
+          assert_difference -> { Member.count }, 1 do
+            patch review_step3_admin_onboarding_request_url(@onboarding_request),
+              params: {household_unit_id: "new"}
+          end
         end
       end
 
@@ -319,7 +330,7 @@ module Admin
       sign_in @admin
 
       patch review_reject_admin_onboarding_request_url(@onboarding_request),
-        params: { rejection_reason: "Documentos ilegibles" }
+        params: {rejection_reason: "Documentos ilegibles"}
 
       assert_redirected_to admin_onboarding_request_url(@onboarding_request)
 
