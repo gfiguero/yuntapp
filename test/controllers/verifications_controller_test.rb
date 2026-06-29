@@ -2,6 +2,7 @@ require "test_helper"
 
 class VerificationsControllerTest < ActionDispatch::IntegrationTest
   setup do
+    Rack::Attack.cache.store.clear
     @member = members(:selendis_member)
     @household_unit = household_units(:selendis_household)
     @association = neighborhood_associations(:manios_de_buin)
@@ -156,5 +157,48 @@ class VerificationsControllerTest < ActionDispatch::IntegrationTest
 
     get verification_url(identifier: cert.validation_token)
     assert_response :not_found
+  end
+
+  # --- Rate limiting (Rack::Attack) ---
+
+  test "rate limits 11th request from same IP within 1 minute" do
+    Rack::Attack.cache.store.clear
+
+    10.times do
+      get verify_url
+      assert_response :success
+    end
+
+    get verify_url
+    assert_response :too_many_requests
+    assert_match(/segundos/, @response.body)
+    assert_not_nil @response.headers["Retry-After"]
+  end
+
+  test "rate limit applies to /verify/:identifier too" do
+    Rack::Attack.cache.store.clear
+    bad_id = "ZZZZZZZZ"
+
+    10.times do
+      get verification_url(identifier: bad_id)
+      assert_response :not_found
+    end
+
+    get verification_url(identifier: bad_id)
+    assert_response :too_many_requests
+  end
+
+  test "rate limit resets after the window expires" do
+    Rack::Attack.cache.store.clear
+
+    10.times { get verify_url }
+    get verify_url
+    assert_response :too_many_requests
+
+    # Avanzar el tiempo más allá de la ventana de 60s
+    travel 61.seconds do
+      get verify_url
+      assert_response :success
+    end
   end
 end
