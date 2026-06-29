@@ -5,3 +5,13 @@ selendis_member:
   verified_identity: selendis_persona
   status: "approved"
   approved_at: <%= Time.zone.now %>
+
+# Dependent member fixture used by Member dependent? and scope tests
+dependent_member:
+  neighborhood_association: manios_de_buin
+  verified_identity: vorazun_persona
+  status: "approved"
+  dependent: true
+  requested_by: selendis
+  approved_by: selendis
+  approved_at: <%= Time.zone.now %>

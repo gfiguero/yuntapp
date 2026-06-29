@@ -59,4 +59,28 @@ class MemberTest < ActiveSupport::TestCase
     member.status = "inactive"
     assert_not member.approved?
   end
+
+  # --- Dependent flag (BR-067) ---
+
+  test "dependent? returns true when dependent flag set" do
+    member = members(:dependent_member)
+    assert member.dependent?
+  end
+
+  test "dependent? returns false by default" do
+    member = members(:selendis_member)
+    assert_not member.dependent?
+  end
+
+  test "dependent scope returns only dependent members" do
+    results = Member.dependent
+    assert_includes results, members(:dependent_member)
+    assert_not_includes results, members(:selendis_member)
+  end
+
+  test "independent scope returns only non-dependent members" do
+    results = Member.independent
+    assert_includes results, members(:selendis_member)
+    assert_not_includes results, members(:dependent_member)
+  end
 end

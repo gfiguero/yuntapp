@@ -13,7 +13,7 @@ class User < ApplicationRecord
   has_many :onboarding_requests
 
   # La solicitud actual es cualquiera que esté en borrador o pendiente
-  has_one :current_onboarding_request, -> { where(status: [ "draft", "pending" ]) }, class_name: "OnboardingRequest"
+  has_one :current_onboarding_request, -> { where(status: ["draft", "pending"]) }, class_name: "OnboardingRequest"
 
   has_many :listings
   has_many :approved_certificates, class_name: "ResidenceCertificate", foreign_key: :approved_by_id
@@ -34,6 +34,10 @@ class User < ApplicationRecord
 
   def household_unit
     residency&.household_unit
+  end
+
+  def family_group
+    residency&.family_group
   end
 
   def household_admin?

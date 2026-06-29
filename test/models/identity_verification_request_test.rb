@@ -269,4 +269,81 @@ class IdentityVerificationRequestTest < ActiveSupport::TestCase
     identity.update!(status: "rejected")
     assert_includes IdentityVerificationRequest.rejected, identity
   end
+
+  # --- Dependent flag (BR-065 to BR-069) ---
+
+  test "dependent? returns true when dependent flag set" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    assert identity.dependent?
+  end
+
+  test "dependent? returns false by default" do
+    identity = identity_verification_requests(:karass_identity)
+    assert_not identity.dependent?
+  end
+
+  test "dependent request is valid without user" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    assert_nil identity.user
+    assert identity.valid?
+  end
+
+  test "dependent request requires family_group" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    identity.family_group = nil
+    assert_not identity.valid?
+    assert identity.errors[:family_group].any?
+  end
+
+  test "dependent request requires requested_by" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    identity.requested_by = nil
+    assert_not identity.valid?
+    assert identity.errors[:requested_by].any?
+  end
+
+  test "dependent request requires neighborhood_association" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    identity.neighborhood_association = nil
+    assert_not identity.valid?
+    assert identity.errors[:neighborhood_association].any?
+  end
+
+  test "dependent request does not require phone (BR-068)" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    identity.phone = nil
+    assert identity.valid?
+  end
+
+  test "dependent request still requires first_name, last_name, run" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    identity.first_name = nil
+    identity.last_name = nil
+    identity.run = nil
+    assert_not identity.valid?
+    assert identity.errors[:first_name].any?
+    assert identity.errors[:last_name].any?
+    assert identity.errors[:run].any?
+  end
+
+  test "dependent request still validates RUN format" do
+    identity = identity_verification_requests(:selendis_dependent_identity)
+    identity.run = "11111111-9"
+    assert_not identity.valid?
+    assert identity.errors[:run].any?
+  end
+
+  test "non-dependent request does not require family_group" do
+    identity = identity_verification_requests(:karass_identity)
+    assert_nil identity.family_group
+    assert identity.valid?
+  end
+
+  test "dependent scope filters dependent requests" do
+    dependent = identity_verification_requests(:selendis_dependent_identity)
+    non_dependent = identity_verification_requests(:karass_identity)
+    results = IdentityVerificationRequest.dependent_requests
+    assert_includes results, dependent
+    assert_not_includes results, non_dependent
+  end
 end

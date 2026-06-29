@@ -1,0 +1,57 @@
+<% content_for :title do %>
+  <%= I18n.t('panel.dependents.new.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('panel.dependents.index.title'), panel_dependents_path %></li>
+  <li><%= I18n.t('actions.new') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.dependents.new.title') %></h1>
+  <p class="mb-4 text-base-content/70"><%= I18n.t('panel.dependents.new.description') %></p>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('list') + I18n.t('actions.index')), panel_dependents_path, class: "btn btn-soft" %>
+  </div>
+
+  <%= form_with(model: [:panel, @identity_verification_request], url: panel_dependents_path, class: "grid gap-4 w-full md:w-1/2") do |form| %>
+
+    <% invalid = @identity_verification_request.errors.include?(:first_name) %>
+    <%= form.label :first_name, I18n.t('activerecord.attributes.identity_verification_request.first_name'), class: "floating-label" do %>
+      <%= form.text_field :first_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.identity_verification_request.first_name') %>
+      <span><%= I18n.t('activerecord.attributes.identity_verification_request.first_name') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @identity_verification_request.errors.full_messages_for(:first_name))) if invalid %>
+
+    <% invalid = @identity_verification_request.errors.include?(:last_name) %>
+    <%= form.label :last_name, I18n.t('activerecord.attributes.identity_verification_request.last_name'), class: "floating-label" do %>
+      <%= form.text_field :last_name, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.identity_verification_request.last_name') %>
+      <span><%= I18n.t('activerecord.attributes.identity_verification_request.last_name') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @identity_verification_request.errors.full_messages_for(:last_name))) if invalid %>
+
+    <% invalid = @identity_verification_request.errors.include?(:run) %>
+    <%= form.label :run, I18n.t('activerecord.attributes.identity_verification_request.run'), class: "floating-label" do %>
+      <%= form.text_field :run, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.identity_verification_request.run') %>
+      <span><%= I18n.t('activerecord.attributes.identity_verification_request.run') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @identity_verification_request.errors.full_messages_for(:run))) if invalid %>
+
+    <% invalid = @identity_verification_request.errors.include?(:phone) %>
+    <%= form.label :phone, I18n.t('panel.dependents.new.phone_optional'), class: "floating-label" do %>
+      <%= form.text_field :phone, class: "input w-full validator #{'input-error' if invalid}", placeholder: I18n.t('panel.dependents.new.phone_optional') %>
+      <span><%= I18n.t('panel.dependents.new.phone_optional') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @identity_verification_request.errors.full_messages_for(:phone))) if invalid %>
+
+    <% invalid = @identity_verification_request.errors.include?(:identity_documents) %>
+    <%= form.label :identity_documents, I18n.t('panel.dependents.new.identity_documents'), class: "floating-label" do %>
+      <%= form.file_field :identity_documents, multiple: true, class: "file-input w-full #{'input-error' if invalid}", accept: "image/png,image/jpeg,application/pdf" %>
+      <span><%= I18n.t('panel.dependents.new.identity_documents') %></span>
+    <% end %>
+    <%= raw(error_message(invalid, @identity_verification_request.errors.full_messages_for(:identity_documents))) if invalid %>
+
+    <%= form.submit I18n.t('actions.save'), class: "btn btn-success" %>
+  <% end %>
+</div>

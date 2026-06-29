@@ -12,7 +12,7 @@ class Member < ApplicationRecord
   has_many :residence_certificates, dependent: :destroy
 
   validates :verified_identity_id, presence: true
-  validates :status, presence: true, inclusion: { in: STATUSES }
+  validates :status, presence: true, inclusion: {in: STATUSES}
   validates :deactivation_reason, presence: true, if: -> { inactive? }
 
   delegate :name, :run, :phone, :email, :first_name, :last_name, to: :verified_identity, allow_nil: true
@@ -23,6 +23,8 @@ class Member < ApplicationRecord
   scope :approved, -> { where(status: "approved") }
   scope :pending, -> { where(status: "pending") }
   scope :active, -> { where.not(status: "inactive") }
+  scope :dependent, -> { where(dependent: true) }
+  scope :independent, -> { where(dependent: false) }
 
   def user
     requested_by || verified_identity&.users&.first
@@ -32,6 +34,7 @@ class Member < ApplicationRecord
   def approved? = status == "approved"
   def rejected? = status == "rejected"
   def inactive? = status == "inactive"
+  def dependent? = dependent
 
   def deactivate!(reason:)
     self.deactivation_reason = reason

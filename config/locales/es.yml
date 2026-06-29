@@ -179,6 +179,7 @@ es:
         user: Usuario
         first_name: Nombre
         last_name: Apellido
+        full_name: Nombre completo
         run: RUN
         phone: Teléfono
         status: Estado
@@ -321,6 +322,7 @@ es:
       actions: Acciones
     headers:
       new_record: Nuevo Registro
+    empty: —
 
   admin:
     members:
@@ -469,6 +471,35 @@ es:
       flash:
         approved: Verificación de identidad aprobada exitosamente.
         rejected: Verificación de identidad rechazada.
+    dependent_reviews:
+      index:
+        title: Residentes Dependientes
+        description: Solicitudes de residentes dependientes (menores) registradas por los administradores de domicilio. Verifica los documentos antes de aprobar.
+        requested_by: Solicitado por
+        empty: No hay solicitudes de residentes dependientes.
+      show:
+        title: Revisión de Residente Dependiente
+        dependent_info: Datos del dependiente
+        requester_info: Datos del solicitante
+        household_admin: Administrador del domicilio
+        household_unit: Domicilio
+        documents: Documentos de identidad
+        rejection_reason: Motivo del rechazo
+        already_resolved: "Esta solicitud ya fue resuelta (%{status})."
+      status:
+        pending: Pendiente
+        approved: Aprobada
+        rejected: Rechazada
+      actions:
+        approve: Aprobar
+        reject: Rechazar
+        confirm_reject: Confirmar rechazo
+      confirm:
+        approve: "¿Aprobar este residente dependiente? Se creará la identidad verificada, residencia y membresía."
+      flash:
+        approved: Residente dependiente aprobado exitosamente.
+        rejected: Solicitud de residente dependiente rechazada.
+        not_pending: Esta solicitud no está pendiente de revisión.
 
   panel:
     verification:
@@ -520,6 +551,26 @@ es:
         identifier: "Certificado ID: %{id}"
       flash:
         requested: Certificado solicitado exitosamente.
+    dependents:
+      index:
+        title: Residentes Dependientes
+        description: Registra a los menores que viven contigo. Solo tú, como administrador del domicilio, puedes hacerlo. Los datos serán verificados por la junta antes de aprobarse.
+        new_dependent: Registrar nuevo dependiente
+        approved: Aprobados
+        pending: Solicitudes pendientes
+        rejected: Solicitudes rechazadas
+        status_approved: Aprobado
+        status_pending: Pendiente
+        empty_approved: Aún no tienes residentes dependientes aprobados.
+        empty_pending: No tienes solicitudes pendientes.
+      new:
+        title: Registrar Residente Dependiente
+        description: Ingresa los datos del menor y adjunta sus documentos de identidad. El teléfono es opcional.
+        phone_optional: Teléfono (opcional)
+        identity_documents: Documentos de identidad (cédula, partida de nacimiento)
+      flash:
+        created: Residente dependiente registrado. La junta revisará la solicitud.
+        not_household_admin: Debes ser administrador del domicilio para gestionar residentes dependientes.
     account_resets:
       flash:
         completed: Tu cuenta ha sido restablecida exitosamente.

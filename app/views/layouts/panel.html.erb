@@ -62,6 +62,7 @@
 
           <% if current_user.household_admin? %>
             <li><%= link_to "Certificados", panel_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
+            <li><%= link_to "Residentes Dependientes", panel_dependents_path, class: ("active" if controller_name == "dependents") %></li>
           <% end %>
 
           <li class="mt-auto pt-4 border-t border-base-300">

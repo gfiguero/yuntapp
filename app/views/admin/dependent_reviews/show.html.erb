@@ -1,0 +1,98 @@
+<% content_for :title do %>
+  <%= I18n.t('admin.dependent_reviews.show.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('admin.dependent_reviews.index.title'), admin_dependent_reviews_path %></li>
+  <li><%= @dependent_request.full_name %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.dependent_reviews.show.title') %></h1>
+
+  <div class="flex flex-row gap-2 mb-6">
+    <%= link_to raw(icon('list') + I18n.t('actions.index')), admin_dependent_reviews_path, class: "btn btn-soft" %>
+  </div>
+
+  <div class="card bg-base-100 border border-base-content/5 mb-6">
+    <div class="card-body">
+      <h2 class="card-title"><%= I18n.t('admin.dependent_reviews.show.dependent_info') %></h2>
+      <dl class="grid grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm text-base-content/60"><%= I18n.t('activerecord.attributes.identity_verification_request.first_name') %></dt>
+          <dd class="font-semibold"><%= @dependent_request.first_name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-base-content/60"><%= I18n.t('activerecord.attributes.identity_verification_request.last_name') %></dt>
+          <dd class="font-semibold"><%= @dependent_request.last_name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-base-content/60"><%= I18n.t('activerecord.attributes.identity_verification_request.run') %></dt>
+          <dd class="font-semibold"><%= @dependent_request.run %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-base-content/60"><%= I18n.t('activerecord.attributes.identity_verification_request.phone') %></dt>
+          <dd class="font-semibold"><%= @dependent_request.phone.presence || I18n.t('shared.empty') %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 border border-base-content/5 mb-6">
+    <div class="card-body">
+      <h2 class="card-title"><%= I18n.t('admin.dependent_reviews.show.requester_info') %></h2>
+      <dl class="grid grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm text-base-content/60"><%= I18n.t('admin.dependent_reviews.show.household_admin') %></dt>
+          <dd class="font-semibold"><%= @dependent_request.requested_by&.name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm text-base-content/60"><%= I18n.t('admin.dependent_reviews.show.household_unit') %></dt>
+          <dd class="font-semibold">
+            <%= @dependent_request.family_group&.household_unit&.street_name %>
+            <%= @dependent_request.family_group&.household_unit&.number %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <% if @dependent_request.identity_documents.attached? %>
+    <div class="card bg-base-100 border border-base-content/5 mb-6">
+      <div class="card-body">
+        <h2 class="card-title"><%= I18n.t('admin.dependent_reviews.show.documents') %></h2>
+        <ul class="list-disc list-inside">
+          <% @dependent_request.identity_documents.each do |doc| %>
+            <li><%= link_to doc.filename.to_s, url_for(doc), target: "_blank", class: "link link-primary", rel: "noopener" %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @dependent_request.pending? %>
+    <div class="flex flex-row gap-4 mt-6">
+      <%= button_to I18n.t('admin.dependent_reviews.actions.approve'), approve_admin_dependent_review_path(@dependent_request), method: :patch, class: "btn btn-success", data: { turbo_confirm: I18n.t('admin.dependent_reviews.confirm.approve') } %>
+
+      <details class="dropdown">
+        <summary class="btn btn-error"><%= I18n.t('admin.dependent_reviews.actions.reject') %></summary>
+        <div class="dropdown-content bg-base-100 border border-base-content/10 rounded-box p-4 mt-2 w-80 z-10">
+          <%= form_with(url: reject_admin_dependent_review_path(@dependent_request), method: :patch, class: "grid gap-2") do |form| %>
+            <label class="floating-label">
+              <%= form.text_area :rejection_reason, class: "textarea w-full", required: true %>
+              <span><%= I18n.t('admin.dependent_reviews.show.rejection_reason') %></span>
+            </label>
+            <%= form.submit I18n.t('admin.dependent_reviews.actions.confirm_reject'), class: "btn btn-error btn-sm" %>
+          <% end %>
+        </div>
+      </details>
+    </div>
+  <% else %>
+    <p class="text-base-content/70 mt-6">
+      <%= I18n.t('admin.dependent_reviews.show.already_resolved', status: I18n.t("admin.dependent_reviews.status.#{@dependent_request.status}")) %>
+    </p>
+    <% if @dependent_request.rejection_reason.present? %>
+      <p class="mt-2"><strong><%= I18n.t('activerecord.attributes.identity_verification_request.rejection_reason') %>:</strong> <%= @dependent_request.rejection_reason %></p>
+    <% end %>
+  <% end %>
+</div>

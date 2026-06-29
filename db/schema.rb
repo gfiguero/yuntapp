@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_27_035758) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_29_153501) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -98,16 +98,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_035758) do
 
   create_table "identity_verification_requests", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.boolean "dependent", default: false, null: false
+    t.integer "family_group_id"
     t.string "first_name"
     t.string "last_name"
+    t.integer "neighborhood_association_id"
     t.integer "onboarding_request_id"
     t.string "phone"
     t.text "rejection_reason"
+    t.integer "requested_by_id"
     t.string "run"
     t.string "status", default: "draft", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
+    t.integer "user_id"
+    t.index ["dependent"], name: "index_identity_verification_requests_on_dependent"
+    t.index ["family_group_id"], name: "index_identity_verification_requests_on_family_group_id"
+    t.index ["neighborhood_association_id"], name: "idx_on_neighborhood_association_id_0ecb910a99"
     t.index ["onboarding_request_id"], name: "index_identity_verification_requests_on_onboarding_request_id"
+    t.index ["requested_by_id"], name: "index_identity_verification_requests_on_requested_by_id"
     t.index ["user_id"], name: "index_identity_verification_requests_on_user_id"
   end
 
@@ -129,6 +137,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_035758) do
     t.integer "approved_by_id"
     t.datetime "created_at", null: false
     t.text "deactivation_reason"
+    t.boolean "dependent", default: false, null: false
     t.integer "neighborhood_association_id", null: false
     t.text "rejection_reason"
     t.integer "requested_by_id"
@@ -136,6 +145,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_035758) do
     t.datetime "updated_at", null: false
     t.integer "verified_identity_id", null: false
     t.index ["approved_by_id"], name: "index_members_on_approved_by_id"
+    t.index ["dependent"], name: "index_members_on_dependent"
     t.index ["neighborhood_association_id"], name: "index_members_on_neighborhood_association_id"
     t.index ["requested_by_id"], name: "index_members_on_requested_by_id"
     t.index ["status"], name: "index_members_on_status"
@@ -302,8 +312,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_27_035758) do
   add_foreign_key "household_units", "communes"
   add_foreign_key "household_units", "neighborhood_delegations"
   add_foreign_key "household_units", "verified_residences"
+  add_foreign_key "identity_verification_requests", "family_groups"
+  add_foreign_key "identity_verification_requests", "neighborhood_associations"
   add_foreign_key "identity_verification_requests", "onboarding_requests"
   add_foreign_key "identity_verification_requests", "users"
+  add_foreign_key "identity_verification_requests", "users", column: "requested_by_id"
   add_foreign_key "listings", "categories"
   add_foreign_key "listings", "users"
   add_foreign_key "members", "neighborhood_associations"

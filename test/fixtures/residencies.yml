@@ -6,5 +6,6 @@ selendis_residency:
   verified_identity: selendis_persona
   verified_residence: selendis_verified_residence
   household_unit: selendis_household
+  family_group: selendis_family_group
   household_admin: true
   status: "approved"

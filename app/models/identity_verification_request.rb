@@ -1,15 +1,24 @@
 class IdentityVerificationRequest < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true
   belongs_to :onboarding_request, optional: true
+  belongs_to :family_group, optional: true
+  belongs_to :requested_by, class_name: "User", optional: true
+  belongs_to :neighborhood_association, optional: true
 
   has_many_attached :identity_documents
 
   STATUSES = %w[draft pending approved rejected].freeze
 
-  validates :status, inclusion: { in: STATUSES }
+  validates :status, inclusion: {in: STATUSES}
 
-  # Validaciones solo si no está en borrador
-  validates :first_name, :last_name, :run, :phone, presence: true, unless: -> { draft? || status == "draft" }
+  # Validaciones de presencia para nombre/apellido/RUN solo si no es draft
+  validates :first_name, :last_name, :run, presence: true, unless: -> { draft? || status == "draft" }
+
+  # Teléfono requerido solo para solicitudes no-draft y no-dependientes (BR-068)
+  validates :phone, presence: true, unless: -> { draft? || status == "draft" || dependent? }
+
+  # Para solicitudes dependientes, el contexto de familia/usuario es obligatorio
+  validates :family_group, :requested_by, :neighborhood_association, presence: true, if: :dependent?
 
   # Validaciones de formato siempre (incluso en draft, si el campo no está vacío)
   validates :run, run: true, allow_blank: true
@@ -40,6 +49,8 @@ class IdentityVerificationRequest < ApplicationRecord
   scope :pending, -> { where(status: "pending") }
   scope :approved, -> { where(status: "approved") }
   scope :rejected, -> { where(status: "rejected") }
+  scope :dependent_requests, -> { where(dependent: true) }
+  scope :independent_requests, -> { where(dependent: false) }
 
   before_validation :normalize_run_field
   before_validation :normalize_names
