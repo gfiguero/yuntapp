@@ -75,4 +75,54 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     cert.generate_folio!
     assert_match(/\ACR-\d+-\d+\z/, cert.folio)
   end
+
+  # BR-008: issued certificates are immutable
+  test "issued certificate cannot be modified" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "issued"
+    )
+    assert_not cert.update(purpose: "otro propósito")
+    assert cert.errors[:base].any?
+    cert.reload
+    assert_equal "trámite bancario", cert.purpose
+  end
+
+  test "issued certificate raises on update!" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "issued"
+    )
+    assert_raises(ActiveRecord::RecordInvalid) do
+      cert.update!(purpose: "otro propósito")
+    end
+  end
+
+  test "paid certificate can be transitioned to issued" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "paid"
+    )
+    assert cert.update(status: "issued", issue_date: Date.current, expiration_date: 6.months.from_now.to_date)
+  end
+
+  test "pending_payment certificate can be modified" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "pending_payment"
+    )
+    assert cert.update(purpose: "arriendo")
+  end
 end
