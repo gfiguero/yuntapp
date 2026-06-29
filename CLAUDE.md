@@ -273,6 +273,11 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-062 | Certificados | Una vez que el admin aprobó el onboarding del socio (identidad + domicilio verificados), los certificados se emiten automáticamente tras el pago confirmado. No requieren revisión ni aprobación del admin por cada solicitud |
 | BR-063 | Certificados | No existe posibilidad de rechazo de un certificado post-verificación. Por lo tanto no hay devoluciones de pago. El pago es el último paso antes de la emisión automática |
 | BR-064 | Certificados | Los estados del certificado se simplifican a: `pending_payment` → `paid` → `issued`. Los estados `approved` y `rejected` quedan eliminados del flujo de certificados |
+| BR-065 | Residencia | El `household_admin` puede registrar residentes dependientes (menores de edad) en su `FamilyGroup` sin que estos tengan cuenta de usuario. Se modela como `IdentityVerificationRequest(dependent: true)` con `family_group_id`, `requested_by_id` y `neighborhood_association_id` |
+| BR-066 | Identidad | El admin de la junta debe verificar la identidad del dependiente con documentación antes de aprobarlo, igual que en el onboarding estándar. Las solicitudes dependientes aparecen en `admin/dependent_reviews`, separadas del flujo normal de onboarding |
+| BR-067 | Residencia | Al aprobar un dependiente, en una sola transacción se crea `VerifiedIdentity` + `Member(dependent: true, status: approved)` + `Residency(household_admin: false, status: approved)` heredando la `VerifiedResidence` del `HouseholdUnit` del `FamilyGroup` del padre |
+| BR-068 | Identidad | El teléfono es opcional para dependientes (menores pueden no tenerlo). Las demás validaciones (RUN normalizado y dígito verificador, nombre y apellido) aplican igual que para identidades independientes |
+| BR-069 | Identidad | Cuando un dependiente crece y hace su propio onboarding en cualquier junta, el mecanismo existente de RUN duplicado (BR-057-059) detecta la coincidencia. Al aprobar el nuevo onboarding, el `Member(dependent: true)` anterior pasa a `inactive` automáticamente — la graduación no requiere lógica nueva |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización

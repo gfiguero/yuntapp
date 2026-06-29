@@ -1,0 +1,94 @@
+<% content_for :title do %>
+  <%= I18n.t('panel.dependents.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= I18n.t('panel.dependents.index.title') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.dependents.index.title') %></h1>
+  <p class="mb-4 text-base-content/70"><%= I18n.t('panel.dependents.index.description') %></p>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('new') + I18n.t('panel.dependents.index.new_dependent')), new_panel_dependent_path, class: "btn btn-soft btn-primary" %>
+  </div>
+
+  <h2 class="font-bold text-2xl my-4"><%= I18n.t('panel.dependents.index.approved') %></h2>
+  <% if @dependent_members.any? %>
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mb-6">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><%= I18n.t('activerecord.attributes.member.name') %></th>
+            <th><%= I18n.t('activerecord.attributes.member.run') %></th>
+            <th><%= I18n.t('activerecord.attributes.member.status') %></th>
+          </tr>
+        </thead>
+        <tbody>
+        <% @dependent_members.each do |member| %>
+          <tr class="hover:bg-base-300">
+            <td><%= member.name %></td>
+            <td><%= member.run %></td>
+            <td><span class="badge badge-success"><%= I18n.t('panel.dependents.index.status_approved') %></span></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-base-content/70 mb-6"><%= I18n.t('panel.dependents.index.empty_approved') %></p>
+  <% end %>
+
+  <h2 class="font-bold text-2xl my-4"><%= I18n.t('panel.dependents.index.pending') %></h2>
+  <% if @pending_requests.any? %>
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mb-6">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.full_name') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.run') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.status') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.created_at') %></th>
+          </tr>
+        </thead>
+        <tbody>
+        <% @pending_requests.each do |request| %>
+          <tr class="hover:bg-base-300">
+            <td><%= request.full_name %></td>
+            <td><%= request.run %></td>
+            <td><span class="badge badge-warning"><%= I18n.t('panel.dependents.index.status_pending') %></span></td>
+            <td><%= l(request.created_at.to_date) %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-base-content/70 mb-6"><%= I18n.t('panel.dependents.index.empty_pending') %></p>
+  <% end %>
+
+  <% if @rejected_requests.any? %>
+    <h2 class="font-bold text-2xl my-4"><%= I18n.t('panel.dependents.index.rejected') %></h2>
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mb-6">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.full_name') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.run') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.rejection_reason') %></th>
+          </tr>
+        </thead>
+        <tbody>
+        <% @rejected_requests.each do |request| %>
+          <tr class="hover:bg-base-300">
+            <td><%= request.full_name %></td>
+            <td><%= request.run %></td>
+            <td><%= request.rejection_reason %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

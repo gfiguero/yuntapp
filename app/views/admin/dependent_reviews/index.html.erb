@@ -1,0 +1,51 @@
+<% content_for :title do %>
+  <%= I18n.t('admin.dependent_reviews.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= I18n.t('admin.dependent_reviews.index.title') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.dependent_reviews.index.title') %></h1>
+  <p class="mb-4 text-base-content/70"><%= I18n.t('admin.dependent_reviews.index.description') %></p>
+
+  <% if @dependent_requests.any? %>
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+      <table class="table">
+        <thead>
+          <tr>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.full_name') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.run') %></th>
+            <th><%= I18n.t('admin.dependent_reviews.index.requested_by') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.status') %></th>
+            <th><%= I18n.t('activerecord.attributes.identity_verification_request.created_at') %></th>
+            <th class="w-20"><%= I18n.t('shared.table.actions') %></th>
+          </tr>
+        </thead>
+        <tbody>
+        <% @dependent_requests.each do |request| %>
+          <tr class="hover:bg-base-300">
+            <td><%= request.full_name %></td>
+            <td><%= request.run %></td>
+            <td><%= request.requested_by&.name %></td>
+            <td>
+              <span class="badge <%= request.pending? ? 'badge-warning' : (request.approved? ? 'badge-success' : 'badge-error') %>">
+                <%= I18n.t("admin.dependent_reviews.status.#{request.status}") %>
+              </span>
+            </td>
+            <td><%= l(request.created_at.to_date) %></td>
+            <td>
+              <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
+                <%= link_to icon('show'), admin_dependent_review_path(request), class: "btn btn-sm btn-soft btn-info" %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-base-content/70"><%= I18n.t('admin.dependent_reviews.index.empty') %></p>
+  <% end %>
+</div>

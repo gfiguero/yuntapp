@@ -23,6 +23,8 @@ class Member < ApplicationRecord
   scope :approved, -> { where(status: "approved") }
   scope :pending, -> { where(status: "pending") }
   scope :active, -> { where.not(status: "inactive") }
+  scope :dependent, -> { where(dependent: true) }
+  scope :independent, -> { where(dependent: false) }
 
   def user
     requested_by || verified_identity&.users&.first
@@ -32,6 +34,7 @@ class Member < ApplicationRecord
   def approved? = status == "approved"
   def rejected? = status == "rejected"
   def inactive? = status == "inactive"
+  def dependent? = dependent
 
   def deactivate!(reason:)
     self.deactivation_reason = reason

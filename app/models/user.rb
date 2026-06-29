@@ -36,6 +36,10 @@ class User < ApplicationRecord
     residency&.household_unit
   end
 
+  def family_group
+    residency&.family_group
+  end
+
   def household_admin?
     residency&.household_admin? || false
   end

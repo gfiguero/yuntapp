@@ -23,3 +23,13 @@ karax_identity:
   run: "66666666-6"
   phone: "+56977778888"
   status: "pending"
+
+selendis_dependent_identity:
+  first_name: "Aiur"
+  last_name: "Daelaam"
+  run: "77777777-7"
+  status: "pending"
+  dependent: true
+  family_group: selendis_family_group
+  requested_by: selendis
+  neighborhood_association: manios_de_buin

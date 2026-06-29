@@ -65,6 +65,7 @@ Rails.application.routes.draw do
       end
     end
     resources :residence_certificates, only: [ :index, :show, :new, :create ]
+    resources :dependents, only: [ :index, :new, :create ]
 
     delete "reset_account", to: "account_resets#destroy", as: :reset_account
 
@@ -193,6 +194,12 @@ Rails.application.routes.draw do
       end
     end
     resources :verifications, only: [ :index, :show ] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
+    resources :dependent_reviews, only: [ :index, :show ] do
       member do
         patch :approve
         patch :reject

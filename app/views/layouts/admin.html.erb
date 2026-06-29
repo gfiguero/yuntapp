@@ -63,6 +63,15 @@
             <% end %>
           </li>
           <li><%= link_to "Certificados", admin_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
+          <li>
+            <%= link_to admin_dependent_reviews_path, class: ("active" if controller_name == "dependent_reviews") do %>
+              Residentes Dependientes
+              <% pending_dependents = current_neighborhood_association ? current_neighborhood_association.identity_verification_requests.dependent_requests.where(status: "pending").count : 0 %>
+              <% if pending_dependents > 0 %>
+                <span class="badge badge-warning badge-sm"><%= pending_dependents %></span>
+              <% end %>
+            <% end %>
+          </li>
 
           <li class="menu-title mt-4">Registros</li>
           <li><%= link_to "Domicilios", admin_household_units_path, class: ("active" if controller_name == "household_units") %></li>
