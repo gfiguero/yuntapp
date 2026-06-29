@@ -439,10 +439,6 @@ es:
         count: "%{count} certificados"
       show:
         identifier: "Certificado ID: %{id}"
-      flash:
-        created: Certificado creado exitosamente.
-        updated: Certificado actualizado exitosamente.
-        destroyed: Certificado eliminado exitosamente.
         issued: Certificado emitido exitosamente.
     onboarding_requests:
       index:

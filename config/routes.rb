@@ -248,12 +248,9 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :residence_certificates do
+    resources :residence_certificates, only: [ :index, :show ] do
       collection do
         get :search
-      end
-      member do
-        get :delete
       end
     end
     resources :certificate_pricings, only: [ :index, :new, :create ]
