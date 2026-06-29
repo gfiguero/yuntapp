@@ -19,7 +19,7 @@ module Admin
       # Since steps 1-2 don't write data, a match here means the identity existed
       # before this onboarding process.
       @existing_identity = VerifiedIdentity
-        .includes(residencies: { household_unit: { neighborhood_delegation: :neighborhood_association } })
+        .includes(residencies: {household_unit: {neighborhood_delegation: :neighborhood_association}})
         .find_by(run: @identity_request.run)
 
       # Find existing household units with matching delegation + number (same association)
@@ -118,16 +118,20 @@ module Admin
           )
         end
 
-        # 6. Create Residency
+        # 6. Create FamilyGroup for this nuclear family within the HouseholdUnit (BR-043)
+        family_group = FamilyGroup.create!(household_unit: household_unit)
+
+        # 7. Create Residency linked to the new FamilyGroup
         Residency.create!(
           verified_identity: verified_identity,
           verified_residence: verified_residence,
           household_unit: household_unit,
+          family_group: family_group,
           household_admin: true,
           status: "approved"
         )
 
-        # 7. Create Member (association membership)
+        # 8. Create Member (association membership)
         Member.create!(
           verified_identity: verified_identity,
           neighborhood_association: @onboarding_request.neighborhood_association,
@@ -137,7 +141,7 @@ module Admin
           approved_at: Time.current
         )
 
-        # 8. Approve the onboarding request
+        # 9. Approve the onboarding request
         @onboarding_request.update!(status: "approved")
       end
 
