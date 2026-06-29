@@ -112,5 +112,54 @@ module Panel
       assert_nil cert.payment_id
       assert cert.pending_payment?
     end
+
+    # --- show with issued certificate ---
+
+    test "show on issued cert displays download link and validation_code" do
+      sign_in @household_admin
+
+      cert = ResidenceCertificate.create!(
+        member: @member,
+        household_unit: household_units(:selendis_household),
+        neighborhood_association: @association,
+        purpose: "trámite bancario",
+        status: "issued",
+        folio: "CR-1-99",
+        validation_token: "uuid-show-test",
+        validation_code: "SHOWCODE",
+        issue_date: Date.current,
+        expiration_date: Date.current + 6.months,
+        issued_at: Time.current
+      )
+      cert.pdf_document.attach(
+        io: StringIO.new("%PDF-1.4 fake content"),
+        filename: "test.pdf",
+        content_type: "application/pdf"
+      )
+
+      get panel_residence_certificate_url(cert)
+      assert_response :success
+      assert_match I18n.t("panel.residence_certificates.show.download_pdf"), @response.body
+      assert_match "SHOWCODE", @response.body
+    end
+
+    test "show on paid cert (awaiting issuance) shows processing message" do
+      sign_in @household_admin
+
+      cert = ResidenceCertificate.create!(
+        member: @member,
+        household_unit: household_units(:selendis_household),
+        neighborhood_association: @association,
+        purpose: "test",
+        status: "paid",
+        amount: 1500,
+        payment_id: "MP-SHOW-PAID",
+        paid_at: Time.current
+      )
+
+      get panel_residence_certificate_url(cert)
+      assert_response :success
+      assert_match I18n.t("panel.residence_certificates.show.processing"), @response.body
+    end
   end
 end

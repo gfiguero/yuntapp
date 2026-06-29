@@ -246,7 +246,6 @@ Rails.application.routes.draw do
       end
       member do
         get :delete
-        patch :issue
       end
     end
     resources :certificate_pricings, only: [ :index, :new, :create ]

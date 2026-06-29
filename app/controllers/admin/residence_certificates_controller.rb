@@ -2,7 +2,7 @@ module Admin
   class ResidenceCertificatesController < ApplicationController
     include Pagy::Method
 
-    before_action :set_residence_certificate, only: %i[show edit update delete destroy issue]
+    before_action :set_residence_certificate, only: %i[show edit update delete destroy]
     before_action :set_residence_certificates, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -68,13 +68,6 @@ module Admin
     def destroy
       @residence_certificate.destroy!
       redirect_to admin_residence_certificates_path, notice: I18n.t("admin.residence_certificates.flash.destroyed"), status: :see_other, format: :html
-    end
-
-    # PATCH /admin/residence_certificates/1/issue
-    def issue
-      @residence_certificate.generate_folio!
-      @residence_certificate.update!(status: "issued", issue_date: Date.current, expiration_date: 6.months.from_now.to_date)
-      redirect_to admin_residence_certificate_path(@residence_certificate), notice: I18n.t("admin.residence_certificates.flash.issued"), status: :see_other
     end
 
     private
