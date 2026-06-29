@@ -15,7 +15,7 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get search with json format" do
-    get search_listings_url(format: :json), params: { items: [ @listing.id ] }
+    get search_listings_url(format: :json), params: {items: [@listing.id]}
     assert_response :success
 
     json_response = JSON.parse(response.body)
@@ -30,13 +30,13 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create listing" do
     assert_difference("Listing.count") do
-      post listings_url, params: { listing: {
+      post listings_url, params: {listing: {
         active: @listing.active,
         description: @listing.description,
         name: "New Unique Listing",
         price: @listing.price,
         user_id: @user.id
-      } }
+      }}
     end
 
     assert_redirected_to listing_url(Listing.last)
@@ -44,7 +44,7 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
 
   test "should not create listing with invalid params" do
     assert_no_difference("Listing.count") do
-      post listings_url, params: { listing: { name: "" } } # Name is required assuming validation
+      post listings_url, params: {listing: {name: ""}} # Name is required assuming validation
     end
 
     assert_response :unprocessable_content
@@ -61,14 +61,14 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update listing" do
-    patch listing_url(@listing), params: { listing: { name: "Updated Name" } }
+    patch listing_url(@listing), params: {listing: {name: "Updated Name"}}
     assert_redirected_to listing_url(@listing)
     @listing.reload
     assert_equal "Updated Name", @listing.name
   end
 
   test "should not update listing with invalid params" do
-    patch listing_url(@listing), params: { listing: { name: "" } }
+    patch listing_url(@listing), params: {listing: {name: ""}}
     assert_response :unprocessable_content
   end
 

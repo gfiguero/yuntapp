@@ -1,7 +1,7 @@
 module Admin
   class DependentReviewsController < Admin::ApplicationController
-    before_action :set_dependent_request, only: [ :show, :approve, :reject ]
-    before_action :ensure_pending!, only: [ :approve, :reject ]
+    before_action :set_dependent_request, only: [:show, :approve, :reject]
+    before_action :ensure_pending!, only: [:approve, :reject]
 
     # GET /admin/dependent_reviews
     def index
