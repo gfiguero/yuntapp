@@ -160,7 +160,7 @@ module Admin
       sign_in @admin
 
       patch reject_admin_dependent_review_url(@dependent_request),
-        params: {rejection_reason: "Documento ilegible"}
+        params: { rejection_reason: "Documento ilegible" }
 
       @dependent_request.reload
       assert @dependent_request.rejected?
@@ -175,7 +175,7 @@ module Admin
         assert_no_difference -> { Member.count } do
           assert_no_difference -> { Residency.count } do
             patch reject_admin_dependent_review_url(@dependent_request),
-              params: {rejection_reason: "test"}
+              params: { rejection_reason: "test" }
           end
         end
       end

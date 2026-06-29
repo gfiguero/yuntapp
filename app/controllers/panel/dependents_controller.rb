@@ -22,7 +22,7 @@ module Panel
         .dependent
         .joins(:verified_identity)
         .joins("INNER JOIN residencies ON residencies.verified_identity_id = verified_identities.id")
-        .where(residencies: {family_group_id: family_group.id, status: "approved"})
+        .where(residencies: { family_group_id: family_group.id, status: "approved" })
         .where(neighborhood_association: current_user.neighborhood_association)
         .distinct
     end

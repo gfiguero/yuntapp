@@ -3,7 +3,7 @@ class AddDependentFieldsToIdentityVerificationRequests < ActiveRecord::Migration
     change_table :identity_verification_requests do |t|
       t.boolean :dependent, default: false, null: false
       t.references :family_group, foreign_key: true
-      t.references :requested_by, foreign_key: {to_table: :users}
+      t.references :requested_by, foreign_key: { to_table: :users }
       t.references :neighborhood_association, foreign_key: true
     end
 
