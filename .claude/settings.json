@@ -1,10 +1,4 @@
 {
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
-    "everything-claude-code@everything-claude-code": true,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
-    "claude-mem@thedotmack": true
-  },
   "permissions": {
     "allow": [
       "Bash(git log*)",
@@ -24,33 +18,87 @@
       "Bash(gh issue*)",
       "Bash(gh label*)",
       "Bash(gh api*)",
-      "Bash(bin/rails test*)",
-      "Bash(bin/rails db:*)",
-      "Bash(bin/rails generate*)",
-      "Bash(bin/rails routes*)",
+      "Bash(bin/rails*)",
       "Bash(bin/dev*)",
-      "Bash(bundle exec rubocop*)",
-      "Bash(bundle exec erb_lint*)",
-      "Bash(bundle exec standardrb*)",
-      "Bash(bundle exec brakeman*)",
-      "Bash(bundle exec bundler-audit*)",
+      "Bash(bundle*)",
       "Bash(ls*)",
       "Bash(find . *)",
       "Bash(grep*)",
-      "Bash(mkdir*)"
+      "Bash(rg*)",
+      "Bash(mkdir*)",
+      "Bash(echo*)",
+      "Bash(cat*)",
+      "Bash(wc*)",
+      "Bash(head*)",
+      "Bash(tail*)",
+      "Bash(sort*)",
+      "Bash(which*)",
+      "Bash(sed*)",
+      "Bash(awk*)",
+      "Bash(true)",
+      "Bash(false)",
+      "Bash(test *)",
+      "Bash(jq*)",
+      "Bash(ruby*)",
+      "Bash(kamal*)",
+      "Bash(diff*)",
+      "Bash(cp*)",
+      "Bash(mv*)",
+      "Bash(date*)"
     ]
   },
+  "language": "spanish",
+  "autoCompactEnabled": true,
+  "fileCheckpointingEnabled": true,
+  "worktree": {
+    "symlinkDirectories": ["log", "tmp", "storage"]
+  },
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '=== Sesión iniciada ===' && echo \"Rama: $(git branch --show-current 2>/dev/null)\" && echo '' && cat .claude/team/current-sprint.md 2>/dev/null | head -25; true",
+            "statusMessage": "Cargando contexto del sprint..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; [[ \"$f\" =~ \\.rb$ ]] && [ -f \"$f\" ] && bundle exec rubocop --autocorrect \"$f\" 2>/dev/null; } || true",
+            "statusMessage": "Ejecutando RuboCop..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // empty' | { read -r f; [[ \"$f\" =~ \\.html\\.erb$ ]] && [ -f \"$f\" ] && bundle exec erb_lint --autocorrect \"$f\" 2>/dev/null; } || true",
+            "statusMessage": "Ejecutando ERB Lint..."
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "echo '' && echo '=== Sesion terminada ===' && git status --short 2>/dev/null | head -10 && echo '--- En progreso ---' && grep -F '- [ ]' .claude/team/current-sprint.md 2>/dev/null | head -5 || true"
+            "command": "echo '' && echo '=== Sesión terminada ===' && echo \"Rama: $(git branch --show-current 2>/dev/null)\" && git status --short 2>/dev/null | head -10; echo '--- En progreso ---'; grep -F '- [ ]' .claude/team/current-sprint.md 2>/dev/null | head -5; true"
           }
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "everything-claude-code@everything-claude-code": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "claude-mem@thedotmack": true
   }
 }

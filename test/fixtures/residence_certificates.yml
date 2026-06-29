@@ -1,0 +1,2 @@
+# No residence_certificates fixtures — table is truncated on load to avoid FK violations
+# from development data. Certificates are created dynamically in test setups.
