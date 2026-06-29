@@ -16,6 +16,9 @@ gem "prawn-table", "~> 0.2"
 
 # QR code generation embedded in the certificate PDF [https://github.com/whomwah/rqrcode]
 gem "rqrcode", "~> 2.2"
+
+# Rate limiting and throttling for the public verification endpoint
+gem "rack-attack", "~> 6.7"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
