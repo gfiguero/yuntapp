@@ -1,0 +1,22 @@
+<% content_for :title do %>
+  <%= I18n.t('panel.payments.success.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('panel.residence_certificates.index.title'), panel_residence_certificates_path %></li>
+  <li><%= I18n.t('panel.payments.success.title') %></li>
+<% end %>
+
+<div class="w-full max-w-2xl mx-auto">
+  <div class="card bg-success/10 border border-success/30">
+    <div class="card-body text-center">
+      <h1 class="card-title text-3xl justify-center text-success"><%= I18n.t('panel.payments.success.title') %></h1>
+      <p class="mt-2"><%= I18n.t('panel.payments.success.description') %></p>
+      <% if @certificate.present? %>
+        <%= link_to I18n.t('actions.show'), panel_residence_certificate_path(@certificate), class: "btn btn-soft btn-primary mt-4" %>
+      <% else %>
+        <%= link_to I18n.t('panel.residence_certificates.index.title'), panel_residence_certificates_path, class: "btn btn-soft btn-primary mt-4" %>
+      <% end %>
+    </div>
+  </div>
+</div>

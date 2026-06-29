@@ -48,5 +48,18 @@
       <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.created_at') %></dt>
       <dd><%= l(@residence_certificate.created_at.to_date) %></dd>
     </div>
+    <% if @residence_certificate.amount.present? %>
+      <div class="p-2 grid gap-2">
+        <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.amount') %></dt>
+        <dd>$<%= number_with_delimiter(@residence_certificate.amount) %> CLP</dd>
+      </div>
+    <% end %>
   </dl>
+
+  <% if @residence_certificate.pending_payment? && @residence_certificate.amount.present? %>
+    <div class="my-6">
+      <%= button_to I18n.t('panel.payments.actions.pay_with_mercadopago'), new_panel_payment_path(certificate_id: @residence_certificate.id), method: :get, class: "btn btn-primary btn-lg" %>
+      <p class="text-sm text-base-content/70 mt-2"><%= I18n.t('panel.payments.show.help') %></p>
+    </div>
+  <% end %>
 </div>

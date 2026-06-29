@@ -278,6 +278,10 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-067 | Residencia | Al aprobar un dependiente, en una sola transacción se crea `VerifiedIdentity` + `Member(dependent: true, status: approved)` + `Residency(household_admin: false, status: approved)` heredando la `VerifiedResidence` del `HouseholdUnit` del `FamilyGroup` del padre |
 | BR-068 | Identidad | El teléfono es opcional para dependientes (menores pueden no tenerlo). Las demás validaciones (RUN normalizado y dígito verificador, nombre y apellido) aplican igual que para identidades independientes |
 | BR-069 | Identidad | Cuando un dependiente crece y hace su propio onboarding en cualquier junta, el mecanismo existente de RUN duplicado (BR-057-059) detecta la coincidencia. Al aprobar el nuevo onboarding, el `Member(dependent: true)` anterior pasa a `inactive` automáticamente — la graduación no requiere lógica nueva |
+| BR-070 | Precios | Cada junta puede definir múltiples precios históricos con vigencia (`effective_from`, `effective_to`). El precio efectivo de un certificado es el vigente al momento de crear el `ResidenceCertificate` y queda capturado en `amount` (snapshot inmutable). Crear un nuevo precio cierra automáticamente la vigencia del anterior |
+| BR-071 | Pagos | El webhook de MercadoPago es idempotente: si llega dos veces con el mismo `payment_id`, no se procesa dos veces ni se actualiza el certificado. Implementado vía índice único en `residence_certificates.payment_id` + chequeo explícito en el controller |
+| BR-072 | Pagos | El webhook de MercadoPago debe validar la firma `x-signature` (HMAC-SHA256 con `webhook_secret`) antes de procesar. Webhooks sin firma válida son descartados con `401 Unauthorized` |
+| BR-073 | Pagos | Si el pago es rechazado, refunded o cancelado por MP, el certificado vuelve/permanece en `pending_payment`. El usuario puede reintentar pagando desde la UI (BR-003). El webhook no degrada un certificado ya `issued` |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización

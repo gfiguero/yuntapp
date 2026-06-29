@@ -88,6 +88,7 @@
           <li class="menu-title mt-4">Configuración</li>
           <li><%= link_to "Directiva", admin_board_members_path, class: ("active" if controller_name == "board_members") %></li>
           <li><%= link_to "Delegaciones Vecinales", admin_neighborhood_delegations_path, class: ("active" if controller_name == "neighborhood_delegations") %></li>
+          <li><%= link_to "Precio de Certificados", admin_certificate_pricings_path, class: ("active" if controller_name == "certificate_pricings") %></li>
 
           <li class="menu-title mt-4">Sistema</li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>

@@ -186,6 +186,11 @@ es:
         rejection_reason: Motivo de rechazo
         identity_documents: Documentos de identidad
         created_at: Fecha de creación
+      certificate_pricing:
+        price: Precio (CLP)
+        effective_from: Vigente desde
+        effective_to: Vigente hasta
+        created_by: Creado por
       residence_verification_request:
         id: ID
         user: Usuario
@@ -471,6 +476,23 @@ es:
       flash:
         approved: Verificación de identidad aprobada exitosamente.
         rejected: Verificación de identidad rechazada.
+    certificate_pricings:
+      index:
+        title: Precio del Certificado
+        description: Define el precio que cobrará la junta por cada certificado de residencia. El mínimo es $1.000 CLP (BR-005). Yuntapp retiene 10%% por operación.
+        current_pricing: Precio vigente
+        no_current_pricing: La junta aún no ha definido un precio. Hasta entonces, los socios no podrán solicitar certificados.
+        effective_since: "Vigente desde %{date}"
+        new_pricing: Cambiar precio
+        history: Historial de precios
+        active: Vigente
+        empty: No hay precios registrados todavía.
+      new:
+        title: Cambiar precio del certificado
+        description: Al guardar, el precio anterior queda cerrado y el nuevo se aplica a las próximas solicitudes. Los certificados ya solicitados mantienen el precio original (snapshot).
+        price_help: "Precio en CLP (mínimo $%{min})"
+      flash:
+        created: Nuevo precio guardado. Se aplicará a las próximas solicitudes.
     dependent_reviews:
       index:
         title: Residentes Dependientes
@@ -551,6 +573,27 @@ es:
         identifier: "Certificado ID: %{id}"
       flash:
         requested: Certificado solicitado exitosamente.
+        no_price: La junta aún no ha definido un precio para los certificados. Comunícate con la directiva.
+        not_household_admin: Debes ser administrador del domicilio para solicitar certificados.
+    payments:
+      show:
+        help: Serás redirigido a MercadoPago para completar el pago. Tu certificado se emitirá automáticamente tras la confirmación.
+      success:
+        title: Pago recibido
+        description: Recibimos tu pago. Tu certificado se está procesando y estará disponible para descarga en breve.
+      failure:
+        title: Pago rechazado
+        description: El pago no pudo completarse. Puedes intentarlo nuevamente desde el detalle del certificado.
+      pending:
+        title: Pago pendiente
+        description: Tu pago está siendo procesado por MercadoPago. Te notificaremos cuando se confirme.
+      actions:
+        pay_with_mercadopago: Pagar con MercadoPago
+      flash:
+        not_household_admin: Debes ser administrador del domicilio para pagar certificados.
+        not_pending_payment: Este certificado no está pendiente de pago.
+        misconfigured: MercadoPago no está configurado. Contacta soporte.
+        preference_failed: No se pudo iniciar el pago. Inténtalo nuevamente.
     dependents:
       index:
         title: Residentes Dependientes
