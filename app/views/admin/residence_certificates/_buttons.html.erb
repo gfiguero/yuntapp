@@ -28,8 +28,4 @@
     <%= button_to raw(icon('delete') + I18n.t('actions.confirm')), [:admin, @residence_certificate], class: "btn btn-soft btn-error", method: :delete %>
   <% end %>
 
-  <% if %w[ show ].include?(action_name) && @residence_certificate.pending_payment? %>
-    <%= button_to I18n.t('actions.issue'), issue_admin_residence_certificate_path(@residence_certificate), class: "btn btn-soft btn-primary", method: :patch %>
-  <% end %>
-
 </div>

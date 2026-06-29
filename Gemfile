@@ -9,6 +9,13 @@ gem "sqlite3", ">= 2.1"
 gem "activerecord-like" # An Active Record Plugin that allows chaining a more DSL-style 'like' or 'not-like' query
 # MercadoPago official SDK for payment processing [https://github.com/mercadopago/sdk-ruby]
 gem "mercadopago-sdk", "~> 3.1"
+
+# PDF generation for residence certificates [https://github.com/prawnpdf/prawn]
+gem "prawn", "~> 2.5"
+gem "prawn-table", "~> 0.2"
+
+# QR code generation embedded in the certificate PDF [https://github.com/whomwah/rqrcode]
+gem "rqrcode", "~> 2.2"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]

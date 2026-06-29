@@ -282,6 +282,10 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-071 | Pagos | El webhook de MercadoPago es idempotente: si llega dos veces con el mismo `payment_id`, no se procesa dos veces ni se actualiza el certificado. Implementado vía índice único en `residence_certificates.payment_id` + chequeo explícito en el controller |
 | BR-072 | Pagos | El webhook de MercadoPago debe validar la firma `x-signature` (HMAC-SHA256 con `webhook_secret`) antes de procesar. Webhooks sin firma válida son descartados con `401 Unauthorized` |
 | BR-073 | Pagos | Si el pago es rechazado, refunded o cancelado por MP, el certificado vuelve/permanece en `pending_payment`. El usuario puede reintentar pagando desde la UI (BR-003). El webhook no degrada un certificado ya `issued` |
+| BR-074 | Certificados | El `validation_token` (UUID) y `validation_code` (alfanumérico de 8 caracteres, sin 0/O/1/I para evitar confusión visual) se generan al emitir el certificado y son únicos en la base de datos. El código se usa para verificación manual/telefónica; el token para el QR |
+| BR-075 | Certificados | El PDF se genera una sola vez al emitir y se almacena vía Active Storage (`pdf_document`). Descargas posteriores reutilizan el archivo almacenado |
+| BR-076 | Certificados | La transición `paid → issued` se ejecuta en un job asíncrono (`IssueCertificateJob`) disparado tras confirmar el pago vía `after_commit`. Si la generación del PDF falla, el job reintenta hasta 3 veces con backoff polinomial; si todos fallan, el certificado queda en `paid` para revisión manual |
+| BR-077 | Certificados | Eliminada la acción manual `Admin::ResidenceCertificatesController#issue`. La emisión es exclusivamente automática (BR-062). El admin ya no puede forzar emisión sin pago |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización

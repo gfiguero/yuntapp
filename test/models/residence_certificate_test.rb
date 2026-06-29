@@ -1,6 +1,8 @@
 require "test_helper"
 
 class ResidenceCertificateTest < ActiveSupport::TestCase
+  include ActiveJob::TestHelper
+
   def setup
     @member = members(:selendis_member)
     @household_unit = household_units(:selendis_household)
@@ -305,5 +307,160 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordInvalid) do
       cert.mark_as_paid!(payment_id: "MP-XYZ")
     end
+  end
+
+  # --- After-commit job enqueue (BR-076) ---
+
+  test "mark_as_paid! enqueues IssueCertificateJob after commit" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      amount: 1500
+    )
+
+    assert_enqueued_with(job: IssueCertificateJob, args: [cert.id]) do
+      cert.mark_as_paid!(payment_id: "MP-NEW")
+    end
+  end
+
+  test "does not enqueue job on subsequent saves once already paid" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      amount: 1500,
+      status: "paid",
+      payment_id: "MP-PRE",
+      paid_at: 1.hour.ago
+    )
+
+    assert_no_enqueued_jobs only: IssueCertificateJob do
+      cert.mark_as_paid!(payment_id: "MP-PRE") # idempotent — no status change
+    end
+  end
+
+  # --- issue! transition (BR-062, BR-074) ---
+
+  test "issue! transitions paid to issued with folio, tokens and dates" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      amount: 1500,
+      status: "paid",
+      payment_id: "MP-PAY",
+      paid_at: Time.current
+    )
+
+    cert.issue!
+
+    assert cert.issued?
+    assert_match(/\ACR-\d+-\d+\z/, cert.folio)
+    assert cert.validation_token.present?
+    assert_match(/\A[\h-]+\z/, cert.validation_token) # uuid-ish
+    assert cert.validation_code.present?
+    assert_equal ResidenceCertificate::VALIDATION_CODE_LENGTH, cert.validation_code.length
+    assert_not_nil cert.issued_at
+    assert_equal Date.current, cert.issue_date
+    assert_equal Date.current + 6.months, cert.expiration_date
+  end
+
+  test "issue! is idempotent when already issued (BR-076)" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "issued",
+      validation_token: "uuid-preset",
+      validation_code: "PRESET12"
+    )
+
+    cert.issue!
+    assert cert.issued?
+    assert_equal "uuid-preset", cert.validation_token
+    assert_equal "PRESET12", cert.validation_code
+  end
+
+  test "issue! raises when status is not paid" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "pending_payment"
+    )
+
+    assert_raises(RuntimeError) do
+      cert.issue!
+    end
+  end
+
+  test "issue! preserves existing folio/tokens if already set (defense against double issuance)" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "paid",
+      payment_id: "MP-FOO",
+      paid_at: Time.current,
+      folio: "CR-MANUAL-999",
+      validation_token: "abc-existing",
+      validation_code: "EXIST123"
+    )
+
+    cert.issue!
+
+    assert cert.issued?
+    assert_equal "CR-MANUAL-999", cert.folio
+    assert_equal "abc-existing", cert.validation_token
+    assert_equal "EXIST123", cert.validation_code
+  end
+
+  # --- Uniqueness validations (BR-074) ---
+
+  test "validation_token must be unique" do
+    ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      validation_token: "uuid-shared-token"
+    )
+
+    duplicate = ResidenceCertificate.new(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "otro",
+      validation_token: "uuid-shared-token"
+    )
+    assert_not duplicate.valid?
+    assert duplicate.errors[:validation_token].any?
+  end
+
+  test "validation_code must be unique" do
+    ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      validation_code: "ABCD1234"
+    )
+
+    duplicate = ResidenceCertificate.new(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "otro",
+      validation_code: "ABCD1234"
+    )
+    assert_not duplicate.valid?
+    assert duplicate.errors[:validation_code].any?
   end
 end

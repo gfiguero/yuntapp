@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_29_163412) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_29_171037) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -213,6 +213,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_163412) do
     t.string "folio"
     t.integer "household_unit_id", null: false
     t.date "issue_date"
+    t.datetime "issued_at"
     t.integer "member_id", null: false
     t.integer "neighborhood_association_id", null: false
     t.text "notes"
@@ -222,12 +223,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_163412) do
     t.text "purpose"
     t.string "status", default: "pending_payment", null: false
     t.datetime "updated_at", null: false
+    t.string "validation_code"
+    t.string "validation_token"
     t.index ["approved_by_id"], name: "index_residence_certificates_on_approved_by_id"
     t.index ["household_unit_id"], name: "index_residence_certificates_on_household_unit_id"
     t.index ["member_id"], name: "index_residence_certificates_on_member_id"
     t.index ["neighborhood_association_id", "folio"], name: "index_residence_certificates_on_association_and_folio", unique: true
     t.index ["neighborhood_association_id"], name: "index_residence_certificates_on_neighborhood_association_id"
     t.index ["payment_id"], name: "index_residence_certificates_on_payment_id", unique: true, where: "payment_id IS NOT NULL"
+    t.index ["validation_code"], name: "index_residence_certificates_on_validation_code", unique: true, where: "validation_code IS NOT NULL"
+    t.index ["validation_token"], name: "index_residence_certificates_on_validation_token", unique: true, where: "validation_token IS NOT NULL"
   end
 
   create_table "residence_verification_requests", force: :cascade do |t|

@@ -571,6 +571,9 @@ es:
         count: "%{count} certificados"
       show:
         identifier: "Certificado ID: %{id}"
+        processing: Tu pago fue recibido. El certificado se está generando y estará disponible para descarga en unos segundos. Recarga la página.
+        download_pdf: Descargar PDF del certificado
+        validation_code: Código de verificación
       flash:
         requested: Certificado solicitado exitosamente.
         no_price: La junta aún no ha definido un precio para los certificados. Comunícate con la directiva.

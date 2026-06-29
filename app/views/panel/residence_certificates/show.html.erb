@@ -62,4 +62,20 @@
       <p class="text-sm text-base-content/70 mt-2"><%= I18n.t('panel.payments.show.help') %></p>
     </div>
   <% end %>
+
+  <% if @residence_certificate.paid? && !@residence_certificate.issued? %>
+    <div class="alert alert-info my-6">
+      <%= I18n.t('panel.residence_certificates.show.processing') %>
+    </div>
+  <% end %>
+
+  <% if @residence_certificate.issued? && @residence_certificate.pdf_document.attached? %>
+    <div class="my-6">
+      <%= link_to I18n.t('panel.residence_certificates.show.download_pdf'), rails_blob_path(@residence_certificate.pdf_document, disposition: "attachment"), class: "btn btn-success btn-lg" %>
+      <p class="text-sm text-base-content/70 mt-2">
+        <%= I18n.t('panel.residence_certificates.show.validation_code') %>:
+        <span class="font-mono font-bold"><%= @residence_certificate.validation_code %></span>
+      </p>
+    </div>
+  <% end %>
 </div>
