@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_29_153501) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_29_163412) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -56,6 +56,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_153501) do
     t.datetime "created_at", null: false
     t.string "name"
     t.datetime "updated_at", null: false
+  end
+
+  create_table "certificate_pricings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "created_by_id", null: false
+    t.datetime "effective_from", null: false
+    t.datetime "effective_to"
+    t.integer "neighborhood_association_id", null: false
+    t.integer "price", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_certificate_pricings_on_created_by_id"
+    t.index ["neighborhood_association_id", "effective_from"], name: "idx_certificate_pricings_on_assoc_and_from"
+    t.index ["neighborhood_association_id"], name: "index_certificate_pricings_on_neighborhood_association_id"
   end
 
   create_table "communes", force: :cascade do |t|
@@ -193,6 +206,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_153501) do
   end
 
   create_table "residence_certificates", force: :cascade do |t|
+    t.integer "amount"
     t.integer "approved_by_id"
     t.datetime "created_at", null: false
     t.date "expiration_date"
@@ -202,6 +216,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_153501) do
     t.integer "member_id", null: false
     t.integer "neighborhood_association_id", null: false
     t.text "notes"
+    t.datetime "paid_at"
+    t.string "payment_id"
+    t.integer "platform_fee"
     t.text "purpose"
     t.string "status", default: "pending_payment", null: false
     t.datetime "updated_at", null: false
@@ -210,6 +227,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_153501) do
     t.index ["member_id"], name: "index_residence_certificates_on_member_id"
     t.index ["neighborhood_association_id", "folio"], name: "index_residence_certificates_on_association_and_folio", unique: true
     t.index ["neighborhood_association_id"], name: "index_residence_certificates_on_neighborhood_association_id"
+    t.index ["payment_id"], name: "index_residence_certificates_on_payment_id", unique: true, where: "payment_id IS NOT NULL"
   end
 
   create_table "residence_verification_requests", force: :cascade do |t|
@@ -307,6 +325,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_153501) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "board_members", "members"
   add_foreign_key "board_members", "neighborhood_associations"
+  add_foreign_key "certificate_pricings", "neighborhood_associations"
+  add_foreign_key "certificate_pricings", "users", column: "created_by_id"
   add_foreign_key "communes", "regions"
   add_foreign_key "family_groups", "household_units"
   add_foreign_key "household_units", "communes"

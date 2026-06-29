@@ -39,6 +39,18 @@
     {
       "fingerprint": "f852c112e990dd84eabded2aa0d862ed160402e26af97291e06c27b9fd08780b",
       "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
+    },
+    {
+      "fingerprint": "4d24c82acb3a0df0b319607de18a1472edbe9752255c4ae0955466afa4d844cd",
+      "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
+    },
+    {
+      "fingerprint": "5c4f2607747b2a0a1b13f9cc42c77a24410014186cfd1233a2e11fe225406d00",
+      "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
+    },
+    {
+      "fingerprint": "c929dcd497b1bf04269b102d91ad4b78196b726239b5d81fa373fa8eb8e3b6b6",
+      "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
     }
   ]
 }

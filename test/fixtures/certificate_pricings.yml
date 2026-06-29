@@ -1,0 +1,5 @@
+manios_current_pricing:
+  neighborhood_association: manios_de_buin
+  price: 1500
+  effective_from: <%= 1.day.ago %>
+  created_by: selendis
