@@ -546,7 +546,8 @@ es:
         title: Residentes Dependientes
         description: Solicitudes de residentes dependientes (menores) registradas por los administradores de domicilio. Verifica los documentos antes de aprobar.
         requested_by: Solicitado por
-        empty: No hay solicitudes de residentes dependientes.
+        empty: No hay solicitudes de residentes dependientes
+        empty_description: Cuando un administrador de domicilio registre un menor en su grupo familiar, la solicitud aparecerá aquí para que la revises.
       show:
         title: Revisión de Residente Dependiente
         dependent_info: Datos del dependiente
@@ -617,6 +618,10 @@ es:
       index:
         title: Certificados de Residencia
         count: "%{count} certificados"
+      empty:
+        title: Aún no has solicitado certificados
+        description: Los certificados de residencia son documentos oficiales emitidos por tu junta de vecinos. Solicita el primero cuando lo necesites.
+        cta: Solicitar mi primer certificado
       show:
         identifier: "Certificado ID: %{id}"
         processing: Tu pago fue recibido. El certificado se está generando y estará disponible para descarga en unos segundos. Recarga la página.

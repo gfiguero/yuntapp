@@ -1,0 +1,16 @@
+<%# Breadcrumb bar reutilizable. Las vistas alimentan los segmentos vía
+    `content_for :breadcrumb do <li>...</li> end`. Si una vista no define
+    breadcrumb, solo se muestra el home link (todavía orienta al usuario).
+    Locals:
+      home_label: texto del primer segmento (ej. "Mi Panel")
+      home_path:  ruta del primer segmento %>
+<% home_label ||= "Inicio" %>
+<% home_path ||= root_path %>
+
+<nav class="text-sm breadcrumbs px-5 py-2 bg-base-100 border-b border-base-200"
+     aria-label="Breadcrumb">
+  <ul>
+    <li><%= link_to home_label, home_path, class: "text-base-content/60 hover:text-base-content" %></li>
+    <%= content_for(:breadcrumb) %>
+  </ul>
+</nav>

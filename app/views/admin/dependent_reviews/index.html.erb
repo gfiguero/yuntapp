@@ -44,6 +44,9 @@
       </table>
     </div>
   <% else %>
-    <p class="text-base-content/70"><%= I18n.t('admin.dependent_reviews.index.empty') %></p>
+    <%= render "shared/empty_state",
+          icon: "users",
+          title: I18n.t('admin.dependent_reviews.index.empty'),
+          description: I18n.t('admin.dependent_reviews.index.empty_description') %>
   <% end %>
 </div>
