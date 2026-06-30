@@ -10,6 +10,13 @@
   /* custom theme here */
 }
 
+/* Tipografía principal: Lexend.
+   Optimizada para legibilidad en interfaces civic/gov (recomendación
+   ui-ux-pro-max para producto Yuntapp). Fallback al system stack. */
+body {
+  font-family: 'Lexend', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 /* Align DaisyUI checkboxes vertically with adjacent text */
 label:has(> .checkbox) {
   align-items: center;

@@ -9,6 +9,7 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+    <%= render "shared/google_fonts" %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -23,7 +24,10 @@
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
           <%= link_to root_path, class: "inline-block" do %>
-            <h1 class="text-4xl font-bold tracking-tight">Yuntapp</h1>
+            <div class="flex justify-center mb-2">
+              <%= render "shared/logo", variant: :icon, size: "lg" %>
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight">Yuntapp</h1>
             <p class="text-base-content/60 text-sm mt-1">Plataforma vecinal</p>
           <% end %>
         </div>

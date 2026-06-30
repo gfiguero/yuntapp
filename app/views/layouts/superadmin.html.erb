@@ -9,6 +9,7 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+    <%= render "shared/google_fonts" %>
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -49,12 +50,9 @@
         <div class="flex flex-col w-72 bg-base-100 border-r border-base-200 h-full overflow-y-auto">
 
           <!-- Brand -->
-          <div class="px-4 py-5 border-b border-base-200">
-            <div class="flex items-center gap-2">
-              <%= icon("home", class: "w-6 h-6 text-primary") %>
-              <span class="font-bold text-lg text-base-content">Yuntapp</span>
-              <span class="badge badge-primary badge-sm ml-auto">Superadmin</span>
-            </div>
+          <div class="px-4 py-5 border-b border-base-200 flex items-center gap-2">
+            <%= render "shared/logo", variant: :horizontal, size: "md" %>
+            <span class="badge badge-primary badge-sm ml-auto">Superadmin</span>
           </div>
 
           <!-- Navigation -->

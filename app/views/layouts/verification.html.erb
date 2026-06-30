@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= render "shared/google_fonts" %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -18,8 +19,8 @@
   <body class="bg-base-200 min-h-screen flex flex-col">
     <header class="bg-base-100 border-b border-base-300">
       <div class="container mx-auto px-6 py-4">
-        <h1 class="text-2xl font-bold">Yuntapp</h1>
-        <p class="text-xs text-base-content/60"><%= I18n.t("verifications.layout.tagline") %></p>
+        <%= render "shared/logo", variant: :horizontal, size: "lg" %>
+        <p class="text-xs text-base-content/60 mt-1"><%= I18n.t("verifications.layout.tagline") %></p>
       </div>
     </header>
 

@@ -1,62 +1,88 @@
 <div class="w-full">
-  <h1 class="font-bold text-4xl my-4">Bienvenido, <%= current_user.name %></h1>
+  <div class="mb-6">
+    <h1 class="font-bold text-3xl md:text-4xl">Bienvenido, <%= current_user.name %></h1>
+    <p class="text-base-content/60 mt-1">Gestiona tu acreditación, residentes y certificados.</p>
+  </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  <% onboarding_req = current_user.current_onboarding_request %>
 
-    <%# Solicitud de Acreditación %>
-    <% onboarding_req = current_user.current_onboarding_request %>
-    <% if onboarding_req.present? && !onboarding_req.draft? %>
-      <div class="card bg-base-200 shadow-sm">
-        <div class="card-body">
-          <h2 class="card-title"><%= I18n.t('panel.onboarding.status.title') %></h2>
-          <%= status_badge(onboarding_req.status) %>
-          <p class="text-sm mt-2"><%= I18n.t("panel.onboarding.status.#{onboarding_req.status}_message") %></p>
-          <div class="card-actions justify-end mt-2">
-            <%= link_to "Ver detalle", panel_onboarding_status_path, class: "btn btn-sm btn-soft" %>
+  <%# Card primario destacado: estado del onboarding cuando está enviado.
+      Jerarquía visual fuerte porque es el contexto más importante del panel. %>
+  <% if onboarding_req.present? && !onboarding_req.draft? %>
+    <div class="card bg-primary/5 border border-primary/20 shadow-sm mb-6">
+      <div class="card-body">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div class="flex-1 min-w-0">
+            <h2 class="card-title text-2xl"><%= I18n.t('panel.onboarding.status.title') %></h2>
+            <p class="text-sm text-base-content/70 mt-1"><%= I18n.t("panel.onboarding.status.#{onboarding_req.status}_message") %></p>
           </div>
+          <%= status_badge(onboarding_req.status) %>
+        </div>
+        <div class="card-actions justify-end mt-4">
+          <%= link_to "Ver detalle", panel_onboarding_status_path, class: "btn btn-primary" %>
         </div>
       </div>
-    <% end %>
+    </div>
+  <% end %>
 
-    <%# Socios del domicilio (solo household_admin) %>
+  <%# Cards secundarios de acción: misma jerarquía entre sí, secundaria respecto al onboarding card. %>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <% if current_user.household_admin? %>
-      <div class="card bg-base-200 shadow-sm">
+      <div class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
         <div class="card-body">
-          <h2 class="card-title">Socios del Domicilio</h2>
+          <div class="flex items-center gap-2 mb-2">
+            <%= icon('users', class: 'w-5 h-5 text-primary') %>
+            <h2 class="card-title text-lg">Socios del Domicilio</h2>
+          </div>
           <p class="text-sm">
-            <%= current_user.household_unit.approved_residencies.count %> aprobados,
-            <%= current_user.household_unit.residencies.where(status: "pending").count %> pendientes
+            <span class="font-semibold"><%= current_user.household_unit.approved_residencies.count %></span> aprobados,
+            <span class="font-semibold"><%= current_user.household_unit.residencies.where(status: "pending").count %></span> pendientes
           </p>
           <div class="card-actions justify-end mt-2">
             <%= link_to "Gestionar", panel_members_path, class: "btn btn-sm btn-soft" %>
           </div>
         </div>
       </div>
-    <% end %>
 
-    <%# Certificados de residencia (solo household_admin) %>
-    <% if current_user.household_admin? %>
-      <div class="card bg-base-200 shadow-sm">
+      <div class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
         <div class="card-body">
-          <h2 class="card-title">Certificados de Residencia</h2>
-          <p class="text-sm">Solicita y revisa certificados de residencia.</p>
+          <div class="flex items-center gap-2 mb-2">
+            <%= icon('id', class: 'w-5 h-5 text-primary') %>
+            <h2 class="card-title text-lg">Certificados de Residencia</h2>
+          </div>
+          <p class="text-sm">Solicita certificados oficiales para ti y los miembros de tu domicilio.</p>
           <div class="card-actions justify-end mt-2">
             <%= link_to "Ver certificados", panel_residence_certificates_path, class: "btn btn-sm btn-soft" %>
           </div>
         </div>
       </div>
+
+      <div class="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
+        <div class="card-body">
+          <div class="flex items-center gap-2 mb-2">
+            <%= icon('users', class: 'w-5 h-5 text-primary') %>
+            <h2 class="card-title text-lg">Residentes Dependientes</h2>
+          </div>
+          <p class="text-sm">Registra a los menores que viven contigo.</p>
+          <div class="card-actions justify-end mt-2">
+            <%= link_to "Gestionar", panel_dependents_path, class: "btn btn-sm btn-soft" %>
+          </div>
+        </div>
+      </div>
     <% end %>
 
-    <%# Perfil %>
+    <%# Perfil: jerarquía más baja (info contextual), bg-base-200 más quieto. %>
     <div class="card bg-base-200 shadow-sm">
       <div class="card-body">
-        <h2 class="card-title">Mi Perfil</h2>
-        <p class="text-sm"><%= current_user.email %></p>
+        <div class="flex items-center gap-2 mb-2">
+          <%= icon('user', class: 'w-5 h-5 text-base-content/60') %>
+          <h2 class="card-title text-lg">Mi Perfil</h2>
+        </div>
+        <p class="text-sm text-base-content/70 truncate"><%= current_user.email %></p>
         <div class="card-actions justify-end mt-2">
-          <%= link_to "Editar perfil", panel_profile_path, class: "btn btn-sm btn-soft" %>
+          <%= link_to "Editar perfil", panel_profile_path, class: "btn btn-sm btn-ghost" %>
         </div>
       </div>
     </div>
-
   </div>
 </div>
