@@ -203,6 +203,153 @@ module Panel
       assert Member.exists?(member_id), "Member should not be destroyed"
     end
 
+    # --- update_step2 — file attachments + RUN validation ---
+
+    test "update_step2 attaches identity_documents when present" do
+      sign_in @urunis
+      complete_step1
+      get panel_onboarding_step2_url
+
+      assert_difference -> { ActiveStorage::Attachment.count }, 1 do
+        patch panel_onboarding_step2_url, params: {
+          identity_verification_request: {
+            identity_documents: [fixture_file_upload("id_placeholder.png", "image/png")]
+          }
+        }
+      end
+
+      ivr = @urunis.reload.current_onboarding_request.identity_verification_request
+      assert ivr.identity_documents.attached?
+    end
+
+    test "update_step2 rejects RUN with invalid check digit" do
+      sign_in @urunis
+      complete_step1
+      get panel_onboarding_step2_url
+
+      patch panel_onboarding_step2_url, params: {
+        identity_verification_request: {run: "11111111-9"}
+      }
+      # 422 cuando la validación de RUN falla (vs 200 con turbo_stream autosave en happy path)
+      assert_response :unprocessable_content
+
+      ivr = @urunis.reload.current_onboarding_request&.identity_verification_request
+      # El RUN inválido no debe haberse persistido
+      assert_not_equal "11111111-9", ivr&.run
+    end
+
+    test "delete_document removes a previously attached identity_document" do
+      sign_in @urunis
+      complete_step1
+      get panel_onboarding_step2_url
+      patch panel_onboarding_step2_url, params: {
+        identity_verification_request: {
+          identity_documents: [fixture_file_upload("id_placeholder.png", "image/png")]
+        }
+      }
+
+      ivr = @urunis.reload.current_onboarding_request.identity_verification_request
+      attachment = ivr.identity_documents.first
+      assert attachment.present?
+
+      assert_difference -> { ivr.identity_documents.count }, -1 do
+        delete panel_onboarding_delete_document_url(attachment_id: attachment.id)
+      end
+    end
+
+    # --- update_step3 — BR-019 toggle delegation vs manual + delete_residence_document ---
+
+    test "update_step3 accepts manual_address with street_name (BR-019)" do
+      sign_in @urunis
+      complete_step2_with_attachment
+      get panel_onboarding_step3_url
+
+      patch panel_onboarding_step3_url, params: {
+        commit_continue: "Continuar",
+        residence_verification_request: {
+          manual_address: "1",
+          street_name: "Calle Falsa",
+          number: "123"
+        }
+      }
+
+      rvr = @urunis.reload.current_onboarding_request.residence_verification_request
+      assert_not_nil rvr
+      assert_equal "Calle Falsa", rvr.street_name
+      assert_equal "123", rvr.number
+    end
+
+    test "update_step3 accepts neighborhood_delegation_id without street_name (BR-019)" do
+      sign_in @urunis
+      complete_step2_with_attachment
+      get panel_onboarding_step3_url
+
+      patch panel_onboarding_step3_url, params: {
+        commit_continue: "Continuar",
+        residence_verification_request: {
+          neighborhood_delegation_id: @delegation.id,
+          number: "42"
+        }
+      }
+
+      rvr = @urunis.reload.current_onboarding_request.residence_verification_request
+      assert_not_nil rvr
+      assert_equal @delegation.id, rvr.neighborhood_delegation_id
+    end
+
+    test "delete_residence_document removes a previously attached residence_document" do
+      sign_in @urunis
+      complete_step2_with_attachment
+      get panel_onboarding_step3_url
+      patch panel_onboarding_step3_url, params: {
+        residence_verification_request: {
+          neighborhood_delegation_id: @delegation.id,
+          number: "42",
+          residence_documents: [fixture_file_upload("id_placeholder.png", "image/png")]
+        }
+      }
+
+      rvr = @urunis.reload.current_onboarding_request.residence_verification_request
+      attachment = rvr.residence_documents.first
+      assert attachment.present?
+
+      assert_difference -> { rvr.residence_documents.count }, -1 do
+        delete panel_onboarding_delete_residence_document_url(attachment_id: attachment.id)
+      end
+    end
+
+    # --- submit action — terms gate + session cleanup ---
+
+    test "submit redirects back to step4 when terms_accepted is missing" do
+      sign_in @urunis
+      complete_full_flow_until_step4
+
+      post panel_onboarding_submit_url
+      assert_redirected_to panel_onboarding_step4_url
+      assert_equal I18n.t("panel.onboarding.step4.terms_required"), flash[:alert]
+
+      # OR should still be draft
+      onboarding = @urunis.reload.current_onboarding_request
+      assert onboarding.draft?
+    end
+
+    test "submit with terms_accepted transitions OR to pending and clears session" do
+      sign_in @urunis
+      complete_full_flow_until_step4
+
+      post panel_onboarding_submit_url, params: {terms_accepted: "1"}
+      assert_redirected_to panel_root_url
+
+      # urunis no longer has a current_onboarding_request because it transitioned to pending
+      # and current_onboarding_request scope only includes draft/pending — wait pending IS included
+      onboarding = @urunis.reload.current_onboarding_request
+      assert_not_nil onboarding
+      assert onboarding.pending?
+      assert_not_nil onboarding.terms_accepted_at
+      assert_equal "pending", onboarding.identity_verification_request.status
+      assert_equal "pending", onboarding.residence_verification_request.status
+    end
+
     private
 
     def complete_step1
@@ -213,6 +360,35 @@ module Panel
         commune_id: @commune.id,
         neighborhood_association_id: @association.id
       }
+    end
+
+    def complete_step2_with_attachment
+      complete_step1
+      get panel_onboarding_step2_url
+      patch panel_onboarding_step2_url, params: {
+        commit_continue: "Continuar",
+        identity_verification_request: {
+          first_name: "Urunis",
+          last_name: "Test",
+          run: "12345678-5",
+          phone: "+56912345678",
+          identity_documents: [fixture_file_upload("id_placeholder.png", "image/png")]
+        }
+      }
+    end
+
+    def complete_full_flow_until_step4
+      complete_step2_with_attachment
+      get panel_onboarding_step3_url
+      patch panel_onboarding_step3_url, params: {
+        commit_continue: "Continuar",
+        residence_verification_request: {
+          neighborhood_delegation_id: @delegation.id,
+          number: "42",
+          residence_documents: [fixture_file_upload("id_placeholder.png", "image/png")]
+        }
+      }
+      get panel_onboarding_step4_url
     end
   end
 end
