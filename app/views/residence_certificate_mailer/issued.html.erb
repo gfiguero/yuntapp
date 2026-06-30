@@ -1,0 +1,18 @@
+<p><%= t("residence_certificate_mailer.issued.greeting", name: @member.first_name) %></p>
+
+<p><%= t("residence_certificate_mailer.issued.body_intro", folio: @certificate.folio) %></p>
+
+<ul>
+  <li><strong><%= t("residence_certificate_mailer.issued.folio") %>:</strong> <%= @certificate.folio %></li>
+  <li><strong><%= t("residence_certificate_mailer.issued.issue_date") %>:</strong> <%= l(@certificate.issue_date) %></li>
+  <li><strong><%= t("residence_certificate_mailer.issued.expiration_date") %>:</strong> <%= l(@certificate.expiration_date) %></li>
+  <li><strong><%= t("residence_certificate_mailer.issued.validation_code") %>:</strong> <%= @certificate.validation_code %></li>
+</ul>
+
+<p><%= t("residence_certificate_mailer.issued.download_intro") %></p>
+
+<p>
+  <%= link_to t("residence_certificate_mailer.issued.verify_link"), @verification_url %>
+</p>
+
+<p><%= t("residence_certificate_mailer.issued.signature") %></p>

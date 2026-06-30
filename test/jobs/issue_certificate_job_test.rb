@@ -1,6 +1,8 @@
 require "test_helper"
 
 class IssueCertificateJobTest < ActiveJob::TestCase
+  include ActionMailer::TestHelper
+
   setup do
     @certificate = ResidenceCertificate.create!(
       member: members(:selendis_member),
@@ -23,6 +25,12 @@ class IssueCertificateJobTest < ActiveJob::TestCase
     assert @certificate.validation_token.present?
     assert @certificate.validation_code.present?
     assert @certificate.pdf_document.attached?
+  end
+
+  test "perform enqueues the issued notification email" do
+    assert_enqueued_emails 1 do
+      IssueCertificateJob.new.perform(@certificate.id)
+    end
   end
 
   test "perform is a no-op when certificate is already issued" do

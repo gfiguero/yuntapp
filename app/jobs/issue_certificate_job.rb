@@ -11,5 +11,6 @@ class IssueCertificateJob < ApplicationJob
 
     certificate.issue!
     CertificatePdfService.new(certificate).generate_and_attach!
+    ResidenceCertificateMailer.issued(certificate).deliver_later
   end
 end
