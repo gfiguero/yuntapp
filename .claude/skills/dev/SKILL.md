@@ -120,8 +120,8 @@ git branch -a | grep "feature/<slug>"
 If branch exists, append date: `feature/<slug>-YYYYMMDD`
 
 ```bash
-git checkout main
-git pull origin main
+git checkout master
+git pull origin master
 git checkout -b feature/<slug>
 ```
 
@@ -172,7 +172,7 @@ Run validations, commit, push, create PR → see Finish Protocol and PR Protocol
 ```bash
 git fetch origin
 git branch -a | grep "fix/<slug>"
-git checkout main && git pull origin main
+git checkout master && git pull origin master
 git checkout -b fix/<slug>
 ```
 
@@ -223,7 +223,7 @@ See Finish Protocol and PR Protocol. Include root cause in PR body.
 ```bash
 git fetch origin
 git branch -a | grep "refactor/<slug>"
-git checkout main && git pull origin main
+git checkout master && git pull origin master
 git checkout -b refactor/<slug>
 ```
 
@@ -260,7 +260,7 @@ See Finish Protocol and PR Protocol.
 ```bash
 git fetch origin
 git branch -a | grep "tests/<slug>"
-git checkout main && git pull origin main
+git checkout master && git pull origin master
 git checkout -b tests/<slug>
 ```
 
@@ -335,7 +335,7 @@ gh pr create \
 🤖 Generated with Claude Code autonomous agent workflow
 BODY
 )" \
-  --base main
+  --base master
 ```
 
 ---

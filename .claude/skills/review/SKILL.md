@@ -34,10 +34,10 @@ Ejemplos:
 
 ### Fase 1: Recopilar contexto
 
-1. Identificar el branch y commits desde main:
+1. Identificar el branch y commits desde master:
 ```bash
-git log main...HEAD --oneline
-git diff --stat main...HEAD
+git log master...HEAD --oneline
+git diff --stat master...HEAD
 ```
 
 2. Si se indico un PR numero, obtener descripcion:
@@ -52,7 +52,7 @@ gh pr view <number>
 ### Fase 2: Analisis de cambios
 
 ```bash
-git diff main...HEAD
+git diff master...HEAD
 ```
 
 Para cada archivo modificado, evaluar:
