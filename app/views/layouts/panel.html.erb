@@ -15,6 +15,7 @@
   </head>
 
   <body>
+    <%= render "shared/skip_to_main" %>
     <%= render "shared/flash" %>
     <div class="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" class="drawer-toggle">
@@ -29,7 +30,7 @@
             <div class="flex-1 px-2 mx-2 font-bold text-xl">Panel de Usuario</div>
         </div>
 
-        <main class="container mx-auto mt-2 mb-5 px-5 flex flex-col w-full">
+        <main id="main-content" tabindex="-1" class="container mx-auto mt-2 mb-5 px-5 flex flex-col w-full">
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-2xl font-bold">Panel de Usuario</h1>
             </div>

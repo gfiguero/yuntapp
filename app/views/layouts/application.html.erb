@@ -26,6 +26,7 @@
   </head>
 
   <body class="min-h-screen flex flex-col">
+    <%= render "shared/skip_to_main" %>
     <%= render "shared/flash" %>
     <nav class="navbar bg-base-100 shadow-sm">
       <div class="container mx-auto px-1 flex flex-row">
@@ -89,7 +90,7 @@
         </div>
       </div>
     <% end %>
-    <main class="container mx-auto mt-2 mb-5 px-5 flex flex-col">
+    <main id="main-content" tabindex="-1" class="container mx-auto mt-2 mb-5 px-5 flex flex-col">
       <%= yield %>
     </main>
     <%= render "shared/footer" %>
