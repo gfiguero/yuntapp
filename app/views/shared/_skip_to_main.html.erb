@@ -1,0 +1,6 @@
+<%# Skip link: oculto hasta recibir focus por Tab. Permite a usuarios de teclado
+    saltar la navegación lateral y aterrizar directo en el contenido principal. %>
+<a href="#main-content"
+   class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 btn btn-primary">
+  <%= I18n.t('shared.a11y.skip_to_main') %>
+</a>

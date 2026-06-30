@@ -36,9 +36,7 @@
             </td>
             <td><%= l(request.created_at.to_date) %></td>
             <td>
-              <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-                <%= link_to icon('show'), admin_dependent_review_path(request), class: "btn btn-sm btn-soft btn-info" %>
-              </div>
+              <%= icon_link_to 'show', admin_dependent_review_path(request), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
             </td>
           </tr>
         <% end %>

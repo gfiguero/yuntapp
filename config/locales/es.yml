@@ -328,6 +328,10 @@ es:
     headers:
       new_record: Nuevo Registro
     empty: —
+    a11y:
+      skip_to_main: Saltar al contenido principal
+    flash:
+      dismiss: Cerrar notificación
 
   residence_certificate_mailer:
     issued:

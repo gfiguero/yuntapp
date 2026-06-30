@@ -23,7 +23,7 @@
       </div>
     </header>
 
-    <main class="flex-1 container mx-auto px-6 py-12">
+    <main id="main-content" tabindex="-1" class="flex-1 container mx-auto px-6 py-12">
       <% flash.each do |type, message| %>
         <% alert_class = case type
              when "notice" then "alert-success"

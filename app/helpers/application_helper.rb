@@ -70,4 +70,18 @@ module ApplicationHelper
   def mini_token
     rand(36**8).to_s(36)
   end
+
+  # Genera un link icon-only con aria-label + tooltip DaisyUI.
+  # Garantiza accesibilidad para usuarios de lectores de pantalla
+  # (los tooltips no son anunciados por defecto).
+  #
+  # Uso:
+  #   icon_link_to('show', panel_member_path(member), t('actions.show'),
+  #                class: 'btn btn-sm btn-soft btn-info')
+  def icon_link_to(icon_name, path, label, html_options = {})
+    classes = html_options.delete(:class) || "btn btn-sm btn-soft"
+    content_tag(:div, class: "tooltip", data: {tip: label}) do
+      link_to icon(icon_name), path, html_options.merge(class: classes, aria: {label: label})
+    end
+  end
 end

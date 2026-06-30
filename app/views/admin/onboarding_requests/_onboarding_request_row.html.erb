@@ -4,8 +4,6 @@
   <td><%= status_badge(onboarding_request.status) %></td>
   <td><%= l(onboarding_request.created_at, format: :short) %></td>
   <td>
-    <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), admin_onboarding_request_path(onboarding_request), class: "btn btn-sm btn-soft btn-info" %>
-    </div>
+    <%= icon_link_to 'show', admin_onboarding_request_path(onboarding_request), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
   </td>
 </tr>

@@ -34,9 +34,7 @@
           <td><%= truncate(certificate.purpose, length: 50) %></td>
           <td><%= l(certificate.created_at.to_date) %></td>
           <td>
-            <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-              <%= link_to icon('show'), panel_residence_certificate_path(certificate), class: "btn btn-sm btn-soft btn-info" %>
-            </div>
+            <%= icon_link_to 'show', panel_residence_certificate_path(certificate), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
           </td>
         </tr>
       <% end %>

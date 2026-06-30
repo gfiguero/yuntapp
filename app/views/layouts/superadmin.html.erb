@@ -15,6 +15,8 @@
   </head>
 
   <body>
+    <%= render "shared/skip_to_main" %>
+    <%= render "shared/flash" %>
     <div class="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" class="drawer-toggle">
       <div class="drawer-content flex flex-col items-center justify-start min-h-screen">
@@ -34,7 +36,7 @@
           </div>
         </div>
 
-        <main class="container mx-auto mt-4 mb-8 px-5 flex flex-col w-full">
+        <main id="main-content" tabindex="-1" class="container mx-auto mt-4 mb-8 px-5 flex flex-col w-full">
           <%= yield %>
         </main>
 
