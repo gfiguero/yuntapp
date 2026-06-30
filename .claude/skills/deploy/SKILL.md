@@ -21,7 +21,7 @@ Workflow de deploy de produccion para yuntapp usando Kamal.
 ## Input
 
 `$ARGUMENTS` — Tipo de deploy. Ejemplos:
-- `/deploy` — deploy estandar (main branch)
+- `/deploy` — deploy estandar (master branch)
 - `/deploy rollback` — rollback al deploy anterior
 - `/deploy status` — estado actual del servidor
 - `/deploy logs` — ver logs de produccion
@@ -62,7 +62,7 @@ Antes de cualquier deploy a produccion:
 
 ```bash
 git status              # no debe haber cambios sin commitear
-git log main..HEAD      # debe estar sincronizado con origin/main
+git log master..HEAD      # debe estar sincronizado con origin/master
 ```
 
 ### 1.2 Ejecutar suite de calidad completa
@@ -88,7 +88,7 @@ Si hay migraciones pendientes, el deploy las aplicara automaticamente (ver Fase 
 ### 1.4 Revisar cambios de schema
 
 ```bash
-git diff origin/main -- db/schema.rb
+git diff origin/master -- db/schema.rb
 ```
 
 Si hay cambios de schema, revisar que:
@@ -222,15 +222,15 @@ NO hacer rollback si:
 ## Deploy de emergencia (hotfix)
 
 ```bash
-git checkout main
-git pull origin main
+git checkout master
+git pull origin master
 git checkout -b fix/descripcion-hotfix
 # ... hacer el fix ...
 git add <files>
 git commit -m "fix: descripcion del hotfix"
 git push -u origin fix/descripcion-hotfix
-# Crear PR, aprobar, merge a main
-git checkout main && git pull origin main
+# Crear PR, aprobar, merge a master
+git checkout master && git pull origin master
 kamal deploy
 ```
 

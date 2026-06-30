@@ -128,8 +128,8 @@ Usar `ExitPlanMode` para presentar el plan al usuario. El plan debe incluir:
 #### 3.1 Preparar branch
 
 ```bash
-git checkout main
-git pull origin main
+git checkout master
+git pull origin master
 git checkout -b feature/<slug-descriptivo>
 ```
 
@@ -179,7 +179,7 @@ Si alguna falla, corregir y re-ejecutar hasta que las 3 pasen.
 #### 4.1 Identificar archivos tocados
 
 ```bash
-git diff --name-only main...HEAD
+git diff --name-only master...HEAD
 ```
 
 #### 4.2 Auditar cada archivo nuevo/modificado
@@ -255,7 +255,7 @@ gh pr create \
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )" \
-  --base main \
+  --base master \
   --assignee "@me"
 ```
 

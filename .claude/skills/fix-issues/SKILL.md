@@ -64,8 +64,8 @@ Repetir para cada issue en orden (menor numero primero):
 #### 2.1 Preparar branch
 
 ```bash
-git checkout main
-git pull origin main
+git checkout master
+git pull origin master
 git checkout -b fix/<issue-number>-<slug>
 ```
 
@@ -153,7 +153,7 @@ Closes #<issue-number>
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )" \
-  --base main \
+  --base master \
   --assignee "@me"
 ```
 
@@ -181,7 +181,7 @@ Total: X PRs creados, Y fallidos
 ## Reglas
 
 - **Un PR por issue**: Nunca combinar multiples issues en un solo PR
-- **Branch desde main**: Siempre crear branch desde main actualizado
+- **Branch desde master**: Siempre crear branch desde master actualizado
 - **Validaciones obligatorias**: standardrb + erb_lint + tests deben pasar antes de commit
 - **No skip hooks**: Nunca usar `--no-verify` en commits
 - **Minimal changes**: Solo modificar lo necesario para resolver el issue

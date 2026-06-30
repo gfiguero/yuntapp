@@ -1,6 +1,6 @@
 ---
 name: merge-pr
-description: Mezcla un PR aprobado en main, deja un comentario de cierre y elimina la rama remota.
+description: Mezcla un PR aprobado en master, deja un comentario de cierre y elimina la rama remota.
 disable-model-invocation: true
 allowed-tools:
   - Bash(gh pr *)
@@ -47,12 +47,12 @@ gh pr comment <number> --body "Revisado y mergeado. Rama eliminada."
 
 Anotar exito o fallo para el resumen final.
 
-### Actualizar main local
+### Actualizar master local
 
-Despues de procesar todos los PRs, actualizar la rama main local:
+Despues de procesar todos los PRs, actualizar la rama master local:
 
 ```bash
-git fetch origin main
+git fetch origin master
 ```
 
 Esto asegura que el proyecto local tenga los commits mergeados sin cambiar de rama.
