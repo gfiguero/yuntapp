@@ -1,0 +1,27 @@
+<%# Marca de Yuntapp. Acepta variantes: :horizontal (default), :stacked, :icon.
+    El SVG se renderiza inline para que tome currentColor cuando esté en
+    fondos claros/oscuros (ej. sidebar dark mode futuro). %>
+<%
+  variant ||= :horizontal
+  size ||= "md"
+  text_classes = case size
+    when "sm" then "text-base font-semibold tracking-tight"
+    when "lg" then "text-3xl font-bold tracking-tight"
+    else "text-xl font-bold tracking-tight"
+  end
+  icon_size = case size
+    when "sm" then "w-6 h-6"
+    when "lg" then "w-10 h-10"
+    else "w-8 h-8"
+  end
+%>
+
+<div class="flex <%= variant == :stacked ? 'flex-col gap-1' : 'flex-row items-center gap-2' %>" aria-label="Yuntapp">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="<%= icon_size %>" aria-hidden="true">
+    <circle cx="16" cy="16" r="15" fill="currentColor" class="text-primary" />
+    <path d="M10 8 L16 16 L22 8 M16 16 L16 24" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </svg>
+  <% unless variant == :icon %>
+    <span class="<%= text_classes %>">Yuntapp</span>
+  <% end %>
+</div>
