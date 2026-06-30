@@ -1,0 +1,21 @@
+<%# Empty state amigable con icon + título + descripción opcional + CTA opcional.
+    Reemplaza el patrón "No hay registros" plano que no orienta al usuario.
+    Locals:
+      title:        encabezado (requerido)
+      description:  texto explicativo (opcional)
+      icon:         nombre de icon helper (default "info")
+      cta_text:     texto del botón CTA (opcional)
+      cta_path:     ruta del botón CTA (requerido si cta_text presente)
+      cta_class:    clase del botón (default "btn btn-primary") %>
+<div class="text-center py-12 px-4">
+  <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-base-200 mb-4">
+    <%= icon((local_assigns[:icon] || "info").to_s, class: "w-8 h-8 text-base-content/40") %>
+  </div>
+  <h3 class="text-lg font-semibold mb-1"><%= title %></h3>
+  <% if local_assigns[:description].present? %>
+    <p class="text-sm text-base-content/60 mb-4 max-w-md mx-auto"><%= description %></p>
+  <% end %>
+  <% if local_assigns[:cta_text].present? && local_assigns[:cta_path].present? %>
+    <%= link_to cta_text, cta_path, class: local_assigns[:cta_class] || "btn btn-primary" %>
+  <% end %>
+</div>
