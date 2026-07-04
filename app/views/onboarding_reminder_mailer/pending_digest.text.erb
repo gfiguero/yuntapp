@@ -1,0 +1,11 @@
+<%= t(".greeting") %>
+
+<%= t(".intro", count: @count) %>
+
+<% @requests.each do |request| -%>
+- <%= request.applicant_name %> (<%= t(".waiting", count: request.days_pending) %>)
+<% end -%>
+
+<%= t(".cta") %>: <%= @panel_url %>
+
+<%= t(".signature") %>

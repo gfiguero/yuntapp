@@ -350,6 +350,22 @@ es:
       verify_link: Verificación pública
       signature: Equipo Yuntapp
 
+  onboarding_reminder_mailer:
+    pending_digest:
+      subject:
+        one: Tienes 1 solicitud de socio pendiente de revisión
+        other: Tienes %{count} solicitudes de socio pendientes de revisión
+      greeting: "Hola,"
+      intro:
+        one: "Tu junta de vecinos tiene 1 solicitud de socio esperando revisión:"
+        other: "Tu junta de vecinos tiene %{count} solicitudes de socio esperando revisión:"
+      waiting:
+        zero: ingresada hoy
+        one: esperando hace 1 día
+        other: esperando hace %{count} días
+      cta: Revisar solicitudes pendientes
+      signature: Equipo Yuntapp
+
   verifications:
     layout:
       title: Verificación de Certificado — Yuntapp

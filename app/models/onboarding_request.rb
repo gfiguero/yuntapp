@@ -24,6 +24,25 @@ class OnboardingRequest < ApplicationRecord
   def rejected? = status == "rejected"
   def cancelled? = status == "cancelled"
 
+  # Nombre legible del solicitante para los recordatorios al admin (BR-050).
+  # Cae al email si aún no hay datos de identidad cargados.
+  def applicant_name
+    ivr = identity_verification_request
+    full = [ivr&.first_name, ivr&.last_name].compact.join(" ").strip
+    full.presence || user&.email
+  end
+
+  # Momento en que la solicitud entró a revisión (`pending`). Se usa para
+  # informar la antigüedad en los recordatorios.
+  def pending_since
+    terms_accepted_at || created_at
+  end
+
+  def days_pending(as_of: Time.current)
+    return 0 unless pending_since
+    ((as_of - pending_since) / 1.day).floor
+  end
+
   # BR-017: el envío de onboarding es atómico. OnboardingRequest +
   # IdentityVerificationRequest + ResidenceVerificationRequest pasan a
   # `pending` juntas. Si alguna update falla, se revierte todo y los
