@@ -322,6 +322,10 @@ es:
     issue: Emitir
     deactivate: Desactivar
 
+  members:
+    deactivation:
+      cascade_reason: "Desactivación en cascada del jefe de hogar: %{reason}"
+
   shared:
     table:
       actions: Acciones

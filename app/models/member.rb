@@ -36,9 +36,45 @@ class Member < ApplicationRecord
   def inactive? = status == "inactive"
   def dependent? = dependent
 
+  # Residencia aprobada más reciente del socio (mismo criterio que User#residency).
+  def residency
+    verified_identity&.residencies&.approved&.order(created_at: :desc)&.first
+  end
+
+  def household_admin?
+    residency&.household_admin? || false
+  end
+
+  # Residentes dependientes del mismo grupo familiar que este socio gestiona.
+  def dependent_members
+    family_group = residency&.family_group
+    return Member.none unless family_group
+
+    Member.dependent.active
+      .joins(:verified_identity)
+      .joins("INNER JOIN residencies ON residencies.verified_identity_id = verified_identities.id")
+      .where(residencies: {family_group_id: family_group.id, status: "approved"})
+      .where(neighborhood_association_id: neighborhood_association_id)
+      .distinct
+  end
+
+  # BR-037/BR-038: al desactivar un household_admin, sus residentes dependientes
+  # quedan desactivados en cascada conservando registro y motivo. La operación es
+  # atómica: si algo falla, no queda nadie a medio desactivar.
   def deactivate!(reason:)
-    self.deactivation_reason = reason
-    self.status = "inactive"
-    save!
+    transaction do
+      mark_inactive!(reason)
+
+      if household_admin?
+        cascade_reason = I18n.t("members.deactivation.cascade_reason", reason: reason)
+        dependent_members.find_each { |dependent| dependent.mark_inactive!(cascade_reason) }
+      end
+    end
+  end
+
+  protected
+
+  def mark_inactive!(reason)
+    update!(status: "inactive", deactivation_reason: reason)
   end
 end
