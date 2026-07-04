@@ -9,3 +9,13 @@ selendis_residency:
   family_group: selendis_family_group
   household_admin: true
   status: "approved"
+
+# Residente dependiente en el mismo grupo familiar de selendis (jefe de hogar).
+# Usado para probar la cascada de desactivación (BR-037).
+vorazun_residency:
+  verified_identity: vorazun_persona
+  verified_residence: selendis_verified_residence
+  household_unit: selendis_household
+  family_group: selendis_family_group
+  household_admin: false
+  status: "approved"
