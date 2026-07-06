@@ -1,0 +1,18 @@
+<p><%= t(".greeting") %></p>
+
+<p><%= t(".intro", count: @count) %></p>
+
+<ul>
+  <% @requests.each do |request| %>
+    <li>
+      <strong><%= request.applicant_name %></strong>
+      — <%= t(".waiting", count: request.days_pending) %>
+    </li>
+  <% end %>
+</ul>
+
+<p>
+  <%= link_to t(".cta"), @panel_url %>
+</p>
+
+<p><%= t(".signature") %></p>
