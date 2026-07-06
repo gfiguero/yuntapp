@@ -8,7 +8,7 @@ gem "propshaft"
 gem "sqlite3", ">= 2.1"
 gem "activerecord-like" # An Active Record Plugin that allows chaining a more DSL-style 'like' or 'not-like' query
 # MercadoPago official SDK for payment processing [https://github.com/mercadopago/sdk-ruby]
-gem "mercadopago-sdk", "~> 3.1"
+gem "mercadopago-sdk", "~> 3.2"
 
 # PDF generation for residence certificates [https://github.com/prawnpdf/prawn]
 gem "prawn", "~> 2.5"
