@@ -56,7 +56,8 @@ gem "thruster", require: false
 gem "image_processing"
 # Backend de procesamiento de imágenes para Active Storage (variant_processor :vips).
 # Desde image_processing 2.0, ruby-vips es una dependencia "soft" y debe declararse
-# explícitamente. El Dockerfile instala la librería de sistema libvips.
+# explícitamente. Requiere la librería de sistema libvips (instalada en el Dockerfile
+# y en el workflow de CI).
 gem "ruby-vips"
 
 group :development, :test do
