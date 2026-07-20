@@ -157,6 +157,11 @@
                 <div class="text-xs text-base-content/50">Superadmin</div>
               </div>
             </div>
+            <%= link_to edit_user_registration_path,
+                  class: "btn btn-sm btn-ghost btn-block justify-start gap-2 mb-1" do %>
+              <%= icon("user", class: "w-4 h-4") %>
+              Mi Cuenta
+            <% end %>
             <%= link_to destroy_user_session_path,
                   data: { turbo_method: :delete },
                   class: "btn btn-sm btn-ghost btn-block justify-start gap-2 text-error hover:bg-error/10" do %>

@@ -96,6 +96,7 @@
           <li><%= link_to "Precio de Certificados", admin_certificate_pricings_path, class: ("active" if controller_name == "certificate_pricings") %></li>
 
           <li class="menu-title mt-4">Sistema</li>
+          <li><%= link_to "Mi Cuenta", edit_user_registration_path, class: ("active" if controller_name == "registrations") %></li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
         </ul>
 

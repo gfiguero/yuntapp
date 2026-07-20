@@ -72,6 +72,7 @@
             <div class="text-xs text-base-content/60 truncate px-2"><%= current_user.email %></div>
           </li>
           <li class="menu-title">Sistema</li>
+          <li><%= link_to "Mi Cuenta", edit_user_registration_path, class: ("active" if controller_name == "registrations") %></li>
           <li><%= link_to "Reiniciar Onboarding", panel_onboarding_restart_path, data: { turbo_method: :delete, turbo_confirm: "¿Estás seguro? Esto eliminará tu progreso actual y podrás registrarte en otra junta." }, class: "text-warning" %></li>
           <li><%= link_to I18n.t('actions.reset'), panel_reset_account_path, data: { turbo_method: :delete, turbo_confirm: I18n.t('panel.account_resets.confirm') }, class: "text-error" %></li>
           <li><%= link_to "Cerrar Sesión", destroy_user_session_path, data: { turbo_method: :delete } %></li>
