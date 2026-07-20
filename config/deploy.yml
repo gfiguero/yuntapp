@@ -2,12 +2,12 @@
 service: yuntapp
 
 # Name of the container image (use your-user/app-name on external registries).
-image: <%= ENV.fetch("KAMAL_REGISTRY_IMAGE", "garrifigueroa/yuntapp") %>
+image: <%= ENV.fetch("KAMAL_REGISTRY_IMAGE", "gfiguero/yuntapp") %>
 
 # Deploy to these servers.
 servers:
   web:
-    - <%= ENV.fetch("SERVER_IP", "192.168.0.1") %>
+    - <%= ENV.fetch("SERVER_IP", "143.198.120.175") %>
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -20,17 +20,19 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# proxy:
-#   ssl: true
-#   host: app.example.com
+# Primer deploy en IP (HTTP). Cuando el DNS de yuntapp.cl apunte a la IP,
+# cambiar a: ssl: true + host: yuntapp.cl y reactivar assume_ssl/force_ssl en production.rb.
+proxy:
+  ssl: false
+  # host: yuntapp.cl
 
 # Where you keep your container images.
 registry:
   # Alternatives: hub.docker.com / registry.digitalocean.com / ghcr.io / ...
-  server: <%= ENV.fetch("KAMAL_REGISTRY_SERVER", "registry.digitalocean.com") %>
+  server: <%= ENV.fetch("KAMAL_REGISTRY_SERVER", "ghcr.io") %>
 
   # Needed for authenticated registries.
-  username: <%= ENV.fetch("KAMAL_REGISTRY_USERNAME", "garrifigueroa") %>
+  username: <%= ENV.fetch("KAMAL_REGISTRY_USERNAME", "gfiguero") %>
 
   # Always use an access token rather than real password when possible.
   password:
@@ -80,6 +82,11 @@ asset_path: /rails/public/assets
 # Configure the image builder.
 builder:
   arch: amd64
+  # Usar el builder docker por defecto en vez del driver docker-container.
+  # En este Docker Desktop el driver docker-container falla con ENOSPC
+  # (buildkit con almacenamiento propio roto). El driver docker compila
+  # directo en el daemon principal. Válido porque solo compilamos 1 arch (amd64).
+  driver: docker
 
   # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
   # remote: ssh://docker@docker-builder-server
