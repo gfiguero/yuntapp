@@ -20,11 +20,9 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# Primer deploy en IP (HTTP). Cuando el DNS de yuntapp.cl apunte a la IP,
-# cambiar a: ssl: true + host: yuntapp.cl y reactivar assume_ssl/force_ssl en production.rb.
 proxy:
-  ssl: false
-  # host: yuntapp.cl
+  ssl: true
+  host: yuntapp.cl
 
 # Where you keep your container images.
 registry:
