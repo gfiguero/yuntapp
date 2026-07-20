@@ -15,7 +15,7 @@ gem "prawn", "~> 2.5"
 gem "prawn-table", "~> 0.2"
 
 # QR code generation embedded in the certificate PDF [https://github.com/whomwah/rqrcode]
-gem "rqrcode", "~> 2.2"
+gem "rqrcode", "~> 3.2"
 
 # Rate limiting and throttling for the public verification endpoint
 gem "rack-attack", "~> 6.7"
