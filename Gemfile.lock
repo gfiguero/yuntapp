@@ -132,7 +132,7 @@ GEM
     dotenv (3.2.0)
     drb (2.2.3)
     ed25519 (1.4.0)
-    erb (6.0.5)
+    erb (6.0.6)
     erb_lint (0.9.0)
       activesupport
       better_html (>= 2.0.1)
@@ -333,10 +333,10 @@ GEM
       actionpack (>= 7.0)
       railties (>= 7.0)
     rexml (3.4.4)
-    rqrcode (2.2.0)
+    rqrcode (3.2.0)
       chunky_png (~> 1.0)
-      rqrcode_core (~> 1.0)
-    rqrcode_core (1.2.0)
+      rqrcode_core (~> 2.0)
+    rqrcode_core (2.1.0)
     rubocop (1.88.2)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -485,24 +485,24 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
-  mercadopago-sdk (~> 3.1)
+  mercadopago-sdk
   minitest
   pagy
   prawn
-  prawn-table (~> 0.2)
+  prawn-table
   propshaft
-  puma (>= 5.0)
+  puma
   rack-attack
-  rails (~> 8.1.1)
-  rqrcode (~> 2.2)
+  rails
+  rqrcode
   ruby-vips
   selenium-webdriver
   simplecov
   solid_cable
   solid_cache
   solid_queue
-  sqlite3 (>= 2.1)
-  standard (>= 1.35.1)
+  sqlite3
+  standard
   stimulus-rails
   tailwindcss-rails
   thruster
