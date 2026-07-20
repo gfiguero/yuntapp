@@ -4,6 +4,10 @@ service: yuntapp
 # Name of the container image (use your-user/app-name on external registries).
 image: <%= ENV.fetch("KAMAL_REGISTRY_IMAGE", "gfiguero/yuntapp") %>
 
+# Retener solo 2 versiones (actual + 1 para rollback). El droplet tiene 8.7 GB
+# y cada imagen pesa ~934 MB; el default de 5 llenaba el disco.
+retain_containers: 2
+
 # Deploy to these servers.
 servers:
   web:
