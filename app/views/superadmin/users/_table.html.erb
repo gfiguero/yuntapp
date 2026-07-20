@@ -2,12 +2,12 @@
   <table class="table table-zebra w-full">
     <thead>
       <tr>
-        <th><%= sort_link("id", I18n.t('activerecord.attributes.user.id'), params) %></th>
+        <th><%= sort_link('superadmin_users_path', I18n.t('activerecord.attributes.user.id'), 'id') %></th>
         <th><%= I18n.t('activerecord.attributes.user.email') %></th>
         <th><%= I18n.t('activerecord.attributes.user.admin') %></th>
         <th><%= I18n.t('activerecord.attributes.user.superadmin') %></th>
         <th><%= I18n.t('activerecord.attributes.user.neighborhood_association') %></th>
-        <th><%= sort_link("created_at", I18n.t('activerecord.attributes.user.created_at'), params) %></th>
+        <th><%= sort_link('superadmin_users_path', I18n.t('activerecord.attributes.user.created_at'), 'created_at') %></th>
         <th></th>
       </tr>
     </thead>
