@@ -164,9 +164,7 @@ GEM
       activesupport (>= 6.1)
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
-    image_processing (1.14.0)
-      mini_magick (>= 4.9.5, < 6)
-      ruby-vips (>= 2.0.17, < 3)
+    image_processing (2.0.2)
     importmap-rails (2.2.3)
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -209,8 +207,6 @@ GEM
     mercadopago-sdk (3.2.0)
       faraday (~> 2.0)
       json (~> 2.5)
-    mini_magick (5.3.2)
-      logger
     mini_mime (1.1.5)
     minitest (6.0.6)
       drb (~> 2.0)
@@ -485,20 +481,21 @@ DEPENDENCIES
   debug
   devise!
   erb_lint
-  image_processing (~> 1.2)
+  image_processing
   importmap-rails
   jbuilder
   kamal
   mercadopago-sdk (~> 3.1)
-  minitest (~> 6.0)
+  minitest
   pagy
-  prawn (~> 2.5)
+  prawn
   prawn-table (~> 0.2)
   propshaft
   puma (>= 5.0)
-  rack-attack (~> 6.7)
+  rack-attack
   rails (~> 8.1.1)
   rqrcode (~> 2.2)
+  ruby-vips
   selenium-webdriver
   simplecov
   solid_cable

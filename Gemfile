@@ -11,14 +11,14 @@ gem "activerecord-like" # An Active Record Plugin that allows chaining a more DS
 gem "mercadopago-sdk", "~> 3.1"
 
 # PDF generation for residence certificates [https://github.com/prawnpdf/prawn]
-gem "prawn", "~> 2.5"
+gem "prawn"
 gem "prawn-table", "~> 0.2"
 
 # QR code generation embedded in the certificate PDF [https://github.com/whomwah/rqrcode]
 gem "rqrcode", "~> 2.2"
 
 # Rate limiting and throttling for the public verification endpoint
-gem "rack-attack", "~> 6.7"
+gem "rack-attack"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -53,7 +53,11 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-gem "image_processing", "~> 1.2"
+gem "image_processing"
+# Backend de procesamiento de imágenes para Active Storage (variant_processor :vips).
+# Desde image_processing 2.0, ruby-vips es una dependencia "soft" y debe declararse
+# explícitamente. El Dockerfile instala la librería de sistema libvips.
+gem "ruby-vips"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -86,4 +90,4 @@ end
 gem "devise", github: "heartcombo/devise", branch: "main"
 gem "pagy"
 
-gem "minitest", "~> 6.0", group: :test
+gem "minitest", group: :test
