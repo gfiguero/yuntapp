@@ -491,9 +491,9 @@ DEPENDENCIES
   prawn
   prawn-table
   propshaft
-  puma
+  puma (>= 5.0)
   rack-attack
-  rails
+  rails (~> 8.1)
   rqrcode
   ruby-vips
   selenium-webdriver
@@ -501,8 +501,8 @@ DEPENDENCIES
   solid_cable
   solid_cache
   solid_queue
-  sqlite3
-  standard
+  sqlite3 (>= 2.1)
+  standard (>= 1.35.1)
   stimulus-rails
   tailwindcss-rails
   thruster

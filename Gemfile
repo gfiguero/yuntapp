@@ -1,11 +1,11 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails"
+gem "rails", "~> 8.1"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use sqlite3 as the database for Active Record
-gem "sqlite3"
+gem "sqlite3", ">= 2.1"
 gem "activerecord-like" # An Active Record Plugin that allows chaining a more DSL-style 'like' or 'not-like' query
 # MercadoPago official SDK for payment processing [https://github.com/mercadopago/sdk-ruby]
 gem "mercadopago-sdk"
@@ -20,7 +20,7 @@ gem "rqrcode"
 # Rate limiting and throttling for the public verification endpoint
 gem "rack-attack"
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma"
+gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
@@ -70,7 +70,7 @@ group :development, :test do
   gem "brakeman", require: false
 
   # Ruby style guide and linter (replaces rubocop-rails-omakase as the single source of truth)
-  gem "standard", require: false
+  gem "standard", ">= 1.35.1", require: false
 
   gem "simplecov"
   gem "erb_lint", require: false
