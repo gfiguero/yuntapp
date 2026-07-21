@@ -83,24 +83,44 @@ class MercadopagoServiceTest < ActiveSupport::TestCase
   end
 
   # --- ConfigurationError when access_token missing ---
+  # MercadopagoService.new hace fallback a Rails.application.config.mercadopago
+  # cuando el arg es nil. Para probar el caso "sin credenciales" de forma
+  # determinista (independiente de si el entorno tiene credenciales cargadas),
+  # forzamos la config en blanco durante el bloque.
 
   test "create_preference raises ConfigurationError when access_token blank" do
-    service = MercadopagoService.new(access_token: nil, webhook_secret: SECRET)
-    cert = ResidenceCertificate.new(id: 1, amount: 1500)
+    with_blank_mercadopago_config do
+      service = MercadopagoService.new(access_token: nil, webhook_secret: SECRET)
+      cert = ResidenceCertificate.new(id: 1, amount: 1500)
 
-    assert_raises(MercadopagoService::ConfigurationError) do
-      service.create_preference(cert,
-        success_url: "https://x.test/s",
-        failure_url: "https://x.test/f",
-        pending_url: "https://x.test/p",
-        notification_url: "https://x.test/n")
+      assert_raises(MercadopagoService::ConfigurationError) do
+        service.create_preference(cert,
+          success_url: "https://x.test/s",
+          failure_url: "https://x.test/f",
+          pending_url: "https://x.test/p",
+          notification_url: "https://x.test/n")
+      end
     end
   end
 
   test "fetch_payment raises ConfigurationError when access_token blank" do
-    service = MercadopagoService.new(access_token: nil, webhook_secret: SECRET)
-    assert_raises(MercadopagoService::ConfigurationError) do
-      service.fetch_payment("MP-XYZ")
+    with_blank_mercadopago_config do
+      service = MercadopagoService.new(access_token: nil, webhook_secret: SECRET)
+      assert_raises(MercadopagoService::ConfigurationError) do
+        service.fetch_payment("MP-XYZ")
+      end
     end
+  end
+
+  private
+
+  # Fuerza config.mercadopago en blanco durante el bloque y la restaura después,
+  # para que el fallback del servicio no tome credenciales reales del entorno.
+  def with_blank_mercadopago_config
+    original = Rails.application.config.mercadopago
+    Rails.application.config.mercadopago = {access_token: nil, webhook_secret: nil}
+    yield
+  ensure
+    Rails.application.config.mercadopago = original
   end
 end
