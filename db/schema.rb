@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_29_213109) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_21_053942) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -72,10 +72,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_213109) do
   end
 
   create_table "communes", force: :cascade do |t|
+    t.string "code"
     t.datetime "created_at", null: false
     t.string "name"
     t.integer "region_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_communes_on_code", unique: true, where: "code IS NOT NULL"
     t.index ["region_id"], name: "index_communes_on_region_id"
   end
 
@@ -198,11 +200,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_29_213109) do
   end
 
   create_table "regions", force: :cascade do |t|
+    t.string "code"
     t.integer "country_id", null: false
     t.datetime "created_at", null: false
     t.string "name"
+    t.integer "position"
     t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_regions_on_code", unique: true, where: "code IS NOT NULL"
     t.index ["country_id"], name: "index_regions_on_country_id"
+    t.index ["position"], name: "index_regions_on_position", unique: true, where: "position IS NOT NULL"
   end
 
   create_table "residence_certificates", force: :cascade do |t|
