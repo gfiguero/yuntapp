@@ -897,3 +897,7 @@ es:
       created: Etiqueta creada exitosamente.
       updated: Etiqueta actualizada exitosamente.
       destroyed: Etiqueta eliminada exitosamente.
+
+  payments:
+    mercadopago:
+      item_title: "Certificado de Residencia %{folio}"

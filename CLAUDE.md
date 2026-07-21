@@ -33,9 +33,11 @@ Las juntas de vecinos son el ente emisor oficial reconocido. El certificado emit
 - La comisión cubre los gastos operacionales de la plataforma (hosting, pasarela de pago, soporte).
 
 ### Pasarela de Pago
-- **MercadoPago** es la pasarela de pago elegida (aún no implementada).
-- El pago debe completarse **antes** de que el admin de la junta revise y emita el certificado.
-- Si el pago falla o es rechazado, la solicitud permanece en estado `pending_payment` y no avanza.
+- **MercadoPago** (Checkout Pro) es la pasarela de pago, **implementada** con el SDK oficial `mercadopago-sdk`.
+- `MercadopagoService` crea la preference de checkout y valida la firma HMAC del webhook (BR-072). `Panel::PaymentsController` crea la preference y redirige al `init_point` de MP. `Webhooks::MercadopagoController` recibe la notificación, es idempotente (BR-071) y marca el certificado como `paid`.
+- El pago debe completarse **antes** de la emisión. Tras confirmarse, el certificado se emite **automáticamente** (BR-062), sin revisión del admin.
+- Si el pago falla, es rechazado o reembolsado, el certificado permanece/vuelve a `pending_payment` y no avanza (BR-003, BR-073).
+- Credenciales en `config/initializers/mercadopago.rb`: lee `ENV["MERCADOPAGO_ACCESS_TOKEN"]`/`MERCADOPAGO_WEBHOOK_SECRET` o `credentials.mercadopago.{access_token,webhook_secret}`.
 
 ---
 
@@ -446,11 +448,18 @@ Country -> Region -> Commune -> NeighborhoodAssociation -> NeighborhoodDelegatio
 - Un `household_admin` solo puede gestionar su propio `FamilyGroup`
 
 #### ResidenceCertificate
-- Status: pending_payment | paid | approved | rejected | issued
+- Status: pending_payment | paid | issued (BR-064 — los estados `approved`/`rejected` fueron eliminados del flujo)
 - Campos: `folio` (unico por asociacion), `issue_date`, `expiration_date`, `purpose`, `notes`
-- Campos pendientes de implementar: `amount` (precio cobrado en CLP), `platform_fee` (10% de amount), `payment_id` (referencia MercadoPago), `validation_token` (UUID para URL publica), `validation_code` (codigo alfanumerico legible)
+- Campos de pago/validación (implementados): `amount` (precio en CLP, snapshot inmutable — BR-070), `platform_fee` (10% de amount), `payment_id` (referencia MercadoPago, único — BR-071), `validation_token` (UUID para la URL pública), `validation_code` (8 chars alfanuméricos sin 0/O/1/I — BR-074)
 - `generate_folio!`: formato "CR-{association_id}-{sequence}"
-- Regla: solo avanza de `paid` a `approved`/`rejected` el admin de la junta correspondiente
+- `mark_as_paid!` (idempotente, pending_payment → paid) e `issue!` (paid → issued) en `app/models/residence_certificate.rb`
+- Emisión automática tras el pago vía `IssueCertificateJob` (after_commit, 3 retries — BR-076). El PDF con QR + código + URL se genera con `CertificatePdfService` y se guarda en Active Storage `pdf_document` (BR-075)
+- Verificación pública vía `find_for_public_verification` + scope `findable_publicly` (BR-079/BR-081)
+
+#### CertificatePricing _(BR-070)_
+- Precio histórico de certificados por junta, con vigencia: `price`, `effective_from`, `effective_to`
+- `CertificatePricing.current_for(association)`: precio vigente. Crear un precio nuevo cierra la vigencia del anterior
+- El `amount` del `ResidenceCertificate` captura el precio vigente al momento de crearse (snapshot inmutable)
 
 #### BoardMember
 - Posiciones: presidente | secretario | tesorero | director
