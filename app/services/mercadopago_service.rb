@@ -1,4 +1,6 @@
 require "openssl"
+require "mercadopago"
+require "mercadopago/sdk"
 
 # Wrapper sobre el SDK oficial de MercadoPago. Encapsula:
 #   - Creación de Preferences (checkout)
