@@ -25,7 +25,7 @@ class ResidenceCertificateMailerTest < ActionMailer::TestCase
     end
 
     assert_equal [users(:selendis).email], email.to
-    assert_equal [ENV.fetch("MAILER_DEFAULT_FROM", "no-reply@yuntapp.cl")], email.from
+    assert_equal [ENV.fetch("MAILER_DEFAULT_FROM", "no-reply@send.yuntapp.cl")], email.from
     assert_match @certificate.folio, email.body.encoded
     assert_match @certificate.validation_code, email.body.encoded
     assert_match "/verify/uuid-mail-test", email.body.encoded
