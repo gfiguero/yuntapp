@@ -58,7 +58,7 @@
 
   <% if @residence_certificate.pending_payment? && @residence_certificate.amount.present? %>
     <div class="my-6">
-      <%= button_to I18n.t('panel.payments.actions.pay_with_mercadopago'), new_panel_payment_path(certificate_id: @residence_certificate.id), method: :get, class: "btn btn-primary btn-lg" %>
+      <%= link_to I18n.t('panel.payments.actions.pay_with_mercadopago'), new_panel_payment_path(certificate_id: @residence_certificate.id), class: "btn btn-primary btn-lg" %>
       <p class="text-sm text-base-content/70 mt-2"><%= I18n.t('panel.payments.show.help') %></p>
     </div>
   <% end %>
