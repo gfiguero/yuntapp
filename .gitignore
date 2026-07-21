@@ -42,3 +42,6 @@
 
 # Ignore Claude Code local settings
 .claude/settings.local.json
+
+# Ignore Claude Code git worktrees (creados por el flujo EnterWorktree)
+.claude/worktrees/
