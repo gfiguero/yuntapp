@@ -91,4 +91,9 @@ end
 gem "devise", github: "heartcombo/devise", branch: "main"
 gem "pagy"
 
+# Envio de correo transaccional via API HTTP de Resend (esquiva el bloqueo de
+# puertos SMTP salientes de DigitalOcean). Se engancha como delivery_method de
+# ActionMailer en produccion.
+gem "resend"
+
 gem "minitest", group: :test

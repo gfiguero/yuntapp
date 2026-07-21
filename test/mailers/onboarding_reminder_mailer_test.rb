@@ -14,7 +14,7 @@ class OnboardingReminderMailerTest < ActionMailer::TestCase
     end
 
     assert_equal [@admin.email], email.to
-    assert_equal [ENV.fetch("MAILER_DEFAULT_FROM", "no-reply@yuntapp.cl")], email.from
+    assert_equal [ENV.fetch("MAILER_DEFAULT_FROM", "no-reply@send.yuntapp.cl")], email.from
   end
 
   test "subject comes from i18n with the pending count" do

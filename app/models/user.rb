@@ -47,4 +47,15 @@ class User < ApplicationRecord
   def verified?
     verified_identity.present?
   end
+
+  private
+
+  # Encola los correos de Devise (confirmacion, reset de password, etc.) en
+  # Solid Queue en vez de enviarlos sincronicamente dentro del request. Evita
+  # que un fallo del backend SMTP tumbe el registro con un 500 (el default de
+  # Devise es deliver_now). Consistente con el resto de mailers de la app, que
+  # ya usan deliver_later.
+  def send_devise_notification(notification, *args)
+    devise_mailer.send(notification, self, *args).deliver_later
+  end
 end
