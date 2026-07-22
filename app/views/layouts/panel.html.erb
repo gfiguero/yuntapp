@@ -43,16 +43,20 @@
         <ul class="menu p-4 w-80 bg-base-200 text-base-content h-full flex flex-col overflow-y-auto">
           <li class="mb-4 px-2"><%= render "shared/logo", variant: :horizontal, size: "md" %></li>
           <li><%= link_to "Dashboard", panel_root_path, class: ("active" if current_page?(panel_root_path)) %></li>
-          <% onboarding_req = current_user.current_onboarding_request %>
-          <% onboarding_link = (onboarding_req.present? && !onboarding_req.draft?) ? panel_onboarding_status_path : panel_onboarding_step1_path %>
-          <li>
-            <%= link_to onboarding_link, class: ("active" if controller_name == "onboarding") do %>
-              <%= I18n.t('panel.onboarding.status.sidebar') %>
-              <% if onboarding_req.present? && !onboarding_req.draft? %>
-                <%= status_badge(onboarding_req.status) %>
+          <%# Un socio aprobado no tiene solicitud "actual" y onboarding#step1
+              lo redirige de vuelta al dashboard — el link sería un duplicado. %>
+          <% unless current_user.member&.approved? %>
+            <% onboarding_req = current_user.current_onboarding_request %>
+            <% onboarding_link = (onboarding_req.present? && !onboarding_req.draft?) ? panel_onboarding_status_path : panel_onboarding_step1_path %>
+            <li>
+              <%= link_to onboarding_link, class: ("active" if controller_name == "onboarding") do %>
+                <%= I18n.t('panel.onboarding.status.sidebar') %>
+                <% if onboarding_req.present? && !onboarding_req.draft? %>
+                  <%= status_badge(onboarding_req.status) %>
+                <% end %>
               <% end %>
-            <% end %>
-          </li>
+            </li>
+          <% end %>
 
           <li class="menu-title mt-4">Mis Cosas</li>
           <li><%= link_to "Mi Perfil", panel_profile_path, class: ("active" if controller_name == "profile") %></li>
