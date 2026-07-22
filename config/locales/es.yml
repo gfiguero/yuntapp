@@ -637,6 +637,7 @@ es:
     residence_certificates:
       index:
         title: Certificados de Residencia
+        description: Solicita certificados de residencia oficiales para ti y los miembros de tu domicilio. Tras confirmarse el pago, el certificado se emite automáticamente y queda disponible para descarga.
         count: "%{count} certificados"
       empty:
         title: Aún no has solicitado certificados
