@@ -1,8 +1,15 @@
-<div class="flex justify-between items-center mb-4">
-  <h1 class="text-2xl font-bold">Mi Perfil</h1>
-</div>
+<% content_for :title do %>
+  Mi Perfil
+<% end %>
 
-<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<% content_for :breadcrumb do %>
+  <li>Mi Perfil</li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4">Mi Perfil</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body">
       <h2 class="card-title mb-4">Información Personal</h2>
@@ -109,4 +116,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

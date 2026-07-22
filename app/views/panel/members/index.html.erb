@@ -1,3 +1,11 @@
+<% content_for :title do %>
+  <%= I18n.t('panel.members.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= I18n.t('panel.members.index.title') %></li>
+<% end %>
+
 <div class="w-full">
   <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.members.index.title') %></h1>
 
