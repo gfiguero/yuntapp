@@ -6,7 +6,7 @@ module Panel
     before_action :set_residency, only: [:show, :edit, :update]
 
     def index
-      @residencies = current_user.household_unit.residencies.where.not(verified_identity: current_user.verified_identity)
+      @residencies = current_user.household_unit.residencies.includes(:verified_identity).where.not(verified_identity: current_user.verified_identity)
     end
 
     def show

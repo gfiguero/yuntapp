@@ -16,21 +16,21 @@
         </tr>
       </thead>
       <tbody>
-      <% @members.each do |member| %>
+      <% @residencies.each do |residency| %>
         <tr class="hover:bg-base-300">
-          <td><%= member.name %></td>
-          <td><%= member.run %></td>
+          <td><%= residency.name %></td>
+          <td><%= residency.run %></td>
           <td>
-            <% if member.pending? %>
+            <% if residency.pending? %>
               <span class="badge badge-warning badge-sm"><%= I18n.t('activerecord.attributes.member/status.pending') %></span>
-            <% elsif member.approved? %>
+            <% elsif residency.approved? %>
               <span class="badge badge-success badge-sm"><%= I18n.t('activerecord.attributes.member/status.approved') %></span>
-            <% elsif member.rejected? %>
+            <% elsif residency.rejected? %>
               <span class="badge badge-error badge-sm"><%= I18n.t('activerecord.attributes.member/status.rejected') %></span>
             <% end %>
           </td>
           <td>
-            <%= icon_link_to 'show', panel_member_path(member), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
+            <%= icon_link_to 'show', panel_member_path(residency), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
           </td>
         </tr>
       <% end %>
