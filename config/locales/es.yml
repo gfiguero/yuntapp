@@ -621,6 +621,11 @@ es:
     members:
       index:
         title: Socios del Domicilio
+        description: Registra a las demás personas que viven contigo para que la junta las acredite como socias del domicilio. Solo tú, como administrador del domicilio, puedes hacerlo.
+      empty:
+        title: Aún no has registrado socios en tu domicilio
+        description: Agrega a las personas que viven contigo y la junta verificará sus datos antes de acreditarlas.
+        cta: Registrar mi primer socio
       flash:
         requested: Solicitud de acreditación enviada exitosamente.
         resubmitted: Solicitud de acreditación reenviada exitosamente.

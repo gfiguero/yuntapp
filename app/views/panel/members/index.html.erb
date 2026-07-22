@@ -8,7 +8,16 @@
 
 <div class="w-full">
   <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.members.index.title') %></h1>
+  <p class="mb-4 text-base-content/70"><%= I18n.t('panel.members.index.description') %></p>
 
+  <% if @residencies.none? %>
+    <%= render "shared/empty_state",
+          icon: "users",
+          title: I18n.t('panel.members.empty.title'),
+          description: I18n.t('panel.members.empty.description'),
+          cta_text: I18n.t('panel.members.empty.cta'),
+          cta_path: new_panel_member_path %>
+  <% else %>
   <div class="flex flex-row gap-2 mb-4">
     <%= link_to raw(icon('new') + I18n.t('actions.new')), new_panel_member_path, class: "btn btn-soft btn-primary" %>
   </div>
@@ -45,4 +54,5 @@
       </tbody>
     </table>
   </div>
+  <% end %>
 </div>
