@@ -16,16 +16,22 @@ module Webhooks
       raw_id = params.dig(:data, :id) || params[:id] || params[:resource]
       data_id = extract_id(raw_id)
 
-      unless valid_signature?(data_id)
-        Rails.logger.warn("MercadoPago webhook: invalid signature (topic=#{topic}, data_id=#{data_id})")
-        head :unauthorized
-        return
-      end
-
       if data_id.blank?
         Rails.logger.warn("MercadoPago webhook: missing data_id in payload")
         head :ok
         return
+      end
+
+      # La firma HMAC solo está presente en notificaciones topic=payment.
+      # merchant_order llega sin x-signature ni x-request-id. En ese caso
+      # confiamos en la consulta a la API de MP como validación secundaria.
+      unless valid_signature?(data_id)
+        if topic == "payment"
+          Rails.logger.warn("MercadoPago webhook: invalid signature for payment (data_id=#{data_id})")
+          head :unauthorized
+          return
+        end
+        Rails.logger.info("MercadoPago webhook: no signature for topic=#{topic} (data_id=#{data_id}), proceeding")
       end
 
       case topic
