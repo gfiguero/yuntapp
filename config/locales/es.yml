@@ -682,6 +682,10 @@ es:
         status_pending: Pendiente
         empty_approved: Aún no tienes residentes dependientes aprobados.
         empty_pending: No tienes solicitudes pendientes.
+      empty:
+        title: Aún no has registrado residentes dependientes
+        description: Registra a los menores que viven contigo para que la junta verifique su identidad. Solo tú, como administrador del domicilio, puedes hacerlo.
+        cta: Registrar mi primer dependiente
       new:
         title: Registrar Residente Dependiente
         description: Ingresa los datos del menor y adjunta sus documentos de identidad. El teléfono es opcional.
