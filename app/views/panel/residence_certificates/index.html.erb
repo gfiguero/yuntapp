@@ -9,11 +9,11 @@
 <div class="w-full">
   <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.residence_certificates.index.title') %></h1>
 
-  <div class="flex flex-row gap-2 mb-4">
-    <%= link_to raw(icon('new') + I18n.t('actions.new')), new_panel_residence_certificate_path, class: "btn btn-soft btn-primary" %>
-  </div>
-
   <% if @residence_certificates.any? %>
+    <div class="flex flex-row gap-2 mb-4">
+      <%= link_to raw(icon('new') + I18n.t('actions.new')), new_panel_residence_certificate_path, class: "btn btn-soft btn-primary" %>
+    </div>
+
     <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
       <table class="table">
         <thead>
