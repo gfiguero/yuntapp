@@ -33,6 +33,9 @@ module Panel
       @residency.verified_identity = verified_identity
       @residency.household_unit = household_unit
       @residency.verified_residence = household_unit.verified_residence
+      # BR-041: los residentes registrados por el household_admin pertenecen
+      # a su mismo núcleo familiar.
+      @residency.family_group = current_user.family_group
       @residency.status = "pending"
 
       if @residency.save
