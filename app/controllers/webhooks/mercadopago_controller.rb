@@ -22,15 +22,18 @@ module Webhooks
         return
       end
 
-      # La firma HMAC solo está presente en notificaciones topic=payment.
-      # merchant_order llega sin x-signature ni x-request-id. En ese caso
-      # confiamos en la consulta a la API de MP como validación secundaria.
-      unless valid_signature?(data_id)
-        if topic == "payment"
-          Rails.logger.warn("MercadoPago webhook: invalid signature for payment (data_id=#{data_id})")
-          head :unauthorized
-          return
-        end
+      # La firma HMAC solo está presente en notificaciones v1.0 (WebHook).
+      # Feed v2.0 envía topic=payment y topic=merchant_order sin x-signature.
+      # En ambos casos confiamos en la consulta a la API de MP como validación
+      # secundaria. Solo rechazamos si x-signature está presente pero es inválida.
+      signature_present = request.headers["x-signature"].present?
+      if signature_present && !valid_signature?(data_id)
+        Rails.logger.warn("MercadoPago webhook: invalid signature for #{topic} (data_id=#{data_id})")
+        head :unauthorized
+        return
+      end
+
+      if !signature_present
         Rails.logger.info("MercadoPago webhook: no signature for topic=#{topic} (data_id=#{data_id}), proceeding")
       end
 

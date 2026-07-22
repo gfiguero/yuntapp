@@ -44,14 +44,18 @@ module Webhooks
     end
 
     # --- Signature verification (BR-072) ---
+    # Se rechaza con 401 solo cuando x-signature está presente pero es inválida.
+    # Si no hay firma (Feed v2.0) se procesa igual — la API de MP es la validación real.
 
-    test "returns 401 when signature is missing" do
-      post webhooks_mercadopago_url,
-        params: {topic: "payment", data: {id: "MP-PAY-123"}}
-      assert_response :unauthorized
+    test "returns 200 when signature is not present (Feed v2.0)" do
+      stub_fetch_payment({"id" => "MP-PAY-123", "status" => "approved", "external_reference" => nil}) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", id: "MP-PAY-123"}
+      end
+      assert_response :ok
     end
 
-    test "returns 401 when signature is invalid" do
+    test "returns 401 when signature is present but invalid" do
       post webhooks_mercadopago_url,
         params: {topic: "payment", data: {id: "MP-PAY-123"}},
         headers: {
