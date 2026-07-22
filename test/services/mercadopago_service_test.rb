@@ -82,6 +82,76 @@ class MercadopagoServiceTest < ActiveSupport::TestCase
     )
   end
 
+  # --- optional request_id (Feed v2.0) ---
+
+  test "verifies signature without request_id" do
+    ts = "1700000000"
+    data_id = "MP-PAY-NOREQID"
+    manifest = "id:#{data_id};ts:#{ts};"
+    valid_hash = OpenSSL::HMAC.hexdigest("sha256", SECRET, manifest)
+
+    assert @service.verify_signature(
+      signature_header: "ts=#{ts},v1=#{valid_hash}",
+      request_id: nil,
+      data_id: data_id
+    )
+  end
+
+  test "verifies signature without request_id when x-request-id is blank string" do
+    ts = "1700000000"
+    data_id = "MP-PAY-BLANKREQID"
+    manifest = "id:#{data_id};ts:#{ts};"
+    valid_hash = OpenSSL::HMAC.hexdigest("sha256", SECRET, manifest)
+
+    assert @service.verify_signature(
+      signature_header: "ts=#{ts},v1=#{valid_hash}",
+      request_id: "",
+      data_id: data_id
+    )
+  end
+
+  test "rejects tampered signature without request_id" do
+    ts = "1700000000"
+    data_id = "MP-PAY-NOREQID"
+
+    assert_not @service.verify_signature(
+      signature_header: "ts=#{ts},v1=deadbeef",
+      request_id: nil,
+      data_id: data_id
+    )
+  end
+
+  # --- v2 prefix ---
+
+  test "verifies signature with v2 prefix" do
+    ts = "1700000000"
+    data_id = "MP-PAY-V2"
+    manifest = "id:#{data_id};ts:#{ts};"
+    valid_hash = OpenSSL::HMAC.hexdigest("sha256", SECRET, manifest)
+
+    assert @service.verify_signature(
+      signature_header: "ts=#{ts},v2=#{valid_hash}",
+      request_id: nil,
+      data_id: data_id
+    )
+  end
+
+  # --- v1 takes precedence over v2 ---
+
+  test "uses v1 over v2 when both are present" do
+    ts = "1700000000"
+    data_id = "MP-PAY-BOTH"
+    manifest = "id:#{data_id};ts:#{ts};"
+    correct_hash = OpenSSL::HMAC.hexdigest("sha256", SECRET, manifest)
+    wrong_hash = "fff"
+
+    assert @service.verify_signature(
+      signature_header: "ts=#{ts},v1=#{correct_hash},v2=#{wrong_hash}",
+      request_id: nil,
+      data_id: data_id
+    )
+  end
+
   # --- ConfigurationError when access_token missing ---
   # MercadopagoService.new hace fallback a Rails.application.config.mercadopago
   # cuando el arg es nil. Para probar el caso "sin credenciales" de forma

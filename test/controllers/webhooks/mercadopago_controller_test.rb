@@ -26,7 +26,11 @@ module Webhooks
     end
 
     def valid_signature_header(data_id:, ts: "1700000000", request_id: "req-1")
-      manifest = "id:#{data_id};request-id:#{request_id};ts:#{ts};"
+      manifest = if request_id.present?
+        "id:#{data_id};request-id:#{request_id};ts:#{ts};"
+      else
+        "id:#{data_id};ts:#{ts};"
+      end
       hash = OpenSSL::HMAC.hexdigest("sha256", SECRET, manifest)
       "ts=#{ts},v1=#{hash}"
     end
@@ -42,13 +46,14 @@ module Webhooks
     # --- Signature verification (BR-072) ---
 
     test "returns 401 when signature is missing" do
-      post webhooks_mercadopago_url, params: {data: {id: "MP-PAY-123"}}
+      post webhooks_mercadopago_url,
+        params: {topic: "payment", data: {id: "MP-PAY-123"}}
       assert_response :unauthorized
     end
 
     test "returns 401 when signature is invalid" do
       post webhooks_mercadopago_url,
-        params: {data: {id: "MP-PAY-123"}},
+        params: {topic: "payment", data: {id: "MP-PAY-123"}},
         headers: {
           "x-signature" => "ts=123,v1=deadbeef",
           "x-request-id" => "req-1"
@@ -61,7 +66,7 @@ module Webhooks
 
       stub_fetch_payment({"id" => "MP-PAY-999", "status" => "approved"}) do
         post webhooks_mercadopago_url,
-          params: {data: {id: "MP-PAY-999"}},
+          params: {topic: "payment", data: {id: "MP-PAY-999"}},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
@@ -81,7 +86,7 @@ module Webhooks
         "external_reference" => @certificate.id.to_s
       }) do
         post webhooks_mercadopago_url,
-          params: {data: {id: "MP-PAY-OK"}},
+          params: {topic: "payment", data: {id: "MP-PAY-OK"}},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
@@ -103,7 +108,7 @@ module Webhooks
         "external_reference" => @certificate.id.to_s
       }) do
         post webhooks_mercadopago_url,
-          params: {data: {id: "MP-PAY-REJ"}},
+          params: {topic: "payment", data: {id: "MP-PAY-REJ"}},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
@@ -122,7 +127,7 @@ module Webhooks
         "external_reference" => @certificate.id.to_s
       }) do
         post webhooks_mercadopago_url,
-          params: {data: {id: "MP-PAY-PEND"}},
+          params: {topic: "payment", data: {id: "MP-PAY-PEND"}},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
@@ -150,7 +155,7 @@ module Webhooks
 
       stub_class_method(MercadopagoService, :new, fake) do
         post webhooks_mercadopago_url,
-          params: {data: {id: "MP-PAY-DUP"}},
+          params: {topic: "payment", data: {id: "MP-PAY-DUP"}},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
@@ -171,7 +176,7 @@ module Webhooks
         "external_reference" => "999999"
       }) do
         post webhooks_mercadopago_url,
-          params: {data: {id: "MP-PAY-ORPHAN"}},
+          params: {topic: "payment", data: {id: "MP-PAY-ORPHAN"}},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
@@ -189,7 +194,7 @@ module Webhooks
         "external_reference" => @certificate.id.to_s
       }) do
         post webhooks_mercadopago_url,
-          params: {resource: "/v1/payments/MP-PAY-FROM-URL"},
+          params: {topic: "payment", resource: "/v1/payments/MP-PAY-FROM-URL"},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
@@ -197,6 +202,72 @@ module Webhooks
       @certificate.reload
       assert @certificate.paid?
       assert_equal "MP-PAY-FROM-URL", @certificate.payment_id
+    end
+
+    # --- MP WebHook v1.0 (type en body, sin topic) ---
+
+    test "handles MP v1.0 format with type in body (no topic param)" do
+      sig = valid_signature_header(data_id: "MP-PAY-V1")
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-V1",
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url,
+          params: {type: "payment", data: {id: "MP-PAY-V1"}},
+          headers: {"x-signature" => sig, "x-request-id" => "req-1"}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.paid?
+      assert_equal "MP-PAY-V1", @certificate.payment_id
+    end
+
+    # --- Feed v2.0 payment sin x-request-id ---
+
+    test "handles Feed v2.0 payment notification without x-request-id" do
+      sig = valid_signature_header(data_id: "MP-PAY-V2", request_id: nil)
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-V2",
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", id: "MP-PAY-V2"},
+          headers: {"x-signature" => sig}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.paid?
+      assert_equal "MP-PAY-V2", @certificate.payment_id
+    end
+
+    # --- Handle v2 prefix in signature ---
+
+    test "accepts signature with v2 prefix" do
+      ts = "1700000000"
+      data_id = "MP-PAY-V2PREFIX"
+      manifest = "id:#{data_id};ts:#{ts};"
+      hash = OpenSSL::HMAC.hexdigest("sha256", SECRET, manifest)
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-V2PREFIX",
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", id: "MP-PAY-V2PREFIX"},
+          headers: {"x-signature" => "ts=#{ts},v2=#{hash}"}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.paid?
+      assert_equal "MP-PAY-V2PREFIX", @certificate.payment_id
     end
   end
 end

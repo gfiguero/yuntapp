@@ -12,7 +12,7 @@ module Webhooks
 
     # POST /webhooks/mercadopago
     def create
-      topic = params[:topic]
+      topic = params[:topic] || params[:type]
       raw_id = params.dig(:data, :id) || params[:id] || params[:resource]
       data_id = extract_id(raw_id)
 

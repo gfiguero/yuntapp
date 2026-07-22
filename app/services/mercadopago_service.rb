@@ -63,19 +63,27 @@ class MercadopagoService
 
   # Verifica la firma del webhook según el protocolo de MercadoPago.
   # Header `x-signature`: "ts=<timestamp>,v1=<hmac_hash>"
-  # Header `x-request-id`: id de la request
-  # Manifest a firmar: "id:<data_id>;request-id:<x-request-id>;ts:<ts>;"
-  def verify_signature(signature_header:, request_id:, data_id:)
+  # Header `x-request-id` (opcional): id de la request. MP solo lo envía en
+  #   notificaciones v1.0 (WebHook). Feed v2.0 no lo incluye.
+  # Manifest a firmar:
+  #   Con request-id: "id:<data_id>;request-id:<x-request-id>;ts:<ts>;"
+  #   Sin request-id: "id:<data_id>;ts:<ts>;"
+  # Soporta v1 y v2 como prefijo del hash.
+  def verify_signature(signature_header:, request_id: nil, data_id:)
     return false if @webhook_secret.blank?
-    return false if signature_header.blank? || request_id.blank? || data_id.blank?
+    return false if signature_header.blank? || data_id.blank?
 
     parts = signature_header.to_s.split(",").map { |p| p.strip.split("=", 2) }.to_h
     ts = parts["ts"]
-    received_hash = parts["v1"]
+    received_hash = parts["v1"] || parts["v2"]
 
     return false if ts.blank? || received_hash.blank?
 
-    manifest = "id:#{data_id};request-id:#{request_id};ts:#{ts};"
+    manifest = if request_id.present?
+      "id:#{data_id};request-id:#{request_id};ts:#{ts};"
+    else
+      "id:#{data_id};ts:#{ts};"
+    end
     computed_hash = OpenSSL::HMAC.hexdigest("sha256", @webhook_secret, manifest)
 
     secure_compare(computed_hash, received_hash)
