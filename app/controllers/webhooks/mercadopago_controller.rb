@@ -4,15 +4,20 @@ module Webhooks
     # Seguridad: verifica firma HMAC `x-signature` (BR-072), idempotencia por
     # payment_id (BR-071), consulta el estado real a la API de MP antes de
     # marcar como pagado.
+    #
+    # MP envía notificaciones de dos tipos:
+    #   topic=payment       → data_id es un payment_id directamente
+    #   topic=merchant_order → data_id es un merchant_order_id (contiene payments anidados)
     skip_forgery_protection
 
     # POST /webhooks/mercadopago
     def create
-      data_id = params.dig(:data, :id) || params[:id] || params[:resource]
-      data_id = extract_payment_id(data_id)
+      topic = params[:topic]
+      raw_id = params.dig(:data, :id) || params[:id] || params[:resource]
+      data_id = extract_id(raw_id)
 
       unless valid_signature?(data_id)
-        Rails.logger.warn("MercadoPago webhook: invalid signature (data_id=#{data_id})")
+        Rails.logger.warn("MercadoPago webhook: invalid signature (topic=#{topic}, data_id=#{data_id})")
         head :unauthorized
         return
       end
@@ -23,15 +28,14 @@ module Webhooks
         return
       end
 
-      # Idempotencia (BR-071): si ya procesamos este payment_id, respondemos OK sin re-procesar
-      if ResidenceCertificate.exists?(payment_id: data_id)
-        Rails.logger.info("MercadoPago webhook: payment_id #{data_id} already processed")
-        head :ok
-        return
+      case topic
+      when "payment"
+        process_payment_notification(data_id)
+      when "merchant_order"
+        process_merchant_order(data_id)
+      else
+        Rails.logger.info("MercadoPago webhook: unhandled topic=#{topic} (data_id=#{data_id})")
       end
-
-      payment = mercadopago.fetch_payment(data_id)
-      process_payment(payment, data_id)
 
       head :ok
     rescue MercadopagoService::ConfigurationError => e
@@ -56,14 +60,43 @@ module Webhooks
       )
     end
 
-    def process_payment(payment, data_id)
+    # topic=payment: data_id es un payment_id directamente.
+    def process_payment_notification(payment_id)
+      if ResidenceCertificate.exists?(payment_id: payment_id)
+        Rails.logger.info("MercadoPago webhook: payment_id #{payment_id} already processed")
+        return
+      end
+
+      payment = mercadopago.fetch_payment(payment_id)
+      return unless payment.is_a?(Hash)
+      mark_certificate_paid(payment, payment_id)
+    end
+
+    # topic=merchant_order: data_id es un merchant_order_id.
+    # Buscamos los payments dentro del merchant_order y los procesamos
+    # individualmente (cada payment tiene su propio payment_id).
+    def process_merchant_order(merchant_order_id)
+      order = mercadopago.fetch_merchant_order(merchant_order_id)
+      return unless order.is_a?(Hash)
+
+      payments = order["payments"] || []
+      payments.each do |payment_entry|
+        pid = payment_entry["id"]
+        next if pid.nil? || ResidenceCertificate.exists?(payment_id: pid.to_s)
+
+        payment = mercadopago.fetch_payment(pid.to_s)
+        mark_certificate_paid(payment, pid.to_s)
+      end
+    end
+
+    def mark_certificate_paid(payment, payment_id)
       return unless payment.is_a?(Hash)
 
       external_reference = payment["external_reference"] || payment[:external_reference]
       status = payment["status"] || payment[:status]
 
       if external_reference.blank?
-        Rails.logger.warn("MercadoPago webhook: missing external_reference for #{data_id}")
+        Rails.logger.warn("MercadoPago webhook: missing external_reference for #{payment_id}")
         return
       end
 
@@ -75,23 +108,18 @@ module Webhooks
 
       case status.to_s
       when "approved"
-        certificate.mark_as_paid!(payment_id: data_id)
-        Rails.logger.info("MercadoPago webhook: certificate ##{certificate.id} marked paid (payment_id=#{data_id})")
+        certificate.mark_as_paid!(payment_id: payment_id)
+        Rails.logger.info("MercadoPago webhook: certificate ##{certificate.id} marked paid (payment_id=#{payment_id})")
       else
-        Rails.logger.info("MercadoPago webhook: payment #{data_id} status=#{status} for certificate ##{certificate.id} — no transition")
+        Rails.logger.info("MercadoPago webhook: payment #{payment_id} status=#{status} for certificate ##{certificate.id} — no transition")
       end
     end
 
-    # MP envía el id del payment de varias formas: `data: { id: 123 }`,
-    # `id: 123`, o `resource: "/v1/payments/123"`. Normalizamos.
-    def extract_payment_id(value)
+    # Extrae el último segmento de una URL o devuelve el valor tal cual.
+    def extract_id(value)
       return nil if value.blank?
       str = value.to_s
-      if str.include?("/")
-        str.split("/").last
-      else
-        str
-      end
+      str.include?("/") ? str.split("/").last : str
     end
   end
 end

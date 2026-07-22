@@ -53,6 +53,14 @@ class MercadopagoService
     response[:response]
   end
 
+  # Consulta un merchant_order (contiene payments anidados cuando el checkout
+  # usa mercadopago con múltiples medios de pago parciales).
+  def fetch_merchant_order(merchant_order_id)
+    ensure_access_token!
+    response = sdk.merchant_order.get(merchant_order_id)
+    response[:response]
+  end
+
   # Verifica la firma del webhook según el protocolo de MercadoPago.
   # Header `x-signature`: "ts=<timestamp>,v1=<hmac_hash>"
   # Header `x-request-id`: id de la request
