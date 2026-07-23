@@ -29,6 +29,28 @@ suscripciones) contra el sandbox de MercadoPago.
   vencimiento futuro. Nombre del titular controla el resultado: `APRO`
   aprueba, `OTHE` rechaza.
 
+## Arquitectura de notificaciones: los dos canales (aprendido 2026-07-23)
+
+MercadoPago tiene **dos canales de notificación** con claves de firma distintas:
+
+1. **Webhook del panel** ("Tus integraciones → app → Webhooks"): firma con la
+   **clave secreta que muestra esa página** (copiarla DESPUÉS de guardar la
+   configuración). Es el único canal cuya firma podemos verificar. La config
+   debe hacerse en el panel de la cuenta dueña del `access_token` — para
+   sandbox, entrar logueado como la **cuenta vendedora de prueba**; para
+   go-live, la cuenta real (y actualizar `webhook_secret` en credentials al
+   cambiar de token).
+2. **`notification_url` por preference**: firma con una clave interna **no
+   consultable** — sus notificaciones siempre fallan la verificación (401).
+   Por eso las preferences **ya no envían `notification_url`**: todo fluye
+   por el canal del panel.
+
+Detalles del canal del panel:
+- Las órdenes comerciales llegan con `type=topic_merchant_order_wh` (no
+  `merchant_order` como el canal legacy). El controller maneja ambos.
+- "Simular notificación" del panel usa la misma clave: sirve para validar la
+  firma sin hacer un pago.
+
 ## Restricciones del sandbox descubiertas en las pruebas
 
 - **Pagos obsoletos con `external_reference` reciclado**: si la BD dev se
