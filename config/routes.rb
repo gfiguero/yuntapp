@@ -62,6 +62,7 @@ Rails.application.routes.draw do
   namespace :panel do
     root to: "dashboard#index"
     resource :profile, only: [:show, :update], controller: "profile"
+    resource :neighborhood_association, only: [:show], controller: "neighborhood_association"
     resources :listings do
       collection do
         get :search

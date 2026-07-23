@@ -1,0 +1,87 @@
+<% content_for :title do %>
+  <%= I18n.t('panel.neighborhood_association.show.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= I18n.t('panel.neighborhood_association.show.title') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= @association.name %></h1>
+  <p class="mb-4 text-base-content/70"><%= I18n.t('panel.neighborhood_association.show.description') %></p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="flex flex-col gap-8">
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title mb-4"><%= I18n.t('panel.neighborhood_association.show.general_info') %></h2>
+          <dl class="grid gap-3">
+            <div>
+              <dt class="text-sm text-base-content/60"><%= I18n.t('panel.neighborhood_association.show.commune') %></dt>
+              <dd class="font-semibold"><%= @association.commune&.name || "—" %></dd>
+            </div>
+            <div>
+              <dt class="text-sm text-base-content/60"><%= I18n.t('panel.neighborhood_association.show.region') %></dt>
+              <dd class="font-semibold"><%= @association.commune&.region&.name || "—" %></dd>
+            </div>
+            <div>
+              <dt class="text-sm text-base-content/60"><%= I18n.t('panel.neighborhood_association.show.approved_members') %></dt>
+              <dd class="font-semibold"><%= @approved_members_count %></dd>
+            </div>
+            <% if @delegations.any? %>
+              <div>
+                <dt class="text-sm text-base-content/60"><%= I18n.t('panel.neighborhood_association.show.delegations') %></dt>
+                <dd class="font-semibold"><%= @delegations.map(&:name).join(", ") %></dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title mb-4"><%= I18n.t('panel.neighborhood_association.show.certificates') %></h2>
+          <% if @current_price.present? %>
+            <p class="text-sm text-base-content/60"><%= I18n.t('panel.neighborhood_association.show.current_price') %></p>
+            <p class="text-3xl font-bold">$<%= number_with_delimiter(@current_price) %> CLP</p>
+          <% else %>
+            <p class="text-sm text-base-content/60"><%= I18n.t('panel.neighborhood_association.show.no_price') %></p>
+          <% end %>
+          <% if current_user.household_admin? %>
+            <div class="card-actions justify-end mt-2">
+              <%= link_to I18n.t('panel.neighborhood_association.show.request_certificate'), new_panel_residence_certificate_path, class: "btn btn-sm btn-soft btn-primary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title mb-4"><%= I18n.t('panel.neighborhood_association.show.board') %></h2>
+        <% if @board_members.any? %>
+          <div class="overflow-x-auto">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th><%= I18n.t('panel.neighborhood_association.show.board_position') %></th>
+                  <th><%= I18n.t('panel.neighborhood_association.show.board_name') %></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @board_members.each do |board_member| %>
+                  <tr>
+                    <td class="font-semibold"><%= board_member.position.capitalize %></td>
+                    <td><%= board_member.member.name %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-sm text-base-content/60"><%= I18n.t('panel.neighborhood_association.show.no_board') %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

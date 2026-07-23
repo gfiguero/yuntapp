@@ -618,6 +618,25 @@ es:
         resubmitted: Solicitud de acreditación reenviada exitosamente.
         run_not_found_no_household: No se encontró un socio con ese RUN. Debes crear un domicilio primero para solicitar acreditación.
         linked: Tu cuenta ha sido vinculada exitosamente a tu registro de socio existente.
+    neighborhood_association:
+      show:
+        title: Mi Junta
+        description: Información general de la junta de vecinos a la que perteneces.
+        general_info: Información General
+        commune: Comuna
+        region: Región
+        approved_members: Socios aprobados
+        delegations: Delegaciones
+        certificates: Certificados de Residencia
+        current_price: Precio vigente del certificado
+        no_price: La junta aún no ha definido el precio del certificado.
+        request_certificate: Solicitar certificado
+        board: Directiva
+        board_position: Cargo
+        board_name: Nombre
+        no_board: La junta aún no ha registrado su directiva.
+      flash:
+        not_member: Debes ser socio de una junta de vecinos para ver esta información.
     listings:
       index:
         title: Publicaciones
