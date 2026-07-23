@@ -8,8 +8,21 @@
 
 <div class="w-full">
   <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.listings.index.title') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('panel.listings.index.count', count: @pagy.count) %></h3>
-  <%= render "buttons" %>
-  <%= render "table" %>
-  <%= render "filter" %>
+  <p class="mb-4 text-base-content/70"><%= I18n.t('panel.listings.index.description') %></p>
+
+  <%# Empty state solo sin filtros activos: si un filtro da 0 resultados se
+      mantiene la tabla (y el botón de filtro) para poder limpiarlo. %>
+  <% if @pagy.count.zero? && params.values_at(:id, :name, :price, :description, :active).all?(&:blank?) %>
+    <%= render "shared/empty_state",
+          icon: "list",
+          title: I18n.t('panel.listings.empty.title'),
+          description: I18n.t('panel.listings.empty.description'),
+          cta_text: I18n.t('panel.listings.empty.cta'),
+          cta_path: new_panel_listing_path %>
+  <% else %>
+    <h3 class="font-bold text-xl mb-4"><%= I18n.t('panel.listings.index.count', count: @pagy.count) %></h3>
+    <%= render "buttons" %>
+    <%= render "table" %>
+    <%= render "filter" %>
+  <% end %>
 </div>

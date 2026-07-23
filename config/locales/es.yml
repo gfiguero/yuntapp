@@ -640,7 +640,12 @@ es:
     listings:
       index:
         title: Publicaciones
+        description: Publica productos o servicios en el marketplace comunitario y compártelos con tus vecinos.
         count: "%{count} publicaciones"
+      empty:
+        title: Aún no has creado publicaciones
+        description: Comparte productos o servicios con tus vecinos publicándolos en el marketplace comunitario de tu junta.
+        cta: Crear mi primera publicación
       show:
         identifier: "Publicación ID: %{id}"
       flash:
