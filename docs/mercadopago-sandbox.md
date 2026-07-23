@@ -31,6 +31,15 @@ suscripciones) contra el sandbox de MercadoPago.
 
 ## Restricciones del sandbox descubiertas en las pruebas
 
+- **Pagos obsoletos con `external_reference` reciclado**: si la BD dev se
+  recrea, los ids de certificados/listings se repiten y un *payment search*
+  por `external_reference` puede encontrar pagos aprobados de sesiones
+  anteriores. Al probar, filtrar por `date_created` o usar ids nuevos.
+  Este escenario motivó BR-090 (validación de monto en el webhook).
+- **`back_urls` de preferences con `auto_return`**: también exigen https
+  público (`auto_return invalid. back_url.success must be defined` con
+  localhost). Sin `auto_return` las preferences sí aceptan localhost.
+
 - **`back_url` de suscripciones debe ser https válida**: la API de
   `preapproval` rechaza `http://localhost:3000/...` con
   `Invalid value for back_url`. Consecuencia: el flujo de suscripción no

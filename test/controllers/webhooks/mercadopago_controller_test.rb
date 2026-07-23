@@ -86,6 +86,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-OK",
+        "transaction_amount" => 1500,
         "status" => "approved",
         "external_reference" => @certificate.id.to_s
       }) do
@@ -108,6 +109,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-REJ",
+        "transaction_amount" => 1500,
         "status" => "rejected",
         "external_reference" => @certificate.id.to_s
       }) do
@@ -127,6 +129,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-PEND",
+        "transaction_amount" => 1500,
         "status" => "pending",
         "external_reference" => @certificate.id.to_s
       }) do
@@ -176,6 +179,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-ORPHAN",
+        "transaction_amount" => 1500,
         "status" => "approved",
         "external_reference" => "999999"
       }) do
@@ -194,6 +198,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-FROM-URL",
+        "transaction_amount" => 1500,
         "status" => "approved",
         "external_reference" => @certificate.id.to_s
       }) do
@@ -215,6 +220,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-V1",
+        "transaction_amount" => 1500,
         "status" => "approved",
         "external_reference" => @certificate.id.to_s
       }) do
@@ -236,6 +242,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-V2",
+        "transaction_amount" => 1500,
         "status" => "approved",
         "external_reference" => @certificate.id.to_s
       }) do
@@ -260,6 +267,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-V2PREFIX",
+        "transaction_amount" => 1500,
         "status" => "approved",
         "external_reference" => @certificate.id.to_s
       }) do
@@ -274,6 +282,67 @@ module Webhooks
       assert_equal "MP-PAY-V2PREFIX", @certificate.payment_id
     end
 
+    # --- BR-090: validación de monto ---
+
+    test "rejects payment with amount different from certificate amount (BR-090)" do
+      sig = valid_signature_header(data_id: "MP-PAY-BADAMT")
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-BADAMT",
+        "transaction_amount" => 2000,
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", data: {id: "MP-PAY-BADAMT"}},
+          headers: {"x-signature" => sig, "x-request-id" => "req-1"}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.pending_payment?
+      assert_nil @certificate.payment_id
+    end
+
+    test "rejects payment without transaction_amount (BR-090)" do
+      sig = valid_signature_header(data_id: "MP-PAY-NOAMT")
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-NOAMT",
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", data: {id: "MP-PAY-NOAMT"}},
+          headers: {"x-signature" => sig, "x-request-id" => "req-1"}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.pending_payment?
+    end
+
+    test "rejects listing payment with wrong amount (BR-090)" do
+      listing = Listing.create!(name: "Webhook listing", user: users(:artanis), amount: 1200)
+      sig = valid_signature_header(data_id: "MP-PAY-LSTBADAMT")
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-LSTBADAMT",
+        "transaction_amount" => 500,
+        "status" => "approved",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", data: {id: "MP-PAY-LSTBADAMT"}},
+          headers: {"x-signature" => sig, "x-request-id" => "req-1"}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert listing.pending_payment?
+      assert_nil listing.payment_id
+    end
+
     # --- Publicaciones del marketplace (BR-083/BR-087) ---
     # external_reference "listing-<id>" enruta el pago a Listing.
 
@@ -283,6 +352,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-LST",
+        "transaction_amount" => 1200,
         "status" => "approved",
         "external_reference" => "listing-#{listing.id}"
       }) do
@@ -304,6 +374,7 @@ module Webhooks
 
       stub_fetch_payment({
         "id" => "MP-PAY-LSTREJ",
+        "transaction_amount" => 1200,
         "status" => "rejected",
         "external_reference" => "listing-#{listing.id}"
       }) do

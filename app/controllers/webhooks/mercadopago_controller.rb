@@ -190,17 +190,27 @@ module Webhooks
         return
       end
 
+      amount = payment["transaction_amount"] || payment[:transaction_amount]
+
       if external_reference.start_with?("listing-")
-        mark_listing_paid(external_reference.delete_prefix("listing-"), status, payment_id)
+        mark_listing_paid(external_reference.delete_prefix("listing-"), status, payment_id, amount)
       else
-        mark_certificate_paid(external_reference, status, payment_id)
+        mark_certificate_paid(external_reference, status, payment_id, amount)
       end
     end
 
-    def mark_certificate_paid(certificate_id, status, payment_id)
+    def mark_certificate_paid(certificate_id, status, payment_id, amount)
       certificate = ResidenceCertificate.find_by(id: certificate_id)
       unless certificate
         Rails.logger.warn("MercadoPago webhook: certificate ##{certificate_id} not found")
+        return
+      end
+
+      # BR-090: el monto pagado debe coincidir exactamente con el monto del
+      # certificado. Rechaza pagos de otro monto (manipulación o pagos
+      # obsoletos de otra operación con external_reference coincidente).
+      unless amount_matches?(amount, certificate.amount)
+        Rails.logger.warn("MercadoPago webhook: payment #{payment_id} amount #{amount.inspect} != certificate ##{certificate.id} amount #{certificate.amount.inspect} — rejected")
         return
       end
 
@@ -213,10 +223,16 @@ module Webhooks
       end
     end
 
-    def mark_listing_paid(listing_id, status, payment_id)
+    def mark_listing_paid(listing_id, status, payment_id, amount)
       listing = Listing.find_by(id: listing_id)
       unless listing
         Rails.logger.warn("MercadoPago webhook: listing ##{listing_id} not found")
+        return
+      end
+
+      # BR-090: mismo control de monto que los certificados.
+      unless amount_matches?(amount, listing.amount)
+        Rails.logger.warn("MercadoPago webhook: payment #{payment_id} amount #{amount.inspect} != listing ##{listing.id} amount #{listing.amount.inspect} — rejected")
         return
       end
 
@@ -227,6 +243,11 @@ module Webhooks
       else
         Rails.logger.info("MercadoPago webhook: payment #{payment_id} status=#{status} for listing ##{listing.id} — no transition")
       end
+    end
+
+    def amount_matches?(paid_amount, expected_amount)
+      return false if paid_amount.nil? || expected_amount.nil?
+      paid_amount.to_d == expected_amount.to_d
     end
 
     # Extrae el último segmento de una URL o devuelve el valor tal cual.
