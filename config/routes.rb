@@ -61,8 +61,7 @@ Rails.application.routes.draw do
 
   namespace :panel do
     root to: "dashboard#index"
-    resource :profile, only: [ :show, :update ], controller: "profile"
-    resources :members, only: [ :index, :show, :new, :create, :edit, :update ]
+    resource :profile, only: [:show, :update], controller: "profile"
     resources :listings do
       collection do
         get :search
@@ -71,9 +70,9 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :residence_certificates, only: [ :index, :show, :new, :create ]
-    resources :dependents, only: [ :index, :new, :create ]
-    resources :payments, only: [ :new ] do
+    resources :residence_certificates, only: [:index, :show, :new, :create]
+    resources :dependents, only: [:index, :new, :create]
+    resources :payments, only: [:new] do
       collection do
         get :success
         get :failure
@@ -161,15 +160,15 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :onboarding_requests, except: [ :new, :create ] do
+    resources :onboarding_requests, except: [:new, :create] do
       collection { get :search }
       member { get :delete }
     end
-    resources :identity_verification_requests, except: [ :new, :create ] do
+    resources :identity_verification_requests, except: [:new, :create] do
       collection { get :search }
       member { get :delete }
     end
-    resources :residence_verification_requests, except: [ :new, :create ] do
+    resources :residence_verification_requests, except: [:new, :create] do
       collection { get :search }
       member { get :delete }
     end
@@ -194,7 +193,7 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :onboarding_requests, only: [ :index, :show ] do
+    resources :onboarding_requests, only: [:index, :show] do
       collection do
         get :search
       end
@@ -208,13 +207,13 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :verifications, only: [ :index, :show ] do
+    resources :verifications, only: [:index, :show] do
       member do
         patch :approve
         patch :reject
       end
     end
-    resources :dependent_reviews, only: [ :index, :show ] do
+    resources :dependent_reviews, only: [:index, :show] do
       member do
         patch :approve
         patch :reject
@@ -248,12 +247,12 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :residence_certificates, only: [ :index, :show ] do
+    resources :residence_certificates, only: [:index, :show] do
       collection do
         get :search
       end
     end
-    resources :certificate_pricings, only: [ :index, :new, :create ]
+    resources :certificate_pricings, only: [:index, :new, :create]
   end
 
   namespace :webhooks do

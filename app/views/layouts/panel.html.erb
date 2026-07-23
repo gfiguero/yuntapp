@@ -60,9 +60,6 @@
 
           <li class="menu-title mt-4">Mis Cosas</li>
           <li><%= link_to "Mi Perfil", panel_profile_path, class: ("active" if controller_name == "profile") %></li>
-          <% if current_user.household_admin? %>
-            <li><%= link_to "Socios del Domicilio", panel_members_path, class: ("active" if controller_name == "members") %></li>
-          <% end %>
 
           <% if current_user.household_admin? %>
             <li><%= link_to "Certificados", panel_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>

@@ -76,7 +76,7 @@ module ApplicationHelper
   # (los tooltips no son anunciados por defecto).
   #
   # Uso:
-  #   icon_link_to('show', panel_member_path(member), t('actions.show'),
+  #   icon_link_to('show', panel_residence_certificate_path(certificate), t('actions.show'),
   #                class: 'btn btn-sm btn-soft btn-info')
   def icon_link_to(icon_name, path, label, html_options = {})
     classes = html_options.delete(:class) || "btn btn-sm btn-soft"

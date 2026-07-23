@@ -292,6 +292,7 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-079 | Validación | El endpoint `/verify/:identifier` acepta el `validation_token` (UUID) o el `validation_code` (8 chars alfanumérico, case-insensitive). Ambos resuelven al mismo certificado vía `ResidenceCertificate.find_for_public_verification` |
 | BR-080 | Validación | Un certificado con `expiration_date < today` se muestra como **Vencido** con response 200 OK (cumple BR-009 — URL responde indefinidamente). Solo identificadores **inexistentes** o certificados no-`issued` retornan 404 |
 | BR-081 | Validación | La verificación pública nunca expone certificados que no estén en estado `issued`. El scope `findable_publicly` filtra automáticamente; el controller no puede ser engañado vía URL para mostrar certs en `pending_payment` o `paid` |
+| BR-082 | Residencia | El registro de convivientes del domicilio se realiza exclusivamente vía el flujo de residentes dependientes (BR-065 a BR-069). El antiguo flujo "Socios del Domicilio" (`panel/members`) fue eliminado en 2026-07-22: estaba incompleto (creaba `Residency` en `pending` sin revisión admin posible y sin `Member`, rompiendo BR-027 al solicitar certificados) y duplicaba la funcionalidad de dependientes |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización
