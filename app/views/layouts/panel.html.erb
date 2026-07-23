@@ -68,6 +68,7 @@
             <li><%= link_to "Certificados", panel_residence_certificates_path, class: ("active" if controller_name == "residence_certificates") %></li>
             <li><%= link_to "Residentes Dependientes", panel_dependents_path, class: ("active" if controller_name == "dependents") %></li>
           <% end %>
+          <li><%= link_to "Publicaciones", panel_listings_path, class: ("active" if controller_name == "listings") %></li>
 
           <li class="mt-auto pt-4 border-t border-base-300">
             <div class="text-xs text-base-content/60 truncate px-2"><%= current_user.email %></div>
