@@ -1,11 +1,11 @@
 {
     "schema_version": 1,
-    "commit": "503968226ebe3e0951e80271c2ae77abd7b50cba",
-    "indexed_at": "2026-07-22T01:45:42Z",
+    "commit": "735327f0fc5935bc57f5f1b2b7dd0b22cecb9d8f",
+    "indexed_at": "2026-07-22T13:42:10Z",
     "project": "home-gfiguero-Proyectos-RubymineProjects-yuntapp",
-    "nodes": 3046,
-    "edges": 5198,
-    "original_size": 9502720,
-    "compressed_size": 1270862,
+    "nodes": 0,
+    "edges": 0,
+    "original_size": 102400,
+    "compressed_size": 1396,
     "compression_level": 3
 }
