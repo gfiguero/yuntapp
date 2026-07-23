@@ -6,7 +6,7 @@ class ResidenceCertificate < ApplicationRecord
   PLATFORM_FEE_PERCENTAGE = 10
   VALIDITY_PERIOD = 6.months
   VALIDATION_CODE_LENGTH = 8
-  VALIDATION_CODE_ALPHABET = ("A".."Z").to_a + ("2".."9").to_a # sin 0/O/1/I para evitar confusión visual
+  VALIDATION_CODE_ALPHABET = ("A".."Z").to_a - %w[O I] + ("2".."9").to_a # sin 0/O/1/I para evitar confusión visual (BR-074)
 
   class AlreadyPaidError < StandardError; end
 

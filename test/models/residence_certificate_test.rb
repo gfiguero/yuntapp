@@ -364,6 +364,7 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_match(/\A[\h-]+\z/, cert.validation_token) # uuid-ish
     assert cert.validation_code.present?
     assert_equal ResidenceCertificate::VALIDATION_CODE_LENGTH, cert.validation_code.length
+    assert_no_match(/[OI01]/, cert.validation_code, "el código no debe contener 0/O/1/I (BR-074)")
     assert_not_nil cert.issued_at
     assert_equal Date.current, cert.issue_date
     assert_equal Date.current + 6.months, cert.expiration_date
