@@ -1,0 +1,8 @@
+<%# Badge del estado de publicación (BR-083/BR-086). %>
+<% if listing.published? %>
+  <span class="badge badge-success badge-sm"><%= I18n.t('panel.listings.publication.published_until', date: l(listing.published_until)) %></span>
+<% elsif listing.publication_expired? %>
+  <span class="badge badge-error badge-sm"><%= I18n.t('panel.listings.publication.expired') %></span>
+<% else %>
+  <span class="badge badge-warning badge-sm"><%= I18n.t('panel.listings.publication.pending_payment') %></span>
+<% end %>

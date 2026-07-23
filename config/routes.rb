@@ -80,6 +80,13 @@ Rails.application.routes.draw do
         get :pending
       end
     end
+    resources :listing_payments, only: [:new] do
+      collection do
+        get :success
+        get :failure
+        get :pending
+      end
+    end
 
     delete "reset_account", to: "account_resets#destroy", as: :reset_account
 
@@ -254,6 +261,7 @@ Rails.application.routes.draw do
       end
     end
     resources :certificate_pricings, only: [:index, :new, :create]
+    resources :listing_pricings, only: [:index, :new, :create]
   end
 
   namespace :webhooks do

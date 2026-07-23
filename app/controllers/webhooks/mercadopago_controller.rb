@@ -71,14 +71,14 @@ module Webhooks
 
     # topic=payment: data_id es un payment_id directamente.
     def process_payment_notification(payment_id)
-      if ResidenceCertificate.exists?(payment_id: payment_id)
+      if payment_already_processed?(payment_id)
         Rails.logger.info("MercadoPago webhook: payment_id #{payment_id} already processed")
         return
       end
 
       payment = mercadopago.fetch_payment(payment_id)
       return unless payment.is_a?(Hash)
-      mark_certificate_paid(payment, payment_id)
+      mark_payable_paid(payment, payment_id)
     end
 
     # topic=merchant_order: data_id es un merchant_order_id.
@@ -91,17 +91,26 @@ module Webhooks
       payments = order["payments"] || []
       payments.each do |payment_entry|
         pid = payment_entry["id"]
-        next if pid.nil? || ResidenceCertificate.exists?(payment_id: pid.to_s)
+        next if pid.nil? || payment_already_processed?(pid.to_s)
 
         payment = mercadopago.fetch_payment(pid.to_s)
-        mark_certificate_paid(payment, pid.to_s)
+        mark_payable_paid(payment, pid.to_s)
       end
     end
 
-    def mark_certificate_paid(payment, payment_id)
+    # Idempotencia compartida (BR-071/BR-087): un payment_id ya registrado en
+    # certificados o publicaciones no se vuelve a procesar.
+    def payment_already_processed?(payment_id)
+      ResidenceCertificate.exists?(payment_id: payment_id) || Listing.exists?(payment_id: payment_id)
+    end
+
+    # Enruta el pago según external_reference:
+    #   "listing-<id>" → publicación del marketplace (BR-083)
+    #   "<id>" a secas → certificado de residencia (formato original)
+    def mark_payable_paid(payment, payment_id)
       return unless payment.is_a?(Hash)
 
-      external_reference = payment["external_reference"] || payment[:external_reference]
+      external_reference = (payment["external_reference"] || payment[:external_reference]).to_s
       status = payment["status"] || payment[:status]
 
       if external_reference.blank?
@@ -109,9 +118,17 @@ module Webhooks
         return
       end
 
-      certificate = ResidenceCertificate.find_by(id: external_reference)
+      if external_reference.start_with?("listing-")
+        mark_listing_paid(external_reference.delete_prefix("listing-"), status, payment_id)
+      else
+        mark_certificate_paid(external_reference, status, payment_id)
+      end
+    end
+
+    def mark_certificate_paid(certificate_id, status, payment_id)
+      certificate = ResidenceCertificate.find_by(id: certificate_id)
       unless certificate
-        Rails.logger.warn("MercadoPago webhook: certificate ##{external_reference} not found")
+        Rails.logger.warn("MercadoPago webhook: certificate ##{certificate_id} not found")
         return
       end
 
@@ -121,6 +138,22 @@ module Webhooks
         Rails.logger.info("MercadoPago webhook: certificate ##{certificate.id} marked paid (payment_id=#{payment_id})")
       else
         Rails.logger.info("MercadoPago webhook: payment #{payment_id} status=#{status} for certificate ##{certificate.id} — no transition")
+      end
+    end
+
+    def mark_listing_paid(listing_id, status, payment_id)
+      listing = Listing.find_by(id: listing_id)
+      unless listing
+        Rails.logger.warn("MercadoPago webhook: listing ##{listing_id} not found")
+        return
+      end
+
+      case status.to_s
+      when "approved"
+        listing.mark_as_paid!(payment_id: payment_id)
+        Rails.logger.info("MercadoPago webhook: listing ##{listing.id} published (payment_id=#{payment_id})")
+      else
+        Rails.logger.info("MercadoPago webhook: payment #{payment_id} status=#{status} for listing ##{listing.id} — no transition")
       end
     end
 

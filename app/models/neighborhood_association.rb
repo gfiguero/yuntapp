@@ -15,8 +15,13 @@ class NeighborhoodAssociation < ApplicationRecord
   has_many :board_members, dependent: :destroy
   has_many :residence_certificates, dependent: :destroy
   has_many :certificate_pricings, dependent: :destroy
+  has_many :listing_pricings, dependent: :destroy
 
   def current_certificate_price
     CertificatePricing.current_for(self)&.price
+  end
+
+  def current_listing_price
+    ListingPricing.current_for(self)&.price
   end
 end

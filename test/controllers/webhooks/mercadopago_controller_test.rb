@@ -273,5 +273,71 @@ module Webhooks
       assert @certificate.paid?
       assert_equal "MP-PAY-V2PREFIX", @certificate.payment_id
     end
+
+    # --- Publicaciones del marketplace (BR-083/BR-087) ---
+    # external_reference "listing-<id>" enruta el pago a Listing.
+
+    test "publishes listing when MP returns approved for listing reference" do
+      listing = Listing.create!(name: "Webhook listing", user: users(:artanis), amount: 1200)
+      sig = valid_signature_header(data_id: "MP-PAY-LST")
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-LST",
+        "status" => "approved",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", data: {id: "MP-PAY-LST"}},
+          headers: {"x-signature" => sig, "x-request-id" => "req-1"}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert listing.published?
+      assert_equal "MP-PAY-LST", listing.payment_id
+      assert_equal Date.current + 30.days, listing.published_until
+    end
+
+    test "does not publish listing when MP returns rejected" do
+      listing = Listing.create!(name: "Webhook listing", user: users(:artanis), amount: 1200)
+      sig = valid_signature_header(data_id: "MP-PAY-LSTREJ")
+
+      stub_fetch_payment({
+        "id" => "MP-PAY-LSTREJ",
+        "status" => "rejected",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", data: {id: "MP-PAY-LSTREJ"}},
+          headers: {"x-signature" => sig, "x-request-id" => "req-1"}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert listing.pending_payment?
+      assert_nil listing.payment_id
+    end
+
+    test "listing payment_id already processed is idempotent (BR-087)" do
+      listing = Listing.create!(name: "Webhook listing", user: users(:artanis), amount: 1200)
+      listing.mark_as_paid!(payment_id: "MP-PAY-DUP")
+      original_until = listing.published_until
+      sig = valid_signature_header(data_id: "MP-PAY-DUP")
+
+      # fetch_payment no debería llamarse; si se llama y retorna approved,
+      # mark_as_paid! con el mismo payment_id sigue siendo no-op.
+      stub_fetch_payment({
+        "id" => "MP-PAY-DUP",
+        "status" => "approved",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post webhooks_mercadopago_url,
+          params: {topic: "payment", data: {id: "MP-PAY-DUP"}},
+          headers: {"x-signature" => sig, "x-request-id" => "req-1"}
+      end
+
+      assert_response :ok
+      assert_equal original_until, listing.reload.published_until
+    end
   end
 end

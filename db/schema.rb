@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_22_233148) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_004950) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -134,16 +134,38 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_233148) do
     t.index ["user_id"], name: "index_identity_verification_requests_on_user_id"
   end
 
+  create_table "listing_pricings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "created_by_id", null: false
+    t.datetime "effective_from", null: false
+    t.datetime "effective_to"
+    t.integer "neighborhood_association_id", null: false
+    t.integer "price", null: false
+    t.datetime "updated_at", null: false
+    t.index ["neighborhood_association_id", "effective_to"], name: "index_listing_pricings_on_association_and_effective_to"
+    t.index ["neighborhood_association_id"], name: "index_listing_pricings_on_neighborhood_association_id"
+  end
+
   create_table "listings", force: :cascade do |t|
     t.boolean "active"
+    t.integer "amount"
     t.integer "category_id"
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name"
+    t.integer "neighborhood_association_id"
+    t.datetime "paid_at"
+    t.string "payment_id"
+    t.integer "platform_fee"
     t.decimal "price"
+    t.string "publication_status", default: "pending_payment", null: false
+    t.date "published_until"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["category_id"], name: "index_listings_on_category_id"
+    t.index ["neighborhood_association_id"], name: "index_listings_on_neighborhood_association_id"
+    t.index ["payment_id"], name: "index_listings_on_payment_id", unique: true
+    t.index ["publication_status"], name: "index_listings_on_publication_status"
     t.index ["user_id"], name: "index_listings_on_user_id"
   end
 
@@ -353,6 +375,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_22_233148) do
   add_foreign_key "identity_verification_requests", "onboarding_requests"
   add_foreign_key "identity_verification_requests", "users"
   add_foreign_key "identity_verification_requests", "users", column: "requested_by_id"
+  add_foreign_key "listing_pricings", "neighborhood_associations"
+  add_foreign_key "listing_pricings", "users", column: "created_by_id"
   add_foreign_key "listings", "categories"
   add_foreign_key "listings", "users"
   add_foreign_key "members", "neighborhood_associations"

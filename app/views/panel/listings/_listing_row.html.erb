@@ -1,8 +1,9 @@
 <tr class="hover:bg-base-300">
   <td><%= listing.name %></td>
+  <td><%= render "publication_badge", listing: listing %></td>
   <td>
     <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), [:admin, listing], class: "btn btn-sm btn-soft btn-info" %>
+      <%= link_to icon('show'), [:panel, listing], class: "btn btn-sm btn-soft btn-info" %>
     </div>
     <div class="tooltip" data-tip="<%= I18n.t('actions.edit') %>">
       <%= link_to icon('edit'), edit_panel_listing_path(listing), class: "btn btn-sm btn-soft btn-success" %>

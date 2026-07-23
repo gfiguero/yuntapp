@@ -1,0 +1,22 @@
+<% content_for :title do %>
+  <%= I18n.t('panel.listing_payments.pending.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('panel.listings.index.title'), panel_listings_path %></li>
+  <li><%= I18n.t('panel.listing_payments.pending.title') %></li>
+<% end %>
+
+<div class="w-full max-w-2xl mx-auto">
+  <div class="card bg-warning/10 border border-warning/30">
+    <div class="card-body text-center">
+      <h1 class="card-title text-3xl justify-center text-warning"><%= I18n.t('panel.listing_payments.pending.title') %></h1>
+      <p class="mt-2"><%= I18n.t('panel.listing_payments.pending.description') %></p>
+      <% if @listing.present? %>
+        <%= link_to I18n.t('actions.show'), panel_listing_path(@listing), class: "btn btn-soft btn-primary mt-4" %>
+      <% else %>
+        <%= link_to I18n.t('panel.listings.index.title'), panel_listings_path, class: "btn btn-soft btn-primary mt-4" %>
+      <% end %>
+    </div>
+  </div>
+</div>

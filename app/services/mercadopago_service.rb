@@ -46,6 +46,36 @@ class MercadopagoService
     response[:response]
   end
 
+  # Crea una preference para habilitar una publicación del marketplace
+  # (BR-083). El external_reference lleva el prefijo "listing-" para que el
+  # webhook pueda distinguirlo de los certificados (que usan el id a secas).
+  def create_listing_preference(listing, success_url:, failure_url:, pending_url:, notification_url:)
+    ensure_access_token!
+
+    payload = {
+      items: [
+        {
+          id: "listing-#{listing.id}",
+          title: I18n.t("payments.mercadopago.listing_item_title", name: listing.name),
+          quantity: 1,
+          currency_id: "CLP",
+          unit_price: listing.amount
+        }
+      ],
+      external_reference: "listing-#{listing.id}",
+      back_urls: {
+        success: success_url,
+        failure: failure_url,
+        pending: pending_url
+      },
+      auto_return: "approved",
+      notification_url: notification_url
+    }
+
+    response = sdk.preference.create(payload)
+    response[:response]
+  end
+
   # Consulta el estado actual de un pago vía MP API.
   def fetch_payment(payment_id)
     ensure_access_token!
@@ -69,7 +99,7 @@ class MercadopagoService
   #   Con request-id: "id:<data_id>;request-id:<x-request-id>;ts:<ts>;"
   #   Sin request-id: "id:<data_id>;ts:<ts>;"
   # Soporta v1 y v2 como prefijo del hash.
-  def verify_signature(signature_header:, request_id: nil, data_id:)
+  def verify_signature(signature_header:, data_id:, request_id: nil)
     return false if @webhook_secret.blank?
     return false if signature_header.blank? || data_id.blank?
 

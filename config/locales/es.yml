@@ -191,6 +191,11 @@ es:
         effective_from: Vigente desde
         effective_to: Vigente hasta
         created_by: Creado por
+      listing_pricing:
+        price: Precio (CLP)
+        effective_from: Vigente desde
+        effective_to: Vigente hasta
+        created_by: Creado por
       residence_verification_request:
         id: ID
         user: Usuario
@@ -561,6 +566,23 @@ es:
         price_help: "Precio en CLP (mínimo $%{min})"
       flash:
         created: Nuevo precio guardado. Se aplicará a las próximas solicitudes.
+    listing_pricings:
+      index:
+        title: Precio de Publicaciones
+        description: Define el precio que cobrará la junta por habilitar cada publicación del marketplace por 30 días. El mínimo es $1.000 CLP (BR-084). Yuntapp retiene 10%% por operación.
+        current_pricing: Precio vigente
+        no_current_pricing: La junta aún no ha definido un precio. Hasta entonces, los socios no podrán habilitar publicaciones.
+        effective_since: "Vigente desde %{date}"
+        new_pricing: Cambiar precio
+        history: Historial de precios
+        active: Vigente
+        empty: No hay precios registrados todavía.
+      new:
+        title: Cambiar precio de publicación
+        description: Al guardar, el precio anterior queda cerrado y el nuevo se aplica a los próximos pagos de publicación. Las publicaciones ya pagadas mantienen el precio original (snapshot).
+        price_help: "Precio en CLP (mínimo $%{min})"
+      flash:
+        created: Nuevo precio guardado. Se aplicará a los próximos pagos de publicación.
     dependent_reviews:
       index:
         title: Residentes Dependientes
@@ -646,6 +668,14 @@ es:
         title: Aún no has creado publicaciones
         description: Comparte productos o servicios con tus vecinos publicándolos en el marketplace comunitario de tu junta.
         cta: Crear mi primera publicación
+      publication:
+        column: Publicación
+        pending_payment: Pendiente de pago
+        published_until: "Publicada hasta %{date}"
+        expired: Vencida
+        pay_description: Para habilitar esta publicación por 30 días debes pagar el precio definido por tu junta de vecinos.
+        pay_cta: Pagar publicación
+        renew_cta: Renovar publicación
       show:
         identifier: "Publicación ID: %{id}"
       flash:
@@ -689,6 +719,20 @@ es:
         not_pending_payment: Este certificado no está pendiente de pago.
         misconfigured: MercadoPago no está configurado. Contacta soporte.
         preference_failed: No se pudo iniciar el pago. Inténtalo nuevamente.
+    listing_payments:
+      success:
+        title: Pago exitoso
+        description: Tu pago fue procesado. La publicación quedará habilitada por 30 días en cuanto MercadoPago confirme la operación.
+      failure:
+        title: Pago rechazado
+        description: El pago no pudo completarse. Puedes intentarlo nuevamente desde tu publicación.
+      pending:
+        title: Pago pendiente
+        description: Tu pago está siendo procesado por MercadoPago. La publicación se habilitará automáticamente cuando se confirme.
+      flash:
+        not_payable: Esta publicación ya está pagada y vigente.
+        not_member: Debes ser socio de una junta de vecinos para habilitar publicaciones.
+        no_price: Tu junta aún no ha definido el precio de publicación. Contacta a tu junta.
     dependents:
       index:
         title: Residentes Dependientes
@@ -924,3 +968,4 @@ es:
   payments:
     mercadopago:
       item_title: "Certificado de Residencia %{folio}"
+      listing_item_title: "Publicación en marketplace: %{name}"

@@ -293,6 +293,11 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-080 | Validación | Un certificado con `expiration_date < today` se muestra como **Vencido** con response 200 OK (cumple BR-009 — URL responde indefinidamente). Solo identificadores **inexistentes** o certificados no-`issued` retornan 404 |
 | BR-081 | Validación | La verificación pública nunca expone certificados que no estén en estado `issued`. El scope `findable_publicly` filtra automáticamente; el controller no puede ser engañado vía URL para mostrar certs en `pending_payment` o `paid` |
 | BR-082 | Residencia | El registro de convivientes del domicilio se realiza exclusivamente vía el flujo de residentes dependientes (BR-065 a BR-069). El antiguo flujo "Socios del Domicilio" (`panel/members`) fue eliminado en 2026-07-22: estaba incompleto (creaba `Residency` en `pending` sin revisión admin posible y sin `Member`, rompiendo BR-027 al solicitar certificados) y duplicaba la funcionalidad de dependientes |
+| BR-083 | Pagos | Para habilitar una publicación del marketplace el usuario debe pagar vía MercadoPago (mismo mecanismo Checkout Pro que los certificados). Estados de publicación: `pending_payment` → `published`. Solo el webhook con pago `approved` publica; pagos rechazados/pendientes no cambian el estado |
+| BR-084 | Precios | Cada junta define el precio de habilitación de publicaciones con vigencias históricas (`ListingPricing`, espejo de BR-070). Mínimo $1.000 CLP. El monto se captura en `amount` (snapshot) al iniciar el pago. Para pagar, el usuario debe ser socio activo de una junta y esa junta debe tener precio vigente |
+| BR-085 | Comisión | Yuntapp retiene el 10% del pago de cada publicación (`platform_fee`); el 90% es para la junta del socio, registrada como snapshot en `listings.neighborhood_association_id` |
+| BR-086 | Pagos | La publicación queda vigente 30 días desde el pago (`published_until`). Al vencer puede renovarse con un nuevo pago, que otorga 30 días desde el nuevo pago. Las publicaciones existentes antes del cobro recibieron 30 días de gracia en la migración |
+| BR-087 | Pagos | El webhook de MercadoPago es compartido entre certificados y publicaciones: `external_reference` con prefijo `listing-<id>` enruta a `Listing`; un id a secas enruta a `ResidenceCertificate` (formato original). La idempotencia por `payment_id` (BR-071) se verifica contra ambas tablas |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización
@@ -467,8 +472,14 @@ Country -> Region -> Commune -> NeighborhoodAssociation -> NeighborhoodDelegatio
 - Campos: `position`, `start_date`, `end_date`, `active`
 
 #### Listing (Marketplace)
-- Pertenece a: `user`, `category` (opcional)
+- Pertenece a: `user`, `category` (opcional), `neighborhood_association` (opcional, snapshot al pagar — BR-085)
 - Campos: `name`, `description`, `price`, `active`
+- Publicación pagada (BR-083/BR-086): `publication_status` (`pending_payment` | `published`), `amount` (snapshot del precio de la junta), `platform_fee` (10%), `payment_id` (único), `paid_at`, `published_until` (pago + 30 días)
+- `mark_as_paid!` (idempotente, BR-087) publica por 30 días; renovación tras vencimiento con nuevo pago
+
+#### ListingPricing _(BR-084)_
+- Precio histórico por junta para habilitar publicaciones, con vigencia (`price`, `effective_from`, `effective_to`) — espejo de `CertificatePricing`
+- `ListingPricing.current_for(association)`: precio vigente. Mínimo $1.000 CLP. Gestionado en `admin/listing_pricings`
 
 ### Concerns
 
