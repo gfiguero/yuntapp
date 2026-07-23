@@ -19,8 +19,7 @@ module Panel
         @listing,
         success_url: success_panel_listing_payments_url,
         failure_url: failure_panel_listing_payments_url,
-        pending_url: pending_panel_listing_payments_url,
-        notification_url: webhooks_mercadopago_url
+        pending_url: pending_panel_listing_payments_url
       )
 
       init_point = preference["init_point"] || preference[:init_point]

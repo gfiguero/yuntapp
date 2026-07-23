@@ -167,8 +167,7 @@ class MercadopagoServiceTest < ActiveSupport::TestCase
         service.create_preference(cert,
           success_url: "https://x.test/s",
           failure_url: "https://x.test/f",
-          pending_url: "https://x.test/p",
-          notification_url: "https://x.test/n")
+          pending_url: "https://x.test/p")
       end
     end
   end

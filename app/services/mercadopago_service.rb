@@ -18,8 +18,11 @@ class MercadopagoService
   end
 
   # Crea una preference en MercadoPago y retorna el hash de respuesta.
-  # back_urls y notification_url deben venir del controller (necesita request.url).
-  def create_preference(certificate, success_url:, failure_url:, pending_url:, notification_url:)
+  # back_urls deben venir del controller (necesita request.url).
+  # Sin notification_url: las notificaciones llegan exclusivamente por el
+  # webhook configurado en el panel de MP, cuya firma sí es verificable
+  # (el canal de notification_url firma con una clave no consultable).
+  def create_preference(certificate, success_url:, failure_url:, pending_url:)
     ensure_access_token!
 
     payload = {
@@ -38,8 +41,7 @@ class MercadopagoService
         failure: failure_url,
         pending: pending_url
       },
-      auto_return: "approved",
-      notification_url: notification_url
+      auto_return: "approved"
     }
 
     response = sdk.preference.create(payload)
@@ -49,7 +51,7 @@ class MercadopagoService
   # Crea una preference para habilitar una publicación del marketplace
   # (BR-083). El external_reference lleva el prefijo "listing-" para que el
   # webhook pueda distinguirlo de los certificados (que usan el id a secas).
-  def create_listing_preference(listing, success_url:, failure_url:, pending_url:, notification_url:)
+  def create_listing_preference(listing, success_url:, failure_url:, pending_url:)
     ensure_access_token!
 
     payload = {
@@ -68,8 +70,7 @@ class MercadopagoService
         failure: failure_url,
         pending: pending_url
       },
-      auto_return: "approved",
-      notification_url: notification_url
+      auto_return: "approved"
     }
 
     response = sdk.preference.create(payload)
