@@ -339,5 +339,89 @@ module Webhooks
       assert_response :ok
       assert_equal original_until, listing.reload.published_until
     end
+
+    # --- Suscripciones (BR-088/BR-089) ---
+
+    def stub_subscription_service(preapproval: nil, authorized_payment: nil, &block)
+      fake = Object.new
+      fake.define_singleton_method(:fetch_preapproval) { |_id| preapproval }
+      fake.define_singleton_method(:fetch_authorized_payment) { |_id| authorized_payment }
+      stub_class_method(MercadopagoService, :new, fake, &block)
+    end
+
+    test "subscription_preapproval syncs subscription status (BR-088)" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis), amount: 1200)
+
+      stub_subscription_service(preapproval: {
+        "id" => "PRE-1",
+        "status" => "authorized",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post webhooks_mercadopago_url,
+          params: {type: "subscription_preapproval", data: {id: "PRE-1"}}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert_equal "PRE-1", listing.preapproval_id
+      assert listing.subscription_active?
+    end
+
+    test "subscription_preapproval syncs cancellation from MP" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-2", subscription_status: "authorized")
+
+      stub_subscription_service(preapproval: {
+        "id" => "PRE-2",
+        "status" => "cancelled",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post webhooks_mercadopago_url,
+          params: {type: "subscription_preapproval", data: {id: "PRE-2"}}
+      end
+
+      assert_response :ok
+      assert_equal "cancelled", listing.reload.subscription_status
+    end
+
+    test "subscription_authorized_payment approved renews the listing (BR-089)" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-3", subscription_status: "authorized")
+      listing.mark_as_paid!(payment_id: "MP-FIRST")
+      current_until = listing.published_until
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AUTHPAY-1",
+        "preapproval_id" => "PRE-3",
+        "payment" => {"id" => "MP-RECUR-1", "status" => "approved"}
+      }) do
+        post webhooks_mercadopago_url,
+          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-1"}}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert_equal current_until + 30.days, listing.published_until
+      assert_equal "MP-RECUR-1", listing.payment_id
+    end
+
+    test "subscription_authorized_payment rejected does not renew" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-4", subscription_status: "authorized")
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AUTHPAY-2",
+        "preapproval_id" => "PRE-4",
+        "payment" => {"id" => "MP-RECUR-2", "status" => "rejected"}
+      }) do
+        post webhooks_mercadopago_url,
+          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-2"}}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert listing.pending_payment?
+      assert_nil listing.payment_id
+    end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_004950) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_23_010420) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -157,14 +157,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_004950) do
     t.datetime "paid_at"
     t.string "payment_id"
     t.integer "platform_fee"
+    t.string "preapproval_id"
     t.decimal "price"
     t.string "publication_status", default: "pending_payment", null: false
     t.date "published_until"
+    t.string "subscription_status"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["category_id"], name: "index_listings_on_category_id"
     t.index ["neighborhood_association_id"], name: "index_listings_on_neighborhood_association_id"
     t.index ["payment_id"], name: "index_listings_on_payment_id", unique: true
+    t.index ["preapproval_id"], name: "index_listings_on_preapproval_id", unique: true
     t.index ["publication_status"], name: "index_listings_on_publication_status"
     t.index ["user_id"], name: "index_listings_on_user_id"
   end

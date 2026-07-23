@@ -298,6 +298,8 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-085 | Comisión | Yuntapp retiene el 10% del pago de cada publicación (`platform_fee`); el 90% es para la junta del socio, registrada como snapshot en `listings.neighborhood_association_id` |
 | BR-086 | Pagos | La publicación queda vigente 30 días desde el pago (`published_until`). Al vencer puede renovarse con un nuevo pago, que otorga 30 días desde el nuevo pago. Las publicaciones existentes antes del cobro recibieron 30 días de gracia en la migración |
 | BR-087 | Pagos | El webhook de MercadoPago es compartido entre certificados y publicaciones: `external_reference` con prefijo `listing-<id>` enruta a `Listing`; un id a secas enruta a `ResidenceCertificate` (formato original). La idempotencia por `payment_id` (BR-071) se verifica contra ambas tablas |
+| BR-088 | Pagos | Las publicaciones pueden auto-renovarse vía Suscripciones de MercadoPago (`preapproval`, frecuencia mensual), opcional al pago único. El monto queda fijo al autorizar (snapshot del precio vigente); si la junta cambia su precio, las suscripciones vigentes mantienen el monto antiguo — para tomar el nuevo, el usuario debe cancelar y volver a suscribirse. El usuario puede cancelar en cualquier momento desde su panel |
+| BR-089 | Pagos | Cada cobro recurrente aprobado (webhook `subscription_authorized_payment`) extiende la vigencia 30 días desde el vencimiento vigente si la publicación está al día, o desde la fecha del cobro si estaba vencida. Cancelar la suscripción no corta la vigencia ya pagada: la publicación vence normalmente. Si el cobro recurrente falla, la publicación simplemente vence (BR-086) sin degradarse antes |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización
@@ -476,6 +478,7 @@ Country -> Region -> Commune -> NeighborhoodAssociation -> NeighborhoodDelegatio
 - Campos: `name`, `description`, `price`, `active`
 - Publicación pagada (BR-083/BR-086): `publication_status` (`pending_payment` | `published`), `amount` (snapshot del precio de la junta), `platform_fee` (10%), `payment_id` (único), `paid_at`, `published_until` (pago + 30 días)
 - `mark_as_paid!` (idempotente, BR-087) publica por 30 días; renovación tras vencimiento con nuevo pago
+- Auto-renovación (BR-088/BR-089): `preapproval_id` (único), `subscription_status` (`pending` | `authorized` | `paused` | `cancelled`). `renew_from_subscription!` extiende la vigencia con cada cobro recurrente aprobado. Controlador `Panel::ListingSubscriptionsController` (suscribir/cancelar); webhooks `subscription_preapproval` y `subscription_authorized_payment`
 
 #### ListingPricing _(BR-084)_
 - Precio histórico por junta para habilitar publicaciones, con vigencia (`price`, `effective_from`, `effective_to`) — espejo de `CertificatePricing`

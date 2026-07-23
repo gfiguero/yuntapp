@@ -54,6 +54,49 @@ class ListingPublicationTest < ActiveSupport::TestCase
     assert_equal 150, @listing.platform_fee
   end
 
+  # --- Auto-renovación por suscripción (BR-088/BR-089) ---
+
+  test "renew_from_subscription! publishes a pending listing 30 days from payment" do
+    @listing.renew_from_subscription!(payment_id: "MP-SUB-1")
+
+    assert @listing.published?
+    assert_equal Date.current + 30.days, @listing.published_until
+  end
+
+  test "renew_from_subscription! extends from current expiry when still published (BR-089)" do
+    @listing.mark_as_paid!(payment_id: "MP-SUB-1")
+    current_until = @listing.published_until
+
+    @listing.renew_from_subscription!(payment_id: "MP-SUB-2")
+    assert_equal current_until + 30.days, @listing.published_until
+  end
+
+  test "renew_from_subscription! extends from payment date when expired (BR-089)" do
+    @listing.mark_as_paid!(payment_id: "MP-SUB-1")
+    @listing.update_columns(published_until: 10.days.ago.to_date)
+
+    @listing.renew_from_subscription!(payment_id: "MP-SUB-2")
+    assert_equal Date.current + 30.days, @listing.published_until
+  end
+
+  test "renew_from_subscription! is idempotent for same payment_id (BR-087)" do
+    @listing.renew_from_subscription!(payment_id: "MP-SUB-1")
+    original_until = @listing.published_until
+
+    @listing.renew_from_subscription!(payment_id: "MP-SUB-1")
+    assert_equal original_until, @listing.reload.published_until
+  end
+
+  test "subscribable when payable without active subscription" do
+    assert @listing.subscribable?
+
+    @listing.update!(subscription_status: "authorized")
+    assert_not @listing.subscribable?
+
+    @listing.update!(subscription_status: "cancelled")
+    assert @listing.subscribable?
+  end
+
   test "published scope excludes pending and expired" do
     published = Listing.create!(name: "published", user: users(:artanis))
     published.mark_as_paid!(payment_id: "MP-scope-1")

@@ -733,6 +733,19 @@ es:
         not_payable: Esta publicación ya está pagada y vigente.
         not_member: Debes ser socio de una junta de vecinos para habilitar publicaciones.
         no_price: Tu junta aún no ha definido el precio de publicación. Contacta a tu junta.
+    listing_subscriptions:
+      badge_active: Renovación automática
+      subscribe_cta: Activar renovación automática
+      cancel_cta: Cancelar renovación automática
+      cancel_confirm: ¿Cancelar la renovación automática? La publicación seguirá vigente hasta su fecha de vencimiento y luego deberás pagar manualmente.
+      active_description: MercadoPago cobrará automáticamente cada mes y la publicación se renovará sola. Puedes cancelar cuando quieras; la vigencia ya pagada se conserva.
+      success:
+        title: Suscripción autorizada
+        description: Tu renovación automática quedó activa. MercadoPago realizará el primer cobro y la publicación se habilitará en cuanto se confirme.
+      flash:
+        not_subscribable: La publicación ya tiene renovación automática activa o no requiere pago.
+        no_subscription: Esta publicación no tiene una renovación automática activa.
+        cancelled: Renovación automática cancelada. La publicación seguirá vigente hasta su vencimiento.
     dependents:
       index:
         title: Residentes Dependientes
@@ -969,3 +982,4 @@ es:
     mercadopago:
       item_title: "Certificado de Residencia %{folio}"
       listing_item_title: "Publicación en marketplace: %{name}"
+      listing_subscription_reason: "Renovación mensual de publicación: %{name}"

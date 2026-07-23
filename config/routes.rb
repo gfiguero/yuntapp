@@ -87,6 +87,12 @@ Rails.application.routes.draw do
         get :pending
       end
     end
+    resources :listing_subscriptions, only: [:new] do
+      collection do
+        get :success
+        delete :cancel
+      end
+    end
 
     delete "reset_account", to: "account_resets#destroy", as: :reset_account
 

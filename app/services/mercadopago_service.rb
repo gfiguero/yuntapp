@@ -76,6 +76,51 @@ class MercadopagoService
     response[:response]
   end
 
+  # Crea una suscripción (preapproval) para auto-renovar una publicación
+  # cada mes (BR-088). El monto queda fijo al autorizar; MP cobra
+  # automáticamente cada ciclo y notifica vía webhook.
+  def create_listing_subscription(listing, payer_email:, back_url:)
+    ensure_access_token!
+
+    payload = {
+      reason: I18n.t("payments.mercadopago.listing_subscription_reason", name: listing.name),
+      external_reference: "listing-#{listing.id}",
+      payer_email: payer_email,
+      back_url: back_url,
+      auto_recurring: {
+        frequency: 1,
+        frequency_type: "months",
+        transaction_amount: listing.amount,
+        currency_id: "CLP"
+      }
+    }
+
+    response = sdk.preapproval.create(payload)
+    response[:response]
+  end
+
+  # Consulta una suscripción por id.
+  def fetch_preapproval(preapproval_id)
+    ensure_access_token!
+    response = sdk.preapproval.get(preapproval_id)
+    response[:response]
+  end
+
+  # Cancela una suscripción. MP deja de intentar cobros futuros.
+  def cancel_preapproval(preapproval_id)
+    ensure_access_token!
+    response = sdk.preapproval.update(preapproval_id, {status: "cancelled"})
+    response[:response]
+  end
+
+  # Consulta un cobro recurrente (authorized payment / invoice) por id.
+  # Contiene el preapproval_id y el payment anidado con su estado real.
+  def fetch_authorized_payment(authorized_payment_id)
+    ensure_access_token!
+    response = sdk.invoice.get(authorized_payment_id)
+    response[:response]
+  end
+
   # Consulta el estado actual de un pago vía MP API.
   def fetch_payment(payment_id)
     ensure_access_token!

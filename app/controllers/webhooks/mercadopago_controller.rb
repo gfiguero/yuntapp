@@ -42,6 +42,10 @@ module Webhooks
         process_payment_notification(data_id)
       when "merchant_order"
         process_merchant_order(data_id)
+      when "subscription_preapproval"
+        process_subscription_preapproval(data_id)
+      when "subscription_authorized_payment"
+        process_subscription_authorized_payment(data_id)
       else
         Rails.logger.info("MercadoPago webhook: unhandled topic=#{topic} (data_id=#{data_id})")
       end
@@ -95,6 +99,74 @@ module Webhooks
 
         payment = mercadopago.fetch_payment(pid.to_s)
         mark_payable_paid(payment, pid.to_s)
+      end
+    end
+
+    # topic=subscription_preapproval: cambió el estado de una suscripción
+    # (autorizada, pausada o cancelada por el usuario/MP). Sincroniza el
+    # estado local (BR-088).
+    def process_subscription_preapproval(preapproval_id)
+      preapproval = mercadopago.fetch_preapproval(preapproval_id)
+      return unless preapproval.is_a?(Hash)
+
+      external_reference = (preapproval["external_reference"] || preapproval[:external_reference]).to_s
+      status = (preapproval["status"] || preapproval[:status]).to_s
+
+      listing = Listing.find_by(preapproval_id: preapproval_id)
+      listing ||= Listing.find_by(id: external_reference.delete_prefix("listing-")) if external_reference.start_with?("listing-")
+
+      unless listing
+        Rails.logger.warn("MercadoPago webhook: no listing for preapproval #{preapproval_id}")
+        return
+      end
+
+      if Listing::SUBSCRIPTION_STATUSES.include?(status)
+        listing.update!(preapproval_id: preapproval_id, subscription_status: status)
+        Rails.logger.info("MercadoPago webhook: listing ##{listing.id} subscription #{status} (preapproval=#{preapproval_id})")
+      else
+        Rails.logger.info("MercadoPago webhook: preapproval #{preapproval_id} status=#{status} — no sync")
+      end
+    end
+
+    # topic=subscription_authorized_payment: cobro recurrente de una
+    # suscripción. Si el payment anidado está aprobado, extiende la vigencia
+    # de la publicación (BR-089).
+    def process_subscription_authorized_payment(authorized_payment_id)
+      invoice = mercadopago.fetch_authorized_payment(authorized_payment_id)
+      return unless invoice.is_a?(Hash)
+
+      preapproval_id = (invoice["preapproval_id"] || invoice[:preapproval_id]).to_s
+      payment = invoice["payment"] || invoice[:payment] || {}
+      payment_id = (payment["id"] || payment[:id]).to_s
+      payment_status = (payment["status"] || payment[:status]).to_s
+
+      if payment_id.blank?
+        Rails.logger.info("MercadoPago webhook: authorized_payment #{authorized_payment_id} without payment yet")
+        return
+      end
+
+      if payment_already_processed?(payment_id)
+        Rails.logger.info("MercadoPago webhook: payment_id #{payment_id} already processed")
+        return
+      end
+
+      listing = Listing.find_by(preapproval_id: preapproval_id)
+      unless listing
+        external_reference = (invoice["external_reference"] || invoice[:external_reference]).to_s
+        listing = Listing.find_by(id: external_reference.delete_prefix("listing-")) if external_reference.start_with?("listing-")
+      end
+
+      unless listing
+        Rails.logger.warn("MercadoPago webhook: no listing for authorized_payment #{authorized_payment_id} (preapproval=#{preapproval_id})")
+        return
+      end
+
+      case payment_status
+      when "approved"
+        listing.renew_from_subscription!(payment_id: payment_id)
+        Rails.logger.info("MercadoPago webhook: listing ##{listing.id} renewed until #{listing.published_until} (payment_id=#{payment_id})")
+      else
+        Rails.logger.info("MercadoPago webhook: authorized_payment #{authorized_payment_id} payment status=#{payment_status} for listing ##{listing.id} — no renewal")
       end
     end
 

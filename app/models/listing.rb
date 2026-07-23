@@ -2,6 +2,9 @@ class Listing < ApplicationRecord
   include Filterable
 
   PUBLICATION_STATUSES = %w[pending_payment published].freeze
+  # Estados de la suscripción de auto-renovación en MercadoPago (BR-088).
+  # pending: preapproval creada, esperando autorización del usuario en MP.
+  SUBSCRIPTION_STATUSES = %w[pending authorized paused cancelled].freeze
   PLATFORM_FEE_PERCENTAGE = 10
   PUBLICATION_PERIOD = 30.days
 
@@ -16,6 +19,8 @@ class Listing < ApplicationRecord
   validates :name, presence: true
   validates :publication_status, presence: true, inclusion: {in: PUBLICATION_STATUSES}
   validates :payment_id, uniqueness: true, allow_nil: true
+  validates :preapproval_id, uniqueness: true, allow_nil: true
+  validates :subscription_status, inclusion: {in: SUBSCRIPTION_STATUSES}, allow_nil: true
 
   scope :published, -> { where(publication_status: "published").where("published_until >= ?", Date.current) }
 
@@ -54,6 +59,33 @@ class Listing < ApplicationRecord
       payment_id: payment_id,
       paid_at: paid_at,
       published_until: paid_at.to_date + PUBLICATION_PERIOD
+    )
+    self
+  end
+
+  def subscription_active?
+    subscription_status == "authorized"
+  end
+
+  # Puede activar auto-renovación: pagable y sin suscripción vigente.
+  # Un intento abandonado (pending) puede reiniciarse con una nueva preapproval.
+  def subscribable?
+    payable? && !subscription_active?
+  end
+
+  # Renovación por cobro recurrente aprobado (BR-089). Idempotente por
+  # payment_id. Extiende 30 días desde el vencimiento vigente si la
+  # publicación está al día (el cobro llega antes de vencer), o desde la
+  # fecha del cobro si estaba vencida.
+  def renew_from_subscription!(payment_id:, paid_at: Time.current)
+    return self if self.payment_id == payment_id
+
+    base = published? ? published_until : paid_at.to_date
+    update!(
+      publication_status: "published",
+      payment_id: payment_id,
+      paid_at: paid_at,
+      published_until: base + PUBLICATION_PERIOD
     )
     self
   end

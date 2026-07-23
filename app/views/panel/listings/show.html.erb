@@ -15,12 +15,33 @@
   <div class="card bg-base-100 border border-base-content/5 mb-6 max-w-md">
     <div class="card-body">
       <h2 class="card-title"><%= I18n.t('panel.listings.publication.column') %></h2>
-      <div><%= render "publication_badge", listing: @listing %></div>
+      <div class="flex gap-2 items-center">
+        <%= render "publication_badge", listing: @listing %>
+        <% if @listing.subscription_active? %>
+          <span class="badge badge-info badge-sm"><%= I18n.t('panel.listing_subscriptions.badge_active') %></span>
+        <% end %>
+      </div>
+
       <% if @listing.payable? %>
         <p class="text-sm text-base-content/60"><%= I18n.t('panel.listings.publication.pay_description') %></p>
         <div class="card-actions justify-end mt-2">
           <%= link_to I18n.t("panel.listings.publication.#{@listing.publication_expired? ? 'renew_cta' : 'pay_cta'}"),
                 new_panel_listing_payment_path(listing_id: @listing.id), class: "btn btn-primary btn-sm" %>
+          <% if @listing.subscribable? %>
+            <%= link_to I18n.t('panel.listing_subscriptions.subscribe_cta'),
+                  new_panel_listing_subscription_path(listing_id: @listing.id), class: "btn btn-soft btn-secondary btn-sm" %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @listing.subscription_active? %>
+        <p class="text-sm text-base-content/60"><%= I18n.t('panel.listing_subscriptions.active_description') %></p>
+        <div class="card-actions justify-end mt-2">
+          <%= button_to I18n.t('panel.listing_subscriptions.cancel_cta'),
+                cancel_panel_listing_subscriptions_path(listing_id: @listing.id),
+                method: :delete,
+                class: "btn btn-soft btn-warning btn-sm",
+                data: { turbo_confirm: I18n.t('panel.listing_subscriptions.cancel_confirm') } %>
         </div>
       <% end %>
     </div>
