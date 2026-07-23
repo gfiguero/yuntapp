@@ -211,6 +211,8 @@ class DemoJuntaSeeder
       Residency.where(household_unit_id: hu_ids).delete_all
       Member.where(neighborhood_association_id: assoc.id).delete_all
       # IVR antes que FamilyGroup y OnboardingRequest: los referencia (family_group_id / onboarding_request_id).
+      # Las VI del flujo real de onboarding referencian su IVR: anular antes de borrar las IVR.
+      VerifiedIdentity.where(id: vi_ids).update_all(identity_verification_request_id: nil)
       IdentityVerificationRequest.where(id: ivr_ids).delete_all
       FamilyGroup.where(household_unit_id: hu_ids).delete_all
       ResidenceVerificationRequest.where(onboarding_request_id: onboarding_ids).delete_all
