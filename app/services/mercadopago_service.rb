@@ -83,7 +83,8 @@ class MercadopagoService
     ensure_access_token!
 
     payload = {
-      reason: I18n.t("payments.mercadopago.listing_subscription_reason", name: listing.name),
+      # MP limita reason a 60 caracteres (error 400 si se excede).
+      reason: I18n.t("payments.mercadopago.listing_subscription_reason", name: listing.name).truncate(60),
       external_reference: "listing-#{listing.id}",
       payer_email: payer_email,
       back_url: back_url,
