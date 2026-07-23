@@ -204,6 +204,10 @@ class DemoJuntaSeeder
       purge_attachments(VerifiedResidence.where(id: vres_ids))
       purge_attachments(VerifiedIdentity.where(id: vi_ids))
 
+      # Certificados y directiva antes que Members: los referencian (member_id).
+      purge_attachments(ResidenceCertificate.where(neighborhood_association_id: assoc.id))
+      ResidenceCertificate.where(neighborhood_association_id: assoc.id).delete_all
+      BoardMember.where(neighborhood_association_id: assoc.id).delete_all
       Residency.where(household_unit_id: hu_ids).delete_all
       Member.where(neighborhood_association_id: assoc.id).delete_all
       # IVR antes que FamilyGroup y OnboardingRequest: los referencia (family_group_id / onboarding_request_id).
@@ -216,6 +220,7 @@ class DemoJuntaSeeder
       HouseholdUnit.where(id: hu_ids).delete_all # referencia verified_residence: antes que VerifiedResidence
       VerifiedResidence.where(id: vres_ids).delete_all
       CertificatePricing.where(neighborhood_association_id: assoc.id).delete_all
+      ListingPricing.where(neighborhood_association_id: assoc.id).delete_all
       NeighborhoodDelegation.where(id: deleg_ids).delete_all
     end
 
