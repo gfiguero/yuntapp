@@ -282,6 +282,29 @@ module Webhooks
       assert_equal "MP-PAY-V2PREFIX", @certificate.payment_id
     end
 
+    test "processes panel-channel merchant order event name topic_merchant_order_wh" do
+      real_service = MercadopagoService.new
+      fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
+      fake.define_singleton_method(:fetch_merchant_order) do |_id|
+        {"payments" => [{"id" => "MP-PANEL-MO"}]}
+      end
+      fake.define_singleton_method(:fetch_payment) do |_id|
+        {"id" => "MP-PANEL-MO", "transaction_amount" => 1500, "status" => "approved",
+         "external_reference" => ResidenceCertificate.order(:id).last.id.to_s}
+      end
+
+      stub_class_method(MercadopagoService, :new, fake) do
+        post webhooks_mercadopago_url,
+          params: {type: "topic_merchant_order_wh", data: {id: "MO-1"}}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.paid?
+      assert_equal "MP-PANEL-MO", @certificate.payment_id
+    end
+
     # --- BR-090: validación de monto ---
 
     test "rejects payment with amount different from certificate amount (BR-090)" do

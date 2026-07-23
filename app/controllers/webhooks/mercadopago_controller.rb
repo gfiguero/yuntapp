@@ -41,7 +41,10 @@ module Webhooks
       case topic
       when "payment"
         process_payment_notification(data_id)
-      when "merchant_order"
+      when "merchant_order", "topic_merchant_order_wh"
+        # "topic_merchant_order_wh" es el nombre del evento de órdenes
+        # comerciales cuando la notificación viene del webhook configurado
+        # en el panel de MP (el canal legacy usa "merchant_order").
         process_merchant_order(data_id)
       when "subscription_preapproval"
         process_subscription_preapproval(data_id)
