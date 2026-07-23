@@ -28,6 +28,7 @@ module Webhooks
       # secundaria. Solo rechazamos si x-signature está presente pero es inválida.
       signature_present = request.headers["x-signature"].present?
       if signature_present && !valid_signature?(data_id)
+        log_signature_diagnostics(data_id)
         Rails.logger.warn("MercadoPago webhook: invalid signature for #{topic} (data_id=#{data_id})")
         head :unauthorized
         return
@@ -63,6 +64,36 @@ module Webhooks
 
     def mercadopago
       @mercadopago ||= MercadopagoService.new
+    end
+
+    # DIAGNÓSTICO TEMPORAL: ante firma inválida, loguea los componentes del
+    # manifest y prefijos de los hashes calculados con las variantes posibles
+    # de data_id, para identificar qué está firmando MP realmente. No expone
+    # la clave (solo prefijos de HMACs, que ya viajan en el request).
+    def log_signature_diagnostics(data_id)
+      secret = Rails.application.config.mercadopago[:webhook_secret]
+      parts = request.headers["x-signature"].to_s.split(",").map { |p| p.strip.split("=", 2) }.to_h
+      ts = parts["ts"]
+      received = (parts["v1"] || parts["v2"]).to_s
+      request_id = request.headers["x-request-id"]
+
+      candidates = {
+        "extracted" => data_id,
+        "query_data_id" => request.query_parameters["data.id"],
+        "query_id" => request.query_parameters["id"],
+        "resource_raw" => params[:resource]
+      }.compact
+
+      results = candidates.flat_map do |name, id_value|
+        [[nil, "#{name}/sin-reqid"], [request_id, "#{name}/con-reqid"]].filter_map do |rid, label|
+          next if rid.nil? && label.end_with?("con-reqid") && request_id.blank?
+          manifest = rid.present? ? "id:#{id_value};request-id:#{rid};ts:#{ts};" : "id:#{id_value};ts:#{ts};"
+          hash = OpenSSL::HMAC.hexdigest("sha256", secret.to_s, manifest)
+          "#{label}=#{hash[0..7]}#{"✓MATCH" if hash == received}"
+        end
+      end
+
+      Rails.logger.warn("MercadoPago webhook DIAG: ts=#{ts} reqid=#{request_id.present?} received=#{received[0..7]} candidates: #{results.join(" | ")}")
     end
 
     def valid_signature?(data_id)
