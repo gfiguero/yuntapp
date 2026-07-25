@@ -70,6 +70,15 @@ module Admin
         # Link user to verified identity
         user.update!(verified_identity: verified_identity)
 
+        # 1b. BR-029/BR-059/BR-069 (ADR-006): si este RUN ya tenía una membresía
+        # aprobada (en esta u otra junta), se desactiva al aprobar la nueva. Debe ir
+        # ANTES de crear la nueva Residency/Member: deactivate! cascadea a los
+        # dependientes del socio anterior (BR-099) e invalida sus certificados (BR-097).
+        IdentityTransferService.deactivate_prior_memberships!(
+          verified_identity,
+          reason: I18n.t("members.deactivation.identity_transfer")
+        )
+
         # 2. Approve residence request and create VerifiedResidence
         residence_req.update!(status: "approved")
 

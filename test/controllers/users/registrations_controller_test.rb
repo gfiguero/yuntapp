@@ -46,6 +46,36 @@ module Users
       assert_not_nil user.confirmation_sent_at
     end
 
+    # BR-093: el email es inmutable después del registro.
+    test "update descarta el cambio de email aunque llegue en los params" do
+      user = users(:karass)
+      sign_in user
+
+      put user_registration_url, params: {
+        user: {email: "otro-correo@yuntapp.test", current_password: "honorandduty"}
+      }
+
+      user.reload
+      assert_equal "karass@daelaam.io", user.email
+      assert_nil user.unconfirmed_email, "no debe quedar reconfirmación pendiente hacia el email nuevo"
+    end
+
+    test "update sí permite cambiar la contraseña con la contraseña actual" do
+      user = users(:karass)
+      sign_in user
+
+      put user_registration_url, params: {
+        user: {
+          password: "nueva-clave-segura-1",
+          password_confirmation: "nueva-clave-segura-1",
+          current_password: "honorandduty"
+        }
+      }
+
+      assert user.reload.valid_password?("nueva-clave-segura-1"),
+        "el cambio de contraseña debe seguir funcionando (solo el email está bloqueado)"
+    end
+
     test "sign-up redirects with a notice about pending confirmation" do
       post user_registration_url, params: {
         user: {

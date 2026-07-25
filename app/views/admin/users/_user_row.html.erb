@@ -1,5 +1,8 @@
-<tr class="hover:bg-base-300">
-  <td><%= user.email %></td>
+<tr class="hover:bg-base-300 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= url_for([:admin, user]) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to user.email, [:admin, user], class: "link link-hover font-medium" %></td>
   <td><%= user.first_name %></td>
   <td><%= user.last_name %></td>
   <td>
@@ -10,7 +13,6 @@
     <% end %>
   </td>
   <td>
-    <%= icon_link_to 'show', [:admin, user], I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
     <%= icon_link_to 'edit', edit_admin_user_path(user), I18n.t('actions.edit'), class: "btn btn-sm btn-soft btn-success" %>
     <%= icon_link_to 'delete', delete_admin_user_path(user), I18n.t('actions.delete'), class: "btn btn-sm btn-soft btn-warning" %>
   </td>

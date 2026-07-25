@@ -324,6 +324,75 @@ module Admin
       assert_equal existing_identity, @karax.verified_identity
     end
 
+    # --- Identity transfer on duplicate RUN (BR-029/BR-059/BR-069, ADR-006) ---
+
+    test "approve_step3 deactivates a prior active membership with the same RUN" do
+      sign_in @admin
+
+      # Identidad preexistente con el mismo RUN y una membresía aprobada en OTRA junta.
+      existing_identity = VerifiedIdentity.create!(
+        run: @identity_request.run,
+        first_name: "Karax",
+        last_name: "Khalai",
+        phone: "+56977778888",
+        email: "karax@example.com"
+      )
+      prior_member = Member.create!(
+        verified_identity: existing_identity,
+        neighborhood_association: neighborhood_associations(:association_0),
+        status: "approved",
+        approved_at: Time.current
+      )
+
+      patch review_step3_admin_onboarding_request_url(@onboarding_request)
+
+      prior_member.reload
+      assert prior_member.inactive?, "el Member anterior del mismo RUN debe quedar inactive"
+      assert prior_member.deactivation_reason.present?
+
+      # La nueva membresía en la junta del admin queda aprobada
+      new_member = Member.where(verified_identity: existing_identity, status: "approved").last
+      assert_not_nil new_member
+      assert_equal @onboarding_request.neighborhood_association, new_member.neighborhood_association
+    end
+
+    test "approve_step3 cascades deactivation to the prior household_admin's dependents" do
+      sign_in @admin
+
+      # La identidad preexistente (mismo RUN) es household_admin de un grupo con un dependiente.
+      existing_identity = VerifiedIdentity.create!(
+        run: @identity_request.run,
+        first_name: "Karax",
+        last_name: "Khalai",
+        phone: "+56977778888",
+        email: "karax@example.com"
+      )
+      hu = household_units(:selendis_household)
+      family_group = family_groups(:selendis_family_group)
+      Residency.create!(
+        verified_identity: existing_identity,
+        verified_residence: hu.verified_residence,
+        household_unit: hu,
+        family_group: family_group,
+        household_admin: true,
+        status: "approved"
+      )
+      admin_member = Member.create!(
+        verified_identity: existing_identity,
+        neighborhood_association: neighborhood_associations(:manios_de_buin),
+        status: "approved",
+        approved_at: Time.current
+      )
+      dependent_member = members(:dependent_member) # vorazun, mismo family_group, manios_de_buin
+
+      patch review_step3_admin_onboarding_request_url(@onboarding_request)
+
+      admin_member.reload
+      dependent_member.reload
+      assert admin_member.inactive?, "el household_admin anterior debe quedar inactive"
+      assert dependent_member.inactive?, "sus dependientes deben quedar inactive en cascada (BR-099)"
+    end
+
     # --- Reject ---
 
     test "admin can reject request with reason" do

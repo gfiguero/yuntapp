@@ -1,8 +1,8 @@
-<tr>
-  <td><%= verified_identity.id %></td>
+<tr class="hover:bg-base-300 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= admin_verification_path(verified_identity) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to verified_identity.id, admin_verification_path(verified_identity), class: "link link-hover font-medium" %></td>
   <td><%= verified_identity.name %></td>
   <td><%= verified_identity.run %></td>
-  <td>
-    <%= link_to I18n.t('actions.show'), admin_verification_path(verified_identity), class: "btn btn-sm btn-soft" %>
-  </td>
 </tr>

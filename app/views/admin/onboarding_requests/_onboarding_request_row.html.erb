@@ -1,9 +1,9 @@
-<tr class="hover:bg-base-300">
-  <td><%= onboarding_request.id %></td>
+<tr class="hover:bg-base-300 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= admin_onboarding_request_path(onboarding_request) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to onboarding_request.id, admin_onboarding_request_path(onboarding_request), class: "link link-hover font-medium" %></td>
   <td><%= onboarding_request.user.name %></td>
   <td><%= status_badge(onboarding_request.status) %></td>
   <td><%= l(onboarding_request.created_at, format: :short) %></td>
-  <td>
-    <%= icon_link_to 'show', admin_onboarding_request_path(onboarding_request), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
-  </td>
 </tr>

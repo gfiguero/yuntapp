@@ -124,6 +124,53 @@ module Admin
       assert_redirected_to admin_dependent_reviews_url
     end
 
+    # --- Transición household_admin → dependiente (BR-095/BR-096/BR-097, ADR-006) ---
+
+    test "approve deactivates the prior household_admin membership with the same RUN and cascades" do
+      sign_in @admin
+
+      # El solicitante entrante es un household_admin ya activo (selendis) que gestiona a
+      # un dependiente (vorazun), y ahora se registra como dependiente en OTRO domicilio.
+      selendis_identity = verified_identities(:selendis_persona)
+      prior_admin_member = members(:selendis_member)
+      cascaded_dependent = members(:dependent_member)
+      assert prior_admin_member.approved?
+      assert cascaded_dependent.approved?
+
+      # Domicilio destino nuevo (distinto al de selendis, para no chocar en residencies).
+      src_hu = household_units(:selendis_household)
+      target_vr = VerifiedResidence.create!(neighborhood_association: @neighborhood_association)
+      target_hu = HouseholdUnit.create!(
+        neighborhood_delegation: src_hu.neighborhood_delegation,
+        commune: src_hu.commune,
+        number: "999",
+        verified_residence: target_vr
+      )
+      target_fg = FamilyGroup.create!(household_unit: target_hu)
+      @dependent_request.update!(run: selendis_identity.run, family_group: target_fg)
+
+      patch approve_admin_dependent_review_url(@dependent_request)
+
+      prior_admin_member.reload
+      cascaded_dependent.reload
+      assert prior_admin_member.inactive?, "el household_admin anterior debe quedar inactive (BR-095)"
+      assert cascaded_dependent.inactive?, "sus dependientes deben quedar inactive en cascada (BR-096)"
+      assert prior_admin_member.deactivation_reason.present?
+
+      # La nueva membresía dependiente queda aprobada
+      new_member = Member.where(verified_identity: selendis_identity, dependent: true, status: "approved").last
+      assert_not_nil new_member
+    end
+
+    test "approve does not deactivate anything when the RUN has no prior membership" do
+      sign_in @admin
+
+      # @dependent_request usa un RUN nuevo (77777777-7) sin membresías previas.
+      assert_no_difference -> { Member.where(status: "inactive").count } do
+        patch approve_admin_dependent_review_url(@dependent_request)
+      end
+    end
+
     test "approve fails if dependent_request is not pending" do
       sign_in @admin
       @dependent_request.update!(status: "approved")

@@ -22,22 +22,33 @@
             <th><%= I18n.t('activerecord.attributes.residence_certificate.folio') %></th>
             <th><%= I18n.t('activerecord.attributes.residence_certificate.member') %></th>
             <th><%= I18n.t('activerecord.attributes.residence_certificate.status') %></th>
+            <th><%= I18n.t('activerecord.attributes.residence_certificate.validity') %></th>
             <th><%= I18n.t('activerecord.attributes.residence_certificate.purpose') %></th>
             <th><%= I18n.t('activerecord.attributes.residence_certificate.created_at') %></th>
-            <th class="w-20"><%= I18n.t('shared.table.actions') %></th>
           </tr>
         </thead>
         <tbody>
         <% @residence_certificates.each do |certificate| %>
-          <tr class="hover:bg-base-300">
-            <td><%= certificate.folio || "—" %></td>
+          <tr class="hover:bg-base-300 cursor-pointer"
+              data-controller="row-link"
+              data-row-link-url-value="<%= panel_residence_certificate_path(certificate) %>"
+              data-action="click->row-link#visit">
+            <td><%= link_to certificate.folio || "—", panel_residence_certificate_path(certificate), class: "link link-hover font-medium" %></td>
             <td><%= certificate.member.name %></td>
             <td><%= I18n.t("activerecord.attributes.residence_certificate/status.#{certificate.status}") %></td>
+            <td>
+              <% if certificate.issued? %>
+                <% if certificate.expired? %>
+                  <span class="badge badge-soft badge-error"><%= I18n.t('activerecord.attributes.residence_certificate/validity.expired') %></span>
+                <% else %>
+                  <span class="badge badge-soft badge-success"><%= I18n.t('activerecord.attributes.residence_certificate/validity.valid') %></span>
+                <% end %>
+              <% else %>
+                —
+              <% end %>
+            </td>
             <td><%= truncate(certificate.purpose, length: 50) %></td>
             <td><%= l(certificate.created_at.to_date) %></td>
-            <td>
-              <%= icon_link_to 'show', panel_residence_certificate_path(certificate), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
-            </td>
           </tr>
         <% end %>
         </tbody>

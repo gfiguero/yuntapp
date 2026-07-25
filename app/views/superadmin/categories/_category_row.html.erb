@@ -1,9 +1,9 @@
-<tr class="hover:bg-base-200/50">
-  <td><%= category.name %></td>
+<tr class="hover:bg-base-200/50 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= url_for([:superadmin, category]) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to category.name, [:superadmin, category], class: "link link-hover font-medium" %></td>
   <td>
-    <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), [:superadmin, category], class: "btn btn-sm btn-soft btn-info", aria: { label: "#{I18n.t('actions.show')} #{category.name}" } %>
-    </div>
     <div class="tooltip" data-tip="<%= I18n.t('actions.edit') %>">
       <%= link_to icon('edit'), edit_superadmin_category_path(category), class: "btn btn-sm btn-soft btn-success", aria: { label: "#{I18n.t('actions.edit')} #{category.name}" } %>
     </div>

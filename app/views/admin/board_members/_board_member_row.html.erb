@@ -1,11 +1,11 @@
-<tr class="hover:bg-base-300">
-  <td><%= board_member.member.name %></td>
+<tr class="hover:bg-base-300 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= url_for([:admin, board_member]) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to board_member.member.name, [:admin, board_member], class: "link link-hover font-medium" %></td>
   <td><%= board_member.position.capitalize %></td>
   <td><%= board_member.active? ? "Sí" : "No" %></td>
   <td>
-    <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), [:admin, board_member], class: "btn btn-sm btn-soft btn-info" %>
-    </div>
     <%= icon_link_to 'edit', edit_admin_board_member_path(board_member), I18n.t('actions.edit'), class: "btn btn-sm btn-soft btn-success" %>
     <%= icon_link_to 'delete', delete_admin_board_member_path(board_member), I18n.t('actions.delete'), class: "btn btn-sm btn-soft btn-warning" %>
   </td>

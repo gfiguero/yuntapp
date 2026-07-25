@@ -16,7 +16,7 @@ module Admin
         validation_token: SecureRandom.uuid,
         validation_code: "ADMINTST",
         issue_date: Date.current,
-        expiration_date: Date.current + 6.months,
+        expiration_date: Date.current + 30.days,
         issued_at: Time.current
       )
     end

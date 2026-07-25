@@ -8,7 +8,7 @@
 
 <div class="w-full">
   <h1 class="font-bold text-4xl my-4">Mi Cuenta</h1>
-  <p class="mb-4 text-base-content/70">Administra tus credenciales de acceso: correo, contraseña y eliminación de la cuenta.</p>
+  <p class="mb-4 text-base-content/70">Administra tus credenciales de acceso: contraseña y eliminación de la cuenta.</p>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
     <div class="card bg-base-100 shadow-xl">
@@ -18,16 +18,13 @@
         <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "grid gap-4" }) do |f| %>
           <%= render "users/shared/error_messages", resource: resource %>
 
-          <%= f.label :email, "Email", class: "floating-label" do %>
-            <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "input w-full", placeholder: "Email" %>
-            <span>Email</span>
-          <% end %>
-
-          <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-            <div class="alert alert-warning">
-              <span>Esperando confirmación para: <%= resource.unconfirmed_email %></span>
-            </div>
-          <% end %>
+          <div>
+            <%= f.label :email, "Email", class: "floating-label" do %>
+              <%= f.email_field :email, disabled: true, class: "input w-full" %>
+              <span>Email</span>
+            <% end %>
+            <p class="text-xs text-base-content/50 mt-1">El correo electrónico no puede modificarse.</p>
+          </div>
 
           <div>
             <%= f.label :password, "Nueva contraseña", class: "floating-label" do %>

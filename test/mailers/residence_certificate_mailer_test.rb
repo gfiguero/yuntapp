@@ -12,7 +12,7 @@ class ResidenceCertificateMailerTest < ActionMailer::TestCase
       validation_token: "uuid-mail-test",
       validation_code: "MAILCODE",
       issue_date: Date.current,
-      expiration_date: Date.current + 6.months,
+      expiration_date: Date.current + 30.days,
       issued_at: Time.current
     )
   end
@@ -60,7 +60,7 @@ class ResidenceCertificateMailerTest < ActionMailer::TestCase
       validation_token: "uuid-orphan",
       validation_code: "ORPHAN12",
       issue_date: Date.current,
-      expiration_date: Date.current + 6.months,
+      expiration_date: Date.current + 30.days,
       issued_at: Time.current
     )
 
@@ -93,7 +93,7 @@ class ResidenceCertificateMailerTest < ActionMailer::TestCase
       validation_token: "uuid-dep",
       validation_code: "DEPCODE1",
       issue_date: Date.current,
-      expiration_date: Date.current + 6.months,
+      expiration_date: Date.current + 30.days,
       issued_at: Time.current
     )
 

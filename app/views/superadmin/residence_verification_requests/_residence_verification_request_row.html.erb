@@ -1,14 +1,14 @@
-<tr class="hover:bg-base-200/50">
-  <td><%= residence_verification_request.id %></td>
+<tr class="hover:bg-base-200/50 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= url_for([:superadmin, residence_verification_request]) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to residence_verification_request.id, [:superadmin, residence_verification_request], class: "link link-hover font-medium" %></td>
   <td><%= residence_verification_request.user&.email %></td>
   <td><%= residence_verification_request.neighborhood_delegation&.name || residence_verification_request.street_name %></td>
   <td><%= residence_verification_request.commune&.name %></td>
   <td><%= status_badge(residence_verification_request.status) %></td>
   <td><%= l(residence_verification_request.created_at, format: :short) if residence_verification_request.created_at %></td>
   <td>
-    <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), [:superadmin, residence_verification_request], class: "btn btn-sm btn-soft btn-info", aria: { label: "#{I18n.t('actions.show')} solicitud ##{residence_verification_request.id}" } %>
-    </div>
     <div class="tooltip" data-tip="<%= I18n.t('actions.edit') %>">
       <%= link_to icon('edit'), edit_superadmin_residence_verification_request_path(residence_verification_request), class: "btn btn-sm btn-soft btn-success", aria: { label: "#{I18n.t('actions.edit')} solicitud ##{residence_verification_request.id}" } %>
     </div>

@@ -12,7 +12,7 @@ class CertificatePdfServiceTest < ActiveSupport::TestCase
       validation_token: "uuid-test-token",
       validation_code: "ABCD1234",
       issue_date: Date.current,
-      expiration_date: Date.current + 6.months,
+      expiration_date: Date.current + 30.days,
       issued_at: Time.current
     )
   end

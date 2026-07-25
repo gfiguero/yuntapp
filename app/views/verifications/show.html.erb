@@ -1,7 +1,13 @@
 <%
-  status_key = @certificate.expired? ? "expired" : "valid"
-  badge_class = @certificate.expired? ? "badge-warning" : "badge-success"
-  alert_class = @certificate.expired? ? "alert-warning" : "alert-success"
+  # BR-091: la desactivación del titular invalida el certificado, con
+  # precedencia sobre el vencimiento. Siempre responde 200 (BR-009/BR-080).
+  if @certificate.holder_deactivated?
+    status_key, badge_class, alert_class = "revoked", "badge-error", "alert-error"
+  elsif @certificate.expired?
+    status_key, badge_class, alert_class = "expired", "badge-warning", "alert-warning"
+  else
+    status_key, badge_class, alert_class = "valid", "badge-success", "alert-success"
+  end
 %>
 
 <div class="max-w-2xl mx-auto">

@@ -20,13 +20,15 @@
             <th><%= I18n.t('admin.dependent_reviews.index.requested_by') %></th>
             <th><%= I18n.t('activerecord.attributes.identity_verification_request.status') %></th>
             <th><%= I18n.t('activerecord.attributes.identity_verification_request.created_at') %></th>
-            <th class="w-20"><%= I18n.t('shared.table.actions') %></th>
           </tr>
         </thead>
         <tbody>
         <% @dependent_requests.each do |request| %>
-          <tr class="hover:bg-base-300">
-            <td><%= request.full_name %></td>
+          <tr class="hover:bg-base-300 cursor-pointer"
+              data-controller="row-link"
+              data-row-link-url-value="<%= admin_dependent_review_path(request) %>"
+              data-action="click->row-link#visit">
+            <td><%= link_to request.full_name, admin_dependent_review_path(request), class: "link link-hover font-medium" %></td>
             <td><%= request.run %></td>
             <td><%= request.requested_by&.name %></td>
             <td>
@@ -35,9 +37,6 @@
               </span>
             </td>
             <td><%= l(request.created_at.to_date) %></td>
-            <td>
-              <%= icon_link_to 'show', admin_dependent_review_path(request), I18n.t('actions.show'), class: "btn btn-sm btn-soft btn-info" %>
-            </td>
           </tr>
         <% end %>
         </tbody>

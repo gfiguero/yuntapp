@@ -4,7 +4,8 @@ class ResidenceCertificate < ApplicationRecord
   STATUSES = %w[pending_payment paid issued].freeze
   MINIMUM_AMOUNT = 1000
   PLATFORM_FEE_PERCENTAGE = 10
-  VALIDITY_PERIOD = 6.months
+  # BR-023: por ley, los certificados emitidos por juntas de vecinos duran 30 días.
+  VALIDITY_PERIOD = 30.days
   VALIDATION_CODE_LENGTH = 8
   VALIDATION_CODE_ALPHABET = ("A".."Z").to_a - %w[O I] + ("2".."9").to_a # sin 0/O/1/I para evitar confusión visual (BR-074)
 
@@ -63,6 +64,19 @@ class ResidenceCertificate < ApplicationRecord
 
   def expired?
     expiration_date.present? && expiration_date < Date.current
+  end
+
+  # BR-091: la desactivación del socio (BR-036) invalida sus certificados
+  # mientras permanezca inactivo — no se pueden descargar y la verificación
+  # pública los muestra como no válidos.
+  def holder_deactivated?
+    member.inactive?
+  end
+
+  # BR-091/BR-092: el PDF solo puede descargarse si el certificado está
+  # emitido, vigente y su titular sigue activo.
+  def downloadable?
+    issued? && !expired? && !holder_deactivated?
   end
 
   # RUN enmascarado para verificación pública (BR-078).

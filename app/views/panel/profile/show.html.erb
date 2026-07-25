@@ -20,32 +20,27 @@
         Si necesitas actualizarlos, deberás realizar un nuevo proceso de verificación.
       </p>
 
-      <%= form_with(model: [:panel, @user], url: panel_profile_path, method: :patch, class: "grid gap-4") do |form| %>
-
-        <% if @user.errors.any? %>
-          <div class="alert alert-error">
-            <ul>
-              <% @user.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
+      <dl class="grid gap-4">
         <% if @user.verified_identity %>
-          <div class="form-control">
-            <label class="label">Nombres</label>
-            <input type="text" class="input input-bordered w-full" value="<%= @user.verified_identity.first_name %>" disabled autocomplete="off">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <dt class="text-xs uppercase text-base-content/60">Nombres</dt>
+              <dd class="font-semibold"><%= @user.verified_identity.first_name %></dd>
+            </div>
+            <div>
+              <dt class="text-xs uppercase text-base-content/60">Apellidos</dt>
+              <dd class="font-semibold"><%= @user.verified_identity.last_name %></dd>
+            </div>
           </div>
-
-          <div class="form-control">
-            <label class="label">Apellidos</label>
-            <input type="text" class="input input-bordered w-full" value="<%= @user.verified_identity.last_name %>" disabled autocomplete="off">
-          </div>
-
-          <div class="form-control">
-            <label class="label">RUT</label>
-            <input type="text" class="input input-bordered w-full" value="<%= @user.verified_identity.run %>" disabled autocomplete="off">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <dt class="text-xs uppercase text-base-content/60">RUT</dt>
+              <dd class="font-mono"><%= @user.verified_identity.run %></dd>
+            </div>
+            <div>
+              <dt class="text-xs uppercase text-base-content/60">Teléfono</dt>
+              <dd><%= @user.verified_identity.phone.presence || "—" %></dd>
+            </div>
           </div>
         <% else %>
           <div class="alert alert-info">
@@ -54,28 +49,20 @@
           </div>
         <% end %>
 
-        <div class="form-control">
-          <%= form.label :email, "Correo Electrónico", class: "label" %>
-          <%= form.email_field :email, class: "input input-bordered w-full", disabled: true %>
-          <span class="label-text-alt mt-1 text-info">Para cambiar tu correo, contacta a soporte.</span>
+        <div>
+          <dt class="text-xs uppercase text-base-content/60">Correo Electrónico</dt>
+          <dd><%= @user.email %></dd>
+          <p class="text-xs text-base-content/50 mt-1">El correo electrónico no puede modificarse.</p>
         </div>
+      </dl>
 
-        <div class="divider">Seguridad</div>
+      <div class="divider">Seguridad</div>
 
-        <div class="form-control">
-          <%= form.label :password, "Nueva Contraseña (opcional)", class: "label" %>
-          <%= form.password_field :password, class: "input input-bordered w-full", placeholder: "Dejar en blanco para mantener la actual" %>
-        </div>
-
-        <div class="form-control">
-          <%= form.label :password_confirmation, "Confirmar Nueva Contraseña", class: "label" %>
-          <%= form.password_field :password_confirmation, class: "input input-bordered w-full" %>
-        </div>
-
-        <div class="card-actions justify-end mt-4">
-          <%= form.submit "Guardar Cambios", class: "btn btn-primary" %>
-        </div>
-      <% end %>
+      <p class="text-sm text-base-content/70">
+        El cambio de contraseña se realiza desde
+        <%= link_to "Mi Cuenta", edit_user_registration_path, class: "link link-primary" %>,
+        donde se solicita tu contraseña actual.
+      </p>
     </div>
   </div>
 

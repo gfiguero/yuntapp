@@ -114,7 +114,7 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
       purpose: "trámite bancario",
       status: "paid"
     )
-    assert cert.update(status: "issued", issue_date: Date.current, expiration_date: 6.months.from_now.to_date)
+    assert cert.update(status: "issued", issue_date: Date.current, expiration_date: 30.days.from_now.to_date)
   end
 
   test "pending_payment certificate can be modified" do
@@ -367,7 +367,7 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_no_match(/[OI01]/, cert.validation_code, "el código no debe contener 0/O/1/I (BR-074)")
     assert_not_nil cert.issued_at
     assert_equal Date.current, cert.issue_date
-    assert_equal Date.current + 6.months, cert.expiration_date
+    assert_equal Date.current + 30.days, cert.expiration_date
   end
 
   test "issue! is idempotent when already issued (BR-076)" do
@@ -467,7 +467,7 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
 
   # --- Public verification (BR-009, BR-078, BR-079, BR-080, BR-081) ---
 
-  def issued_certificate(token: SecureRandom.uuid, code: SecureRandom.alphanumeric(8).upcase, expiration: Date.current + 6.months)
+  def issued_certificate(token: SecureRandom.uuid, code: SecureRandom.alphanumeric(8).upcase, expiration: Date.current + 30.days)
     ResidenceCertificate.create!(
       member: @member,
       household_unit: @household_unit,
@@ -584,5 +584,42 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     found = ResidenceCertificate.find_for_public_verification(cert.validation_token)
     assert_equal cert, found
     assert found.expired?
+  end
+
+  # --- BR-091/BR-092: holder_deactivated? y downloadable? ---
+
+  test "holder_deactivated? reflects the member status" do
+    cert = issued_certificate
+    assert_not cert.holder_deactivated?
+
+    @member.deactivate!(reason: "ya no reside en el domicilio")
+    assert cert.reload.holder_deactivated?
+  end
+
+  test "downloadable? is true only for vigente cert with active holder" do
+    cert = issued_certificate
+    assert cert.downloadable?
+  end
+
+  test "downloadable? is false for expired cert (BR-092)" do
+    cert = issued_certificate(expiration: 1.month.ago)
+    assert_not cert.downloadable?
+  end
+
+  test "downloadable? is false when holder was deactivated (BR-091)" do
+    cert = issued_certificate
+    @member.deactivate!(reason: "fraude detectado")
+    assert_not cert.reload.downloadable?
+  end
+
+  test "downloadable? is false for non-issued certificates" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "test",
+      status: "pending_payment"
+    )
+    assert_not cert.downloadable?
   end
 end

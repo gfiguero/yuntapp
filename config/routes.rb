@@ -61,7 +61,7 @@ Rails.application.routes.draw do
 
   namespace :panel do
     root to: "dashboard#index"
-    resource :profile, only: [:show, :update], controller: "profile"
+    resource :profile, only: [:show], controller: "profile"
     resource :neighborhood_association, only: [:show], controller: "neighborhood_association"
     resources :listings do
       collection do
@@ -71,7 +71,11 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :residence_certificates, only: [:index, :show, :new, :create]
+    resources :residence_certificates, only: [:index, :show, :new, :create] do
+      member do
+        get :download
+      end
+    end
     resources :dependents, only: [:index, :new, :create]
     resources :payments, only: [:new] do
       collection do

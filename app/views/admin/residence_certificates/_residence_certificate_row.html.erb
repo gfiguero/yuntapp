@@ -1,11 +1,20 @@
-<tr class="hover:bg-base-300">
-  <td><%= residence_certificate.folio || "—" %></td>
+<tr class="hover:bg-base-300 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= url_for([:admin, residence_certificate]) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to residence_certificate.folio || "—", [:admin, residence_certificate], class: "link link-hover font-medium" %></td>
   <td><%= residence_certificate.member.name %></td>
   <td><%= I18n.t("activerecord.attributes.residence_certificate/status.#{residence_certificate.status}") %></td>
-  <td><%= l(residence_certificate.created_at.to_date) %></td>
   <td>
-    <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), [:admin, residence_certificate], class: "btn btn-sm btn-soft btn-info" %>
-    </div>
+    <% if residence_certificate.issued? %>
+      <% if residence_certificate.expired? %>
+        <span class="badge badge-soft badge-error"><%= I18n.t('activerecord.attributes.residence_certificate/validity.expired') %></span>
+      <% else %>
+        <span class="badge badge-soft badge-success"><%= I18n.t('activerecord.attributes.residence_certificate/validity.valid') %></span>
+      <% end %>
+    <% else %>
+      —
+    <% end %>
   </td>
+  <td><%= l(residence_certificate.created_at.to_date) %></td>
 </tr>

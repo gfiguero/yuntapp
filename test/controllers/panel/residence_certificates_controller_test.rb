@@ -128,7 +128,7 @@ module Panel
         validation_token: "uuid-show-test",
         validation_code: "SHOWCODE",
         issue_date: Date.current,
-        expiration_date: Date.current + 6.months,
+        expiration_date: Date.current + 30.days,
         issued_at: Time.current
       )
       cert.pdf_document.attach(
@@ -141,6 +141,77 @@ module Panel
       assert_response :success
       assert_match I18n.t("panel.residence_certificates.show.download_pdf"), @response.body
       assert_match "SHOWCODE", @response.body
+    end
+
+    # --- BR-091/BR-092: bloqueo por desactivación y vencimiento ---
+
+    test "deactivated member cannot request a new certificate" do
+      sign_in @household_admin
+      @member.deactivate!(reason: "ya no reside en el domicilio")
+
+      get new_panel_residence_certificate_url
+      assert_redirected_to panel_residence_certificates_url
+
+      assert_no_difference -> { ResidenceCertificate.count } do
+        post panel_residence_certificates_url, params: {
+          residence_certificate: {member_id: @residency.id, purpose: "test"}
+        }
+      end
+      assert_redirected_to panel_residence_certificates_url
+    end
+
+    test "download redirects to stored PDF for a vigente certificate" do
+      sign_in @household_admin
+      cert = issued_cert
+      attach_pdf(cert)
+
+      get download_panel_residence_certificate_url(cert)
+      assert_response :redirect
+      assert_match "/rails/active_storage/", @response.redirect_url
+    end
+
+    test "download is blocked for an expired certificate" do
+      sign_in @household_admin
+      cert = issued_cert(expiration: Date.current - 1.day)
+      attach_pdf(cert)
+
+      get download_panel_residence_certificate_url(cert)
+      assert_redirected_to panel_residence_certificate_url(cert)
+      assert_equal I18n.t("panel.residence_certificates.flash.not_downloadable"), flash[:alert]
+    end
+
+    test "download is blocked when the holder was deactivated" do
+      sign_in @household_admin
+      cert = issued_cert
+      attach_pdf(cert)
+      @member.deactivate!(reason: "fraude detectado")
+
+      get download_panel_residence_certificate_url(cert)
+      assert_redirected_to panel_residence_certificate_url(cert)
+      assert_equal I18n.t("panel.residence_certificates.flash.not_downloadable"), flash[:alert]
+    end
+
+    test "show on expired cert shows notice instead of download link" do
+      sign_in @household_admin
+      cert = issued_cert(expiration: Date.current - 1.day)
+      attach_pdf(cert)
+
+      get panel_residence_certificate_url(cert)
+      assert_response :success
+      assert_match I18n.t("panel.residence_certificates.show.expired_notice"), @response.body
+      assert_no_match I18n.t("panel.residence_certificates.show.download_pdf"), @response.body
+    end
+
+    test "show on cert of deactivated holder shows notice instead of download link" do
+      sign_in @household_admin
+      cert = issued_cert
+      attach_pdf(cert)
+      @member.deactivate!(reason: "fraude detectado")
+
+      get panel_residence_certificate_url(cert)
+      assert_response :success
+      assert_match I18n.t("panel.residence_certificates.show.holder_deactivated_notice"), @response.body
+      assert_no_match I18n.t("panel.residence_certificates.show.download_pdf"), @response.body
     end
 
     test "show on paid cert (awaiting issuance) shows processing message" do
@@ -160,6 +231,32 @@ module Panel
       get panel_residence_certificate_url(cert)
       assert_response :success
       assert_match I18n.t("panel.residence_certificates.show.processing"), @response.body
+    end
+
+    private
+
+    def issued_cert(expiration: Date.current + 30.days)
+      ResidenceCertificate.create!(
+        member: @member,
+        household_unit: household_units(:selendis_household),
+        neighborhood_association: @association,
+        purpose: "trámite bancario",
+        status: "issued",
+        folio: "CR-1-#{rand(1_000_000)}",
+        validation_token: SecureRandom.uuid,
+        validation_code: SecureRandom.alphanumeric(8).upcase,
+        issue_date: Date.current,
+        expiration_date: expiration,
+        issued_at: Time.current
+      )
+    end
+
+    def attach_pdf(cert)
+      cert.pdf_document.attach(
+        io: StringIO.new("%PDF-1.4 fake content"),
+        filename: "test.pdf",
+        content_type: "application/pdf"
+      )
     end
   end
 end

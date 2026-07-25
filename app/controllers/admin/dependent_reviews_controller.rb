@@ -34,6 +34,16 @@ module Admin
           verified_identity.identity_document.attach(@dependent_request.identity_documents.first.blob)
         end
 
+        # BR-095/BR-096/BR-097 (ADR-006): si el RUN del dependiente ya pertenecía a un
+        # socio activo (típicamente un household_admin que transiciona a dependiente), se
+        # desactiva su membresía anterior ANTES de crear la nueva Residency dependiente.
+        # deactivate! cascadea a los dependientes que ese socio gestionaba (BR-096) e
+        # invalida sus certificados (BR-097).
+        IdentityTransferService.deactivate_prior_memberships!(
+          verified_identity,
+          reason: I18n.t("members.deactivation.became_dependent")
+        )
+
         family_group = @dependent_request.family_group
         household_unit = family_group.household_unit
         verified_residence = household_unit.verified_residence

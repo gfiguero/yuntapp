@@ -8,7 +8,7 @@ class VerificationsControllerTest < ActionDispatch::IntegrationTest
     @association = neighborhood_associations(:manios_de_buin)
   end
 
-  def issued_cert(token: SecureRandom.uuid, code: SecureRandom.alphanumeric(8).upcase, expiration: Date.current + 6.months)
+  def issued_cert(token: SecureRandom.uuid, code: SecureRandom.alphanumeric(8).upcase, expiration: Date.current + 30.days)
     ResidenceCertificate.create!(
       member: @member,
       household_unit: @household_unit,
@@ -101,6 +101,28 @@ class VerificationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match I18n.t("verifications.show.status.expired_badge"), @response.body
     assert_no_match(/#{I18n.t("verifications.show.status.valid_badge")}/, @response.body)
+  end
+
+  # --- Deactivated holder (BR-091) ---
+
+  test "show returns 200 with revoked badge when holder was deactivated" do
+    cert = issued_cert
+    @member.deactivate!(reason: "ya no reside en el domicilio")
+
+    get verification_url(identifier: cert.validation_token)
+    assert_response :success
+    assert_match I18n.t("verifications.show.status.revoked_badge"), @response.body
+    assert_no_match(/#{I18n.t("verifications.show.status.valid_badge")}/, @response.body)
+  end
+
+  test "revoked state takes precedence over expired" do
+    cert = issued_cert(expiration: 1.month.ago)
+    @member.deactivate!(reason: "fraude detectado")
+
+    get verification_url(identifier: cert.validation_token)
+    assert_response :success
+    assert_match I18n.t("verifications.show.status.revoked_badge"), @response.body
+    assert_no_match(/#{I18n.t("verifications.show.status.expired_badge")}/, @response.body)
   end
 
   # --- 404 paths ---

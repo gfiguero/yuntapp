@@ -1,9 +1,9 @@
-<tr class="hover:bg-base-300">
-  <td><%= neighborhood_association.name %></td>
+<tr class="hover:bg-base-300 cursor-pointer"
+    data-controller="row-link"
+    data-row-link-url-value="<%= url_for(neighborhood_association) %>"
+    data-action="click->row-link#visit">
+  <td><%= link_to neighborhood_association.name, neighborhood_association, class: "link link-hover font-medium" %></td>
   <td>
-    <div class="tooltip" data-tip="<%= I18n.t('actions.show') %>">
-      <%= link_to icon('show'), neighborhood_association, class: "btn btn-sm btn-soft btn-info" %>
-    </div>
     <div class="tooltip" data-tip="<%= I18n.t('actions.edit') %>">
       <%= link_to icon('edit'), edit_neighborhood_association_path(neighborhood_association), class: "btn btn-sm btn-soft btn-success" %>
     </div>
