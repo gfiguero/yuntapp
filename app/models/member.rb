@@ -8,12 +8,18 @@ class Member < ApplicationRecord
 
   belongs_to :requested_by, class_name: "User", optional: true
   belongs_to :approved_by, class_name: "User", optional: true
-  has_many :board_members, dependent: :destroy
-  has_many :residence_certificates, dependent: :destroy
+  has_many :board_members, dependent: :restrict_with_error
+  has_many :residence_certificates, dependent: :restrict_with_error
 
   validates :verified_identity_id, presence: true
   validates :status, presence: true, inclusion: {in: STATUSES}
   validates :deactivation_reason, presence: true, if: -> { inactive? }
+
+  # BR-008/BR-030/BR-091: un Member, una vez creado, NUNCA se destruye; solo se
+  # desactiva (deactivate! → status inactive), conservando su historial (certificados
+  # emitidos, residencias, directiva). Guard de defensa en profundidad que bloquea la
+  # destrucción por cualquier ruta (panel, admin, consola o cascada de un padre).
+  before_destroy :prevent_destruction
 
   delegate :name, :run, :phone, :email, :first_name, :last_name, to: :verified_identity, allow_nil: true
 
@@ -76,5 +82,10 @@ class Member < ApplicationRecord
 
   def mark_inactive!(reason)
     update!(status: "inactive", deactivation_reason: reason)
+  end
+
+  def prevent_destruction
+    errors.add(:base, I18n.t("members.errors.cannot_destroy"))
+    throw :abort
   end
 end

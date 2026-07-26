@@ -431,10 +431,11 @@ es:
       flash:
         created: Socio creado exitosamente.
         updated: Socio actualizado exitosamente.
-        destroyed: Socio eliminado exitosamente.
         approved: Socio aprobado exitosamente.
         rejected: Socio rechazado exitosamente.
         deactivated: Socio desactivado exitosamente.
+      errors:
+        cannot_destroy: Un socio no puede eliminarse; solo puede desactivarse para conservar su historial.
     board_members:
       index:
         title: Directiva
@@ -787,7 +788,8 @@ es:
     account_resets:
       flash:
         completed: Tu cuenta ha sido restablecida exitosamente.
-      confirm: "¿Estás seguro? Se eliminarán todos tus datos (identidad, domicilio, acreditación). Esta acción no se puede deshacer."
+      confirm: "¿Estás seguro? Tu acreditación se desactivará y quedarás libre para iniciar un nuevo onboarding. Tu historial (identidad, domicilio y certificados emitidos) se conserva."
+      deactivation_reason: Restablecimiento de cuenta por el socio
     onboarding:
       title: Acreditación
       subtitle: Completa tu solicitud de acreditación paso a paso

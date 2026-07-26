@@ -54,4 +54,28 @@ class MemberDeactivationTest < ActiveSupport::TestCase
     assert_nothing_raised { @dependent.deactivate!(reason: "Corrección administrativa") }
     assert @dependent.reload.inactive?
   end
+
+  # BR-008/BR-030: un Member nunca se destruye; solo se desactiva.
+  test "a member cannot be destroyed" do
+    id = @member.id
+    assert_not @member.destroy, "destroy debe bloquearse y devolver false"
+    assert Member.exists?(id), "el Member debe sobrevivir"
+    assert_raises(ActiveRecord::RecordNotDestroyed) { @member.destroy! }
+    assert Member.exists?(id)
+  end
+
+  # Los certificados emitidos deben sobrevivir a cualquier intento de borrado del socio.
+  test "attempting to destroy a member does not destroy its certificates" do
+    certificate = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: household_units(:selendis_household),
+      neighborhood_association: neighborhood_associations(:manios_de_buin),
+      purpose: "Trámite bancario",
+      amount: 1000,
+      status: "pending_payment"
+    )
+
+    assert_not @member.destroy
+    assert ResidenceCertificate.exists?(certificate.id), "el certificado debe sobrevivir"
+  end
 end

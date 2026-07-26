@@ -237,12 +237,11 @@ Rails.application.routes.draw do
         patch :reject
       end
     end
-    resources :members do
+    resources :members, except: [:destroy] do
       collection do
         get :search
       end
       member do
-        get :delete
         get :deactivate
         patch :approve
         patch :reject
