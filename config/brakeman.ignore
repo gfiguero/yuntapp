@@ -1,7 +1,7 @@
 {
   "ignored_warnings": [
     {
-      "fingerprint": "4d24c82acb3a0df0b319607de18a1472edbe9752255c4ae0955466afa4d844cd",
+      "fingerprint": "7f11b73cabcf796c91523019ddbc258060c370174f7fe71c5206712e55e75631",
       "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
     },
     {
@@ -9,7 +9,7 @@
       "note": "Intencional: el superadmin necesita poder asignar roles admin/superadmin y neighborhood_association_id. Solo accesible via ensure_superadmin!"
     },
     {
-      "fingerprint": "5c4f2607747b2a0a1b13f9cc42c77a24410014186cfd1233a2e11fe225406d00",
+      "fingerprint": "e6f845ca201bab98cb546501791b9e45eae4eba3d3069ca87542085b0a6c42d7",
       "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
     },
     {
@@ -79,5 +79,5 @@
       "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
     }
   ],
-  "updated": "2026-07-22 22:30:49 -0400"
+  "updated": "2026-07-26 12:20:00 -0400"
 }
