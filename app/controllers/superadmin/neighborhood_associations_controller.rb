@@ -2,7 +2,7 @@ module Superadmin
   class NeighborhoodAssociationsController < Superadmin::ApplicationController
     include Pagy::Method
 
-    before_action :set_neighborhood_association, only: %i[show edit update delete destroy impersonate]
+    before_action :set_neighborhood_association, only: %i[show edit update deactivate confirm_deactivate impersonate]
     before_action :set_neighborhood_associations, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -60,8 +60,8 @@ module Superadmin
       end
     end
 
-    # GET /admin/neighborhood_associations/1/delete
-    def delete
+    # GET /admin/neighborhood_associations/1/deactivate
+    def deactivate
     end
 
     def impersonate
@@ -69,10 +69,13 @@ module Superadmin
       redirect_to admin_root_path, notice: "Ahora estás administrando #{@neighborhood_association.name}"
     end
 
-    # DELETE /admin/neighborhood_associations/1
-    def destroy
-      @neighborhood_association.destroy!
-      redirect_to superadmin_neighborhood_associations_path, notice: I18n.t("superadmin.neighborhood_associations.flash.destroyed"), status: :see_other, format: :html
+    # PATCH /admin/neighborhood_associations/1/confirm_deactivate
+    # BR-054/BR-055: disolución = marcar inactive + cascada de Members a inactive.
+    # No se destruye la junta ni su historial.
+    def confirm_deactivate
+      @neighborhood_association.deactivate!
+      redirect_to superadmin_neighborhood_association_path(@neighborhood_association),
+        notice: I18n.t("superadmin.neighborhood_associations.flash.deactivated"), status: :see_other
     end
 
     private

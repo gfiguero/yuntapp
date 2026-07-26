@@ -67,18 +67,32 @@ module Superadmin
       assert_response :unprocessable_content
     end
 
-    test "should get delete" do
-      get delete_superadmin_neighborhood_association_url(@neighborhood_association)
+    test "should get deactivate" do
+      get deactivate_superadmin_neighborhood_association_url(@neighborhood_association)
       assert_response :success
     end
 
-    test "should destroy neighborhood_association" do
-      deletable = NeighborhoodAssociation.create!(name: "Deletable Association")
-      assert_difference("NeighborhoodAssociation.count", -1) do
-        delete superadmin_neighborhood_association_url(deletable)
+    # BR-054/BR-055/BR-100: disolver marca inactive y cascadea Members; NO destruye.
+    test "confirm_deactivate marks the association inactive without destroying it" do
+      member = members(:selendis_member)
+      assert member.approved?
+
+      assert_no_difference("NeighborhoodAssociation.count") do
+        patch confirm_deactivate_superadmin_neighborhood_association_url(@neighborhood_association)
       end
 
-      assert_redirected_to superadmin_neighborhood_associations_url
+      assert_redirected_to superadmin_neighborhood_association_url(@neighborhood_association)
+      assert_not @neighborhood_association.reload.active?, "la junta debe quedar inactive"
+      assert member.reload.inactive?, "sus socios activos pasan a inactive (BR-054)"
+    end
+
+    test "there is no destroy route for neighborhood associations" do
+      assert_raises(ActionController::RoutingError) do
+        Rails.application.routes.recognize_path(
+          "/superadmin/neighborhood_associations/#{@neighborhood_association.id}",
+          method: :delete
+        )
+      end
     end
   end
 end

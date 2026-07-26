@@ -909,10 +909,16 @@ es:
         count: "%{count} juntas de vecinos"
       show:
         identifier: "Junta de Vecinos ID: %{id}"
+      deactivate:
+        title: Disolver Junta
+        action: Disolver
+        badge: Disuelta
+        warning: "¿Está seguro que desea disolver la junta %{name}? Todos sus socios activos pasarán a inactivo. No se elimina ningún dato: certificados, identidades y residencias se conservan como historial."
+      dissolution_reason: Disolución de la junta de vecinos
       flash:
         created: Junta de Vecinos creada exitosamente.
         updated: Junta de Vecinos actualizada exitosamente.
-        destroyed: Junta de Vecinos eliminada exitosamente.
+        deactivated: Junta de Vecinos disuelta exitosamente. Sus socios activos pasaron a inactivo.
     onboarding_requests:
       index:
         title: Solicitudes de Onboarding

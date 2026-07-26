@@ -1,7 +1,7 @@
 class NeighborhoodAssociationsController < ApplicationController
   include Pagy::Method
 
-  before_action :set_neighborhood_association, only: %i[show edit update delete destroy]
+  before_action :set_neighborhood_association, only: %i[show edit update]
   before_action :set_neighborhood_associations, only: :index
   before_action :disabled_pagination
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -57,16 +57,6 @@ class NeighborhoodAssociationsController < ApplicationController
     else
       render :edit, status: :unprocessable_content
     end
-  end
-
-  # GET //neighborhood_associations/1/delete
-  def delete
-  end
-
-  # DELETE /neighborhood_associations/1
-  def destroy
-    @neighborhood_association.destroy!
-    redirect_to neighborhood_associations_path, deleted: I18n.t("neighborhood_associations.flash.destroyed"), status: :see_other, format: :html
   end
 
   private

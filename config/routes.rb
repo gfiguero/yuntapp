@@ -7,12 +7,9 @@ Rails.application.routes.draw do
       get :delete
     end
   end
-  resources :neighborhood_associations do
+  resources :neighborhood_associations, except: [:destroy] do
     collection do
       get :search
-    end
-    member do
-      get :delete
     end
   end
   resources :tags do
@@ -129,12 +126,13 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :neighborhood_associations do
+    resources :neighborhood_associations, except: [:destroy] do
       collection do
         get :search
       end
       member do
-        get :delete
+        get :deactivate
+        patch :confirm_deactivate
         post :impersonate
       end
     end
