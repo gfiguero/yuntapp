@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_26_211001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_27_205939) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -312,10 +312,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_211001) do
 
   create_table "users", force: :cascade do |t|
     t.boolean "admin"
+    t.string "block_reason"
+    t.datetime "blocked_at"
+    t.integer "blocked_by_id"
     t.datetime "confirmation_sent_at"
     t.string "confirmation_token"
     t.datetime "confirmed_at"
     t.datetime "created_at", null: false
+    t.datetime "deactivated_at"
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.integer "neighborhood_association_id"
@@ -326,6 +330,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_211001) do
     t.string "unconfirmed_email"
     t.datetime "updated_at", null: false
     t.integer "verified_identity_id"
+    t.index ["blocked_by_id"], name: "index_users_on_blocked_by_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, where: "confirmation_token IS NOT NULL"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["neighborhood_association_id"], name: "index_users_on_neighborhood_association_id"
@@ -408,6 +413,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_26_211001) do
   add_foreign_key "residencies", "verified_identities"
   add_foreign_key "residencies", "verified_residences"
   add_foreign_key "users", "neighborhood_associations"
+  add_foreign_key "users", "users", column: "blocked_by_id"
   add_foreign_key "users", "verified_identities"
   add_foreign_key "verified_identities", "identity_verification_requests"
   add_foreign_key "verified_residences", "communes"

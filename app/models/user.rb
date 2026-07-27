@@ -4,10 +4,21 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :confirmable,
     :recoverable, :rememberable, :validatable
 
+  # BR-100: la cuenta nunca se destruye. Reactivación auto-servicio vía correo: el
+  # token es válido solo mientras la cuenta esté desactivada y se invalida al reactivar.
+  generates_token_for :account_reactivation, expires_in: 1.day do
+    deactivated_at&.to_i
+  end
+
   scope :filter_by_email, ->(email) { where.like(email: "%#{email}%") }
+
+  # BR-100: una cuenta nunca se destruye (ni por el usuario vía Devise, ni por consola).
+  # Solo se desactiva o bloquea, conservando el historial. Guard de defensa en profundidad.
+  before_destroy :prevent_destruction
 
   belongs_to :neighborhood_association, optional: true
   belongs_to :verified_identity, optional: true
+  belongs_to :blocked_by, class_name: "User", optional: true
   has_many :identity_verification_requests
   has_many :residence_verification_requests
   has_many :onboarding_requests
@@ -48,7 +59,73 @@ class User < ApplicationRecord
     verified_identity.present?
   end
 
+  def deactivated? = deactivated_at.present?
+
+  def blocked? = blocked_at.present?
+
+  # Devise: bloquea el login si la cuenta está desactivada (por el usuario) o
+  # bloqueada (por un superadmin). BR-100: el registro se conserva como historial.
+  def active_for_authentication?
+    super && !deactivated? && !blocked?
+  end
+
+  def inactive_message
+    if blocked?
+      :account_blocked
+    elsif deactivated?
+      :account_deactivated
+    else
+      super
+    end
+  end
+
+  # Auto-desactivación (reversible por el usuario vía correo). Cascada: nada se borra.
+  def deactivate!
+    return if deactivated?
+    transaction do
+      update!(deactivated_at: Time.current)
+      cascade_account_deactivation!
+    end
+  end
+
+  # Reactivación auto-servicio. Una cuenta bloqueada por un admin NO puede reactivarse
+  # por el usuario: solo levanta el bloqueo un superadmin (unblock!).
+  def reactivate!
+    return if blocked?
+    update!(deactivated_at: nil)
+  end
+
+  # Bloqueo por superadmin (no reversible por el usuario). Un superadmin no es bloqueable.
+  def block!(by:, reason:)
+    transaction do
+      update!(blocked_at: Time.current, blocked_by: by, block_reason: reason)
+      cascade_account_deactivation!
+    end
+  end
+
+  def unblock!
+    update!(blocked_at: nil, blocked_by: nil, block_reason: nil)
+  end
+
   private
+
+  # BR-100/BR-099: al desactivar/bloquear la cuenta, su historial se conserva pero
+  # queda inerte: membresías activas → inactive (con cascada a dependientes),
+  # solicitudes pendientes → canceladas, publicaciones despublicadas. Sin borrado.
+  def cascade_account_deactivation!
+    reason = I18n.t("users.deactivation.cascade_reason")
+    verified_identity&.members&.active&.pluck(:id)&.each do |member_id|
+      member = Member.find(member_id)
+      member.deactivate!(reason: reason) unless member.inactive?
+    end
+    onboarding_requests.where(status: "pending").find_each(&:cancel!)
+    listings.update_all(active: false)
+  end
+
+  def prevent_destruction
+    errors.add(:base, I18n.t("users.errors.cannot_destroy"))
+    throw :abort
+  end
 
   # Encola los correos de Devise (confirmacion, reset de password, etc.) en
   # Solid Queue en vez de enviarlos sincronicamente dentro del request. Evita

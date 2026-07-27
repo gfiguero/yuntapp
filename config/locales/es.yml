@@ -338,6 +338,36 @@ es:
       identity_transfer: "Transferencia de identidad: se aprobó una nueva membresía con el mismo RUN"
       became_dependent: "Transición a residente dependiente de otro grupo familiar"
 
+  users:
+    deactivation:
+      cascade_reason: "Desactivación de la cuenta del socio"
+    errors:
+      cannot_destroy: Una cuenta de usuario no puede eliminarse; solo desactivarse o bloquearse.
+
+  reactivations:
+    new:
+      title: Reactivar mi cuenta
+      help: "Ingresa el correo de tu cuenta. Si está desactivada, te enviaremos un enlace para reactivarla."
+      email: Correo electrónico
+      submit: Enviar enlace de reactivación
+      back_to_login: Volver a iniciar sesión
+    show:
+      title: Reactivar mi cuenta
+      help: "Vas a reactivar la cuenta asociada a %{email}. Podrás iniciar sesión nuevamente."
+      submit: Reactivar mi cuenta
+    flash:
+      sent: "Si la cuenta existe y está desactivada, enviamos un enlace de reactivación a tu correo."
+      invalid: El enlace de reactivación es inválido o expiró.
+      reactivated: Tu cuenta fue reactivada. Ya puedes iniciar sesión.
+
+  reactivation_mailer:
+    instructions:
+      subject: Reactiva tu cuenta de Yuntapp
+      greeting: Hola,
+      body: "Recibimos una solicitud para reactivar tu cuenta. Haz clic en el siguiente enlace para reactivarla (válido por 24 horas):"
+      action: Reactivar mi cuenta
+      ignore: Si no solicitaste esto, ignora este correo; tu cuenta seguirá desactivada.
+
   shared:
     table:
       actions: Acciones
@@ -785,11 +815,16 @@ es:
       flash:
         created: Residente dependiente registrado. La junta revisará la solicitud.
         not_household_admin: Debes ser administrador del domicilio para gestionar residentes dependientes.
-    account_resets:
+    account_deactivations:
+      link: Desactivar mi cuenta
+      new:
+        title: Desactivar mi cuenta
+        warning: "Tu cuenta quedará desactivada: no podrás iniciar sesión ni gestionar solicitudes hasta reactivarla."
+        detail: "No se elimina nada. Tu acreditación se desactivará y tus publicaciones se despublicarán; todo tu historial se conserva. Podrás reactivar tu cuenta más adelante desde el enlace que enviaremos a tu correo."
+        confirm: Desactivar mi cuenta
+        confirm_prompt: "¿Seguro que deseas desactivar tu cuenta? Se cerrará tu sesión."
       flash:
-        completed: Tu cuenta ha sido restablecida exitosamente.
-      confirm: "¿Estás seguro? Tu acreditación se desactivará y quedarás libre para iniciar un nuevo onboarding. Tu historial (identidad, domicilio y certificados emitidos) se conserva."
-      deactivation_reason: Restablecimiento de cuenta por el socio
+        deactivated: Tu cuenta fue desactivada. Para reactivarla, solicita el enlace a tu correo.
     onboarding:
       title: Acreditación
       subtitle: Completa tu solicitud de acreditación paso a paso
@@ -952,9 +987,21 @@ es:
         count: "%{count} usuarios"
       show:
         identifier: "Usuario #%{id}"
+      block:
+        action: Bloquear
+        title: Bloquear cuenta
+        badge: Bloqueada
+        deactivated_badge: Desactivada
+        warning: "¿Bloquear la cuenta %{email}? No podrá iniciar sesión ni reactivarse por sí misma. No se elimina ningún dato."
+        reason_label: Motivo del bloqueo
+        confirm: Bloquear cuenta
+      unblock:
+        action: Desbloquear
       flash:
         updated: Usuario actualizado exitosamente.
-        destroyed: Usuario eliminado exitosamente.
+        blocked: Cuenta bloqueada. El usuario no podrá iniciar sesión ni reactivarla.
+        unblocked: Cuenta desbloqueada. El usuario ya puede iniciar sesión.
+        cannot_block_superadmin: No se puede bloquear a un superadministrador.
 
   categories:
     index:

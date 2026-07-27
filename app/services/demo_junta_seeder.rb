@@ -227,8 +227,12 @@ class DemoJuntaSeeder
     end
 
     # Usuarios antes que la junta: la referencian por neighborhood_association_id.
-    demo_users.destroy_all
-    assoc&.destroy
+    # Borrado crudo (delete): esto es reset de datos de demo/dev y debe saltarse los
+    # guards de BR-100 (before_destroy en User / restrict_with_error en la junta), que
+    # son protecciones de runtime, no para el teardown de seeds. Los hijos ya se
+    # eliminaron con delete_all arriba, así que no quedan referencias colgantes.
+    demo_users.delete_all
+    assoc&.delete
   end
 
   def purge_attachments(scope)
