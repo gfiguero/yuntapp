@@ -183,6 +183,25 @@ module Admin
       end
     end
 
+    test "approve aborts with alert when family_group has no household_admin (#94 guard)" do
+      sign_in @admin
+      orphan_fg = FamilyGroup.create!(household_unit: household_units(:selendis_household))
+      orphan_request = IdentityVerificationRequest.create!(
+        first_name: "Huerfano", last_name: "Sinjefe", run: "7000002-4",
+        status: "pending", dependent: true, family_group: orphan_fg,
+        requested_by: users(:karass), neighborhood_association: @neighborhood_association
+      )
+
+      assert_no_difference -> { Residency.count } do
+        assert_no_difference -> { Member.count } do
+          patch approve_admin_dependent_review_url(orphan_request)
+        end
+      end
+
+      assert_redirected_to admin_dependent_reviews_path
+      assert_equal "pending", orphan_request.reload.status
+    end
+
     test "approve fails if dependent_request is not pending" do
       sign_in @admin
       @dependent_request.update!(status: "approved")
