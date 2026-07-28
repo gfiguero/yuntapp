@@ -100,6 +100,7 @@ es:
       neighborhood_association:
         id: ID
         name: Nombre
+        rut: RUT
         commune: Comuna
         region: Región
       neighborhood_delegation:

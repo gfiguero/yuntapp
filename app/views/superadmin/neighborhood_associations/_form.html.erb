@@ -14,5 +14,12 @@
   <% end %>
   <%= raw(error_message(invalid, neighborhood_association.errors.full_messages_for(:name))) %>
 
+  <% invalid = neighborhood_association.errors.include?(:rut) %>
+  <%= form.label :rut, I18n.t('activerecord.attributes.neighborhood_association.rut'), class: "floating-label" do %>
+    <%= form.text_field :rut, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.neighborhood_association.rut') %>
+    <span><%= I18n.t('activerecord.attributes.neighborhood_association.rut') %></span>
+  <% end %>
+  <%= raw(error_message(invalid, neighborhood_association.errors.full_messages_for(:rut))) %>
+
   <%= form.submit I18n.t('actions.save'), class: "btn btn-success" %>
 <% end %>
