@@ -33,3 +33,7 @@ en:
     attributes:
       neighborhood_association:
         rut: "Tax ID (RUT)"
+  admin:
+    dependent_reviews:
+      flash:
+        family_group_missing_admin: "The family group has no active household admin; the dependent cannot be approved."

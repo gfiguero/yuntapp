@@ -50,8 +50,12 @@ module Panel
         return
       end
 
-      residency = current_user.household_unit.approved_residencies.find(params[:residence_certificate][:member_id])
-      member = residency.verified_identity.members.approved.find_by(neighborhood_association: certificate_association)
+      # Fuente única de "residente actual": el mismo current_residencies que ofrece
+      # el selector (selectable_residencies). Un id que no corresponda a un residente
+      # vigente resuelve a member nil y el save falla con error de validación.
+      submitted_id = params[:residence_certificate][:member_id].to_i
+      residency = current_user.household_unit.current_residencies.find { |r| r.id == submitted_id }
+      member = residency&.verified_identity&.members&.approved&.find_by(neighborhood_association: certificate_association)
 
       @residence_certificate = ResidenceCertificate.new(
         member: member,
@@ -102,7 +106,7 @@ module Panel
     # Solo residentes del domicilio con Member aprobado en la junta pueden ser
     # titulares de un certificado (excluye dependientes desactivados — BR-037).
     def selectable_residencies
-      current_user.household_unit.approved_residencies.select do |residency|
+      current_user.household_unit.current_residencies.select do |residency|
         residency.verified_identity.members.approved.exists?(neighborhood_association: certificate_association)
       end
     end

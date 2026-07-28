@@ -143,10 +143,22 @@ module Admin
       target_hu = HouseholdUnit.create!(
         neighborhood_delegation: src_hu.neighborhood_delegation,
         commune: src_hu.commune,
-        number: "999",
-        verified_residence: target_vr
+        number: "999"
       )
       target_fg = FamilyGroup.create!(household_unit: target_hu)
+      # #94/BR-067: el dependiente hereda la VerifiedResidence del household_admin
+      # de su FamilyGroup. El group destino debe tener un household_admin con residencia.
+      target_admin_identity = VerifiedIdentity.create!(
+        first_name: "Artanis", last_name: "Hierarch", run: "19000001-K", phone: "+56922222222"
+      )
+      Residency.create!(
+        verified_identity: target_admin_identity,
+        verified_residence: target_vr,
+        household_unit: target_hu,
+        family_group: target_fg,
+        household_admin: true,
+        status: "approved"
+      )
       @dependent_request.update!(run: selendis_identity.run, family_group: target_fg)
 
       patch approve_admin_dependent_review_url(@dependent_request)
@@ -169,6 +181,53 @@ module Admin
       assert_no_difference -> { Member.where(status: "inactive").count } do
         patch approve_admin_dependent_review_url(@dependent_request)
       end
+    end
+
+    test "approve aborts with alert when family_group has no household_admin (#94 guard)" do
+      sign_in @admin
+      orphan_fg = FamilyGroup.create!(household_unit: household_units(:selendis_household))
+      orphan_request = IdentityVerificationRequest.create!(
+        first_name: "Huerfano", last_name: "Sinjefe", run: "7000002-4",
+        status: "pending", dependent: true, family_group: orphan_fg,
+        requested_by: users(:karass), neighborhood_association: @neighborhood_association
+      )
+
+      assert_no_difference -> { Residency.count } do
+        assert_no_difference -> { Member.count } do
+          patch approve_admin_dependent_review_url(orphan_request)
+        end
+      end
+
+      assert_redirected_to admin_dependent_reviews_path
+      assert_equal "pending", orphan_request.reload.status
+    end
+
+    test "approved dependent inherits verified_residence from its family_group household_admin (#94)" do
+      sign_in @admin
+
+      # Segundo FamilyGroup en el MISMO household_unit, con otro household_admin
+      # y otra VerifiedResidence — no debe filtrarse al dependiente de selendis.
+      other_household = household_units(:selendis_household)
+      other_family_group = FamilyGroup.create!(household_unit: other_household)
+      other_identity = VerifiedIdentity.create!(
+        run: "7000001-6", first_name: "Otro", last_name: "Jefe",
+        phone: "+56911110000", email: "otro.jefe@example.com"
+      )
+      other_residence = VerifiedResidence.create!(
+        number: "999", neighborhood_association: @neighborhood_association
+      )
+      Residency.create!(
+        verified_identity: other_identity, verified_residence: other_residence,
+        household_unit: other_household, family_group: other_family_group,
+        household_admin: true, status: "approved"
+      )
+
+      patch approve_admin_dependent_review_url(@dependent_request)
+
+      new_dependent_residency = Residency.where(household_admin: false).order(:created_at).last
+      expected = family_groups(:selendis_family_group).household_admin.verified_residence
+      assert_equal expected, new_dependent_residency.verified_residence
+      assert_not_equal other_residence, new_dependent_residency.verified_residence
     end
 
     test "approve fails if dependent_request is not pending" do

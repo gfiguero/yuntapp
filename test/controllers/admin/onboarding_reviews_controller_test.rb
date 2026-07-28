@@ -82,7 +82,7 @@ module Admin
       hu = household_units(:selendis_household)
       Residency.create!(
         verified_identity: existing_identity,
-        verified_residence: hu.verified_residence,
+        verified_residence: verified_residences(:selendis_verified_residence),
         household_unit: hu,
         household_admin: false,
         status: "approved"
@@ -149,7 +149,7 @@ module Admin
       other_hu = household_units(:selendis_household)
       Residency.create!(
         verified_identity: existing_identity,
-        verified_residence: other_hu.verified_residence,
+        verified_residence: verified_residences(:selendis_verified_residence),
         household_unit: other_hu,
         household_admin: false,
         status: "approved"
@@ -227,9 +227,9 @@ module Admin
       # Verify user linked to neighborhood association
       assert_equal @onboarding_request.neighborhood_association, @karax.neighborhood_association
 
-      # Verify household unit linked to verified residence
+      # #94: la VerifiedResidence vive en la Residency, no en el HouseholdUnit.
       household_unit = HouseholdUnit.last
-      assert_equal verified_residence, household_unit.verified_residence
+      assert_equal verified_residence, Residency.last.verified_residence
 
       # Verify residency was created
       residency = Residency.last
@@ -267,10 +267,9 @@ module Admin
       @onboarding_request.reload
       assert @onboarding_request.approved?
 
-      # Verify existing HU was relinked to the new verified residence
-      existing_hu.reload
+      # #94: la VerifiedResidence vive en la Residency, no en el HouseholdUnit.
       verified_residence = VerifiedResidence.find_by(residence_verification_request: @residence_request)
-      assert_equal verified_residence, existing_hu.verified_residence
+      assert_equal verified_residence, Residency.last.verified_residence
 
       # Verify residency is linked to the existing HU
       residency = Residency.last
@@ -371,7 +370,7 @@ module Admin
       family_group = family_groups(:selendis_family_group)
       Residency.create!(
         verified_identity: existing_identity,
-        verified_residence: hu.verified_residence,
+        verified_residence: verified_residences(:selendis_verified_residence),
         household_unit: hu,
         family_group: family_group,
         household_admin: true,
@@ -391,6 +390,47 @@ module Admin
       dependent_member.reload
       assert admin_member.inactive?, "el household_admin anterior debe quedar inactive"
       assert dependent_member.inactive?, "sus dependientes deben quedar inactive en cascada (BR-099)"
+    end
+
+    test "re-onboarding same identity to same household_unit creates a new residency (history preserved, #97)" do
+      sign_in @admin
+
+      # Estancia PREVIA de la misma identidad (mismo RUN del onboarding en curso)
+      # en un household_unit existente — simula "se fue y vuelve".
+      existing_identity = VerifiedIdentity.create!(
+        run: @identity_request.run, first_name: "Karax", last_name: "Khalai",
+        phone: "+56999990000", email: "karax.prev@example.com"
+      )
+      hu = household_units(:matching_karax_household)
+      prior_residence = VerifiedResidence.create!(
+        number: hu.number, neighborhood_association: @onboarding_request.neighborhood_association
+      )
+      prior_family_group = FamilyGroup.create!(household_unit: hu)
+      prior_residency = Residency.create!(
+        verified_identity: existing_identity, verified_residence: prior_residence,
+        household_unit: hu, family_group: prior_family_group,
+        household_admin: true, status: "approved"
+      )
+
+      # Aprobar el onboarding relinkeando al MISMO household_unit debe crear una
+      # SEGUNDA Residency (nueva estancia), no reventar por índice único.
+      assert_difference -> { Residency.where(verified_identity: existing_identity, household_unit: hu).count }, 1 do
+        assert_nothing_raised do
+          patch review_step3_admin_onboarding_request_url(@onboarding_request),
+            params: {household_unit_id: hu.id}
+        end
+      end
+
+      @onboarding_request.reload
+      assert @onboarding_request.approved?
+
+      # La estancia anterior se conserva intacta (historial).
+      assert Residency.exists?(prior_residency.id)
+      # User#residency devuelve la estancia más reciente.
+      assert_equal existing_identity, @karax.reload.verified_identity
+      latest = existing_identity.residencies.approved.order(created_at: :desc).first
+      assert_not_equal prior_residency, latest
+      assert_equal hu, latest.household_unit
     end
 
     # --- Reject ---

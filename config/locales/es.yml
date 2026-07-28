@@ -712,6 +712,7 @@ es:
         approved: Residente dependiente aprobado exitosamente.
         rejected: Solicitud de residente dependiente rechazada.
         not_pending: Esta solicitud no está pendiente de revisión.
+        family_group_missing_admin: "El grupo familiar no tiene un jefe de hogar activo; no se puede aprobar al dependiente."
 
   panel:
     administration_requests:

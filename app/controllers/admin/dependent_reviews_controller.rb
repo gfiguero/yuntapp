@@ -18,6 +18,17 @@ module Admin
 
     # PATCH /admin/dependent_reviews/:id/approve
     def approve
+      family_group = @dependent_request.family_group
+      # #94/BR-067: el dependiente hereda la VerifiedResidence del household_admin
+      # de SU FamilyGroup. Sin household_admin no se puede heredar: abortar con aviso
+      # (no debería ocurrir en el flujo normal; evita un 500 sin contexto).
+      household_admin_residency = family_group.household_admin
+      unless household_admin_residency
+        redirect_to admin_dependent_reviews_path,
+          alert: I18n.t("admin.dependent_reviews.flash.family_group_missing_admin")
+        return
+      end
+
       ActiveRecord::Base.transaction do
         @dependent_request.update!(status: "approved")
 
@@ -44,9 +55,8 @@ module Admin
           reason: I18n.t("members.deactivation.became_dependent")
         )
 
-        family_group = @dependent_request.family_group
         household_unit = family_group.household_unit
-        verified_residence = household_unit.verified_residence
+        verified_residence = household_admin_residency.verified_residence
 
         Residency.create!(
           verified_identity: verified_identity,

@@ -84,7 +84,7 @@ class DemoJuntaSeeder
     identity = build_identity(user.email)
     residence = build_residence(delegation)
     household = HouseholdUnit.create!(neighborhood_delegation: delegation, commune: @commune,
-      number: residence.number, street_name: residence.street_name, verified_residence: residence)
+      number: residence.number, street_name: residence.street_name)
     family_group = FamilyGroup.create!(household_unit: household)
 
     user.update!(verified_identity: identity, neighborhood_association: @association)
