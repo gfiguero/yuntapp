@@ -5,6 +5,10 @@ class AdministrationApprovalServiceTest < ActiveSupport::TestCase
     @staff = users(:artanis) # superadmin
   end
 
+  def upload
+    Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/files/id_placeholder.png"), "image/png")
+  end
+
   test "aprobar junta existente crea identidad, member, boardmember y marca admin" do
     req = AdministrationRequest.create!(
       user: users(:urunis),
@@ -12,7 +16,7 @@ class AdministrationApprovalServiceTest < ActiveSupport::TestCase
       organization_rut: neighborhood_associations(:manios_de_buin).rut,
       position: "presidente",
       first_name: "Ana", last_name: "Soto", run: "15111222-6", phone: "+56911112222",
-      status: "pending"
+      status: "pending", directiva_validity_document: upload
     )
 
     assert_difference -> { Member.count } => 1, -> { BoardMember.count } => 1, -> { VerifiedIdentity.count } => 1 do
@@ -38,7 +42,7 @@ class AdministrationApprovalServiceTest < ActiveSupport::TestCase
       organization_rut: "86429665-3",
       position: "secretario",
       first_name: "Luis", last_name: "Vera", run: "14222333-3", phone: "+56911113333",
-      status: "pending"
+      status: "pending", directiva_validity_document: upload
     )
 
     assert_difference -> { NeighborhoodAssociation.count } => 1 do
@@ -61,7 +65,7 @@ class AdministrationApprovalServiceTest < ActiveSupport::TestCase
       position: "tesorero",
       first_name: identidad.first_name, last_name: identidad.last_name,
       run: identidad.run, phone: "+56911114444",
-      status: "pending"
+      status: "pending", directiva_validity_document: upload
     )
 
     AdministrationApprovalService.approve!(req, approved_by: @staff)

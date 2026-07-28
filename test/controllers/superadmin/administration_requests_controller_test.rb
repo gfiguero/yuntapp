@@ -47,6 +47,19 @@ module Superadmin
       assert req.reload.approved? # sigue approved, no rejected
     end
 
+    test "approve exige confirmacion si el RUN ya está verificado en otra identidad (I3)" do
+      req = administration_requests(:pending_manios)
+      # identidad ajena con el mismo RUN (no ligada al solicitante)
+      VerifiedIdentity.create!(first_name: "Otra", last_name: "Persona", run: req.run)
+
+      patch approve_superadmin_administration_request_url(req)
+      assert req.reload.pending?, "no debe aprobar sin confirmación"
+      assert_not req.user.reload.admin?
+
+      patch approve_superadmin_administration_request_url(req), params: {confirm_duplicate_run: "1"}
+      assert req.reload.approved?, "debe aprobar con confirmación"
+    end
+
     test "un usuario no superadmin no accede" do
       sign_out users(:artanis)
       sign_in users(:selendis)

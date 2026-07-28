@@ -25,6 +25,8 @@ class AdministrationRequest < ApplicationRecord
     validates :organization_rut, presence: true
     validates :run, presence: true
     validate :target_association_present
+    # BR-123: el certificado de vigencia de la directiva es obligatorio para enviar.
+    validate :directiva_validity_document_attached
   end
   validates :organization_rut, run: true, if: -> { organization_rut.present? }
   validates :run, run: true, if: -> { run.present? }
@@ -86,6 +88,12 @@ class AdministrationRequest < ApplicationRecord
     scope = AdministrationRequest.active.where(user_id: user_id)
     scope = scope.where.not(id: id) if persisted?
     errors.add(:base, I18n.t("activerecord.errors.models.administration_request.already_active")) if scope.exists?
+  end
+
+  # BR-123: sin el certificado de vigencia de la directiva no se puede enviar.
+  def directiva_validity_document_attached
+    return if directiva_validity_document.attached?
+    errors.add(:directiva_validity_document, I18n.t("activerecord.errors.models.administration_request.directiva_document_missing"))
   end
 
   def normalize_run_field

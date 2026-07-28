@@ -16,7 +16,7 @@
       <%= I18n.t("superadmin.administration_requests.warn_existing_admin") %>
     </div>
   <% end %>
-  <% if @administration_request.run.present? && VerifiedIdentity.exists?(run: @administration_request.run) %>
+  <% if requires_run_confirmation? %>
     <div class="alert alert-info mb-4">
       <%= I18n.t("superadmin.administration_requests.warn_duplicate_run") %>
     </div>
@@ -77,9 +77,19 @@
       <% end %>
 
       <% if @administration_request.pending? %>
-        <div class="flex gap-2 mt-4">
-          <%= button_to I18n.t("superadmin.administration_requests.approve"), approve_superadmin_administration_request_path(@administration_request), method: :patch, class: "btn btn-success", data: {turbo_confirm: I18n.t("superadmin.administration_requests.approve_confirm")} %>
-        </div>
+        <% if requires_run_confirmation? %>
+          <%= form_with url: approve_superadmin_administration_request_path(@administration_request), method: :patch, class: "mt-4 grid gap-2" do %>
+            <label class="label cursor-pointer justify-start gap-2">
+              <%= check_box_tag "confirm_duplicate_run", "1", false, required: true, class: "checkbox checkbox-warning" %>
+              <span><%= I18n.t("superadmin.administration_requests.confirm_run_label") %></span>
+            </label>
+            <%= submit_tag I18n.t("superadmin.administration_requests.approve"), class: "btn btn-success w-fit" %>
+          <% end %>
+        <% else %>
+          <div class="flex gap-2 mt-4">
+            <%= button_to I18n.t("superadmin.administration_requests.approve"), approve_superadmin_administration_request_path(@administration_request), method: :patch, class: "btn btn-success", data: {turbo_confirm: I18n.t("superadmin.administration_requests.approve_confirm")} %>
+          </div>
+        <% end %>
         <%= form_with url: reject_superadmin_administration_request_path(@administration_request), method: :patch, class: "mt-4 grid gap-2" do |f| %>
           <%= f.text_area "administration_request[rejection_reason]", class: "textarea w-full", placeholder: I18n.t("activerecord.attributes.administration_request.rejection_reason") %>
           <%= f.submit I18n.t("superadmin.administration_requests.reject"), class: "btn btn-error w-fit" %>

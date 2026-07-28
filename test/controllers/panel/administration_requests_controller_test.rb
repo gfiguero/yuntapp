@@ -24,11 +24,25 @@ module Panel
           neighborhood_association_id: neighborhood_associations(:manios_de_buin).id,
           organization_rut: neighborhood_associations(:manios_de_buin).rut,
           position: "presidente",
-          first_name: "Ana", last_name: "Soto", run: "15111222-6", phone: "987654321"
+          first_name: "Ana", last_name: "Soto", run: "15111222-6", phone: "987654321",
+          directiva_validity_document: fixture_file_upload("id_placeholder.png", "image/png")
         }}
       end
       assert_equal "pending", AdministrationRequest.last.status
       assert_redirected_to panel_administration_request_url
+    end
+
+    test "create sin documento de vigencia no crea la solicitud (BR-123)" do
+      sign_in users(:urunis)
+      assert_no_difference "AdministrationRequest.count" do
+        post panel_administration_request_url, params: {administration_request: {
+          neighborhood_association_id: neighborhood_associations(:manios_de_buin).id,
+          organization_rut: neighborhood_associations(:manios_de_buin).rut,
+          position: "presidente",
+          first_name: "Ana", last_name: "Soto", run: "15111222-6", phone: "987654321"
+        }}
+      end
+      assert_response :unprocessable_content
     end
   end
 end

@@ -294,6 +294,7 @@ es:
         administration_request:
           target_missing: Debes seleccionar una junta existente o indicar nombre y comuna de una nueva
           already_active: Ya tienes una solicitud de administración en curso
+          directiva_document_missing: Debes adjuntar el certificado de vigencia de la directiva
 
   errors:
     messages:
@@ -966,11 +967,13 @@ es:
       new_association: "Nueva junta: %{name} (%{commune})"
       warn_existing_admin: Esta junta ya tiene un administrador activo. Avísale antes de aprobar.
       warn_duplicate_run: Este RUN ya está verificado en el sistema. Al aprobar se transferirá la identidad.
+      confirm_run_label: Confirmo que es la misma persona y autorizo la transferencia de la identidad ya verificada con este RUN.
       flash:
         approved: Solicitud aprobada. El solicitante ya administra la junta.
         rejected: Solicitud rechazada.
         reason_required: Debes indicar un motivo para rechazar la solicitud.
         not_pending: Esta solicitud ya fue resuelta.
+        confirm_run_required: Debes confirmar la transferencia de identidad por RUN duplicado antes de aprobar.
     categories:
       index:
         title: Categorías

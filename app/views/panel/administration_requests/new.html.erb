@@ -45,7 +45,7 @@
 
       <div>
         <%= form.label :directiva_validity_document, I18n.t("activerecord.attributes.administration_request.directiva_validity_document"), class: "label" %>
-        <%= form.file_field :directiva_validity_document, class: "file-input w-full" %>
+        <%= form.file_field :directiva_validity_document, required: true, class: "file-input w-full" %>
       </div>
       <div>
         <%= form.label :identity_documents, I18n.t("activerecord.attributes.administration_request.identity_documents"), class: "label" %>

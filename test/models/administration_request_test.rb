@@ -1,6 +1,10 @@
 require "test_helper"
 
 class AdministrationRequestTest < ActiveSupport::TestCase
+  def upload
+    Rack::Test::UploadedFile.new(Rails.root.join("test/fixtures/files/id_placeholder.png"), "image/png")
+  end
+
   def base_attrs(overrides = {})
     {
       user: users(:urunis),
@@ -11,7 +15,8 @@ class AdministrationRequestTest < ActiveSupport::TestCase
       last_name: "pérez",
       run: "16.912.345-4",
       phone: "987654321",
-      status: "pending"
+      status: "pending",
+      directiva_validity_document: upload
     }.merge(overrides)
   end
 
@@ -35,6 +40,12 @@ class AdministrationRequestTest < ActiveSupport::TestCase
     r = AdministrationRequest.new(base_attrs(organization_rut: "83014859-5"))
     assert_not r.valid?
     assert_includes r.errors.attribute_names, :organization_rut
+  end
+
+  test "pending exige el documento de vigencia de la directiva" do
+    r = AdministrationRequest.new(base_attrs(directiva_validity_document: nil))
+    assert_not r.valid?
+    assert_includes r.errors.attribute_names, :directiva_validity_document
   end
 
   test "pending exige junta existente o nombre+comuna nuevos" do
