@@ -967,6 +967,7 @@ es:
         approved: Solicitud aprobada. El solicitante ya administra la junta.
         rejected: Solicitud rechazada.
         reason_required: Debes indicar un motivo para rechazar la solicitud.
+        not_pending: Esta solicitud ya fue resuelta.
     categories:
       index:
         title: Categorías

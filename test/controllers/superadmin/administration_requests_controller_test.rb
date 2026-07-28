@@ -31,6 +31,22 @@ module Superadmin
       assert req.reload.pending?
     end
 
+    test "no se puede aprobar dos veces (no duplica BoardMember)" do
+      req = administration_requests(:pending_manios)
+      patch approve_superadmin_administration_request_url(req)
+      assert req.reload.approved?
+      assert_no_difference "BoardMember.count" do
+        patch approve_superadmin_administration_request_url(req)
+      end
+    end
+
+    test "no se puede rechazar un request ya aprobado" do
+      req = administration_requests(:pending_manios)
+      patch approve_superadmin_administration_request_url(req)
+      patch reject_superadmin_administration_request_url(req), params: {administration_request: {rejection_reason: "tarde"}}
+      assert req.reload.approved? # sigue approved, no rejected
+    end
+
     test "un usuario no superadmin no accede" do
       sign_out users(:artanis)
       sign_in users(:selendis)

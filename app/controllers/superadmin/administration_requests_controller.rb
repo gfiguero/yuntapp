@@ -3,6 +3,7 @@ module Superadmin
     include Pagy::Method
 
     before_action :set_administration_request, only: %i[show approve reject]
+    before_action :ensure_pending!, only: %i[approve reject]
 
     def index
       scope = AdministrationRequest.includes(:user, :neighborhood_association).order(created_at: :desc)
@@ -41,6 +42,13 @@ module Superadmin
 
     def set_administration_request
       @administration_request = AdministrationRequest.find(params[:id])
+    end
+
+    def ensure_pending!
+      unless @administration_request.pending?
+        redirect_to superadmin_administration_request_path(@administration_request),
+          alert: I18n.t("superadmin.administration_requests.flash.not_pending"), status: :see_other
+      end
     end
   end
 end

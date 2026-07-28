@@ -21,6 +21,8 @@ class AdministrationApprovalService
   end
 
   def approve!
+    raise "AdministrationRequest ##{@req.id} no está pending (#{@req.status})" unless @req.pending?
+
     ActiveRecord::Base.transaction do
       junta = resolve_association!
       identity = resolve_identity!
@@ -83,12 +85,11 @@ class AdministrationApprovalService
   end
 
   def ensure_board_member!(member)
-    BoardMember.create!(
+    BoardMember.find_or_create_by!(
       neighborhood_association: member.neighborhood_association,
       member: member,
       position: @req.position,
-      start_date: Date.current,
       active: true
-    )
+    ) { |bm| bm.start_date = Date.current }
   end
 end
