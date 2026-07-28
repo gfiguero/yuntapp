@@ -46,7 +46,13 @@ module Admin
 
         family_group = @dependent_request.family_group
         household_unit = family_group.household_unit
-        verified_residence = household_unit.verified_residence
+        # #94/BR-067: el dependiente hereda la VerifiedResidence del household_admin
+        # de SU FamilyGroup, no una compartida a nivel de HouseholdUnit.
+        household_admin_residency = family_group.household_admin
+        unless household_admin_residency
+          raise "FamilyGroup ##{family_group.id} sin household_admin: no se puede heredar la residencia del dependiente"
+        end
+        verified_residence = household_admin_residency.verified_residence
 
         Residency.create!(
           verified_identity: verified_identity,

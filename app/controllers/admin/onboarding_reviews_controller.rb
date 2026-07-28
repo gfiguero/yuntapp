@@ -34,7 +34,7 @@ module Admin
       end
 
       # Find household units where the verified identity already has residencies (any association)
-      identity_hu_ids = @existing_identity&.residencies&.pluck(:household_unit_id) || []
+      identity_hu_ids = @existing_identity&.residencies&.pluck(:household_unit_id)&.uniq || []
 
       @matching_household_units = HouseholdUnit
         .where(id: address_matches.select(:id))
@@ -111,19 +111,17 @@ module Admin
             .find_or_create_by!(name: residence_req.street_name)
         end
 
-        # 5. Relink existing or create new HouseholdUnit
+        # 5. Relink existing or create new HouseholdUnit (estructura física: no se
+        #    le asocia VerifiedResidence; cada Residency lleva la suya — #94).
         household_unit = if params[:household_unit_id].present? && params[:household_unit_id] != "new"
-          existing = current_neighborhood_association.household_units.find(params[:household_unit_id])
-          existing.update!(verified_residence: verified_residence)
-          existing
+          current_neighborhood_association.household_units.find(params[:household_unit_id])
         else
           HouseholdUnit.create!(
             neighborhood_delegation: delegation,
             commune: residence_req.commune,
             number: residence_req.number,
             street_name: residence_req.street_name,
-            address_detail: residence_req.address_detail,
-            verified_residence: verified_residence
+            address_detail: residence_req.address_detail
           )
         end
 

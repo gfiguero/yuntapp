@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_28_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_28_211113) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -131,10 +131,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_120000) do
     t.string "region"
     t.string "street_name"
     t.datetime "updated_at", null: false
-    t.integer "verified_residence_id"
     t.index ["commune_id"], name: "index_household_units_on_commune_id"
     t.index ["neighborhood_delegation_id"], name: "index_household_units_on_neighborhood_delegation_id"
-    t.index ["verified_residence_id"], name: "index_household_units_on_verified_residence_id"
   end
 
   create_table "identity_verification_requests", force: :cascade do |t|
@@ -327,7 +325,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_120000) do
     t.integer "verified_residence_id", null: false
     t.index ["family_group_id"], name: "index_residencies_on_family_group_id"
     t.index ["household_unit_id"], name: "index_residencies_on_household_unit_id"
-    t.index ["verified_identity_id", "household_unit_id"], name: "index_residencies_on_identity_and_unit", unique: true
     t.index ["verified_identity_id"], name: "index_residencies_on_verified_identity_id"
     t.index ["verified_residence_id"], name: "index_residencies_on_verified_residence_id"
   end
@@ -411,7 +408,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_120000) do
   add_foreign_key "family_groups", "household_units"
   add_foreign_key "household_units", "communes"
   add_foreign_key "household_units", "neighborhood_delegations"
-  add_foreign_key "household_units", "verified_residences"
   add_foreign_key "identity_verification_requests", "family_groups"
   add_foreign_key "identity_verification_requests", "neighborhood_associations"
   add_foreign_key "identity_verification_requests", "onboarding_requests"

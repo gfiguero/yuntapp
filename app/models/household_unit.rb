@@ -3,7 +3,6 @@ class HouseholdUnit < ApplicationRecord
 
   belongs_to :neighborhood_delegation
   belongs_to :commune, optional: true
-  belongs_to :verified_residence, optional: true
   # BR-100/BR-030: los domicilios y su historial de residencia no se destruyen.
   has_many :family_groups, dependent: :restrict_with_error
   has_many :residencies, dependent: :restrict_with_error
