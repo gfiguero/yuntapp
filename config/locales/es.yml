@@ -106,6 +106,8 @@ es:
         directiva_validity_document: Certificado de vigencia de la directiva
         identity_documents: Documentos de identidad
         rejection_reason: Motivo del rechazo
+        applicant: Solicitante
+        target: Junta objetivo
       category:
         id: ID
         name: Nombre
@@ -388,6 +390,8 @@ es:
   shared:
     table:
       actions: Acciones
+      status: Estado
+      view: Ver
     headers:
       new_record: Nuevo Registro
     empty: —
@@ -950,6 +954,19 @@ es:
         submit: Enviar Solicitud
 
   superadmin:
+    administration_requests:
+      index:
+        title: Solicitudes de administración
+      approve: Aprobar solicitud
+      approve_confirm: "¿Confirmas aprobar esta solicitud? Se creará el admin, socio y directiva."
+      reject: Rechazar solicitud
+      new_association: "Nueva junta: %{name} (%{commune})"
+      warn_existing_admin: Esta junta ya tiene un administrador activo. Avísale antes de aprobar.
+      warn_duplicate_run: Este RUN ya está verificado en el sistema. Al aprobar se transferirá la identidad.
+      flash:
+        approved: Solicitud aprobada. El solicitante ya administra la junta.
+        rejected: Solicitud rechazada.
+        reason_required: Debes indicar un motivo para rechazar la solicitud.
     categories:
       index:
         title: Categorías

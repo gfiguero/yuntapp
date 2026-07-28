@@ -1,0 +1,33 @@
+<% content_for :breadcrumb do %>
+  <li><%= I18n.t("superadmin.administration_requests.index.title") %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t("superadmin.administration_requests.index.title") %></h1>
+  <div class="my-4"><%== @pagy.series_nav %></div>
+  <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+    <table class="table table-zebra">
+      <thead>
+        <tr>
+          <th><%= I18n.t("activerecord.attributes.administration_request.applicant") %></th>
+          <th><%= I18n.t("activerecord.attributes.administration_request.target") %></th>
+          <th><%= I18n.t("activerecord.attributes.administration_request.position") %></th>
+          <th><%= I18n.t("shared.table.status") %></th>
+          <th><%= I18n.t("shared.table.actions") %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @administration_requests.each do |req| %>
+          <tr>
+            <td><%= req.user.email %></td>
+            <td><%= req.target_association_label %></td>
+            <td><%= I18n.t("board_members.positions.#{req.position}", default: req.position) %></td>
+            <td><%= status_badge(req.status) %></td>
+            <td><%= link_to I18n.t("shared.table.view"), superadmin_administration_request_path(req), class: "btn btn-sm" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="my-4"><%== @pagy.series_nav %></div>
+</div>

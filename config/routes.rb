@@ -146,6 +146,12 @@ Rails.application.routes.draw do
         post :impersonate
       end
     end
+    resources :administration_requests, only: %i[index show] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
     resources :countries do
       collection do
         get :search
