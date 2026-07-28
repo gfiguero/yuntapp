@@ -30,7 +30,7 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create neighborhood_association" do
     assert_difference("NeighborhoodAssociation.count") do
-      post neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation"}}
+      post neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation", rut: valid_test_rut(1)}}
     end
 
     assert_redirected_to neighborhood_association_url(NeighborhoodAssociation.last)

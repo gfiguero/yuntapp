@@ -87,7 +87,7 @@ module Superadmin
 
     # Only allow a list of trusted parameters through.
     def neighborhood_association_params
-      params.require(:neighborhood_association).permit(:name)
+      params.require(:neighborhood_association).permit(:name, :rut)
     end
 
     def set_neighborhood_associations

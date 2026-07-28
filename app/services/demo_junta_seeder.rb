@@ -16,6 +16,10 @@ require "stringio"
 # Uso: DemoJuntaSeeder.call  /  DemoJuntaSeeder.reset!
 class DemoJuntaSeeder
   ASSOCIATION_NAME = "[DEMO] Junta de Vecinos Los Aromos"
+  DEMO_RUTS = %w[
+    70207956-K 71724860-0 74426693-9 83014859-0 83312584-2
+    86429665-3 91399989-4 91750662-0 94600037-K 96807455-5
+  ].freeze
   EMAIL_LIKE = "gfiguero+demo-%@gmail.com"
   DEMO_PASSWORD = "demo1234"
   COMMUNE_NAME = "Ñuñoa"
@@ -49,7 +53,7 @@ class DemoJuntaSeeder
     ActiveRecord::Base.transaction do
       destroy_demo_data
       @commune = Commune.find_by!(name: COMMUNE_NAME)
-      @association = NeighborhoodAssociation.create!(name: ASSOCIATION_NAME, commune: @commune)
+      @association = NeighborhoodAssociation.create!(name: ASSOCIATION_NAME, commune: @commune, rut: DEMO_RUTS.first)
       @admin = create_user("admin", admin: true, association: @association)
       CertificatePricing.create!(neighborhood_association: @association, price: 2000,
         created_by: @admin, effective_from: Time.current)

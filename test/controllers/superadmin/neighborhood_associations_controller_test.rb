@@ -31,7 +31,7 @@ module Superadmin
 
     test "should create neighborhood_association" do
       assert_difference("NeighborhoodAssociation.count") do
-        post superadmin_neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation"}}
+        post superadmin_neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation", rut: valid_test_rut(2)}}
       end
 
       assert_redirected_to superadmin_neighborhood_association_url(NeighborhoodAssociation.last)
