@@ -1,0 +1,3 @@
+<p><%= t(".body", junta: @request.target_association_label) %></p>
+<% if @request.rejection_reason.present? %><p><%= t(".reason", reason: @request.rejection_reason) %></p><% end %>
+<p><%= t(".signature") %></p>

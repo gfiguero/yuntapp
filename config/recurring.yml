@@ -17,3 +17,7 @@ production:
   onboarding_reminders:
     class: OnboardingRemindersJob
     schedule: every day at 8am
+  # BR-133: digest diario al staff con solicitudes de administración pendientes.
+  administration_reminders:
+    class: AdministrationRemindersJob
+    schedule: every day at 8am

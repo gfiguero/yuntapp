@@ -425,6 +425,34 @@ es:
       cta: Revisar solicitudes pendientes
       signature: Equipo Yuntapp
 
+  administration_request_mailer:
+    submitted:
+      subject: Recibimos tu solicitud de administración
+      body: "Recibimos tu solicitud para administrar la junta %{junta}. El equipo de Yuntapp la revisará y te avisaremos el resultado."
+      signature: Equipo Yuntapp
+    approved:
+      subject: Tu solicitud de administración fue aprobada
+      body: "¡Felicitaciones! Tu solicitud fue aprobada y ya administras la junta %{junta} en Yuntapp."
+      signature: Equipo Yuntapp
+    rejected:
+      subject: Tu solicitud de administración fue rechazada
+      body: "Tu solicitud para administrar la junta %{junta} fue rechazada."
+      reason: "Motivo: %{reason}"
+      signature: Equipo Yuntapp
+    notify_existing_admin:
+      subject: Alguien solicitó administrar tu junta
+      body: "%{solicitante} solicitó administrar la junta %{junta}, que tú administras actualmente."
+      may_object: Si crees que esta solicitud no corresponde, puedes objetarla contactando al equipo de Yuntapp.
+      signature: Equipo Yuntapp
+    staff_digest:
+      subject:
+        one: Hay 1 solicitud de administración pendiente de revisión
+        other: Hay %{count} solicitudes de administración pendientes de revisión
+      intro:
+        one: "Hay 1 solicitud de administración esperando revisión:"
+        other: "Hay %{count} solicitudes de administración esperando revisión:"
+      signature: Equipo Yuntapp
+
   verifications:
     layout:
       title: Verificación de Certificado — Yuntapp

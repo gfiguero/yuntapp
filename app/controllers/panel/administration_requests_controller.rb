@@ -22,6 +22,7 @@ module Panel
 
       if @administration_request.save
         notify_existing_admins
+        AdministrationRequestMailer.submitted(@administration_request).deliver_later
         redirect_to panel_administration_request_path, notice: I18n.t("panel.administration_requests.flash.submitted")
       else
         @cascading_data = build_cascading_data
@@ -55,9 +56,13 @@ module Panel
     end
 
     # BR-130: avisar a los admins vigentes de la junta objetivo.
-    # El mailer AdministrationRequestMailer se agrega en el Task de notificaciones (Task 7).
-    # Por ahora es un no-op seguro para no romper.
     def notify_existing_admins
+      junta = @administration_request.neighborhood_association
+      return unless junta
+
+      User.where(admin: true, neighborhood_association_id: junta.id).find_each do |admin|
+        AdministrationRequestMailer.notify_existing_admin(admin, @administration_request).deliver_later
+      end
     end
 
     # Mismo patrón que Panel::OnboardingController#build_cascading_data.
