@@ -198,33 +198,25 @@ Rails.application.routes.draw do
       collection { get :search }
       member { get :delete }
     end
-    resources :identity_verification_requests, except: [:new, :create] do
+    resources :identity_verification_requests, except: [:new, :create, :destroy] do
       collection { get :search }
-      member { get :delete }
     end
-    resources :residence_verification_requests, except: [:new, :create] do
+    resources :residence_verification_requests, except: [:new, :create, :destroy] do
       collection { get :search }
-      member { get :delete }
     end
   end
 
   namespace :admin do
     post "stop_impersonating", to: "impersonations#stop"
     root to: "dashboard#index"
-    resources :neighborhood_delegations do
+    resources :neighborhood_delegations, except: [:destroy] do
       collection do
         get :search
-      end
-      member do
-        get :delete
       end
     end
-    resources :household_units do
+    resources :household_units, except: [:destroy] do
       collection do
         get :search
-      end
-      member do
-        get :delete
       end
     end
     resources :onboarding_requests, only: [:index, :show] do
@@ -272,12 +264,13 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :board_members do
+    resources :board_members, except: [:destroy] do
       collection do
         get :search
       end
       member do
-        get :delete
+        get :end_term
+        patch :confirm_end_term
       end
     end
     resources :residence_certificates, only: [:index, :show] do

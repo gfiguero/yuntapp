@@ -2,7 +2,7 @@ module Admin
   class HouseholdUnitsController < ApplicationController
     include Pagy::Method
 
-    before_action :set_household_unit, only: %i[show edit update delete destroy]
+    before_action :set_household_unit, only: %i[show edit update]
     before_action :set_household_units, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -58,16 +58,6 @@ module Admin
       else
         render :edit, status: :unprocessable_content
       end
-    end
-
-    # GET /admin/household_units/1/delete
-    def delete
-    end
-
-    # DELETE /admin/household_units/1
-    def destroy
-      @household_unit.destroy!
-      redirect_to admin_household_units_path, notice: I18n.t("admin.household_units.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

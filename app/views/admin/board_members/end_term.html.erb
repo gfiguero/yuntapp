@@ -4,13 +4,17 @@
 
 <% content_for :breadcrumb do %>
   <li><%= link_to I18n.t('admin.board_members.index.title'), admin_board_members_path %></li>
-  <li><%= link_to @board_member.id, admin_board_member_path(@board_member) %></li>
-  <li><%= I18n.t('actions.delete') %></li>
+  <li><%= link_to @board_member.member.name, admin_board_member_path(@board_member) %></li>
+  <li><%= I18n.t('admin.board_members.end_term.action') %></li>
 <% end %>
 
 <div class="w-full">
   <h1 class="font-bold text-4xl my-4"><%= I18n.t('admin.board_members.index.title') %></h1>
-  <h3 class="font-bold text-xl mb-4"><%= I18n.t('admin.board_members.show.identifier', id: @board_member.id) %></h3>
+
+  <div class="alert alert-warning mb-4">
+    <span><%= I18n.t('admin.board_members.end_term.warning', name: @board_member.member.name, position: @board_member.position.capitalize) %></span>
+  </div>
+
   <%= render "buttons" %>
   <%= render @board_member %>
 </div>

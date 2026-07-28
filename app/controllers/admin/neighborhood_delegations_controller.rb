@@ -2,7 +2,7 @@ module Admin
   class NeighborhoodDelegationsController < ApplicationController
     include Pagy::Method
 
-    before_action :set_neighborhood_delegation, only: %i[show edit update delete destroy]
+    before_action :set_neighborhood_delegation, only: %i[show edit update]
     before_action :set_neighborhood_delegations, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -58,16 +58,6 @@ module Admin
       else
         render :edit, status: :unprocessable_content
       end
-    end
-
-    # GET /admin/neighborhood_delegations/1/delete
-    def delete
-    end
-
-    # DELETE /admin/neighborhood_delegations/1
-    def destroy
-      @neighborhood_delegation.destroy!
-      redirect_to admin_neighborhood_delegations_path, notice: I18n.t("admin.neighborhood_delegations.flash.destroyed"), status: :see_other, format: :html
     end
 
     private

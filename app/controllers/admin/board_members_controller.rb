@@ -2,7 +2,7 @@ module Admin
   class BoardMembersController < ApplicationController
     include Pagy::Method
 
-    before_action :set_board_member, only: %i[show edit update delete destroy]
+    before_action :set_board_member, only: %i[show edit update end_term confirm_end_term]
     before_action :set_board_members, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -60,14 +60,16 @@ module Admin
       end
     end
 
-    # GET /admin/board_members/1/delete
-    def delete
+    # GET /admin/board_members/1/end_term
+    def end_term
     end
 
-    # DELETE /admin/board_members/1
-    def destroy
-      @board_member.destroy!
-      redirect_to admin_board_members_path, notice: I18n.t("admin.board_members.flash.destroyed"), status: :see_other, format: :html
+    # PATCH /admin/board_members/1/confirm_end_term
+    # BR-100: la directiva no se destruye; el cargo se cierra (active: false + end_date),
+    # conservando el historial institucional.
+    def confirm_end_term
+      @board_member.end_term!
+      redirect_to admin_board_member_path(@board_member), notice: I18n.t("admin.board_members.flash.term_ended"), status: :see_other
     end
 
     private

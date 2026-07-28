@@ -526,10 +526,13 @@ es:
         count: "%{count} directivos"
       show:
         identifier: "Directivo ID: %{id}"
+      end_term:
+        action: Dar de baja
+        warning: "¿Dar de baja el cargo de %{position} de %{name}? El registro se conserva en el historial de directiva (queda inactivo con fecha de término)."
       flash:
         created: Directivo creado exitosamente.
         updated: Directivo actualizado exitosamente.
-        destroyed: Directivo eliminado exitosamente.
+        term_ended: Cargo dado de baja. El historial de directiva se conserva.
     household_units:
       index:
         title: Domicilios

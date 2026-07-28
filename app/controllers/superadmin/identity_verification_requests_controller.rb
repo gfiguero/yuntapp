@@ -2,7 +2,7 @@ module Superadmin
   class IdentityVerificationRequestsController < Superadmin::ApplicationController
     include Pagy::Method
 
-    before_action :set_identity_verification_request, only: %i[show edit update delete destroy]
+    before_action :set_identity_verification_request, only: %i[show edit update]
     before_action :set_identity_verification_requests, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -32,14 +32,6 @@ module Superadmin
       else
         render :edit, status: :unprocessable_content
       end
-    end
-
-    def delete
-    end
-
-    def destroy
-      @identity_verification_request.destroy!
-      redirect_to superadmin_identity_verification_requests_path, notice: I18n.t("superadmin.identity_verification_requests.flash.destroyed"), status: :see_other, format: :html
     end
 
     private
