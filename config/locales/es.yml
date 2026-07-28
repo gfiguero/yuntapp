@@ -277,6 +277,9 @@ es:
         residence_certificate:
           base:
             immutable: no puede modificarse una vez emitido
+        administration_request:
+          target_missing: Debes seleccionar una junta existente o indicar nombre y comuna de una nueva
+          already_active: Ya tienes una solicitud de administración en curso
 
   errors:
     messages:
