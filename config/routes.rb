@@ -103,6 +103,10 @@ Rails.application.routes.draw do
 
     resource :account_deactivation, only: [:new, :create], controller: "account_deactivations"
 
+    resource :administration_request, only: [:new, :create, :show] do
+      delete :cancel, on: :collection
+    end
+
     delete "onboarding/restart", to: "onboarding#restart", as: :onboarding_restart
     delete "onboarding/cancel", to: "onboarding#cancel", as: :onboarding_cancel
 

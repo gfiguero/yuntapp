@@ -22,6 +22,9 @@ class User < ApplicationRecord
   has_many :identity_verification_requests
   has_many :residence_verification_requests
   has_many :onboarding_requests
+  # Sin dependent:: User nunca se destruye (before_destroy :prevent_destruction),
+  # y las solicitudes de administración se conservan como historial (BR-100).
+  has_many :administration_requests
 
   # La solicitud actual es cualquiera que esté en borrador o pendiente
   has_one :current_onboarding_request, -> { where(status: ["draft", "pending"]) }, class_name: "OnboardingRequest"
