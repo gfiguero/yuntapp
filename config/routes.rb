@@ -1,31 +1,26 @@
 Rails.application.routes.draw do
-  resources :categories do
-    collection do
-      get :search
-    end
-    member do
-      get :delete
-    end
-  end
-  resources :neighborhood_associations, except: [:destroy] do
+  # Controllers top-level solo de lectura (BR-007): la gestión (crear/editar/
+  # borrar) de juntas, categorías, tags y publicaciones vive exclusivamente en
+  # los namespaces superadmin/admin/panel. Aquí solo se expone el browse
+  # (index/show/search) para usuarios autenticados, nunca CRUD de escritura.
+  resources :categories, only: [:index, :show] do
     collection do
       get :search
     end
   end
-  resources :tags do
+  resources :neighborhood_associations, only: [:index, :show] do
     collection do
       get :search
-    end
-    member do
-      get :delete
     end
   end
-  resources :listings do
+  resources :tags, only: [:index, :show] do
     collection do
       get :search
     end
-    member do
-      get :delete
+  end
+  resources :listings, only: [:index, :show] do
+    collection do
+      get :search
     end
   end
 

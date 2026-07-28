@@ -1,7 +1,7 @@
 class ListingsController < ApplicationController
   include Pagy::Method
 
-  before_action :set_listing, only: %i[show edit update delete destroy]
+  before_action :set_listing, only: %i[show]
   before_action :set_listings, only: :index
   before_action :disabled_pagination
   after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -30,55 +30,11 @@ class ListingsController < ApplicationController
   def show
   end
 
-  # GET /listings/new
-  def new
-    @listing = Listing.new
-  end
-
-  # GET /listings/1/edit
-  def edit
-  end
-
-  # POST /listings
-  def create
-    @listing = Listing.new(listing_params)
-
-    if @listing.save
-      redirect_to @listing, created: I18n.t("listings.flash.created")
-    else
-      render :new, status: :unprocessable_content
-    end
-  end
-
-  # PATCH/PUT /listings/1
-  def update
-    if @listing.update(listing_params)
-      redirect_to @listing, updated: I18n.t("listings.flash.updated"), status: :see_other
-    else
-      render :edit, status: :unprocessable_content
-    end
-  end
-
-  # GET //listings/1/delete
-  def delete
-  end
-
-  # DELETE /listings/1
-  def destroy
-    @listing.destroy!
-    redirect_to listings_path, deleted: I18n.t("listings.flash.destroyed"), status: :see_other, format: :html
-  end
-
   private
 
   # Use callbacks to share common setup or constraints between actions.
   def set_listing
     @listing = Listing.find(params.expect(:id))
-  end
-
-  # Only allow a list of trusted parameters through.
-  def listing_params
-    params.expect(listing: [:name, :price, :description, :active, :user_id, :category_id])
   end
 
   def set_listings

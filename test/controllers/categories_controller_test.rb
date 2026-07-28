@@ -23,59 +23,16 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
     assert_equal @category.id, json_response.first["value"]
   end
 
-  test "should get new" do
-    get new_category_url
-    assert_response :success
-  end
-
-  test "should create category" do
-    assert_difference("Category.count") do
-      post categories_url, params: {category: {name: "New Category"}}
-    end
-
-    assert_redirected_to category_url(Category.last)
-  end
-
-  test "should not create category with invalid params" do
-    assert_no_difference("Category.count") do
-      post categories_url, params: {category: {name: ""}}
-    end
-
-    assert_response :unprocessable_content
-  end
-
   test "should show category" do
     get category_url(@category)
     assert_response :success
   end
 
-  test "should get edit" do
-    get edit_category_url(@category)
-    assert_response :success
-  end
-
-  test "should update category" do
-    patch category_url(@category), params: {category: {name: "Updated Category"}}
-    assert_redirected_to category_url(@category)
-    @category.reload
-    assert_equal "Updated Category", @category.name
-  end
-
-  test "should not update category with invalid params" do
-    patch category_url(@category), params: {category: {name: ""}}
-    assert_response :unprocessable_content
-  end
-
-  test "should get delete" do
-    get delete_category_url(@category)
-    assert_response :success
-  end
-
-  test "should destroy category" do
-    assert_difference("Category.count", -1) do
-      delete category_url(@category)
-    end
-
-    assert_redirected_to categories_url
+  # BR-007, #115: este controller top-level es solo lectura (index/show/search).
+  # Las rutas de escritura no deben existir.
+  test "no write routes are exposed (BR-007, #115)" do
+    assert_raises(StandardError) { new_category_path }
+    assert_raises(StandardError) { edit_category_path(@category) }
+    assert_raises(StandardError) { delete_category_path(@category) }
   end
 end

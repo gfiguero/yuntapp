@@ -487,7 +487,7 @@ module Webhooks
       stub_subscription_service(authorized_payment: {
         "id" => "AUTHPAY-1",
         "preapproval_id" => "PRE-3",
-        "payment" => {"id" => "MP-RECUR-1", "status" => "approved"}
+        "payment" => {"id" => "MP-RECUR-1", "status" => "approved", "transaction_amount" => 1200}
       }) do
         post webhooks_mercadopago_url,
           params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-1"}}
@@ -497,6 +497,48 @@ module Webhooks
       listing.reload
       assert_equal current_until + 30.days, listing.published_until
       assert_equal "MP-RECUR-1", listing.payment_id
+    end
+
+    test "subscription_authorized_payment with wrong amount does not renew (BR-090)" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-5", subscription_status: "authorized")
+      listing.mark_as_paid!(payment_id: "MP-FIRST-5")
+      current_until = listing.published_until
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AUTHPAY-3",
+        "preapproval_id" => "PRE-5",
+        "payment" => {"id" => "MP-RECUR-3", "status" => "approved", "transaction_amount" => 500}
+      }) do
+        post webhooks_mercadopago_url,
+          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-3"}}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert_equal current_until, listing.published_until, "no debe extender la vigencia con monto distinto"
+      assert_equal "MP-FIRST-5", listing.payment_id, "no debe registrar el payment_id del cobro rechazado"
+    end
+
+    test "subscription_authorized_payment without transaction_amount does not renew (BR-090)" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-6", subscription_status: "authorized")
+      listing.mark_as_paid!(payment_id: "MP-FIRST-6")
+      current_until = listing.published_until
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AUTHPAY-4",
+        "preapproval_id" => "PRE-6",
+        "payment" => {"id" => "MP-RECUR-4", "status" => "approved"}
+      }) do
+        post webhooks_mercadopago_url,
+          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-4"}}
+      end
+
+      assert_response :ok
+      listing.reload
+      assert_equal current_until, listing.published_until
+      assert_equal "MP-FIRST-6", listing.payment_id
     end
 
     test "subscription_authorized_payment rejected does not renew" do

@@ -166,6 +166,16 @@ module Webhooks
 
       case payment_status
       when "approved"
+        # BR-090: el cobro recurrente debe coincidir exactamente con el monto
+        # snapshot de la publicación, igual que el pago único. Rechaza montos
+        # distintos o payment_ids obsoletos de otra operación cuyo
+        # preapproval/external_reference coincida (protección contra manipulación).
+        amount = payment["transaction_amount"] || payment[:transaction_amount]
+        unless amount_matches?(amount, listing.amount)
+          Rails.logger.warn("MercadoPago webhook: subscription payment #{payment_id} amount #{amount.inspect} != listing ##{listing.id} amount #{listing.amount.inspect} — no renewal")
+          return
+        end
+
         listing.renew_from_subscription!(payment_id: payment_id)
         Rails.logger.info("MercadoPago webhook: listing ##{listing.id} renewed until #{listing.published_until} (payment_id=#{payment_id})")
       else

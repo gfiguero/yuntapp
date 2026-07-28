@@ -23,47 +23,9 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @neighborhood_association.id, json_response.first["value"]
   end
 
-  test "should get new" do
-    get new_neighborhood_association_url
-    assert_response :success
-  end
-
-  test "should create neighborhood_association" do
-    assert_difference("NeighborhoodAssociation.count") do
-      post neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation", rut: valid_test_rut(1)}}
-    end
-
-    assert_redirected_to neighborhood_association_url(NeighborhoodAssociation.last)
-  end
-
-  test "should not create neighborhood_association with invalid params" do
-    assert_no_difference("NeighborhoodAssociation.count") do
-      post neighborhood_associations_url, params: {neighborhood_association: {name: ""}}
-    end
-
-    assert_response :unprocessable_content
-  end
-
   test "should show neighborhood_association" do
     get neighborhood_association_url(@neighborhood_association)
     assert_response :success
-  end
-
-  test "should get edit" do
-    get edit_neighborhood_association_url(@neighborhood_association)
-    assert_response :success
-  end
-
-  test "should update neighborhood_association" do
-    patch neighborhood_association_url(@neighborhood_association), params: {neighborhood_association: {name: "Updated NeighborhoodAssociation"}}
-    assert_redirected_to neighborhood_association_url(@neighborhood_association)
-    @neighborhood_association.reload
-    assert_equal "Updated NeighborhoodAssociation", @neighborhood_association.name
-  end
-
-  test "should not update neighborhood_association with invalid params" do
-    patch neighborhood_association_url(@neighborhood_association), params: {neighborhood_association: {name: ""}}
-    assert_response :unprocessable_content
   end
 
   # BR-100: las juntas no se destruyen; no existe ruta destroy en este controller.
@@ -74,5 +36,12 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
         method: :delete
       )
     end
+  end
+
+  # BR-007, #115: este controller top-level es solo lectura (index/show/search).
+  # Las rutas de escritura no deben existir.
+  test "no write routes are exposed (BR-007, #115)" do
+    assert_raises(StandardError) { new_neighborhood_association_path }
+    assert_raises(StandardError) { edit_neighborhood_association_path(@neighborhood_association) }
   end
 end
