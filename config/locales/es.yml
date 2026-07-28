@@ -341,6 +341,7 @@ es:
       cascade_reason: "Desactivación en cascada del jefe de hogar: %{reason}"
       identity_transfer: "Transferencia de identidad: se aprobó una nueva membresía con el mismo RUN"
       became_dependent: "Transición a residente dependiente de otro grupo familiar"
+      administration_onboarding: Transferencia de identidad por aprobación de administración de otra junta
 
   users:
     deactivation:
