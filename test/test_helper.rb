@@ -31,7 +31,11 @@ module ValidTestRut
       m = (m == 7) ? 2 : m + 1
     }
     r = 11 - (sum % 11)
-    dv = (r == 11) ? "0" : ((r == 10) ? "K" : r.to_s)
+    dv = if r == 11
+      "0"
+    else
+      ((r == 10) ? "K" : r.to_s)
+    end
     "#{body}-#{dv}"
   end
 end
