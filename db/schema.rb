@@ -197,8 +197,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_27_205939) do
     t.integer "commune_id"
     t.datetime "created_at", null: false
     t.string "name"
+    t.string "rut", null: false
     t.datetime "updated_at", null: false
     t.index ["commune_id"], name: "index_neighborhood_associations_on_commune_id"
+    t.index ["rut"], name: "index_neighborhood_associations_on_rut", unique: true
   end
 
   create_table "neighborhood_delegations", force: :cascade do |t|
