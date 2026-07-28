@@ -24,7 +24,8 @@ module Admin
 
     # GET /admin/residence_certificates/search.json
     def search
-      @residence_certificates = params[:items].present? ? ResidenceCertificate.filter_by_id(params[:items]) : ResidenceCertificate.all
+      scope = current_neighborhood_association.residence_certificates
+      @residence_certificates = params[:items].present? ? scope.filter_by_id(params[:items]) : scope
 
       respond_to do |format|
         format.json

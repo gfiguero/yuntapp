@@ -19,7 +19,8 @@ module Admin
 
     # GET /admin/neighborhood_delegations/search.json
     def search
-      @neighborhood_delegations = params[:items].present? ? NeighborhoodDelegation.filter_by_id(params[:items]) : NeighborhoodDelegation.all
+      scope = current_neighborhood_association.neighborhood_delegations
+      @neighborhood_delegations = params[:items].present? ? scope.filter_by_id(params[:items]) : scope
 
       respond_to do |format|
         format.json

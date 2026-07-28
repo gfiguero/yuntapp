@@ -17,6 +17,8 @@ class NeighborhoodAssociation < ApplicationRecord
   has_many :residencies, through: :household_units
   has_many :members
   has_many :users
+  # BR-007: las publicaciones de la junta son las de sus usuarios (aislamiento multi-tenant).
+  has_many :listings, through: :users
   has_many :identity_verification_requests
   has_many :residence_verification_requests
   has_many :onboarding_requests

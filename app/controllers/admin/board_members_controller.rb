@@ -19,7 +19,8 @@ module Admin
 
     # GET /admin/board_members/search.json
     def search
-      @board_members = params[:items].present? ? BoardMember.filter_by_id(params[:items]) : BoardMember.all
+      scope = current_neighborhood_association.board_members
+      @board_members = params[:items].present? ? scope.filter_by_id(params[:items]) : scope
 
       respond_to do |format|
         format.json

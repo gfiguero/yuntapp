@@ -19,7 +19,8 @@ module Admin
 
     # GET /admin/household_units/search.json
     def search
-      @household_units = params[:items].present? ? HouseholdUnit.filter_by_id(params[:items]) : HouseholdUnit.all
+      scope = current_neighborhood_association.household_units
+      @household_units = params[:items].present? ? scope.filter_by_id(params[:items]) : scope
 
       respond_to do |format|
         format.json

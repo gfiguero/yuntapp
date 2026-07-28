@@ -256,7 +256,7 @@ Rails.application.routes.draw do
         patch :confirm_deactivate
       end
     end
-    resources :listings do
+    resources :listings, except: [:new, :create] do
       collection do
         get :search
       end

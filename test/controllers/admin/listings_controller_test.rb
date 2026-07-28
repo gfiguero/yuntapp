@@ -5,9 +5,10 @@ module Admin
     include Devise::Test::IntegrationHelpers
 
     setup do
-      @listing = listings(:artanis_zealot_gauntlets)
-      @user = users(:artanis)
-      sign_in @user
+      @admin = users(:selendis) # admin de manios_de_buin
+      # Publicación de un usuario de la junta del admin (aislamiento multi-tenant).
+      @listing = Listing.create!(user: @admin, name: "Silla de la junta", active: true)
+      sign_in @admin
     end
 
     test "should get index" do
@@ -15,7 +16,7 @@ module Admin
       assert_response :success
     end
 
-    test "should get search with json format" do
+    test "should get search scoped to the admin's association" do
       get search_admin_listings_url(format: :json), params: {items: [@listing.id]}
       assert_response :success
 
@@ -24,36 +25,27 @@ module Admin
       assert_equal @listing.id, json_response.first["value"]
     end
 
-    test "should get new" do
-      get new_admin_listing_url
+    # BR-007: el search no expone publicaciones de otra junta.
+    test "search does not leak listings from another association" do
+      foreign = Listing.create!(user: users(:artanis), name: "Ajena", active: true)
+
+      get search_admin_listings_url(format: :json), params: {items: [foreign.id]}
       assert_response :success
-    end
 
-    test "should create listing" do
-      assert_difference("Listing.count") do
-        post admin_listings_url, params: {listing: {
-          active: @listing.active,
-          description: @listing.description,
-          name: "New Admin Listing",
-          price: @listing.price,
-          user_id: @user.id
-        }}
-      end
-
-      assert_redirected_to admin_listing_url(Listing.last)
-    end
-
-    test "should not create listing with invalid params" do
-      assert_no_difference("Listing.count") do
-        post admin_listings_url, params: {listing: {name: ""}}
-      end
-
-      assert_response :unprocessable_content
+      json_response = JSON.parse(response.body)
+      assert_empty json_response
     end
 
     test "should show listing" do
       get admin_listing_url(@listing)
       assert_response :success
+    end
+
+    # BR-007: no se puede ver una publicación de otra junta (IDOR).
+    test "cannot show a listing from another association" do
+      foreign = Listing.create!(user: users(:artanis), name: "Ajena", active: true)
+      get admin_listing_url(foreign)
+      assert_response :not_found
     end
 
     test "should get edit" do
@@ -62,28 +54,22 @@ module Admin
     end
 
     test "should update listing" do
-      patch admin_listing_url(@listing), params: {listing: {name: "Updated Admin Listing"}}
+      patch admin_listing_url(@listing), params: {listing: {name: "Silla actualizada"}}
       assert_redirected_to admin_listing_url(@listing)
-      @listing.reload
-      assert_equal "Updated Admin Listing", @listing.name
+      assert_equal "Silla actualizada", @listing.reload.name
     end
 
-    test "should not update listing with invalid params" do
-      patch admin_listing_url(@listing), params: {listing: {name: ""}}
-      assert_response :unprocessable_content
+    # BR-007: user_id no es asignable (no se puede reasignar el dueño).
+    test "update ignores user_id" do
+      original_user_id = @listing.user_id
+      patch admin_listing_url(@listing), params: {listing: {name: "X", user_id: users(:artanis).id}}
+      assert_equal original_user_id, @listing.reload.user_id
     end
 
-    test "should get delete" do
-      get delete_admin_listing_url(@listing)
-      assert_response :success
-    end
-
-    test "should destroy listing" do
-      assert_difference("Listing.count", -1) do
-        delete admin_listing_url(@listing)
+    test "there is no create route for admin listings" do
+      assert_raises(ActionController::RoutingError) do
+        Rails.application.routes.recognize_path("/admin/listings", method: :post)
       end
-
-      assert_redirected_to admin_listings_url
     end
   end
 end

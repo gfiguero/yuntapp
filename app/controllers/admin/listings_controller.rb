@@ -19,7 +19,8 @@ module Admin
 
     # GET /admin/listings/search.json
     def search
-      @listings = params[:items].present? ? Listing.filter_by_id(params[:items]) : Listing.all
+      scope = current_neighborhood_association.listings
+      @listings = params[:items].present? ? scope.filter_by_id(params[:items]) : scope
 
       respond_to do |format|
         format.json
@@ -31,24 +32,8 @@ module Admin
     def show
     end
 
-    # GET /admin/listings/new
-    def new
-      @listing = Listing.new
-    end
-
     # GET /admin/listings/1/edit
     def edit
-    end
-
-    # POST /admin/listings
-    def create
-      @listing = Listing.new(listing_params)
-
-      if @listing.save
-        redirect_to admin_listing_path(@listing), notice: I18n.t("admin.listings.flash.created")
-      else
-        render :new, status: :unprocessable_content
-      end
     end
 
     # PATCH/PUT /admin/listings/1
@@ -73,17 +58,19 @@ module Admin
     private
 
     # Use callbacks to share common setup or constraints between actions.
+    # BR-007: el admin solo gestiona las publicaciones de su junta (las de sus usuarios).
     def set_listing
-      @listing = Listing.find(params[:id])
+      @listing = current_neighborhood_association.listings.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
+    # Only allow a list of trusted parameters through. Sin :user_id: el admin no puede
+    # reasignar una publicación a otro usuario (BR-007).
     def listing_params
-      params.require(:listing).permit(:name, :price, :description, :active, :user_id, :category_id)
+      params.require(:listing).permit(:name, :price, :description, :active, :category_id)
     end
 
     def set_listings
-      @listings = Listing.all
+      @listings = current_neighborhood_association.listings
       @listings = @listings.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
       filter_params.each { |attribute, value| @listings = @listings.send(filter_scope(attribute), value) } if filter_params.present?
     end
@@ -93,11 +80,11 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :name, :price, :description, :active, :user_id).reject { |key, value| value.blank? }
+      params.permit(:id, :name, :price, :description, :active).reject { |key, value| value.blank? }
     end
 
     def disabled_pagination
-      render json: Listing.all if params[:items] == "all"
+      render json: current_neighborhood_association.listings if params[:items] == "all"
     end
   end
 end

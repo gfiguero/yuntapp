@@ -2,6 +2,8 @@ module Admin
   class UsersController < ApplicationController
     include Pagy::Method
 
+    SORTABLE_COLUMNS = %w[id email admin created_at].freeze
+
     before_action :set_user, only: %i[show edit update]
     before_action :set_users, only: :index
     before_action :disabled_pagination
@@ -19,7 +21,8 @@ module Admin
 
     # GET /admin/users/search.json
     def search
-      @users = params[:items].present? ? User.where(id: params[:items]) : User.all
+      scope = current_neighborhood_association.users
+      @users = params[:items].present? ? scope.where(id: params[:items]) : scope
 
       respond_to do |format|
         format.json
@@ -74,9 +77,12 @@ module Admin
 
     def set_users
       @users = current_neighborhood_association.users
-      # Add simple sort if params present, similar to other controllers
-      if params[:sort_column].present? && params[:sort_direction].present?
-        @users = @users.order("#{params[:sort_column]} #{params[:sort_direction]}")
+      # Orden con allowlist de columnas + dirección validada (evita SQL injection por
+      # interpolación de params en ORDER BY).
+      if params[:sort_column].present?
+        column = params[:sort_column].to_s
+        direction = (params[:sort_direction].to_s.downcase == "desc") ? :desc : :asc
+        @users = @users.order(column => direction) if SORTABLE_COLUMNS.include?(column)
       end
 
       # Add simple filter
