@@ -1,4 +1,11 @@
 <%
+  dv = ->(body) {
+    sum = 0; m = 2
+    body.to_s.reverse.each_char { |c| sum += c.to_i * m; m = (m == 7) ? 2 : m + 1 }
+    r = 11 - (sum % 11)
+    r == 11 ? "0" : (r == 10 ? "K" : r.to_s)
+  }
+
 factions = [
   "Raynor's Raiders", "Dominion Guard", "Zerg Swarm", "Protoss Conclave", "Kel-Morian Combine",
   "Umojan Protectorate", "Taldarim Death Fleet", "Nerazim Shadow Guard", "Purifiers", "Primal Zerg Pack",
@@ -13,8 +20,10 @@ factions = [
 association_<%= index %>:
   name: <%= name %>
   commune: commune_0_0_<%= index % 10 %>
+  rut: <%= body = (61_000_000 + index).to_s; "#{body}-#{dv.call(body)}" %>
 <% end %>
 
 manios_de_buin:
   name: "Junta de Vecinos Mañíos de Buin"
   commune: commune_0_0_39
+  rut: <%= body = "61999001"; "#{body}-#{dv.call(body)}" %>
