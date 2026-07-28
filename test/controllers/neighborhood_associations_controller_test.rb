@@ -30,7 +30,7 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create neighborhood_association" do
     assert_difference("NeighborhoodAssociation.count") do
-      post neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation"}}
+      post neighborhood_associations_url, params: {neighborhood_association: {name: "New NeighborhoodAssociation", rut: valid_test_rut(1)}}
     end
 
     assert_redirected_to neighborhood_association_url(NeighborhoodAssociation.last)
@@ -66,17 +66,13 @@ class NeighborhoodAssociationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_content
   end
 
-  test "should get delete" do
-    get delete_neighborhood_association_url(@neighborhood_association)
-    assert_response :success
-  end
-
-  test "should destroy neighborhood_association" do
-    deletable = NeighborhoodAssociation.create!(name: "Deletable Association")
-    assert_difference("NeighborhoodAssociation.count", -1) do
-      delete neighborhood_association_url(deletable)
+  # BR-100: las juntas no se destruyen; no existe ruta destroy en este controller.
+  test "there is no destroy route for neighborhood associations" do
+    assert_raises(ActionController::RoutingError) do
+      Rails.application.routes.recognize_path(
+        "/neighborhood_associations/#{@neighborhood_association.id}",
+        method: :delete
+      )
     end
-
-    assert_redirected_to neighborhood_associations_url
   end
 end

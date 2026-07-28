@@ -1,0 +1,18 @@
+<div class="w-full max-w-2xl">
+  <h1 class="font-bold text-3xl my-4"><%= t("superadmin.users.block.title") %></h1>
+
+  <div class="alert alert-warning mb-4">
+    <span><%= t("superadmin.users.block.warning", email: @user.email) %></span>
+  </div>
+
+  <%= form_with url: confirm_block_superadmin_user_path(@user), method: :patch do |f| %>
+    <label class="floating-label">
+      <%= f.text_area :block_reason, required: true, class: "textarea textarea-bordered w-full", placeholder: t("superadmin.users.block.reason_label") %>
+      <span><%= t("superadmin.users.block.reason_label") %></span>
+    </label>
+    <div class="flex flex-row gap-2 mt-4">
+      <%= link_to t("actions.cancel"), superadmin_user_path(@user), class: "btn btn-soft" %>
+      <%= f.submit t("superadmin.users.block.confirm"), class: "btn btn-error" %>
+    </div>
+  <% end %>
+</div>

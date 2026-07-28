@@ -1,0 +1,26 @@
+<% content_for :title do %>
+  <%= I18n.t('superadmin.neighborhood_associations.index.title') %>
+<% end %>
+
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t('superadmin.neighborhood_associations.index.title'), superadmin_neighborhood_associations_path %></li>
+  <li><%= link_to @neighborhood_association.id, superadmin_neighborhood_association_path(@neighborhood_association) %></li>
+  <li><%= I18n.t('superadmin.neighborhood_associations.deactivate.title') %></li>
+<% end %>
+
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('superadmin.neighborhood_associations.index.title') %></h1>
+  <h3 class="font-bold text-xl mb-4"><%= I18n.t('superadmin.neighborhood_associations.show.identifier', id: @neighborhood_association.id) %></h3>
+
+  <div class="alert alert-warning mb-4">
+    <span><%= I18n.t('superadmin.neighborhood_associations.deactivate.warning', name: @neighborhood_association.name) %></span>
+  </div>
+
+  <div class="flex flex-row gap-2 mb-4">
+    <%= link_to raw(icon('list') + I18n.t('actions.index')), superadmin_neighborhood_associations_path, class: "btn btn-soft" %>
+    <%= link_to raw(icon('cancel') + I18n.t('actions.cancel')), [:superadmin, @neighborhood_association], class: "btn btn-soft" %>
+    <%= button_to raw(icon('delete') + I18n.t('actions.confirm')), confirm_deactivate_superadmin_neighborhood_association_path(@neighborhood_association), method: :patch, class: "btn btn-soft btn-error" %>
+  </div>
+
+  <%= render @neighborhood_association %>
+</div>

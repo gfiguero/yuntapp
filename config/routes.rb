@@ -7,12 +7,9 @@ Rails.application.routes.draw do
       get :delete
     end
   end
-  resources :neighborhood_associations do
+  resources :neighborhood_associations, except: [:destroy] do
     collection do
       get :search
-    end
-    member do
-      get :delete
     end
   end
   resources :tags do
@@ -37,6 +34,12 @@ Rails.application.routes.draw do
     registrations: "users/registrations",
     passwords: "users/passwords"
   }
+
+  # Reactivación auto-servicio de cuentas desactivadas (BR-100, forma A: por correo).
+  get "account/reactivate", to: "reactivations#new", as: :new_reactivation
+  post "account/reactivate", to: "reactivations#create", as: :reactivations
+  get "account/reactivate/:token", to: "reactivations#show", as: :reactivate_account
+  patch "account/reactivate/:token", to: "reactivations#update"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -98,7 +101,7 @@ Rails.application.routes.draw do
       end
     end
 
-    delete "reset_account", to: "account_resets#destroy", as: :reset_account
+    resource :account_deactivation, only: [:new, :create], controller: "account_deactivations"
 
     delete "onboarding/restart", to: "onboarding#restart", as: :onboarding_restart
     delete "onboarding/cancel", to: "onboarding#cancel", as: :onboarding_cancel
@@ -129,12 +132,13 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :neighborhood_associations do
+    resources :neighborhood_associations, except: [:destroy] do
       collection do
         get :search
       end
       member do
-        get :delete
+        get :deactivate
+        patch :confirm_deactivate
         post :impersonate
       end
     end
@@ -170,12 +174,14 @@ Rails.application.routes.draw do
         get :delete
       end
     end
-    resources :users do
+    resources :users, except: [:destroy] do
       collection do
         get :search
       end
       member do
-        get :delete
+        get :block
+        patch :confirm_block
+        patch :unblock
       end
     end
     resources :onboarding_requests, except: [:new, :create] do
@@ -237,12 +243,11 @@ Rails.application.routes.draw do
         patch :reject
       end
     end
-    resources :members do
+    resources :members, except: [:destroy] do
       collection do
         get :search
       end
       member do
-        get :delete
         get :deactivate
         patch :approve
         patch :reject

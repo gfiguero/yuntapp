@@ -2,7 +2,7 @@ module Superadmin
   class UsersController < Superadmin::ApplicationController
     include Pagy::Method
 
-    before_action :set_user, only: %i[show edit update delete destroy]
+    before_action :set_user, only: %i[show edit update block confirm_block unblock]
     before_action :set_users, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -44,14 +44,29 @@ module Superadmin
       end
     end
 
-    # GET /superadmin/users/1/delete
-    def delete
+    # GET /superadmin/users/1/block
+    def block
     end
 
-    # DELETE /superadmin/users/1
-    def destroy
-      @user.destroy!
-      redirect_to superadmin_users_path, notice: I18n.t("superadmin.users.flash.destroyed"), status: :see_other, format: :html
+    # PATCH /superadmin/users/1/confirm_block
+    # BR-100: bloquear no destruye la cuenta; la deja inactiva (login bloqueado) y el
+    # usuario no puede reactivarla por sí mismo. Un superadmin no es bloqueable.
+    def confirm_block
+      if @user.superadmin?
+        redirect_to superadmin_user_path(@user), alert: I18n.t("superadmin.users.flash.cannot_block_superadmin")
+        return
+      end
+
+      @user.block!(by: current_user, reason: params[:block_reason])
+      redirect_to superadmin_user_path(@user), notice: I18n.t("superadmin.users.flash.blocked"), status: :see_other
+    rescue ActiveRecord::RecordInvalid
+      render :block, status: :unprocessable_content
+    end
+
+    # PATCH /superadmin/users/1/unblock
+    def unblock
+      @user.unblock!
+      redirect_to superadmin_user_path(@user), notice: I18n.t("superadmin.users.flash.unblocked"), status: :see_other
     end
 
     private

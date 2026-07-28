@@ -3,6 +3,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   before_action :discard_email_param, only: :update
 
+  # BR-100: las cuentas no se eliminan. Se neutraliza la acción destroy de Devise
+  # (registerable): en vez de borrar, se redirige al flujo de desactivación.
+  def destroy
+    redirect_to new_panel_account_deactivation_path
+  end
+
   private
 
   # BR-093: el email de la cuenta es inmutable después del registro. La vista

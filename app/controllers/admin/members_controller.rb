@@ -2,7 +2,7 @@ module Admin
   class MembersController < Admin::ApplicationController
     include Pagy::Method
 
-    before_action :set_member, only: %i[show edit update delete destroy approve reject deactivate confirm_deactivate]
+    before_action :set_member, only: %i[show edit update approve reject deactivate confirm_deactivate]
     before_action :set_members, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -72,16 +72,6 @@ module Admin
       else
         render :edit, status: :unprocessable_content
       end
-    end
-
-    # GET /admin/members/1/delete
-    def delete
-    end
-
-    # DELETE /admin/members/1
-    def destroy
-      @member.destroy!
-      redirect_to admin_members_path, notice: I18n.t("admin.members.flash.destroyed"), status: :see_other, format: :html
     end
 
     # PATCH /admin/members/1/approve

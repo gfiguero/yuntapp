@@ -401,6 +401,27 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     end
   end
 
+  test "issue! falla si la junta no tiene rut (BR-120)" do
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      amount: 1500,
+      status: "paid",
+      payment_id: "MP-NO-RUT",
+      paid_at: Time.current
+    )
+    assert cert.paid?
+    assert_not cert.issued?
+
+    # rut is NOT NULL at the DB level (Task 1); use blank string to simulate a junta
+    # sin RUT, bypassing model validation but respecting the DB constraint.
+    cert.neighborhood_association.update_column(:rut, "") # bypass validation on purpose
+    assert_raises(RuntimeError) { cert.issue! }
+    assert_not cert.reload.issued?
+  end
+
   test "issue! preserves existing folio/tokens if already set (defense against double issuance)" do
     cert = ResidenceCertificate.create!(
       member: @member,

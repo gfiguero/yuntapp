@@ -2,7 +2,7 @@ module Admin
   class UsersController < ApplicationController
     include Pagy::Method
 
-    before_action :set_user, only: %i[show edit update delete destroy]
+    before_action :set_user, only: %i[show edit update]
     before_action :set_users, only: :index
     before_action :disabled_pagination
     after_action { response.headers.merge!(@pagy.headers_hash) if @pagy }
@@ -58,16 +58,6 @@ module Admin
       else
         render :edit, status: :unprocessable_content
       end
-    end
-
-    # GET /admin/users/1/delete
-    def delete
-    end
-
-    # DELETE /admin/users/1
-    def destroy
-      @user.destroy!
-      redirect_to admin_users_path, notice: I18n.t("admin.users.flash.destroyed", default: "User destroyed successfully"), status: :see_other, format: :html
     end
 
     private

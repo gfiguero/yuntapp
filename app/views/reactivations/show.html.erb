@@ -1,0 +1,14 @@
+<div class="card w-full max-w-md bg-base-100 shadow-xl mx-auto">
+  <div class="card-body">
+    <h1 class="card-title text-2xl mb-2"><%= t("reactivations.show.title") %></h1>
+    <p class="text-sm opacity-70 mb-4"><%= t("reactivations.show.help", email: @user.email) %></p>
+
+    <%= form_with url: reactivate_account_path(token: params[:token]), method: :patch do |f| %>
+      <%= f.submit t("reactivations.show.submit"), class: "btn btn-primary w-full" %>
+    <% end %>
+
+    <div class="mt-4 text-center">
+      <%= link_to t("reactivations.new.back_to_login"), new_user_session_path, class: "link link-hover text-sm" %>
+    </div>
+  </div>
+</div>
