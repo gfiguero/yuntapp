@@ -1,0 +1,7 @@
+<p><%= t(".intro", count: @requests.size) %></p>
+<ul>
+  <% @requests.each do |r| %>
+    <li><%= r.applicant_name %> — <%= r.target_association_label %></li>
+  <% end %>
+</ul>
+<p><%= t(".signature") %></p>

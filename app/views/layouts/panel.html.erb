@@ -58,6 +58,18 @@
             </li>
           <% end %>
 
+          <% unless current_user.admin? %>
+            <% admin_req = current_user.administration_requests.order(created_at: :desc).first %>
+            <li>
+              <%= link_to((admin_req&.pending? || admin_req&.approved?) ? panel_administration_request_path : new_panel_administration_request_path, class: ("active" if controller_name == "administration_requests")) do %>
+                <%= I18n.t("panel.administration_requests.sidebar") %>
+                <% if admin_req.present? && !admin_req.draft? %>
+                  <%= status_badge(admin_req.status) %>
+                <% end %>
+              <% end %>
+            </li>
+          <% end %>
+
           <li class="menu-title mt-4">Mis Cosas</li>
           <li><%= link_to "Mi Perfil", panel_profile_path, class: ("active" if controller_name == "profile") %></li>
           <% if current_user.member %>

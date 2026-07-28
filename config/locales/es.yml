@@ -94,6 +94,20 @@ es:
         created_at: Fecha de registro
         password: Contraseña
         password_confirmation: Confirmar Contraseña
+      administration_request:
+        neighborhood_association_id: Junta de Vecinos
+        proposed_association_name: Nombre de la nueva junta
+        organization_rut: RUT de la organización
+        position: Cargo en la directiva
+        first_name: Nombre
+        last_name: Apellido
+        run: RUN
+        phone: Teléfono
+        directiva_validity_document: Certificado de vigencia de la directiva
+        identity_documents: Documentos de identidad
+        rejection_reason: Motivo del rechazo
+        applicant: Solicitante
+        target: Junta objetivo
       category:
         id: ID
         name: Nombre
@@ -277,6 +291,9 @@ es:
         residence_certificate:
           base:
             immutable: no puede modificarse una vez emitido
+        administration_request:
+          target_missing: Debes seleccionar una junta existente o indicar nombre y comuna de una nueva
+          already_active: Ya tienes una solicitud de administración en curso
 
   errors:
     messages:
@@ -338,6 +355,7 @@ es:
       cascade_reason: "Desactivación en cascada del jefe de hogar: %{reason}"
       identity_transfer: "Transferencia de identidad: se aprobó una nueva membresía con el mismo RUN"
       became_dependent: "Transición a residente dependiente de otro grupo familiar"
+      administration_onboarding: Transferencia de identidad por aprobación de administración de otra junta
 
   users:
     deactivation:
@@ -372,6 +390,8 @@ es:
   shared:
     table:
       actions: Acciones
+      status: Estado
+      view: Ver
     headers:
       new_record: Nuevo Registro
     empty: —
@@ -407,6 +427,34 @@ es:
         one: esperando hace 1 día
         other: esperando hace %{count} días
       cta: Revisar solicitudes pendientes
+      signature: Equipo Yuntapp
+
+  administration_request_mailer:
+    submitted:
+      subject: Recibimos tu solicitud de administración
+      body: "Recibimos tu solicitud para administrar la junta %{junta}. El equipo de Yuntapp la revisará y te avisaremos el resultado."
+      signature: Equipo Yuntapp
+    approved:
+      subject: Tu solicitud de administración fue aprobada
+      body: "¡Felicitaciones! Tu solicitud fue aprobada y ya administras la junta %{junta} en Yuntapp."
+      signature: Equipo Yuntapp
+    rejected:
+      subject: Tu solicitud de administración fue rechazada
+      body: "Tu solicitud para administrar la junta %{junta} fue rechazada."
+      reason: "Motivo: %{reason}"
+      signature: Equipo Yuntapp
+    notify_existing_admin:
+      subject: Alguien solicitó administrar tu junta
+      body: "%{solicitante} solicitó administrar la junta %{junta}, que tú administras actualmente."
+      may_object: Si crees que esta solicitud no corresponde, puedes objetarla contactando al equipo de Yuntapp.
+      signature: Equipo Yuntapp
+    staff_digest:
+      subject:
+        one: Hay 1 solicitud de administración pendiente de revisión
+        other: Hay %{count} solicitudes de administración pendientes de revisión
+      intro:
+        one: "Hay 1 solicitud de administración esperando revisión:"
+        other: "Hay %{count} solicitudes de administración esperando revisión:"
       signature: Equipo Yuntapp
 
   verifications:
@@ -468,6 +516,11 @@ es:
       errors:
         cannot_destroy: Un socio no puede eliminarse; solo puede desactivarse para conservar su historial.
     board_members:
+      positions:
+        presidente: Presidente
+        secretario: Secretario
+        tesorero: Tesorero
+        director: Director
       index:
         title: Directiva
         count: "%{count} directivos"
@@ -657,6 +710,18 @@ es:
         not_pending: Esta solicitud no está pendiente de revisión.
 
   panel:
+    administration_requests:
+      sidebar: Administrar mi junta
+      title: Solicitar administración de junta
+      status_title: Estado de tu solicitud de administración
+      new_junta_toggle: Quiero crear una junta nueva (no está en la lista)
+      submit: Enviar solicitud
+      cancel: Cancelar solicitud
+      cancel_confirm: "¿Seguro que quieres cancelar tu solicitud de administración?"
+      flash:
+        submitted: Solicitud enviada. El equipo de Yuntapp la revisará.
+        cancelled: Solicitud cancelada.
+        already_admin: Ya administras una junta.
     verification:
       index:
         title: Verificación de Identidad
@@ -889,6 +954,20 @@ es:
         submit: Enviar Solicitud
 
   superadmin:
+    administration_requests:
+      index:
+        title: Solicitudes de administración
+      approve: Aprobar solicitud
+      approve_confirm: "¿Confirmas aprobar esta solicitud? Se creará el admin, socio y directiva."
+      reject: Rechazar solicitud
+      new_association: "Nueva junta: %{name} (%{commune})"
+      warn_existing_admin: Esta junta ya tiene un administrador activo. Avísale antes de aprobar.
+      warn_duplicate_run: Este RUN ya está verificado en el sistema. Al aprobar se transferirá la identidad.
+      flash:
+        approved: Solicitud aprobada. El solicitante ya administra la junta.
+        rejected: Solicitud rechazada.
+        reason_required: Debes indicar un motivo para rechazar la solicitud.
+        not_pending: Esta solicitud ya fue resuelta.
     categories:
       index:
         title: Categorías

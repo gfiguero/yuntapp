@@ -1,0 +1,58 @@
+<% content_for :title, I18n.t("panel.administration_requests.title") %>
+<div class="w-full max-w-xl">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t("panel.administration_requests.title") %></h1>
+
+  <%= form_with(model: @administration_request, url: panel_administration_request_path, method: :post, html: {novalidate: true}) do |form| %>
+    <% if @administration_request.errors.any? %>
+      <div class="alert alert-error mb-4"><%= @administration_request.errors.full_messages.to_sentence %></div>
+    <% end %>
+
+    <div data-controller="administration-cascade" data-administration-cascade-data-value="<%= @cascading_data.to_json %>" class="grid gap-4">
+      <label class="floating-label">
+        <%= form.select :region_id, [], {}, class: "select w-full", data: {administration_cascade_target: "region", action: "change->administration-cascade#regionChanged", prompt: I18n.t("panel.onboarding.step1.select_region")} %>
+        <span><%= I18n.t("panel.onboarding.step1.region_label") %></span>
+      </label>
+
+      <label class="floating-label">
+        <%= form.select :commune_id, [], {}, class: "select w-full", data: {administration_cascade_target: "commune", action: "change->administration-cascade#communeChanged", prompt: I18n.t("panel.onboarding.step1.select_commune")} %>
+        <span><%= I18n.t("panel.onboarding.step1.commune_label") %></span>
+      </label>
+
+      <label class="label cursor-pointer justify-start gap-2">
+        <%= check_box_tag "new_toggle", "1", false, data: {administration_cascade_target: "newToggle", action: "change->administration-cascade#toggleNew"}, class: "checkbox" %>
+        <span><%= I18n.t("panel.administration_requests.new_junta_toggle") %></span>
+      </label>
+
+      <div data-administration-cascade-target="existingWrap">
+        <label class="floating-label">
+          <%= form.select :neighborhood_association_id, [], {}, class: "select w-full", data: {administration_cascade_target: "association", prompt: I18n.t("panel.onboarding.step1.select_association")} %>
+          <span><%= I18n.t("panel.onboarding.step1.association_label") %></span>
+        </label>
+      </div>
+
+      <div data-administration-cascade-target="newWrap" class="hidden grid gap-2">
+        <%= form.text_field :proposed_association_name, class: "input w-full", placeholder: I18n.t("activerecord.attributes.administration_request.proposed_association_name") %>
+      </div>
+    </div>
+
+    <div class="grid gap-4 mt-6">
+      <%= form.text_field :organization_rut, class: "input w-full", placeholder: I18n.t("activerecord.attributes.administration_request.organization_rut") %>
+      <%= form.select :position, BoardMember::POSITIONS.map { |p| [I18n.t("admin.board_members.positions.#{p}", default: p.capitalize), p] }, {include_blank: I18n.t("activerecord.attributes.administration_request.position")}, class: "select w-full" %>
+      <%= form.text_field :first_name, class: "input w-full", placeholder: I18n.t("activerecord.attributes.administration_request.first_name") %>
+      <%= form.text_field :last_name, class: "input w-full", placeholder: I18n.t("activerecord.attributes.administration_request.last_name") %>
+      <%= form.text_field :run, class: "input w-full", placeholder: I18n.t("activerecord.attributes.administration_request.run") %>
+      <%= form.text_field :phone, class: "input w-full", placeholder: I18n.t("activerecord.attributes.administration_request.phone") %>
+
+      <div>
+        <%= form.label :directiva_validity_document, I18n.t("activerecord.attributes.administration_request.directiva_validity_document"), class: "label" %>
+        <%= form.file_field :directiva_validity_document, class: "file-input w-full" %>
+      </div>
+      <div>
+        <%= form.label :identity_documents, I18n.t("activerecord.attributes.administration_request.identity_documents"), class: "label" %>
+        <%= form.file_field :identity_documents, multiple: true, class: "file-input w-full" %>
+      </div>
+    </div>
+
+    <%= form.submit I18n.t("panel.administration_requests.submit"), class: "btn btn-success mt-6" %>
+  <% end %>
+</div>

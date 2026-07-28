@@ -103,6 +103,13 @@
                 Residencia
               <% end %>
             </li>
+            <li>
+              <%= link_to superadmin_administration_requests_path,
+                    class: "flex items-center gap-2 #{controller_name == 'administration_requests' ? 'bg-primary text-primary-content rounded-lg' : ''}" do %>
+                <%= icon("users", class: "w-4 h-4") %>
+                Administración
+              <% end %>
+            </li>
 
             <li class="menu-title text-xs uppercase tracking-wider mt-3">Geografía</li>
             <li>

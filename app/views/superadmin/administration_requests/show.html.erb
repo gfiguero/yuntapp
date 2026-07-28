@@ -1,0 +1,90 @@
+<% content_for :breadcrumb do %>
+  <li><%= link_to I18n.t("superadmin.administration_requests.index.title"), superadmin_administration_requests_path %></li>
+  <li><%= @administration_request.id %></li>
+<% end %>
+
+<% junta = @administration_request.neighborhood_association %>
+
+<div class="w-full max-w-2xl">
+  <div class="flex items-center justify-between my-4">
+    <h1 class="font-bold text-4xl"><%= @administration_request.target_association_label %></h1>
+    <%= status_badge(@administration_request.status) %>
+  </div>
+
+  <% if junta && User.exists?(admin: true, neighborhood_association_id: junta.id) %>
+    <div class="alert alert-warning mb-4">
+      <%= I18n.t("superadmin.administration_requests.warn_existing_admin") %>
+    </div>
+  <% end %>
+  <% if @administration_request.run.present? && VerifiedIdentity.exists?(run: @administration_request.run) %>
+    <div class="alert alert-info mb-4">
+      <%= I18n.t("superadmin.administration_requests.warn_duplicate_run") %>
+    </div>
+  <% end %>
+
+  <div class="card bg-base-100 shadow border border-base-content/5">
+    <div class="card-body">
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+        <div>
+          <dt class="text-xs font-bold uppercase tracking-wider opacity-60"><%= I18n.t("activerecord.attributes.administration_request.applicant") %></dt>
+          <dd><%= @administration_request.user.email %></dd>
+        </div>
+        <div>
+          <dt class="text-xs font-bold uppercase tracking-wider opacity-60"><%= I18n.t("activerecord.attributes.administration_request.target") %></dt>
+          <dd>
+            <% if @administration_request.new_association? %>
+              <%= I18n.t("superadmin.administration_requests.new_association", name: @administration_request.proposed_association_name, commune: @administration_request.commune&.name) %>
+            <% else %>
+              <%= @administration_request.target_association_label %>
+            <% end %>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-xs font-bold uppercase tracking-wider opacity-60"><%= I18n.t("activerecord.attributes.administration_request.organization_rut") %></dt>
+          <dd><%= @administration_request.organization_rut %></dd>
+        </div>
+        <div>
+          <dt class="text-xs font-bold uppercase tracking-wider opacity-60"><%= I18n.t("activerecord.attributes.administration_request.position") %></dt>
+          <dd><%= I18n.t("board_members.positions.#{@administration_request.position}", default: @administration_request.position) %></dd>
+        </div>
+        <div>
+          <dt class="text-xs font-bold uppercase tracking-wider opacity-60"><%= I18n.t("activerecord.attributes.administration_request.first_name") %></dt>
+          <dd><%= @administration_request.applicant_name %></dd>
+        </div>
+        <div>
+          <dt class="text-xs font-bold uppercase tracking-wider opacity-60"><%= I18n.t("activerecord.attributes.administration_request.run") %></dt>
+          <dd><%= @administration_request.run %></dd>
+        </div>
+        <div>
+          <dt class="text-xs font-bold uppercase tracking-wider opacity-60"><%= I18n.t("activerecord.attributes.administration_request.phone") %></dt>
+          <dd><%= @administration_request.phone %></dd>
+        </div>
+      </dl>
+
+      <div class="divider my-2"></div>
+
+      <div class="grid gap-2">
+        <% if @administration_request.directiva_validity_document.attached? %>
+          <%= link_to I18n.t("activerecord.attributes.administration_request.directiva_validity_document"), rails_blob_path(@administration_request.directiva_validity_document, disposition: "attachment"), class: "link link-primary" %>
+        <% end %>
+        <% @administration_request.identity_documents.each do |document| %>
+          <%= link_to "#{I18n.t("activerecord.attributes.administration_request.identity_documents")} — #{document.filename}", rails_blob_path(document, disposition: "attachment"), class: "link link-primary" %>
+        <% end %>
+      </div>
+
+      <% if @administration_request.rejected? && @administration_request.rejection_reason.present? %>
+        <div class="alert alert-error mt-4"><%= @administration_request.rejection_reason %></div>
+      <% end %>
+
+      <% if @administration_request.pending? %>
+        <div class="flex gap-2 mt-4">
+          <%= button_to I18n.t("superadmin.administration_requests.approve"), approve_superadmin_administration_request_path(@administration_request), method: :patch, class: "btn btn-success", data: {turbo_confirm: I18n.t("superadmin.administration_requests.approve_confirm")} %>
+        </div>
+        <%= form_with url: reject_superadmin_administration_request_path(@administration_request), method: :patch, class: "mt-4 grid gap-2" do |f| %>
+          <%= f.text_area "administration_request[rejection_reason]", class: "textarea w-full", placeholder: I18n.t("activerecord.attributes.administration_request.rejection_reason") %>
+          <%= f.submit I18n.t("superadmin.administration_requests.reject"), class: "btn btn-error w-fit" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -203,6 +203,27 @@ Cada caso de uso documenta el flujo ideal (happy path). Claude Code debe respeta
 
 ---
 
+### UC-008 · Onboarding de administración de junta
+**Actor**: Dirigente acreditado (usuario registrado con email confirmado)
+**Aprobador**: Staff (superadmin) — exclusivo
+**Precondición**: UC-001 completado (cuenta con email confirmado); el usuario no es admin de otra junta (BR-136)
+
+| # | Paso |
+|---|------|
+| 1 | El dirigente entra a "Administrar mi junta" en el panel |
+| 2 | Selecciona su junta del catálogo (región→comuna→junta) o propone una nueva (nombre + comuna) |
+| 3 | Ingresa el RUT de la organización y sube el certificado de vigencia de la directiva |
+| 4 | Declara su cargo en la directiva (presidente/secretario/tesorero/director) |
+| 5 | Ingresa sus datos personales (nombre, apellido, RUN, teléfono, documento de identidad) |
+| 6 | Revisa el resumen y envía la solicitud (`draft` → `pending`) |
+| 7 | Si la junta ya tiene admin activo, los admins vigentes son notificados y pueden objetar |
+| 8 | El staff revisa documentos (RUT + vigencia) y aprueba o rechaza |
+| 9 | Al aprobar: se crea/enlaza la junta con su RUT, y se crean `VerifiedIdentity` + `Member(approved)` + `BoardMember` y el `User` pasa a admin — todo transaccional |
+
+**Postcondición**: `AdministrationRequest` en `approved`; `NeighborhoodAssociation` con RUT; `User` con `admin: true` + `neighborhood_association_id`; `Member(approved)` y `BoardMember` activos del dirigente en esa junta.
+
+---
+
 ## Reglas de Negocio
 
 Estas reglas deben respetarse en cualquier implementación. Si una tarea entra en conflicto con alguna de ellas, consultar antes de implementar.
@@ -312,6 +333,28 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 | BR-099 | Integridad | **Regla general de cascada**: siempre que el `Member` de un `household_admin` pasa a `inactive` —por cualquier causa: unirse a otra junta (BR-029), cambio de dirección (BR-031), reinicio de onboarding (BR-018), desactivación manual del admin (BR-036) o transición a dependiente (BR-095)— sus residentes dependientes quedan desvinculados y sus `Member(dependent: true)` pasan a `inactive` en cascada automáticamente. Se asume que los dependientes acompañan al `household_admin`. Esas identidades quedan como historial auditable (BR-030); para volver a estar activas, cada dependiente debe partir de nuevo con su propio onboarding completo (BR-035/BR-069) o ser registrado otra vez como dependiente por quien asuma el `FamilyGroup`. Esta regla generaliza BR-034/BR-037/BR-096, que son casos particulares del mismo invariante |
 | BR-101 | Acceso | **Las cuentas de usuario no se borran; se desactivan o bloquean.** (a) **Auto-desactivación** (`deactivated_at`): el usuario da de baja su cuenta desde el panel; bloquea el login y cascadea sin borrar (Members activos → `inactive`, onboarding pendientes → `cancelled`, listings despublicadas). Es reversible **por el propio usuario vía su correo**: `ReactivationsController` + `ReactivationMailer` con `generates_token_for(:account_reactivation)` (válido 24h, se invalida al reactivar). El `User` no tiene RUN — la identidad/RUN vive en `VerifiedIdentity`; la reactivación es por email. (b) **Bloqueo** (`blocked_at`/`blocked_by`/`block_reason`): lo aplica un superadmin; bloquea el login y **el usuario no puede auto-reactivarse** (solo `unblock!` de un superadmin). Un superadmin **no es bloqueable** (reservado para el futuro split superadmin real / staff). Enforcement: `User#active_for_authentication?` (Devise) + guard `before_destroy` en `User` (bloquea incluso el `destroy` de Devise registrations) + sin acciones `destroy` en `admin/users`/`superadmin/users`. El flujo dev-only `account_reset` fue eliminado (2026-07-27) |
 | BR-100 | Integridad | **Ningún dato consolidado se destruye.** La información generada en la plataforma (identidades verificadas, socios, residencias, certificados emitidos, directiva, publicaciones) debe sobrevivir a errores, cambios y "borrados". Un `Member`, una vez creado, **nunca** se destruye: solo se desactiva (`deactivate!` → `inactive`), conservando su historial. Enforcement: guard `before_destroy` en `Member` que aborta la destrucción por cualquier ruta; `residence_certificates`/`board_members` con `dependent: :restrict_with_error` (no `:destroy`); sin acción `destroy` en `admin/members`; y el restablecimiento de cuenta (`panel/account_resets`) desactiva y desvincula en vez de destruir. Los borrados físicos que aún existan (p. ej. cascadas `dependent: :destroy` en `NeighborhoodAssociation` — issue #90) deben migrarse a este modelo |
+| BR-119 | Integridad | RUT de la organización **obligatorio**, normalizado + DV módulo 11, **único** entre juntas, almacenado en `NeighborhoodAssociation`. Es la prueba de constitución legal de la junta |
+| BR-120 | Certificados | La emisión de certificados (BR-062) y el cobro de publicaciones exigen junta con RUT válido. Una junta no constituida legalmente no puede emitir — hacerlo violaría la ley chilena |
+| BR-121 | Integridad | **No puede existir `NeighborhoodAssociation` sin RUT** (columna `NOT NULL`, único, DV válido módulo 11). El RUT **no codifica semántica de entorno**: un RUT en cualquier rango —incluido 70.000.000–99.999.999— puede pertenecer a una organización o persona real, en producción o desarrollo. Las juntas heredadas se regularizan asignándoles un RUT válido; para las juntas demo existentes se usan los 10 RUTs provistos (que son solo RUTs válidos, no un marcador de prueba). Distinguir juntas demo, si se necesita, requiere un marcador explícito aparte del RUT |
+| BR-122 | Acceso | Solo el staff (superadmin) aprueba/rechaza una solicitud de administración. Ningún admin de junta ni otro rol puede |
+| BR-123 | Administración | El solicitante declara su cargo (presidente/secretario/tesorero/director) y adjunta **obligatoriamente** el certificado de vigencia de la directiva y el RUT de la organización. Sin ambos no pasa a `pending` |
+| BR-124 | Administración | Precondición: cuenta con email confirmado. Flujo institucional, no auto-registro abierto |
+| BR-125 | Administración | Apunta a junta del catálogo (región→comuna→junta) o propone una nueva (nombre + comuna). La junta nueva **no se crea hasta aprobar**; antes no es visible ni seleccionable por residentes |
+| BR-126 | Administración | Estados: `draft` → `pending` → `approved`/`rejected`; `cancelled` disponible en `pending` (espejo de `OnboardingRequest`) |
+| BR-127 | Identidad | Datos del dirigente con las mismas normalizaciones/validaciones del residente: RUN+DV (BR-010/011), teléfono +569 (BR-013), nombres capitalizados (BR-014) |
+| BR-128 | Integridad | Aprobación transaccional: crea/enlaza `NeighborhoodAssociation` (con RUT); **reutiliza** `VerifiedIdentity` por RUN si existe (ADR-006 si es de otra cuenta) o la crea; **reutiliza** el `Member` de esa junta si existe, si no crea `Member(approved)`; crea `BoardMember(cargo, start_date hoy, active)`; marca `User` admin + FK. Todo o nada |
+| BR-129 | Identidad | Si el RUN pertenece a otra cuenta, aplica transferencia de identidad por RUN duplicado (BR-057–059 / ADR-006) |
+| BR-130 | Administración | Junta con admin activo: los admins vigentes son notificados y pueden objetar; el staff decide. La aprobación **agrega co-admin** (BR-052), no reemplaza |
+| BR-131 | Administración | Rechazo con motivo obligatorio; queda en historial; el usuario puede duplicar/re-enviar (espejo BR-047–049) |
+| BR-132 | Multi-tenant | El admin solo ve/gestiona su junta (BR-007). Su `Member` se crea sin `Residency`/`HouseholdUnit`: no habilita certificados a su nombre hasta hacer onboarding de residencia |
+| BR-133 | Administración | Digest diario al staff de solicitudes pendientes (espejo BR-050); el solicitante es notificado en cada transición |
+| BR-134 | Administración | Un usuario tiene a lo más **una** solicitud de administración activa (`draft`/`pending`) a la vez |
+| BR-135 | Precios | Junta nueva arranca sin `CertificatePricing`/`ListingPricing`; el admin debe definir precio (mín. $1.000 — BR-005/070/084) antes de operar |
+| BR-136 | Acceso | Un usuario solo puede administrar **una** junta a la vez (FK único `User.neighborhood_association_id`). Si ya es admin, no puede solicitar otra administración hasta dejar la actual |
+| BR-137 | Integridad | **Consecuencia del acoplamiento admin↔socio**: si el dirigente ya era socio activo de **otra** junta, aprobarlo desactiva su `Member` anterior (BR-029) → invalida sus certificados de esa junta (BR-091) y, si era `household_admin`, desactiva en cascada a sus dependientes (BR-099). Si ya era socio de la **misma** junta, se reutiliza sin desactivar nada. El sistema **advierte** al solicitante y al staff de esta consecuencia antes de aprobar |
+| BR-138 | Administración | El acceso de admin **no caduca** automáticamente al vencer el período de la directiva (`end_date`). La vigencia queda a criterio del staff/junta (espejo BR-045); la revocación es manual |
+| BR-139 | Administración | Junta nueva con nombre+comuna igual a una existente → **advertencia** de posible duplicado al staff (no bloqueo duro); decide el staff |
+| BR-140 | Administración | Cargo de directiva ya ocupado por un `BoardMember` activo → **advertencia** al staff; no se desplaza automáticamente al titular vigente |
 
 ### Categorías disponibles
 - **Acceso**: quién puede hacer qué y condiciones de autorización
@@ -326,6 +369,7 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 - **Residencia**: reglas sobre domicilios y `HouseholdUnit`
 - **Onboarding**: reglas del flujo de solicitud de membresía
 - **Certificados**: reglas sobre `ResidenceCertificate` y su ciclo de vida
+- **Administración**: onboarding de administradores/dirigentes y creación/administración de juntas
 
 ---
 
