@@ -3,6 +3,12 @@ class NeighborhoodAssociation < ApplicationRecord
 
   validates :name, presence: true
 
+  before_validation :normalize_rut
+
+  # BR-119: RUT obligatorio, único y con DV válido (módulo 11). Reutiliza RunValidator.
+  validates :rut, presence: true, uniqueness: true
+  validates :rut, run: true, if: -> { rut.present? }
+
   belongs_to :commune, optional: true
   # BR-100/BR-055: la junta y su historial (delegaciones, domicilios, certificados,
   # precios, directiva) nunca se destruyen. La disolución es un cambio de estado.
@@ -43,5 +49,14 @@ class NeighborhoodAssociation < ApplicationRecord
         member.deactivate!(reason: reason) unless member.inactive?
       end
     end
+  end
+
+  private
+
+  # Mismo patrón que VerifiedIdentity#normalize_run_field.
+  def normalize_rut
+    return unless rut.present?
+    self.rut = rut.to_s.gsub(/[.\-\s]/, "").upcase
+    self.rut = "#{rut[0..-2]}-#{rut[-1]}" if rut.match?(/\A\d{7,8}[0-9K]\z/)
   end
 end
