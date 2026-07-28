@@ -117,6 +117,7 @@ class ResidenceCertificate < ApplicationRecord
   def issue!(issue_date: Date.current)
     return self if issued?
     raise "Cannot issue certificate ##{id}: status is #{status}, must be paid" unless paid?
+    raise "Cannot issue certificate ##{id}: junta sin RUT (no constituida legalmente, BR-120)" if neighborhood_association.rut.blank?
 
     transaction do
       assign_attributes(
