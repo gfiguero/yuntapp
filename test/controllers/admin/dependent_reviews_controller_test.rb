@@ -202,6 +202,34 @@ module Admin
       assert_equal "pending", orphan_request.reload.status
     end
 
+    test "approved dependent inherits verified_residence from its family_group household_admin (#94)" do
+      sign_in @admin
+
+      # Segundo FamilyGroup en el MISMO household_unit, con otro household_admin
+      # y otra VerifiedResidence — no debe filtrarse al dependiente de selendis.
+      other_household = household_units(:selendis_household)
+      other_family_group = FamilyGroup.create!(household_unit: other_household)
+      other_identity = VerifiedIdentity.create!(
+        run: "7000001-6", first_name: "Otro", last_name: "Jefe",
+        phone: "+56911110000", email: "otro.jefe@example.com"
+      )
+      other_residence = VerifiedResidence.create!(
+        number: "999", neighborhood_association: @neighborhood_association
+      )
+      Residency.create!(
+        verified_identity: other_identity, verified_residence: other_residence,
+        household_unit: other_household, family_group: other_family_group,
+        household_admin: true, status: "approved"
+      )
+
+      patch approve_admin_dependent_review_url(@dependent_request)
+
+      new_dependent_residency = Residency.where(household_admin: false).order(:created_at).last
+      expected = family_groups(:selendis_family_group).household_admin.verified_residence
+      assert_equal expected, new_dependent_residency.verified_residence
+      assert_not_equal other_residence, new_dependent_residency.verified_residence
+    end
+
     test "approve fails if dependent_request is not pending" do
       sign_in @admin
       @dependent_request.update!(status: "approved")
