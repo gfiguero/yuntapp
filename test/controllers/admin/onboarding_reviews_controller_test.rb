@@ -392,6 +392,47 @@ module Admin
       assert dependent_member.inactive?, "sus dependientes deben quedar inactive en cascada (BR-099)"
     end
 
+    test "re-onboarding same identity to same household_unit creates a new residency (history preserved, #97)" do
+      sign_in @admin
+
+      # Estancia PREVIA de la misma identidad (mismo RUN del onboarding en curso)
+      # en un household_unit existente — simula "se fue y vuelve".
+      existing_identity = VerifiedIdentity.create!(
+        run: @identity_request.run, first_name: "Karax", last_name: "Khalai",
+        phone: "+56999990000", email: "karax.prev@example.com"
+      )
+      hu = household_units(:matching_karax_household)
+      prior_residence = VerifiedResidence.create!(
+        number: hu.number, neighborhood_association: @onboarding_request.neighborhood_association
+      )
+      prior_family_group = FamilyGroup.create!(household_unit: hu)
+      prior_residency = Residency.create!(
+        verified_identity: existing_identity, verified_residence: prior_residence,
+        household_unit: hu, family_group: prior_family_group,
+        household_admin: true, status: "approved"
+      )
+
+      # Aprobar el onboarding relinkeando al MISMO household_unit debe crear una
+      # SEGUNDA Residency (nueva estancia), no reventar por índice único.
+      assert_difference -> { Residency.where(verified_identity: existing_identity, household_unit: hu).count }, 1 do
+        assert_nothing_raised do
+          patch review_step3_admin_onboarding_request_url(@onboarding_request),
+            params: {household_unit_id: hu.id}
+        end
+      end
+
+      @onboarding_request.reload
+      assert @onboarding_request.approved?
+
+      # La estancia anterior se conserva intacta (historial).
+      assert Residency.exists?(prior_residency.id)
+      # User#residency devuelve la estancia más reciente.
+      assert_equal existing_identity, @karax.reload.verified_identity
+      latest = existing_identity.residencies.approved.order(created_at: :desc).first
+      assert_not_equal prior_residency, latest
+      assert_equal hu, latest.household_unit
+    end
+
     # --- Reject ---
 
     test "admin can reject request with reason" do
