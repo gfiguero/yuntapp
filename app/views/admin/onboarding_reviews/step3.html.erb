@@ -273,7 +273,7 @@
                 <% end %>
                 <p class="text-sm text-base-content/60">
                   <%= I18n.t('admin.onboarding_reviews.step3.current_members') %>:
-                  <%= hu.approved_residencies.map(&:name).join(', ').presence || I18n.t('admin.onboarding_reviews.step3.no_members') %>
+                  <%= hu.current_residencies.map(&:name).join(', ').presence || I18n.t('admin.onboarding_reviews.step3.no_members') %>
                 </p>
               </div>
             </div>

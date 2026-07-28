@@ -16,4 +16,14 @@ class HouseholdUnit < ApplicationRecord
   def household_admin
     residencies.find_by(household_admin: true)
   end
+
+  # #97: "residente actual" = última estancia aprobada por identidad. Con el
+  # historial de estancias (varias Residency por identidad+domicilio), deduplica
+  # a una fila por persona. El corte de acceso real sigue siendo Member (BR-091).
+  def current_residencies
+    approved_residencies
+      .group_by(&:verified_identity_id)
+      .values
+      .map { |stays| stays.max_by(&:created_at) }
+  end
 end

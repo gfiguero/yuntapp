@@ -102,7 +102,7 @@ module Panel
     # Solo residentes del domicilio con Member aprobado en la junta pueden ser
     # titulares de un certificado (excluye dependientes desactivados — BR-037).
     def selectable_residencies
-      current_user.household_unit.approved_residencies.select do |residency|
+      current_user.household_unit.current_residencies.select do |residency|
         residency.verified_identity.members.approved.exists?(neighborhood_association: certificate_association)
       end
     end
