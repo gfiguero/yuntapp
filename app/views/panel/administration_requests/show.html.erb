@@ -1,0 +1,22 @@
+<% content_for :title, I18n.t("panel.administration_requests.status_title") %>
+<div class="w-full max-w-xl">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t("panel.administration_requests.status_title") %></h1>
+
+  <div class="card bg-base-100 shadow border border-base-content/5">
+    <div class="card-body">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-lg"><%= @administration_request.target_association_label %></span>
+        <%= status_badge(@administration_request.status) %>
+      </div>
+      <p class="text-base-content/60"><%= I18n.t("admin.board_members.positions.#{@administration_request.position}", default: @administration_request.position&.capitalize) %></p>
+
+      <% if @administration_request.rejected? && @administration_request.rejection_reason.present? %>
+        <div class="alert alert-error mt-2"><%= @administration_request.rejection_reason %></div>
+      <% end %>
+
+      <% if @administration_request.pending? %>
+        <%= button_to I18n.t("panel.administration_requests.cancel"), cancel_panel_administration_request_path, method: :delete, class: "btn btn-warning btn-sm mt-4", data: {turbo_confirm: I18n.t("panel.administration_requests.cancel_confirm")} %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -94,6 +94,18 @@ es:
         created_at: Fecha de registro
         password: Contraseña
         password_confirmation: Confirmar Contraseña
+      administration_request:
+        neighborhood_association_id: Junta de Vecinos
+        proposed_association_name: Nombre de la nueva junta
+        organization_rut: RUT de la organización
+        position: Cargo en la directiva
+        first_name: Nombre
+        last_name: Apellido
+        run: RUN
+        phone: Teléfono
+        directiva_validity_document: Certificado de vigencia de la directiva
+        identity_documents: Documentos de identidad
+        rejection_reason: Motivo del rechazo
       category:
         id: ID
         name: Nombre
@@ -472,6 +484,11 @@ es:
       errors:
         cannot_destroy: Un socio no puede eliminarse; solo puede desactivarse para conservar su historial.
     board_members:
+      positions:
+        presidente: Presidente
+        secretario: Secretario
+        tesorero: Tesorero
+        director: Director
       index:
         title: Directiva
         count: "%{count} directivos"
@@ -661,6 +678,18 @@ es:
         not_pending: Esta solicitud no está pendiente de revisión.
 
   panel:
+    administration_requests:
+      sidebar: Administrar mi junta
+      title: Solicitar administración de junta
+      status_title: Estado de tu solicitud de administración
+      new_junta_toggle: Quiero crear una junta nueva (no está en la lista)
+      submit: Enviar solicitud
+      cancel: Cancelar solicitud
+      cancel_confirm: "¿Seguro que quieres cancelar tu solicitud de administración?"
+      flash:
+        submitted: Solicitud enviada. El equipo de Yuntapp la revisará.
+        cancelled: Solicitud cancelada.
+        already_admin: Ya administras una junta.
     verification:
       index:
         title: Verificación de Identidad
