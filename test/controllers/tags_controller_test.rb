@@ -23,59 +23,16 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @tag.id, json_response.first["value"]
   end
 
-  test "should get new" do
-    get new_tag_url
-    assert_response :success
-  end
-
-  test "should create tag" do
-    assert_difference("Tag.count") do
-      post tags_url, params: {tag: {name: "New Tag"}}
-    end
-
-    assert_redirected_to tag_url(Tag.last)
-  end
-
-  test "should not create tag with invalid params" do
-    assert_no_difference("Tag.count") do
-      post tags_url, params: {tag: {name: ""}}
-    end
-
-    assert_response :unprocessable_content
-  end
-
   test "should show tag" do
     get tag_url(@tag)
     assert_response :success
   end
 
-  test "should get edit" do
-    get edit_tag_url(@tag)
-    assert_response :success
-  end
-
-  test "should update tag" do
-    patch tag_url(@tag), params: {tag: {name: "Updated Tag"}}
-    assert_redirected_to tag_url(@tag)
-    @tag.reload
-    assert_equal "Updated Tag", @tag.name
-  end
-
-  test "should not update tag with invalid params" do
-    patch tag_url(@tag), params: {tag: {name: ""}}
-    assert_response :unprocessable_content
-  end
-
-  test "should get delete" do
-    get delete_tag_url(@tag)
-    assert_response :success
-  end
-
-  test "should destroy tag" do
-    assert_difference("Tag.count", -1) do
-      delete tag_url(@tag)
-    end
-
-    assert_redirected_to tags_url
+  # BR-007, #115: este controller top-level es solo lectura (index/show/search).
+  # Las rutas de escritura no deben existir.
+  test "no write routes are exposed (BR-007, #115)" do
+    assert_raises(StandardError) { new_tag_path }
+    assert_raises(StandardError) { edit_tag_path(@tag) }
+    assert_raises(StandardError) { delete_tag_path(@tag) }
   end
 end

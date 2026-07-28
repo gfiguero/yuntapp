@@ -85,12 +85,29 @@ class ResidenceVerificationRequestTest < ActiveSupport::TestCase
     assert residence.valid?
   end
 
-  test "valid with neither delegation nor street_name due to allow_blank" do
+  test "invalid when pending with neither delegation nor street_name (BR-019)" do
     residence = residence_verification_requests(:karass_residence)
     residence.neighborhood_delegation = nil
     residence.street_name = nil
-    # allow_blank: true means blank values pass, even when presence is triggered
-    assert residence.valid?
+    assert_not residence.valid?
+    assert residence.errors[:neighborhood_delegation_id].any?
+    assert residence.errors[:street_name].any?
+  end
+
+  test "invalid when pending without number (BR-020)" do
+    residence = residence_verification_requests(:karass_residence)
+    residence.number = nil
+    assert_not residence.valid?
+    assert residence.errors[:number].any?
+  end
+
+  test "draft allows blank address fields for partial autosave" do
+    residence = residence_verification_requests(:karass_residence)
+    residence.status = "draft"
+    residence.number = nil
+    residence.neighborhood_delegation = nil
+    residence.street_name = nil
+    assert residence.valid?, "draft debe permitir campos en blanco (autosave del onboarding)"
   end
 
   # --- Status predicates ---

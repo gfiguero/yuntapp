@@ -33,20 +33,50 @@ class IssueCertificateJobTest < ActiveJob::TestCase
     end
   end
 
-  test "perform is a no-op when certificate is already issued" do
+  test "perform is a full no-op when already issued with a PDF attached" do
     @certificate.update!(
       status: "issued",
       folio: "CR-1-100",
       validation_token: "preset-token",
       validation_code: "PRESET12"
     )
+    @certificate.pdf_document.attach(
+      io: StringIO.new("%PDF-1.4 fake"),
+      filename: "cert.pdf",
+      content_type: "application/pdf"
+    )
 
-    IssueCertificateJob.new.perform(@certificate.id)
+    assert_no_enqueued_emails do
+      IssueCertificateJob.new.perform(@certificate.id)
+    end
 
     @certificate.reload
     assert_equal "preset-token", @certificate.validation_token
     assert_equal "PRESET12", @certificate.validation_code
-    assert_not @certificate.pdf_document.attached? # no se regenera
+  end
+
+  test "perform backfills the PDF when certificate is issued without one (BR-076 retry)" do
+    # Simula un certificado ya emitido (issue! corrió) al que solo le faltó
+    # adjuntar el PDF porque la generación falló en el intento anterior.
+    @certificate.update!(
+      status: "issued",
+      folio: "CR-1-100",
+      validation_token: "preset-token",
+      validation_code: "PRESET12",
+      issue_date: Date.current,
+      expiration_date: Date.current + 30.days,
+      issued_at: Time.current
+    )
+    assert_not @certificate.pdf_document.attached?
+
+    IssueCertificateJob.new.perform(@certificate.id)
+
+    @certificate.reload
+    # No re-emite: conserva folio/token/code (issue! es idempotente)
+    assert_equal "preset-token", @certificate.validation_token
+    assert_equal "PRESET12", @certificate.validation_code
+    # Pero sí adjunta el PDF que había faltado
+    assert @certificate.pdf_document.attached?
   end
 
   test "perform is a no-op when certificate is not paid" do

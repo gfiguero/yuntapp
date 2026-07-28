@@ -9,9 +9,13 @@ class ResidenceVerificationRequest < ApplicationRecord
 
   STATUSES = %w[draft pending approved rejected cancelled].freeze
 
-  validates :number, presence: true, allow_blank: true
-  validates :neighborhood_delegation_id, presence: true, if: -> { street_name.blank? }, allow_blank: true
-  validates :street_name, presence: true, if: -> { neighborhood_delegation_id.blank? }, allow_blank: true
+  # BR-019/BR-020: el domicilio exige `number` siempre y delegación O calle.
+  # Se valida desde `pending` en adelante: en `draft` el onboarding persiste
+  # datos parciales vía autosave (mismo patrón que IdentityVerificationRequest).
+  # NO usar `allow_blank: true` junto a `presence: true` — se anulan entre sí.
+  validates :number, presence: true, unless: -> { draft? }
+  validates :neighborhood_delegation_id, presence: true, if: -> { !draft? && street_name.blank? }
+  validates :street_name, presence: true, if: -> { !draft? && neighborhood_delegation_id.blank? }
   validates :status, inclusion: {in: STATUSES}
 
   scope :draft, -> { where(status: "draft") }
