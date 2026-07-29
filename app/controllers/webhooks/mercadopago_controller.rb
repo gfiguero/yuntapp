@@ -191,8 +191,14 @@ module Webhooks
           return
         end
 
-        listing.renew_from_subscription!(payment_id: payment_id)
-        record_payment_event(listing, payment_id: payment_id, status: "approved", amount: amount)
+        # #101: renovación y registro del evento (el gate de idempotencia) commitean
+        # atómicamente. Si fallara entre ambos, el rollback deja el listing sin renovar
+        # y sin evento → el reintento de MP re-renueva limpio. Así la idempotencia NO
+        # depende de la guarda `payment_id` de renew_from_subscription! (mero atajo).
+        ActiveRecord::Base.transaction do
+          listing.renew_from_subscription!(payment_id: payment_id)
+          record_payment_event(listing, payment_id: payment_id, status: "approved", amount: amount)
+        end
         Rails.logger.info("MercadoPago webhook: listing ##{listing.id} renewed until #{listing.published_until} (payment_id=#{payment_id})")
       else
         Rails.logger.info("MercadoPago webhook: authorized_payment #{authorized_payment_id} payment status=#{payment_status} for listing ##{listing.id} — no renewal")
@@ -208,7 +214,9 @@ module Webhooks
     end
 
     # Registra el evento de pago (log histórico + idempotencia). Idempotente por
-    # el índice único (payment_id, status).
+    # el índice único (payment_id, status). `amount` es best-effort: en eventos
+    # no-approved (refund/contracargo/rechazo) MP no siempre lo envía y puede ser
+    # nil — no es load-bearing (la idempotencia es por (payment_id, status)).
     def record_payment_event(payable, payment_id:, status:, amount:)
       PaymentEvent.find_or_create_by(payment_id: payment_id, status: status) do |event|
         event.payable = payable
