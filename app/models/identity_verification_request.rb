@@ -20,6 +20,11 @@ class IdentityVerificationRequest < ApplicationRecord
   # Para solicitudes dependientes, el contexto de familia/usuario es obligatorio
   validates :family_group, :requested_by, :neighborhood_association, presence: true, if: :dependent?
 
+  # BR-047/BR-060 (#105): el rechazo de un DEPENDIENTE debe registrar el motivo
+  # (en el onboarding estándar el motivo vive en OnboardingRequest y el IVR se
+  # rechaza en cascada sin motivo propio).
+  validates :rejection_reason, presence: true, if: -> { rejected? && dependent? }
+
   # Validaciones de formato siempre (incluso en draft, si el campo no está vacío)
   validates :run, run: true, allow_blank: true
   validates :phone, phone: true, allow_blank: true

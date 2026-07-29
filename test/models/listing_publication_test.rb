@@ -136,4 +136,46 @@ class ListingPublicationTest < ActiveSupport::TestCase
       listing.apply_mp_payment_status!("in_process")
     end
   end
+
+  # --- #109: snapshot de precio inmutable mientras la publicación está vigente ---
+
+  test "amount cannot change while the publication is live (#109)" do
+    listing = Listing.create!(name: "Vigente", user: users(:artanis), amount: 1200)
+    listing.mark_as_paid!(payment_id: "MP-IMMUT-1")
+    assert listing.published?
+
+    listing.amount = 5000
+    assert_not listing.valid?, "no debe permitirse cambiar amount de una publicación vigente"
+    assert listing.errors[:base].any?
+  end
+
+  test "amount can be re-captured once the publication expired (renewal, #109)" do
+    listing = Listing.create!(name: "Vencida", user: users(:artanis), amount: 1200)
+    listing.mark_as_paid!(payment_id: "MP-IMMUT-2")
+    listing.update_column(:published_until, 1.day.ago.to_date) # vence
+    assert listing.publication_expired?
+
+    listing.amount = 2000
+    assert listing.valid?, "una publicación vencida sí puede re-capturar el precio para renovar"
+    assert listing.save
+  end
+
+  # --- #108: un solo household_admin por FamilyGroup a nivel de BD ---
+
+  test "DB rejects a second household_admin residency in the same family_group (#108)" do
+    hu = household_units(:selendis_household)
+    fg = family_groups(:selendis_family_group)
+    vr = verified_residences(:selendis_verified_residence)
+    other_identity = VerifiedIdentity.create!(
+      run: "7000001-6", first_name: "Otro", last_name: "Admin",
+      phone: "+56911112222", email: "otro.admin.108@example.com"
+    )
+
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      Residency.create!(
+        verified_identity: other_identity, verified_residence: vr,
+        household_unit: hu, family_group: fg, household_admin: true, status: "approved"
+      )
+    end
+  end
 end

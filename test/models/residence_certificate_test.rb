@@ -811,4 +811,24 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
       cert.apply_mp_payment_status!("in_process")
     end
   end
+
+  # --- #107: holder_deactivated? cubre todo estado no-aprobado del Member ---
+
+  test "holder_deactivated? is true for any non-approved member state (#107)" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "issued", folio: "CR-#{@association.id}-8107",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current
+    )
+
+    @member.update_column(:status, "approved")
+    assert_not cert.holder_deactivated?
+    assert cert.downloadable?
+
+    %w[inactive rejected pending].each do |state|
+      @member.update_column(:status, state)
+      assert cert.holder_deactivated?, "member #{state} debe invalidar el certificado"
+      assert_not cert.downloadable?, "member #{state} no debe permitir descarga"
+    end
+  end
 end

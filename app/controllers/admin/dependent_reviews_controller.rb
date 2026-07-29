@@ -84,6 +84,13 @@ module Admin
 
     # PATCH /admin/dependent_reviews/:id/reject
     def reject
+      # BR-047/BR-060 (#105): el motivo de rechazo es obligatorio.
+      if params[:rejection_reason].blank?
+        redirect_to admin_dependent_reviews_path,
+          alert: I18n.t("admin.dependent_reviews.flash.rejection_reason_required")
+        return
+      end
+
       @dependent_request.update!(
         status: "rejected",
         rejection_reason: params[:rejection_reason]

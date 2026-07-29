@@ -157,6 +157,13 @@ module Admin
     end
 
     def reject
+      # BR-047/BR-060 (#105): el motivo de rechazo es obligatorio.
+      if params[:rejection_reason].blank?
+        redirect_to admin_onboarding_request_path(@onboarding_request),
+          alert: I18n.t("admin.onboarding_reviews.flash.rejection_reason_required")
+        return
+      end
+
       ActiveRecord::Base.transaction do
         @onboarding_request.update!(status: "rejected", rejection_reason: params[:rejection_reason])
         @onboarding_request.identity_verification_request&.update!(status: "rejected")

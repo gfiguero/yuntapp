@@ -358,7 +358,8 @@ module Admin
     test "approve_step3 cascades deactivation to the prior household_admin's dependents" do
       sign_in @admin
 
-      # La identidad preexistente (mismo RUN) es household_admin de un grupo con un dependiente.
+      # La identidad preexistente (mismo RUN) es household_admin de SU PROPIO
+      # grupo familiar con un dependiente (BR-041: un admin por FamilyGroup, #108).
       existing_identity = VerifiedIdentity.create!(
         run: @identity_request.run,
         first_name: "Karax",
@@ -367,12 +368,12 @@ module Admin
         email: "karax@example.com"
       )
       hu = household_units(:selendis_household)
-      family_group = family_groups(:selendis_family_group)
+      own_fg = FamilyGroup.create!(household_unit: hu)
       Residency.create!(
         verified_identity: existing_identity,
         verified_residence: verified_residences(:selendis_verified_residence),
         household_unit: hu,
-        family_group: family_group,
+        family_group: own_fg,
         household_admin: true,
         status: "approved"
       )
@@ -382,7 +383,23 @@ module Admin
         status: "approved",
         approved_at: Time.current
       )
-      dependent_member = members(:dependent_member) # vorazun, mismo family_group, manios_de_buin
+
+      # Un dependiente en el mismo grupo del household_admin anterior.
+      dep_identity = VerifiedIdentity.create!(
+        run: "7000002-4", first_name: "Depen", last_name: "Diente",
+        phone: "+56911113333", email: "dep.108@example.com"
+      )
+      Residency.create!(
+        verified_identity: dep_identity,
+        verified_residence: verified_residences(:selendis_verified_residence),
+        household_unit: hu, family_group: own_fg,
+        household_admin: false, status: "approved"
+      )
+      dependent_member = Member.create!(
+        verified_identity: dep_identity,
+        neighborhood_association: neighborhood_associations(:manios_de_buin),
+        status: "approved", dependent: true, approved_at: Time.current
+      )
 
       patch review_step3_admin_onboarding_request_url(@onboarding_request)
 
@@ -452,6 +469,17 @@ module Admin
 
       @residence_request.reload
       assert @residence_request.rejected?
+    end
+
+    test "reject without a reason is refused with an alert (#105)" do
+      sign_in @admin
+
+      patch review_reject_admin_onboarding_request_url(@onboarding_request),
+        params: {rejection_reason: "  "}
+
+      assert_redirected_to admin_onboarding_request_url(@onboarding_request)
+      assert_equal I18n.t("admin.onboarding_reviews.flash.rejection_reason_required"), flash[:alert]
+      assert_not @onboarding_request.reload.rejected?, "no debe rechazar sin motivo"
     end
 
     # --- Show page review link ---

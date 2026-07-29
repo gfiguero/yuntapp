@@ -25,6 +25,10 @@ class Listing < ApplicationRecord
   validates :payment_id, uniqueness: true, allow_nil: true
   validates :preapproval_id, uniqueness: true, allow_nil: true
   validates :subscription_status, inclusion: {in: SUBSCRIPTION_STATUSES}, allow_nil: true
+  # BR-085 (#109): el snapshot amount/platform_fee es inmutable MIENTRAS la
+  # publicación está vigente. Al vencer (publication_expired?) sí puede
+  # re-capturarse el precio para la renovación (BR-086).
+  validate :pricing_snapshot_immutable_while_published, on: :update
 
   scope :published, -> { where(publication_status: "published").where("published_until >= ?", Date.current) }
 
@@ -122,5 +126,17 @@ class Listing < ApplicationRecord
   # decimales); redondeamos al peso más cercano en vez de truncar (#99).
   def compute_platform_fee
     self.platform_fee = (amount * PLATFORM_FEE_PERCENTAGE / 100.0).round
+  end
+
+  # #109/BR-085: el snapshot de precio no puede cambiar mientras la publicación
+  # estaba VIGENTE (según el estado persistido). Una publicación vencida sí puede
+  # re-capturar el precio para renovarse (BR-086), por eso se mira el estado en BD.
+  def pricing_snapshot_immutable_while_published
+    return unless publication_status_in_database == "published"
+    return if published_until_in_database.nil? || published_until_in_database < Date.current
+
+    if amount_changed? || platform_fee_changed?
+      errors.add(:base, "No se puede modificar el precio de una publicación vigente")
+    end
   end
 end

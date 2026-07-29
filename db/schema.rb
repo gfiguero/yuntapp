@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_225856) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_29_232330) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -95,6 +95,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_225856) do
     t.index ["created_by_id"], name: "index_certificate_pricings_on_created_by_id"
     t.index ["neighborhood_association_id", "effective_from"], name: "idx_certificate_pricings_on_assoc_and_from"
     t.index ["neighborhood_association_id"], name: "index_certificate_pricings_on_neighborhood_association_id"
+    t.index ["neighborhood_association_id"], name: "index_certificate_pricings_one_current_per_association", unique: true, where: "effective_to IS NULL"
   end
 
   create_table "communes", force: :cascade do |t|
@@ -168,6 +169,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_225856) do
     t.datetime "updated_at", null: false
     t.index ["neighborhood_association_id", "effective_to"], name: "index_listing_pricings_on_association_and_effective_to"
     t.index ["neighborhood_association_id"], name: "index_listing_pricings_on_neighborhood_association_id"
+    t.index ["neighborhood_association_id"], name: "index_listing_pricings_one_current_per_association", unique: true, where: "effective_to IS NULL"
   end
 
   create_table "listings", force: :cascade do |t|
@@ -339,6 +341,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_225856) do
     t.integer "verified_identity_id", null: false
     t.integer "verified_residence_id", null: false
     t.index ["family_group_id"], name: "index_residencies_on_family_group_id"
+    t.index ["family_group_id"], name: "index_residencies_one_admin_per_family_group", unique: true, where: "household_admin = 1"
     t.index ["household_unit_id"], name: "index_residencies_on_household_unit_id"
     t.index ["verified_identity_id"], name: "index_residencies_on_verified_identity_id"
     t.index ["verified_residence_id"], name: "index_residencies_on_verified_residence_id"

@@ -45,9 +45,13 @@ en:
       neighborhood_association:
         rut: "Tax ID (RUT)"
   admin:
+    onboarding_reviews:
+      flash:
+        rejection_reason_required: "You must provide a reason for the rejection."
     dependent_reviews:
       flash:
         family_group_missing_admin: "The family group has no active household admin; the dependent cannot be approved."
+        rejection_reason_required: "You must provide a reason for the rejection."
   payment_reversal_mailer:
     staff_alert:
       subject: "Alert: reverted payment in Yuntapp"
