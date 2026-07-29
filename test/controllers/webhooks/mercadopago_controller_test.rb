@@ -639,6 +639,19 @@ module Webhooks
       assert_response :ok
     end
 
+    test "charged_back with a different transaction_amount still invalidates (BR-090 gate only on approved)" do
+      @certificate.update!(status: "paid", payment_id: "MP-CBAMT", paid_at: Time.current)
+      @certificate.issue!
+      stub_fetch_payment({
+        "id" => "MP-CBAMT", "transaction_amount" => 999, "status" => "charged_back",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-CBAMT"}}
+      end
+      assert_response :ok
+      assert @certificate.reload.payment_reverted?, "la reversión no debe bloquearse por el monto"
+    end
+
     # --- Error handling (#100/BR-071/BR-073) ---
 
     test "returns 500 on unexpected error so MercadoPago retries" do

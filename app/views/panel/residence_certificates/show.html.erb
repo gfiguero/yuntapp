@@ -113,6 +113,10 @@
           <div class="alert alert-warning mt-4">
             <%= I18n.t('panel.residence_certificates.show.expired_notice') %>
           </div>
+        <% elsif @residence_certificate.payment_reverted? %>
+          <div class="alert alert-error mt-4">
+            <%= I18n.t('panel.residence_certificates.show.payment_reverted') %>
+          </div>
         <% end %>
       <% end %>
     </div>

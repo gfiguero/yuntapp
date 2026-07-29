@@ -231,16 +231,14 @@ module Webhooks
         return
       end
 
-      # BR-090: el monto pagado debe coincidir exactamente con el monto del
-      # certificado. Rechaza pagos de otro monto (manipulación o pagos
-      # obsoletos de otra operación con external_reference coincidente).
-      unless amount_matches?(amount, certificate.amount)
-        Rails.logger.warn("MercadoPago webhook: payment #{payment_id} amount #{amount.inspect} != certificate ##{certificate.id} amount #{certificate.amount.inspect} — rejected")
-        return
-      end
-
       case status.to_s
       when "approved"
+        # BR-090: el monto solo se valida en la transición a pagado. Las
+        # reversiones (refund/contracargo) deben procesarse siempre, sin gate de monto.
+        unless amount_matches?(amount, certificate.amount)
+          Rails.logger.warn("MercadoPago webhook: payment #{payment_id} amount #{amount.inspect} != certificate ##{certificate.id} amount #{certificate.amount.inspect} — rejected")
+          return
+        end
         certificate.mark_as_paid!(payment_id: payment_id)
         certificate.update!(payment_status: "approved") unless certificate.payment_status == "approved"
         Rails.logger.info("MercadoPago webhook: certificate ##{certificate.id} marked paid (payment_id=#{payment_id})")
@@ -256,14 +254,14 @@ module Webhooks
         return
       end
 
-      # BR-090: mismo control de monto que los certificados.
-      unless amount_matches?(amount, listing.amount)
-        Rails.logger.warn("MercadoPago webhook: payment #{payment_id} amount #{amount.inspect} != listing ##{listing.id} amount #{listing.amount.inspect} — rejected")
-        return
-      end
-
       case status.to_s
       when "approved"
+        # BR-090: mismo control de monto que los certificados. Solo en la
+        # transición a pagado; reversiones deben procesarse sin gate de monto.
+        unless amount_matches?(amount, listing.amount)
+          Rails.logger.warn("MercadoPago webhook: payment #{payment_id} amount #{amount.inspect} != listing ##{listing.id} amount #{listing.amount.inspect} — rejected")
+          return
+        end
         listing.mark_as_paid!(payment_id: payment_id)
         listing.update!(payment_status: "approved") unless listing.payment_status == "approved"
         Rails.logger.info("MercadoPago webhook: listing ##{listing.id} published (payment_id=#{payment_id})")

@@ -29,10 +29,17 @@
 
 en:
   hello: "Hello world"
+  verifications:
+    show:
+      status:
+        reverted_title: Invalid certificate
+        reverted_description: This certificate is no longer valid.
+        reverted_badge: Not valid
   panel:
     residence_certificates:
       show:
         payment_in_review: "Your payment is under review by MercadoPago. Once approved, the certificate will be issued automatically."
+        payment_reverted: "The payment for this certificate was reverted, so the document is no longer valid. If you think this is a mistake, contact your neighborhood association."
   activerecord:
     attributes:
       neighborhood_association:
