@@ -787,6 +787,7 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     cert.apply_mp_payment_status!("refunded")
     assert_equal "refunded", cert.payment_status
     assert cert.pending_payment?
+    assert_equal "MP-REV-1", cert.payment_id, "el payment_id se conserva como dato de auditoría"
   end
 
   test "apply_mp_payment_status! keeps an issued certificate issued but marks it reverted" do
@@ -798,6 +799,7 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     cert.apply_mp_payment_status!("charged_back")
     assert cert.issued?
     assert cert.payment_reverted?
+    assert_not cert.downloadable?, "un cert emitido con pago revertido no debe poder descargarse"
   end
 
   test "apply_mp_payment_status! is idempotent for the same status" do

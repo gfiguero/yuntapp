@@ -70,10 +70,12 @@ class Listing < ApplicationRecord
 
   # Espejo de ResidenceCertificate#apply_mp_payment_status! para publicaciones
   # (BR-141). Un pago revertido despublica; los demás estados solo se registran.
+  # La guardia mira el VALOR de columna (no `published?`, que excluye vencidas):
+  # un chargeback sobre un listing ya vencido igual debe corregir el estado.
   def apply_mp_payment_status!(mp_status)
     return self if payment_status == mp_status
 
-    if REVERTED_PAYMENT_STATUSES.include?(mp_status) && published?
+    if REVERTED_PAYMENT_STATUSES.include?(mp_status) && publication_status == "published"
       update!(payment_status: mp_status, publication_status: "pending_payment", published_until: nil)
     else
       update!(payment_status: mp_status)

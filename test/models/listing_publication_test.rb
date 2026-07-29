@@ -129,4 +129,11 @@ class ListingPublicationTest < ActiveSupport::TestCase
     assert_equal "in_process", listing.payment_status
     assert listing.published?
   end
+
+  test "apply_mp_payment_status! is idempotent for the same status on listing" do
+    listing = Listing.create!(name: "Pub", user: users(:artanis), amount: 1200, payment_status: "in_process")
+    assert_no_changes -> { listing.reload.updated_at } do
+      listing.apply_mp_payment_status!("in_process")
+    end
+  end
 end
