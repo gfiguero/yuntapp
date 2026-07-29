@@ -64,6 +64,16 @@ module Webhooks
       assert_response :unauthorized
     end
 
+    test "processes without signature when no webhook_secret is configured (dev/test, #106)" do
+      Rails.application.config.mercadopago[:webhook_secret] = nil
+      # Sin secret configurado, un POST sin firma se procesa (no 401); un recurso
+      # inexistente es un no-op determinista → 200.
+      stub_fetch_payment(nil) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-NOSECRET"}}
+      end
+      assert_response :ok
+    end
+
     test "returns 401 when signature is present but invalid" do
       post webhooks_mercadopago_url,
         params: {topic: "payment", data: {id: "MP-PAY-123"}},
