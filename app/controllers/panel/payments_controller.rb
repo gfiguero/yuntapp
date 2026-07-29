@@ -1,5 +1,7 @@
 module Panel
   class PaymentsController < ApplicationController
+    include MercadopagoPayer
+
     layout "panel"
     before_action :authenticate_user!
     before_action :ensure_household_admin!
@@ -11,6 +13,7 @@ module Panel
     def new
       preference = mercadopago.create_preference(
         @certificate,
+        payer: mercadopago_payer,
         success_url: success_panel_payments_url,
         failure_url: failure_panel_payments_url,
         pending_url: pending_panel_payments_url
