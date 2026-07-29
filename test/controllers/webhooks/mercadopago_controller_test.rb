@@ -145,31 +145,33 @@ module Webhooks
 
     # --- BR-071: idempotency ---
 
-    test "ignores duplicate webhook for already-processed payment_id (BR-071)" do
+    # BR-071: idempotencia por estado — un segundo webhook approved con el mismo
+    # payment_id no produce doble efecto. Ahora siempre se llama fetch_payment
+    # (para poder procesar refunds/contracargos que reúsan el payment_id), pero
+    # mark_as_paid! es idempotente: ya en `paid` con el mismo payment_id, no
+    # cambia nada.
+    test "duplicate approved webhook with same payment_id does not double-process (BR-071)" do
       @certificate.update!(status: "paid", payment_id: "MP-PAY-DUP", paid_at: 1.hour.ago)
       original_paid_at = @certificate.paid_at
 
       sig = valid_signature_header(data_id: "MP-PAY-DUP")
 
-      called = false
-      real_service = MercadopagoService.new
-      fake = Object.new
-      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
-      fake.define_singleton_method(:fetch_payment) { |_|
-        called = true
-        {}
-      }
-
-      stub_class_method(MercadopagoService, :new, fake) do
+      stub_fetch_payment({
+        "id" => "MP-PAY-DUP",
+        "transaction_amount" => 1500,
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
         post webhooks_mercadopago_url,
           params: {topic: "payment", data: {id: "MP-PAY-DUP"}},
           headers: {"x-signature" => sig, "x-request-id" => "req-1"}
       end
 
       assert_response :ok
-      assert_not called, "fetch_payment should NOT be called when payment_id already exists"
       @certificate.reload
-      assert_equal original_paid_at.to_i, @certificate.paid_at.to_i
+      assert @certificate.paid?, "certificate must remain paid"
+      assert_equal "MP-PAY-DUP", @certificate.payment_id, "payment_id must not change"
+      assert_equal original_paid_at.to_i, @certificate.paid_at.to_i, "paid_at must not change"
     end
 
     # --- Certificate not found ---
@@ -558,6 +560,96 @@ module Webhooks
       listing.reload
       assert listing.pending_payment?
       assert_nil listing.payment_id
+    end
+
+    # --- #125/#127: reacciones a estados no-approved ---
+
+    test "duplicate approved with same payment_id on an issued cert stays issued and returns 200" do
+      @certificate.update!(status: "paid", payment_id: "MP-OK-DUP", paid_at: Time.current)
+      @certificate.issue!
+      assert @certificate.issued?
+
+      stub_fetch_payment({
+        "id" => "MP-OK-DUP", "transaction_amount" => 1500, "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-OK-DUP"}}
+      end
+      assert_response :ok
+      assert @certificate.reload.issued?, "un approved duplicado no debe regresar issued→paid"
+    end
+
+    test "in_process payment is registered without issuing the certificate (#125)" do
+      stub_fetch_payment({
+        "id" => "MP-INPROC", "transaction_amount" => 1500, "status" => "in_process",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-INPROC"}}
+      end
+      assert_response :ok
+      @certificate.reload
+      assert_equal "in_process", @certificate.payment_status
+      assert @certificate.pending_payment?
+    end
+
+    test "charged_back on an issued certificate invalidates it and alerts staff (#127, BR-141)" do
+      @certificate.update!(status: "paid", payment_id: "MP-OK", paid_at: Time.current)
+      @certificate.issue!
+      assert @certificate.issued?
+
+      assert_enqueued_emails 1 do
+        stub_fetch_payment({
+          "id" => "MP-OK", "transaction_amount" => 1500, "status" => "charged_back",
+          "external_reference" => @certificate.id.to_s
+        }) do
+          post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-OK"}}
+        end
+      end
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.issued?
+      assert @certificate.payment_reverted?
+      assert_not @certificate.downloadable?
+    end
+
+    test "refund on a paid (not issued) certificate reverts it to pending_payment (#127)" do
+      @certificate.update!(status: "paid", payment_id: "MP-PAID", paid_at: Time.current)
+      stub_fetch_payment({
+        "id" => "MP-PAID", "transaction_amount" => 1500, "status" => "refunded",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-PAID"}}
+      end
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.pending_payment?
+      assert_equal "refunded", @certificate.payment_status
+    end
+
+    test "re-notification of the same payment_status is a no-op" do
+      @certificate.update!(payment_status: "in_process")
+      stub_fetch_payment({
+        "id" => "MP-SAME", "transaction_amount" => 1500, "status" => "in_process",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        assert_no_enqueued_emails do
+          post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-SAME"}}
+        end
+      end
+      assert_response :ok
+    end
+
+    test "charged_back with a different transaction_amount still invalidates (BR-090 gate only on approved)" do
+      @certificate.update!(status: "paid", payment_id: "MP-CBAMT", paid_at: Time.current)
+      @certificate.issue!
+      stub_fetch_payment({
+        "id" => "MP-CBAMT", "transaction_amount" => 999, "status" => "charged_back",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-CBAMT"}}
+      end
+      assert_response :ok
+      assert @certificate.reload.payment_reverted?, "la reversión no debe bloquearse por el monto"
     end
 
     # --- Error handling (#100/BR-071/BR-073) ---

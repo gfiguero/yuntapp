@@ -1,0 +1,11 @@
+<%= t("payment_reversal_mailer.staff_alert.body_intro") %>
+
+<% if @kind == :certificate %>
+- <%= t("payment_reversal_mailer.staff_alert.folio") %>: <%= @payable.folio %>
+<% else %>
+- <%= t("payment_reversal_mailer.staff_alert.listing") %>: <%= @payable.name %>
+<% end %>
+- <%= t("payment_reversal_mailer.staff_alert.payment_status") %>: <%= @payable.payment_status %>
+- <%= t("payment_reversal_mailer.staff_alert.payment_id") %>: <%= @payable.payment_id %>
+
+<%= t("payment_reversal_mailer.staff_alert.body_action") %>

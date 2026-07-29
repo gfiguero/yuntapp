@@ -109,4 +109,31 @@ class ListingPublicationTest < ActiveSupport::TestCase
     assert_not_includes Listing.published, expired
     assert_not_includes Listing.published, @listing
   end
+
+  # --- Task 2: apply_mp_payment_status! en Listing ---
+
+  test "apply_mp_payment_status! unpublishes a listing whose payment was reverted" do
+    listing = Listing.create!(name: "Pub", user: users(:artanis), amount: 1200)
+    listing.mark_as_paid!(payment_id: "MP-LREV-1")
+    assert listing.published?
+    listing.apply_mp_payment_status!("charged_back")
+    assert_equal "charged_back", listing.payment_status
+    assert listing.pending_payment?
+    assert_nil listing.published_until
+  end
+
+  test "apply_mp_payment_status! registers non-reverted status without unpublishing" do
+    listing = Listing.create!(name: "Pub", user: users(:artanis), amount: 1200)
+    listing.mark_as_paid!(payment_id: "MP-LREV-2")
+    listing.apply_mp_payment_status!("in_process")
+    assert_equal "in_process", listing.payment_status
+    assert listing.published?
+  end
+
+  test "apply_mp_payment_status! is idempotent for the same status on listing" do
+    listing = Listing.create!(name: "Pub", user: users(:artanis), amount: 1200, payment_status: "in_process")
+    assert_no_changes -> { listing.reload.updated_at } do
+      listing.apply_mp_payment_status!("in_process")
+    end
+  end
 end

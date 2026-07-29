@@ -125,6 +125,25 @@ class VerificationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/#{I18n.t("verifications.show.status.expired_badge")}/, @response.body)
   end
 
+  # --- Reverted payment (BR-141) ---
+
+  test "reverted certificate shows as No válido (reverted) with 200 and neutral text" do
+    token = SecureRandom.uuid
+    cert = ResidenceCertificate.create!(
+      member: members(:selendis_member), household_unit: household_units(:selendis_household),
+      neighborhood_association: neighborhood_associations(:manios_de_buin), purpose: "t",
+      status: "issued", folio: "CR-1-7001", validation_token: token, validation_code: "REVRT123",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current,
+      payment_status: "charged_back"
+    )
+    get verification_url(identifier: cert.validation_token)
+    assert_response :ok
+    # BR-141: usa la key reverted_badge (texto neutro, no expone motivo al verificador)
+    assert_match I18n.t("verifications.show.status.reverted_badge"), @response.body
+    # No debe aparecer el texto de "socio no activo" (eso es BR-091, no una reversión de pago)
+    assert_no_match(/socio activo/, @response.body)
+  end
+
   # --- 404 paths ---
 
   test "show returns 404 for unknown UUID" do

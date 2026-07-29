@@ -5,6 +5,7 @@ class Listing < ApplicationRecord
   # Estados de la suscripción de auto-renovación en MercadoPago (BR-088).
   # pending: preapproval creada, esperando autorización del usuario en MP.
   SUBSCRIPTION_STATUSES = %w[pending authorized paused cancelled].freeze
+  REVERTED_PAYMENT_STATUSES = %w[refunded charged_back].freeze
   PLATFORM_FEE_PERCENTAGE = 10
   PUBLICATION_PERIOD = 30.days
 
@@ -60,6 +61,28 @@ class Listing < ApplicationRecord
       paid_at: paid_at,
       published_until: paid_at.to_date + PUBLICATION_PERIOD
     )
+    self
+  end
+
+  def payment_reverted?
+    REVERTED_PAYMENT_STATUSES.include?(payment_status)
+  end
+
+  # Espejo de ResidenceCertificate#apply_mp_payment_status! para publicaciones
+  # (BR-141). Un pago revertido despublica; los demás estados solo se registran.
+  # La guardia mira el VALOR de columna (no `published?`, que excluye vencidas):
+  # un chargeback sobre un listing ya vencido igual debe corregir el estado.
+  def apply_mp_payment_status!(mp_status)
+    return self if payment_status == mp_status
+
+    if REVERTED_PAYMENT_STATUSES.include?(mp_status) && publication_status == "published"
+      # Asunción: refund/contracargo se trata como reversión TOTAL (el modelo de
+      # negocio usa montos únicos, sin refunds parciales). Si MP habilitara
+      # refunds parciales, revisar esta lógica.
+      update!(payment_status: mp_status, publication_status: "pending_payment", published_until: nil)
+    else
+      update!(payment_status: mp_status)
+    end
     self
   end
 

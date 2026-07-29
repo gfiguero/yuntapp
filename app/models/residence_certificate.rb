@@ -2,6 +2,7 @@ class ResidenceCertificate < ApplicationRecord
   include Filterable
 
   STATUSES = %w[pending_payment paid issued].freeze
+  REVERTED_PAYMENT_STATUSES = %w[refunded charged_back].freeze
   MINIMUM_AMOUNT = 1000
   PLATFORM_FEE_PERCENTAGE = 10
   # BR-023: por ley, los certificados emitidos por juntas de vecinos duran 30 días.
@@ -66,6 +67,11 @@ class ResidenceCertificate < ApplicationRecord
     expiration_date.present? && expiration_date < Date.current
   end
 
+  # BR-141: un pago revertido por MP (refund/contracargo) invalida el certificado.
+  def payment_reverted?
+    REVERTED_PAYMENT_STATUSES.include?(payment_status)
+  end
+
   # BR-091: la desactivación del socio (BR-036) invalida sus certificados
   # mientras permanezca inactivo — no se pueden descargar y la verificación
   # pública los muestra como no válidos.
@@ -73,10 +79,10 @@ class ResidenceCertificate < ApplicationRecord
     member.inactive?
   end
 
-  # BR-091/BR-092: el PDF solo puede descargarse si el certificado está
-  # emitido, vigente y su titular sigue activo.
+  # BR-091/BR-092/BR-141: el PDF solo puede descargarse si el certificado está
+  # emitido, vigente, su titular sigue activo y el pago no fue revertido.
   def downloadable?
-    issued? && !expired? && !holder_deactivated?
+    issued? && !expired? && !holder_deactivated? && !payment_reverted?
   end
 
   # RUN enmascarado para verificación pública (BR-078).
@@ -104,6 +110,23 @@ class ResidenceCertificate < ApplicationRecord
     end
 
     update!(status: "paid", payment_id: payment_id, paid_at: paid_at)
+    self
+  end
+
+  # Registra el estado crudo de un pago no-`approved` de MP y aplica la reacción
+  # de negocio (BR-141, BR-073). Idempotente por estado. `approved` NO pasa por
+  # aquí — el webhook usa mark_as_paid!.
+  def apply_mp_payment_status!(mp_status)
+    return self if payment_status == mp_status
+
+    if REVERTED_PAYMENT_STATUSES.include?(mp_status) && paid?
+      # Asunción: refund/contracargo se trata como reversión TOTAL (el modelo de
+      # negocio usa montos únicos, sin refunds parciales). Si MP habilitara
+      # refunds parciales, revisar esta lógica.
+      update!(payment_status: mp_status, status: "pending_payment")
+    else
+      update!(payment_status: mp_status)
+    end
     self
   end
 
@@ -165,9 +188,11 @@ class ResidenceCertificate < ApplicationRecord
   # Excepción intencional: adjuntar/reemplazar el `pdf_document` es parte del
   # proceso de emisión (ver IssueCertificateJob) y no se considera mutación
   # del certificado, por eso permitimos cambios que solo afecten attachments.
+  # `payment_status` registra eventos de MP posteriores a la emisión (refund/
+  # chargeback, BR-141) y no forma parte del contenido inmutable (BR-008).
   def immutable_once_issued
     return unless status_in_database == "issued"
-    return if changed.empty?
+    return if (changed - ["payment_status"]).empty?
     errors.add(:base, :immutable)
   end
 
