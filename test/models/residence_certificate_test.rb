@@ -66,16 +66,58 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_equal "pending_payment", cert.status
   end
 
-  test "generate_folio! sets folio with correct format" do
+  test "issue! sets folio with the CR-{association}-{sequence} format (BR-006)" do
     cert = ResidenceCertificate.create!(
       member: @member,
       household_unit: @household_unit,
       neighborhood_association: @association,
       purpose: "trámite bancario",
-      status: "pending_payment"
+      status: "paid"
     )
-    cert.generate_folio!
-    assert_match(/\ACR-\d+-\d+\z/, cert.folio)
+    cert.issue!
+    assert_match(/\ACR-#{@association.id}-\d+\z/, cert.folio)
+  end
+
+  test "next_folio is sequential per association, not derived from global id (#98)" do
+    first = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "uno", status: "paid"
+    )
+    first.issue!
+    first_seq = first.folio.delete_prefix("CR-#{@association.id}-").to_i
+
+    second = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "dos", status: "paid"
+    )
+    second.issue!
+    second_seq = second.folio.delete_prefix("CR-#{@association.id}-").to_i
+
+    assert_equal first_seq + 1, second_seq, "el folio debe incrementar de a uno por junta"
+  end
+
+  test "issue! recovers from a folio collision by retrying with the next number (#98)" do
+    # Simula una emisión concurrente: otro certificado de la misma junta toma
+    # el folio que este iba a usar, justo entre el cálculo y el save.
+    taken = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "tomado", status: "issued",
+      folio: "CR-#{@association.id}-1",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date
+    )
+
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "nuevo", status: "paid"
+    )
+
+    # Forzamos que el primer intento use el folio ya tomado; el retry debe
+    # recalcular al siguiente libre en vez de atascarse.
+    cert.folio = "CR-#{@association.id}-1"
+    assert_nothing_raised { cert.issue! }
+    assert cert.issued?
+    assert_not_equal taken.folio, cert.folio
+    assert_match(/\ACR-#{@association.id}-\d+\z/, cert.folio)
   end
 
   # BR-008: issued certificates are immutable
@@ -186,7 +228,20 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_equal 500, cert.platform_fee
   end
 
-  test "platform_fee uses integer division (CLP has no decimals)" do
+  test "platform_fee rounds to the nearest peso, not truncating (BR-004, #99)" do
+    # 1099 * 10% = 109.9 → 110 (antes truncaba a 109, sub-cobrando)
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      amount: 1099
+    )
+    assert_equal 110, cert.platform_fee
+  end
+
+  test "platform_fee rounds down when the fraction is below half (#99)" do
+    # 1234 * 10% = 123.4 → 123
     cert = ResidenceCertificate.create!(
       member: @member,
       household_unit: @household_unit,

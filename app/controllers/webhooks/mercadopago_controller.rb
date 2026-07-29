@@ -58,8 +58,15 @@ module Webhooks
       Rails.logger.error("MercadoPago webhook: service not configured (#{e.message})")
       head :service_unavailable
     rescue => e
+      # #100/BR-071/BR-073: un error inesperado (timeout a la API de MP,
+      # RecordInvalid por carrera de unicidad, deadlock de SQLite, fallo al
+      # encolar el job) NO debe tragarse con 200 — MercadoPago no reintentaría
+      # y un pago aprobado real quedaría sin marcar. Devolvemos 500 para que MP
+      # reintente la notificación. Los no-op deterministas (pago no aprobado,
+      # monto que no coincide, recurso inexistente, firma inválida) ya retornan
+      # sin excepción y responden 200/401 antes de llegar aquí.
       Rails.logger.error("MercadoPago webhook: unexpected error (#{e.class}: #{e.message})")
-      head :ok
+      head :internal_server_error
     end
 
     private

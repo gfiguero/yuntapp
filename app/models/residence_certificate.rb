@@ -92,11 +92,6 @@ class ResidenceCertificate < ApplicationRecord
     "#{first_digit}.XXX.XXX-#{dv}"
   end
 
-  def generate_folio!
-    sequence = self.class.where(neighborhood_association_id: neighborhood_association_id).maximum(:id) || 0
-    update!(folio: "CR-#{neighborhood_association_id}-#{sequence + 1}")
-  end
-
   # Transición pending_payment → paid. Idempotente para el mismo payment_id (BR-071).
   # Si el certificado ya está pagado con otro payment_id, levanta AlreadyPaidError.
   def mark_as_paid!(payment_id:, paid_at: Time.current)
@@ -112,24 +107,41 @@ class ResidenceCertificate < ApplicationRecord
     self
   end
 
+  # Cantidad máxima de reintentos ante colisión de folio por emisión concurrente
+  # de la misma junta (#98).
+  FOLIO_MAX_ATTEMPTS = 5
+
   # Transición paid → issued. Genera folio, tokens y fecha de vencimiento atómicamente (BR-062, BR-074).
   # Idempotente: si ya está issued, retorna sin cambios.
+  #
+  # #98: el folio se deriva de un contador secuencial por junta. Dos emisiones
+  # concurrentes de la misma junta pueden computar el mismo número; ante la
+  # colisión (índice único association+folio) se limpia el folio y se reintenta
+  # recalculando el siguiente número libre, en vez de quedar atascado en `paid`.
   def issue!(issue_date: Date.current)
     return self if issued?
     raise "Cannot issue certificate ##{id}: status is #{status}, must be paid" unless paid?
     raise "Cannot issue certificate ##{id}: junta sin RUT (no constituida legalmente, BR-120)" if neighborhood_association.rut.blank?
 
-    transaction do
-      assign_attributes(
-        folio: folio.presence || next_folio,
-        validation_token: validation_token.presence || SecureRandom.uuid,
-        validation_code: validation_code.presence || generate_validation_code,
-        issue_date: issue_date,
-        expiration_date: issue_date + VALIDITY_PERIOD,
-        issued_at: Time.current,
-        status: "issued"
-      )
-      save!
+    attempts = 0
+    begin
+      attempts += 1
+      transaction(requires_new: true) do
+        assign_attributes(
+          folio: folio.presence || next_folio,
+          validation_token: validation_token.presence || SecureRandom.uuid,
+          validation_code: validation_code.presence || generate_validation_code,
+          issue_date: issue_date,
+          expiration_date: issue_date + VALIDITY_PERIOD,
+          issued_at: Time.current,
+          status: "issued"
+        )
+        save!
+      end
+    rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
+      raise unless folio_collision?(e) && attempts < FOLIO_MAX_ATTEMPTS
+      self.folio = nil
+      retry
     end
 
     self
@@ -141,9 +153,12 @@ class ResidenceCertificate < ApplicationRecord
     self.status ||= "pending_payment"
   end
 
+  # BR-004: Yuntapp retiene exactamente el 10%. `amount` es entero (CLP sin
+  # decimales), así que redondeamos al peso más cercano en vez de truncar por
+  # división entera (que sub-cobraba en montos no múltiplos de 10 — #99).
   def compute_platform_fee
     return if amount.blank?
-    self.platform_fee = amount * PLATFORM_FEE_PERCENTAGE / 100
+    self.platform_fee = (amount * PLATFORM_FEE_PERCENTAGE / 100.0).round
   end
 
   # BR-008: el certificado emitido es inmutable en sus campos persistidos.
@@ -164,9 +179,33 @@ class ResidenceCertificate < ApplicationRecord
     IssueCertificateJob.perform_later(id)
   end
 
+  # Siguiente folio secuencial POR JUNTA (BR-006). Se basa en el mayor número
+  # de folio ya emitido por la junta (parseando el sufijo de `CR-{assoc}-{n}`),
+  # no en `maximum(:id)` global, que producía folios no secuenciales por junta
+  # y, al no cambiar entre reintentos, dejaba el certificado atascado (#98).
   def next_folio
-    sequence = self.class.where(neighborhood_association_id: neighborhood_association_id).maximum(:id) || 0
-    "CR-#{neighborhood_association_id}-#{sequence + 1}"
+    prefix = "CR-#{neighborhood_association_id}-"
+    last = self.class
+      .where(neighborhood_association_id: neighborhood_association_id)
+      .where.not(folio: nil)
+      .pluck(:folio)
+      .map { |f| f.to_s.delete_prefix(prefix).to_i }
+      .max || 0
+    "#{prefix}#{last + 1}"
+  end
+
+  # ¿El error proviene de una colisión del folio (índice único association+folio
+  # o la validación de unicidad)? Distingue el race de folio (#98) de cualquier
+  # otro fallo, que debe propagarse sin reintento.
+  def folio_collision?(error)
+    case error
+    when ActiveRecord::RecordNotUnique
+      error.message.include?("folio")
+    when ActiveRecord::RecordInvalid
+      error.record.errors.key?(:folio)
+    else
+      false
+    end
   end
 
   def generate_validation_code

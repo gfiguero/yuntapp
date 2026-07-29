@@ -92,7 +92,9 @@ class Listing < ApplicationRecord
 
   private
 
+  # BR-085: Yuntapp retiene exactamente el 10%. `amount` es entero (CLP sin
+  # decimales); redondeamos al peso más cercano en vez de truncar (#99).
   def compute_platform_fee
-    self.platform_fee = amount * PLATFORM_FEE_PERCENTAGE / 100
+    self.platform_fee = (amount * PLATFORM_FEE_PERCENTAGE / 100.0).round
   end
 end
