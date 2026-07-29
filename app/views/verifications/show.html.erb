@@ -1,7 +1,8 @@
 <%
-  # BR-091: la desactivación del titular invalida el certificado, con
-  # precedencia sobre el vencimiento. Siempre responde 200 (BR-009/BR-080).
-  if @certificate.holder_deactivated?
+  # BR-091/BR-141: el certificado es "No válido" si el titular fue desactivado
+  # O si el pago fue revertido (refund/contracargo). Precedencia sobre vencido.
+  # Siempre responde 200 (BR-009/BR-080). No se expone el motivo al verificador.
+  if @certificate.holder_deactivated? || @certificate.payment_reverted?
     status_key, badge_class, alert_class = "revoked", "badge-error", "alert-error"
   elsif @certificate.expired?
     status_key, badge_class, alert_class = "expired", "badge-warning", "alert-warning"

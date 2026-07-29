@@ -816,6 +816,7 @@ es:
       show:
         identifier: "Certificado ID: %{id}"
         processing: Tu pago fue recibido. El certificado se está generando y estará disponible para descarga en unos segundos. Recarga la página.
+        payment_in_review: "Tu pago está siendo revisado por MercadoPago. En cuanto se apruebe, el certificado se emitirá automáticamente."
         download_pdf: Descargar PDF del certificado
         validation_code: Código de verificación
         expired_notice: Este certificado está vencido y ya no puede descargarse. Si lo necesitas, solicita uno nuevo.

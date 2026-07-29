@@ -29,6 +29,10 @@
 
 en:
   hello: "Hello world"
+  panel:
+    residence_certificates:
+      show:
+        payment_in_review: "Your payment is under review by MercadoPago. Once approved, the certificate will be issued automatically."
   activerecord:
     attributes:
       neighborhood_association:

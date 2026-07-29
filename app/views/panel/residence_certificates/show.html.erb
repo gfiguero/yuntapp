@@ -83,6 +83,12 @@
         </div>
       <% end %>
 
+      <% if @residence_certificate.pending_payment? && %w[in_process pending].include?(@residence_certificate.payment_status) %>
+        <div class="alert alert-warning mt-4">
+          <%= I18n.t('panel.residence_certificates.show.payment_in_review') %>
+        </div>
+      <% end %>
+
       <% if @residence_certificate.paid? && !@residence_certificate.issued? %>
         <div class="alert alert-info mt-4">
           <%= I18n.t('panel.residence_certificates.show.processing') %>

@@ -125,6 +125,22 @@ class VerificationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/#{I18n.t("verifications.show.status.expired_badge")}/, @response.body)
   end
 
+  # --- Reverted payment (BR-141) ---
+
+  test "reverted certificate shows as No válido (revoked) with 200" do
+    token = SecureRandom.uuid
+    cert = ResidenceCertificate.create!(
+      member: members(:selendis_member), household_unit: household_units(:selendis_household),
+      neighborhood_association: neighborhood_associations(:manios_de_buin), purpose: "t",
+      status: "issued", folio: "CR-1-7001", validation_token: token, validation_code: "REVRT123",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current,
+      payment_status: "charged_back"
+    )
+    get verification_url(identifier: cert.validation_token)
+    assert_response :ok
+    assert_match I18n.t("verifications.show.status.revoked_badge"), @response.body
+  end
+
   # --- 404 paths ---
 
   test "show returns 404 for unknown UUID" do
