@@ -120,6 +120,28 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_match(/\ACR-#{@association.id}-\d+\z/, cert.folio)
   end
 
+  test "issue! gives up after max attempts and leaves cert in paid for the job to retry (#98)" do
+    ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "tomado", status: "issued",
+      folio: "CR-#{@association.id}-1",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date
+    )
+
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "nuevo", status: "paid"
+    )
+
+    # next_folio siempre devuelve el folio ya tomado → la colisión nunca se
+    # resuelve. Tras FOLIO_MAX_ATTEMPTS, issue! propaga el error y el certificado
+    # queda en paid (BR-076: IssueCertificateJob reintentará / revisión manual).
+    cert.define_singleton_method(:next_folio) { "CR-#{neighborhood_association_id}-1" }
+
+    assert_raises(ActiveRecord::RecordInvalid) { cert.issue! }
+    assert cert.reload.paid?, "el certificado debe quedar en paid, no atascado a medias"
+  end
+
   # BR-008: issued certificates are immutable
   test "issued certificate cannot be modified" do
     cert = ResidenceCertificate.create!(

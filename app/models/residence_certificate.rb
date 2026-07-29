@@ -200,6 +200,10 @@ class ResidenceCertificate < ApplicationRecord
   def folio_collision?(error)
     case error
     when ActiveRecord::RecordNotUnique
+      # SQLite (BD de prod) reporta el nombre de columna en el mensaje
+      # ("UNIQUE constraint failed: ...residence_certificates.folio"), así que
+      # matcheamos "folio". Depende de que la columna se llame `folio`; si se
+      # renombrara, actualizar este match. NO matchea payment_id/validation_*.
       error.message.include?("folio")
     when ActiveRecord::RecordInvalid
       error.record.errors.key?(:folio)

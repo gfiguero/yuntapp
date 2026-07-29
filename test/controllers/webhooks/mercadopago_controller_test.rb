@@ -587,5 +587,24 @@ module Webhooks
 
       assert_response :ok
     end
+
+    test "returns 200 (not 500) when a second payment_id hits an already-paid certificate" do
+      # #100: AlreadyPaidError es determinista — reintentar no cambia nada.
+      # Debe responder 200 para NO gatillar reintentos infinitos de MP.
+      @certificate.mark_as_paid!(payment_id: "MP-FIRST")
+
+      stub_fetch_payment({
+        "id" => "MP-SECOND",
+        "transaction_amount" => 1500,
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-SECOND"}}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert_equal "MP-FIRST", @certificate.payment_id, "no debe cambiar el payment_id original"
+    end
   end
 end
