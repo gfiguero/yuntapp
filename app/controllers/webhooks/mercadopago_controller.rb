@@ -276,6 +276,10 @@ module Webhooks
     # estado (apply_mp_payment_status! no hace nada si el estado no cambió).
     # Ante un pago revertido (refund/contracargo) notifica al staff (BR-141).
     def handle_non_approved(payable, status, payment_id)
+      # Nota: read-then-write sin lock. En SQLite (prod) las escrituras
+      # serializan, así que el peor caso ante dos webhooks casi simultáneos del
+      # mismo pago es un correo de reversión duplicado al staff (benigno). Con un
+      # motor más concurrente, envolver en with_lock.
       changed = payable.payment_status != status
       payable.apply_mp_payment_status!(status)
       unless changed

@@ -564,6 +564,21 @@ module Webhooks
 
     # --- #125/#127: reacciones a estados no-approved ---
 
+    test "duplicate approved with same payment_id on an issued cert stays issued and returns 200" do
+      @certificate.update!(status: "paid", payment_id: "MP-OK-DUP", paid_at: Time.current)
+      @certificate.issue!
+      assert @certificate.issued?
+
+      stub_fetch_payment({
+        "id" => "MP-OK-DUP", "transaction_amount" => 1500, "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-OK-DUP"}}
+      end
+      assert_response :ok
+      assert @certificate.reload.issued?, "un approved duplicado no debe regresar issued→paid"
+    end
+
     test "in_process payment is registered without issuing the certificate (#125)" do
       stub_fetch_payment({
         "id" => "MP-INPROC", "transaction_amount" => 1500, "status" => "in_process",

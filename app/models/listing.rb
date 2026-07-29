@@ -76,6 +76,9 @@ class Listing < ApplicationRecord
     return self if payment_status == mp_status
 
     if REVERTED_PAYMENT_STATUSES.include?(mp_status) && publication_status == "published"
+      # Asunción: refund/contracargo se trata como reversión TOTAL (el modelo de
+      # negocio usa montos únicos, sin refunds parciales). Si MP habilitara
+      # refunds parciales, revisar esta lógica.
       update!(payment_status: mp_status, publication_status: "pending_payment", published_until: nil)
     else
       update!(payment_status: mp_status)
