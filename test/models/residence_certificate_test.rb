@@ -720,4 +720,93 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     )
     assert_not cert.downloadable?
   end
+
+  # --- Task 1: payment_status + payment_reverted? + inmutabilidad ---
+
+  test "payment_reverted? is true only for refunded and charged_back" do
+    cert = ResidenceCertificate.new
+    %w[refunded charged_back].each do |s|
+      cert.payment_status = s
+      assert cert.payment_reverted?, "#{s} debería contar como revertido"
+    end
+    %w[approved in_process pending rejected cancelled].each do |s|
+      cert.payment_status = s
+      assert_not cert.payment_reverted?, "#{s} no debería contar como revertido"
+    end
+    cert.payment_status = nil
+    assert_not cert.payment_reverted?
+  end
+
+  test "downloadable? is false when payment was reverted" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "issued", folio: "CR-#{@association.id}-9001",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current,
+      payment_status: "charged_back"
+    )
+    assert_not cert.downloadable?, "un cert con pago revertido no debe poder descargarse"
+  end
+
+  test "payment_status can be updated on an issued certificate (not blocked by immutability)" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "issued", folio: "CR-#{@association.id}-9002",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current
+    )
+    assert cert.update(payment_status: "charged_back"), cert.errors.full_messages.to_sentence
+    assert_equal "charged_back", cert.reload.payment_status
+  end
+
+  test "other fields remain immutable on an issued certificate" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "issued", folio: "CR-#{@association.id}-9003",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current
+    )
+    assert_not cert.update(purpose: "otro")
+    assert cert.errors[:base].any?
+  end
+
+  # --- Task 2: apply_mp_payment_status! ---
+
+  test "apply_mp_payment_status! registers non-approved status without changing business status" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "pending_payment", amount: 1500
+    )
+    cert.apply_mp_payment_status!("in_process")
+    assert_equal "in_process", cert.payment_status
+    assert cert.pending_payment?
+  end
+
+  test "apply_mp_payment_status! reverts a paid (not issued) certificate to pending_payment" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "paid", amount: 1500, payment_id: "MP-REV-1", paid_at: Time.current
+    )
+    cert.apply_mp_payment_status!("refunded")
+    assert_equal "refunded", cert.payment_status
+    assert cert.pending_payment?
+  end
+
+  test "apply_mp_payment_status! keeps an issued certificate issued but marks it reverted" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "issued", folio: "CR-#{@association.id}-9101",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current
+    )
+    cert.apply_mp_payment_status!("charged_back")
+    assert cert.issued?
+    assert cert.payment_reverted?
+  end
+
+  test "apply_mp_payment_status! is idempotent for the same status" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit, neighborhood_association: @association,
+      purpose: "trámite", status: "pending_payment", amount: 1500, payment_status: "in_process"
+    )
+    assert_no_changes -> { cert.reload.updated_at } do
+      cert.apply_mp_payment_status!("in_process")
+    end
+  end
 end

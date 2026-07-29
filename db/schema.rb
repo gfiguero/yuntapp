@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_28_211113) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_29_171334) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -180,6 +180,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_211113) do
     t.integer "neighborhood_association_id"
     t.datetime "paid_at"
     t.string "payment_id"
+    t.string "payment_status"
     t.integer "platform_fee"
     t.string "preapproval_id"
     t.decimal "price"
@@ -277,6 +278,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_28_211113) do
     t.text "notes"
     t.datetime "paid_at"
     t.string "payment_id"
+    t.string "payment_status"
     t.integer "platform_fee"
     t.text "purpose"
     t.string "status", default: "pending_payment", null: false
