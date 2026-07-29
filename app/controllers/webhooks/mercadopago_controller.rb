@@ -160,11 +160,6 @@ module Webhooks
         return
       end
 
-      if payment_already_processed?(payment_id)
-        Rails.logger.info("MercadoPago webhook: payment_id #{payment_id} already processed")
-        return
-      end
-
       listing = Listing.find_by(preapproval_id: preapproval_id)
       unless listing
         external_reference = (invoice["external_reference"] || invoice[:external_reference]).to_s
@@ -178,6 +173,14 @@ module Webhooks
 
       case payment_status
       when "approved"
+        # #101: idempotencia histórica por (payment_id, status). Un reintento
+        # tardío del webhook de un cobro ya aplicado no re-renueva (antes el
+        # payment_id se perdía al sobrescribirse en renew_from_subscription!).
+        if payment_already_processed?(payment_id, "approved")
+          Rails.logger.info("MercadoPago webhook: subscription payment #{payment_id} already processed")
+          return
+        end
+
         # BR-090: el cobro recurrente debe coincidir exactamente con el monto
         # snapshot de la publicación, igual que el pago único. Rechaza montos
         # distintos o payment_ids obsoletos de otra operación cuyo
@@ -188,17 +191,38 @@ module Webhooks
           return
         end
 
-        listing.renew_from_subscription!(payment_id: payment_id)
+        # #101: renovación y registro del evento (el gate de idempotencia) commitean
+        # atómicamente. Si fallara entre ambos, el rollback deja el listing sin renovar
+        # y sin evento → el reintento de MP re-renueva limpio. Así la idempotencia NO
+        # depende de la guarda `payment_id` de renew_from_subscription! (mero atajo).
+        ActiveRecord::Base.transaction do
+          listing.renew_from_subscription!(payment_id: payment_id)
+          record_payment_event(listing, payment_id: payment_id, status: "approved", amount: amount)
+        end
         Rails.logger.info("MercadoPago webhook: listing ##{listing.id} renewed until #{listing.published_until} (payment_id=#{payment_id})")
       else
         Rails.logger.info("MercadoPago webhook: authorized_payment #{authorized_payment_id} payment status=#{payment_status} for listing ##{listing.id} — no renewal")
       end
     end
 
-    # Idempotencia compartida (BR-071/BR-087): un payment_id ya registrado en
-    # certificados o publicaciones no se vuelve a procesar.
-    def payment_already_processed?(payment_id)
-      ResidenceCertificate.exists?(payment_id: payment_id) || Listing.exists?(payment_id: payment_id)
+    # Idempotencia histórica (#101/BR-071/BR-087): un (payment_id, status) ya
+    # registrado en payment_events no se vuelve a procesar. La clave incluye el
+    # status para no bloquear un refund/contracargo posterior del mismo pago
+    # (reconciliación con Batch G: los refunds reusan el payment_id del approved).
+    def payment_already_processed?(payment_id, status)
+      PaymentEvent.exists?(payment_id: payment_id, status: status)
+    end
+
+    # Registra el evento de pago (log histórico + idempotencia). Idempotente por
+    # el índice único (payment_id, status). `amount` es best-effort: en eventos
+    # no-approved (refund/contracargo/rechazo) MP no siempre lo envía y puede ser
+    # nil — no es load-bearing (la idempotencia es por (payment_id, status)).
+    def record_payment_event(payable, payment_id:, status:, amount:)
+      PaymentEvent.find_or_create_by(payment_id: payment_id, status: status) do |event|
+        event.payable = payable
+        event.amount = amount
+        event.processed_at = Time.current
+      end
     end
 
     # Enruta el pago según external_reference:
@@ -241,9 +265,10 @@ module Webhooks
         end
         certificate.mark_as_paid!(payment_id: payment_id)
         certificate.update!(payment_status: "approved") unless certificate.payment_status == "approved"
+        record_payment_event(certificate, payment_id: payment_id, status: "approved", amount: amount)
         Rails.logger.info("MercadoPago webhook: certificate ##{certificate.id} marked paid (payment_id=#{payment_id})")
       else
-        handle_non_approved(certificate, status.to_s, payment_id)
+        handle_non_approved(certificate, status.to_s, payment_id, amount)
       end
     end
 
@@ -264,16 +289,17 @@ module Webhooks
         end
         listing.mark_as_paid!(payment_id: payment_id)
         listing.update!(payment_status: "approved") unless listing.payment_status == "approved"
+        record_payment_event(listing, payment_id: payment_id, status: "approved", amount: amount)
         Rails.logger.info("MercadoPago webhook: listing ##{listing.id} published (payment_id=#{payment_id})")
       else
-        handle_non_approved(listing, status.to_s, payment_id)
+        handle_non_approved(listing, status.to_s, payment_id, amount)
       end
     end
 
     # #125/#127: aplica un estado no-approved de MP al payable. Idempotente por
     # estado (apply_mp_payment_status! no hace nada si el estado no cambió).
     # Ante un pago revertido (refund/contracargo) notifica al staff (BR-141).
-    def handle_non_approved(payable, status, payment_id)
+    def handle_non_approved(payable, status, payment_id, amount = nil)
       # Nota: read-then-write sin lock. En SQLite (prod) las escrituras
       # serializan, así que el peor caso ante dos webhooks casi simultáneos del
       # mismo pago es un correo de reversión duplicado al staff (benigno). Con un
@@ -284,6 +310,9 @@ module Webhooks
         Rails.logger.info("MercadoPago webhook: #{payable.class}##{payable.id} status=#{status} unchanged — no-op")
         return
       end
+
+      # #101: log histórico del evento (refund/contracargo/rechazo/en revisión).
+      record_payment_event(payable, payment_id: payment_id, status: status, amount: amount)
 
       if ResidenceCertificate::REVERTED_PAYMENT_STATUSES.include?(status)
         Rails.logger.error("MercadoPago webhook: PAYMENT REVERTED #{payable.class}##{payable.id} status=#{status} (payment_id=#{payment_id})")

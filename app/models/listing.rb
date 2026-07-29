@@ -15,6 +15,9 @@ class Listing < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :neighborhood_association, optional: true
 
+  # BR-100: el historial de eventos de pago (#101) no se destruye.
+  has_many :payment_events, as: :payable, dependent: :restrict_with_error
+
   before_save :compute_platform_fee, if: -> { amount.present? && platform_fee.nil? }
 
   validates :name, presence: true

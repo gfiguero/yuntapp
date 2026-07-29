@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_29_171334) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_29_225856) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -250,6 +250,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_29_171334) do
     t.index ["neighborhood_association_id"], name: "index_onboarding_requests_on_neighborhood_association_id"
     t.index ["region_id"], name: "index_onboarding_requests_on_region_id"
     t.index ["user_id"], name: "index_onboarding_requests_on_user_id"
+  end
+
+  create_table "payment_events", force: :cascade do |t|
+    t.integer "amount"
+    t.datetime "created_at", null: false
+    t.integer "payable_id", null: false
+    t.string "payable_type", null: false
+    t.string "payment_id", null: false
+    t.datetime "processed_at", null: false
+    t.string "status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payable_type", "payable_id"], name: "index_payment_events_on_payable"
+    t.index ["payment_id", "status"], name: "index_payment_events_on_payment_id_and_status", unique: true
   end
 
   create_table "regions", force: :cascade do |t|
