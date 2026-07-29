@@ -57,9 +57,24 @@ module Webhooks
     rescue MercadopagoService::ConfigurationError => e
       Rails.logger.error("MercadoPago webhook: service not configured (#{e.message})")
       head :service_unavailable
-    rescue => e
-      Rails.logger.error("MercadoPago webhook: unexpected error (#{e.class}: #{e.message})")
+    rescue ResidenceCertificate::AlreadyPaidError, Listing::AlreadyPaidError,
+      ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
+      # #100: errores DETERMINISTAS — el recurso ya fue pagado con otro payment_id,
+      # una colisión de unicidad (idempotencia efectiva: otro webhook ya lo
+      # procesó) o el certificado es inmutable por estar emitido. Reintentar no
+      # cambiaría el resultado, así que respondemos 200 para que MercadoPago NO
+      # reintente en loop. Solo los fallos transitorios llegan al rescue de abajo.
+      Rails.logger.warn("MercadoPago webhook: deterministic no-op (#{e.class}: #{e.message})")
       head :ok
+    rescue => e
+      # #100/BR-071/BR-073: un error TRANSITORIO (timeout a la API de MP, deadlock
+      # de SQLite, fallo al encolar el job) NO debe tragarse con 200 — MP no
+      # reintentaría y un pago aprobado real quedaría sin marcar. Devolvemos 500
+      # para que MercadoPago reintente. Los no-op deterministas (pago no aprobado,
+      # monto que no coincide, recurso inexistente, firma inválida) ya retornan
+      # sin excepción y responden 200/401 antes de llegar aquí.
+      Rails.logger.error("MercadoPago webhook: unexpected error (#{e.class}: #{e.message})")
+      head :internal_server_error
     end
 
     private

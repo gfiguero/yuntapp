@@ -47,4 +47,26 @@ class CertificatePdfServiceTest < ActiveSupport::TestCase
       CertificatePdfService.new(@certificate.reload).render
     end
   end
+
+  # --- verification_url host resolution (#102) ---
+
+  test "verification_url uses the configured verification_base_url" do
+    original = Rails.application.config.x.verification_base_url
+    Rails.application.config.x.verification_base_url = "https://staging.example.cl"
+
+    url = CertificatePdfService.new(@certificate).send(:verification_url)
+    assert_equal "https://staging.example.cl/verify/#{@certificate.validation_token}", url
+  ensure
+    Rails.application.config.x.verification_base_url = original
+  end
+
+  test "verification_url strips a trailing slash from the configured base" do
+    original = Rails.application.config.x.verification_base_url
+    Rails.application.config.x.verification_base_url = "https://yuntapp.cl/"
+
+    url = CertificatePdfService.new(@certificate).send(:verification_url)
+    assert_equal "https://yuntapp.cl/verify/#{@certificate.validation_token}", url
+  ensure
+    Rails.application.config.x.verification_base_url = original
+  end
 end

@@ -559,5 +559,52 @@ module Webhooks
       assert listing.pending_payment?
       assert_nil listing.payment_id
     end
+
+    # --- Error handling (#100/BR-071/BR-073) ---
+
+    test "returns 500 on unexpected error so MercadoPago retries" do
+      # Un fallo transitorio (p. ej. timeout a la API de MP) NO debe tragarse
+      # con 200: MP no reintentaría y el pago quedaría sin procesar.
+      real_service = MercadopagoService.new
+      fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
+      fake.define_singleton_method(:fetch_payment) { |_payment_id| raise Net::ReadTimeout }
+      stub_class_method(MercadopagoService, :new, fake) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-BOOM"}}
+      end
+
+      assert_response :internal_server_error
+      @certificate.reload
+      assert @certificate.pending_payment?, "el certificado no debe avanzar ante el error"
+    end
+
+    test "still returns 200 for a deterministic no-op (payment not found)" do
+      # Un recurso inexistente es un no-op determinista, no un error transitorio:
+      # 200 para que MP no reintente indefinidamente.
+      stub_fetch_payment(nil) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-NONE"}}
+      end
+
+      assert_response :ok
+    end
+
+    test "returns 200 (not 500) when a second payment_id hits an already-paid certificate" do
+      # #100: AlreadyPaidError es determinista — reintentar no cambia nada.
+      # Debe responder 200 para NO gatillar reintentos infinitos de MP.
+      @certificate.mark_as_paid!(payment_id: "MP-FIRST")
+
+      stub_fetch_payment({
+        "id" => "MP-SECOND",
+        "transaction_amount" => 1500,
+        "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-SECOND"}}
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert_equal "MP-FIRST", @certificate.payment_id, "no debe cambiar el payment_id original"
+    end
   end
 end

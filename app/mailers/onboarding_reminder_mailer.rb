@@ -17,8 +17,8 @@ class OnboardingReminderMailer < ApplicationMailer
   private
 
   def build_panel_url
-    base = Rails.application.config.x.verification_base_url.presence ||
-      "https://#{ENV.fetch("YUNTAPP_HOST", "yuntapp.cl")}"
+    # Host resuelto en config/initializers/verification_url.rb (#102).
+    base = Rails.application.config.x.verification_base_url
     "#{base.chomp("/")}/admin/onboarding_requests"
   end
 end

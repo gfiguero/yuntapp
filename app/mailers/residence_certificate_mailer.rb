@@ -15,8 +15,8 @@ class ResidenceCertificateMailer < ApplicationMailer
   private
 
   def build_verification_url(token)
-    base = Rails.application.config.x.verification_base_url.presence ||
-      "https://#{ENV.fetch("YUNTAPP_HOST", "yuntapp.cl")}"
+    # Host resuelto en config/initializers/verification_url.rb (#102).
+    base = Rails.application.config.x.verification_base_url
     "#{base.chomp("/")}/verify/#{token}"
   end
 end

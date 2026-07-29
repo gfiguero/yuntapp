@@ -49,6 +49,11 @@ env:
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true
 
+    # Host base para las URLs/QR de verificación pública de certificados (#102).
+    # El PDF es inmutable (BR-075): este host queda "cocido" en cada certificado
+    # emitido, así que debe ser el dominio real de producción.
+    YUNTAPP_HOST: yuntapp.cl
+
     # Set number of processes dedicated to Solid Queue (default: 1)
     # JOB_CONCURRENCY: 3
 

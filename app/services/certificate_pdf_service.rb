@@ -214,13 +214,10 @@ class CertificatePdfService
   end
 
   def verification_url
-    base = Rails.application.config.x.verification_base_url.presence || default_base_url
+    # El host lo resuelve config/initializers/verification_url.rb (#102), fuente
+    # única para PDF, mailers y QR — no duplicar el fallback aquí.
+    base = Rails.application.config.x.verification_base_url
     "#{base.chomp("/")}/verify/#{@certificate.validation_token}"
-  end
-
-  def default_base_url
-    host = ENV["YUNTAPP_HOST"] || "yuntapp.cl"
-    "https://#{host}"
   end
 
   def qr_io
