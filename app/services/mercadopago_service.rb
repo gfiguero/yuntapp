@@ -12,6 +12,9 @@ require "mercadopago/sdk"
 class MercadopagoService
   class ConfigurationError < StandardError; end
 
+  STATEMENT_DESCRIPTOR = "YUNTAPP"
+  PREFERENCE_TTL = 24.hours
+
   def initialize(access_token: nil, webhook_secret: nil)
     @access_token = access_token || Rails.application.config.mercadopago[:access_token]
     @webhook_secret = webhook_secret || Rails.application.config.mercadopago[:webhook_secret]
@@ -22,7 +25,7 @@ class MercadopagoService
   # Sin notification_url: las notificaciones llegan exclusivamente por el
   # webhook configurado en el panel de MP, cuya firma sí es verificable
   # (el canal de notification_url firma con una clave no consultable).
-  def create_preference(certificate, success_url:, failure_url:, pending_url:)
+  def create_preference(certificate, success_url:, failure_url:, pending_url:, payer: nil)
     ensure_access_token!
 
     payload = {
@@ -30,6 +33,8 @@ class MercadopagoService
         {
           id: "cert-#{certificate.id}",
           title: I18n.t("payments.mercadopago.item_title", folio: certificate_label(certificate)),
+          description: certificate.purpose,
+          category_id: "services",
           quantity: 1,
           currency_id: "CLP",
           unit_price: certificate.amount
@@ -41,17 +46,22 @@ class MercadopagoService
         failure: failure_url,
         pending: pending_url
       },
-      auto_return: "approved"
+      auto_return: "approved",
+      statement_descriptor: STATEMENT_DESCRIPTOR,
+      expires: true,
+      expiration_date_to: PREFERENCE_TTL.from_now.iso8601(3),
+      payment_methods: {installments: 1}
     }
+    payload[:payer] = payer if payer.present?
 
-    response = sdk.preference.create(payload)
+    response = sdk.preference.create(payload, request_options: idempotent_options("pref-cert-#{certificate.id}"))
     response[:response]
   end
 
   # Crea una preference para habilitar una publicación del marketplace
   # (BR-083). El external_reference lleva el prefijo "listing-" para que el
   # webhook pueda distinguirlo de los certificados (que usan el id a secas).
-  def create_listing_preference(listing, success_url:, failure_url:, pending_url:)
+  def create_listing_preference(listing, success_url:, failure_url:, pending_url:, payer: nil)
     ensure_access_token!
 
     payload = {
@@ -59,6 +69,8 @@ class MercadopagoService
         {
           id: "listing-#{listing.id}",
           title: I18n.t("payments.mercadopago.listing_item_title", name: listing.name),
+          description: listing.name,
+          category_id: "services",
           quantity: 1,
           currency_id: "CLP",
           unit_price: listing.amount
@@ -70,10 +82,15 @@ class MercadopagoService
         failure: failure_url,
         pending: pending_url
       },
-      auto_return: "approved"
+      auto_return: "approved",
+      statement_descriptor: STATEMENT_DESCRIPTOR,
+      expires: true,
+      expiration_date_to: PREFERENCE_TTL.from_now.iso8601(3),
+      payment_methods: {installments: 1}
     }
+    payload[:payer] = payer if payer.present?
 
-    response = sdk.preference.create(payload)
+    response = sdk.preference.create(payload, request_options: idempotent_options("pref-listing-#{listing.id}"))
     response[:response]
   end
 
@@ -97,7 +114,7 @@ class MercadopagoService
       }
     }
 
-    response = sdk.preapproval.create(payload)
+    response = sdk.preapproval.create(payload, request_options: idempotent_options("preapproval-listing-#{listing.id}"))
     response[:response]
   end
 
@@ -170,6 +187,10 @@ class MercadopagoService
 
   def sdk
     @sdk ||= ::Mercadopago::SDK.new(@access_token)
+  end
+
+  def idempotent_options(key)
+    Mercadopago::RequestOptions.new(custom_headers: {"x-idempotency-key" => key})
   end
 
   def ensure_access_token!

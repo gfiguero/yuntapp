@@ -3,6 +3,8 @@ module Panel
   # Mismo mecanismo que el pago de certificados: preference de MercadoPago
   # Checkout Pro + confirmación vía webhook.
   class ListingPaymentsController < ApplicationController
+    include MercadopagoPayer
+
     layout "panel"
     before_action :authenticate_user!
     before_action :set_listing, only: :new
@@ -17,6 +19,7 @@ module Panel
 
       preference = mercadopago.create_listing_preference(
         @listing,
+        payer: mercadopago_payer,
         success_url: success_panel_listing_payments_url,
         failure_url: failure_panel_listing_payments_url,
         pending_url: pending_panel_listing_payments_url
