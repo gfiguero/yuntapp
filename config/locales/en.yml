@@ -37,3 +37,12 @@ en:
     dependent_reviews:
       flash:
         family_group_missing_admin: "The family group has no active household admin; the dependent cannot be approved."
+  payment_reversal_mailer:
+    staff_alert:
+      subject: "Alert: reverted payment in Yuntapp"
+      body_intro: "A payment was reverted (refund or chargeback). Review for possible fraud."
+      folio: "Certificate folio"
+      listing: "Listing"
+      payment_status: "Payment status"
+      payment_id: "MercadoPago payment id"
+      body_action: "The document was automatically invalidated. If warranted, consider deactivating the member (BR-091)."

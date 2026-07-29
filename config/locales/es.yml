@@ -458,6 +458,16 @@ es:
         other: "Hay %{count} solicitudes de administración esperando revisión:"
       signature: Equipo Yuntapp
 
+  payment_reversal_mailer:
+    staff_alert:
+      subject: "Alerta: pago revertido en Yuntapp"
+      body_intro: "Se revirtió un pago (reembolso o contracargo). Revisar posible fraude."
+      folio: "Folio del certificado"
+      listing: "Publicación"
+      payment_status: "Estado del pago"
+      payment_id: "ID de pago MercadoPago"
+      body_action: "El documento quedó invalidado automáticamente. Si corresponde, evaluar desactivar al socio (BR-091)."
+
   verifications:
     layout:
       title: Verificación de Certificado — Yuntapp
