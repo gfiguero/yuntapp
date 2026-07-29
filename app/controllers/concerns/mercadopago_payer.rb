@@ -11,7 +11,8 @@ module MercadopagoPayer
     if identity
       payer[:name] = identity.first_name
       payer[:surname] = identity.last_name
-      payer[:identification] = {type: "RUT", number: identity.run} if identity.run.present?
+      # MP espera el RUT sin separadores para el pre-fill (guardamos "12345678-K").
+      payer[:identification] = {type: "RUT", number: identity.run.delete("-")} if identity.run.present?
     end
     payer
   end
