@@ -91,13 +91,10 @@ module Webhooks
       )
     end
 
-    # topic=payment: data_id es un payment_id directamente.
+    # topic=payment: data_id es un payment_id. Siempre consultamos el estado
+    # real; la idempotencia es por estado (ver mark_payable_paid), no por
+    # "payment_id ya visto" — un refund/contracargo reusa el payment_id.
     def process_payment_notification(payment_id)
-      if payment_already_processed?(payment_id)
-        Rails.logger.info("MercadoPago webhook: payment_id #{payment_id} already processed")
-        return
-      end
-
       payment = mercadopago.fetch_payment(payment_id)
       return unless payment.is_a?(Hash)
       mark_payable_paid(payment, payment_id)
@@ -113,7 +110,7 @@ module Webhooks
       payments = order["payments"] || []
       payments.each do |payment_entry|
         pid = payment_entry["id"]
-        next if pid.nil? || payment_already_processed?(pid.to_s)
+        next if pid.nil?
 
         payment = mercadopago.fetch_payment(pid.to_s)
         mark_payable_paid(payment, pid.to_s)
@@ -245,9 +242,10 @@ module Webhooks
       case status.to_s
       when "approved"
         certificate.mark_as_paid!(payment_id: payment_id)
+        certificate.update!(payment_status: "approved") unless certificate.payment_status == "approved"
         Rails.logger.info("MercadoPago webhook: certificate ##{certificate.id} marked paid (payment_id=#{payment_id})")
       else
-        Rails.logger.info("MercadoPago webhook: payment #{payment_id} status=#{status} for certificate ##{certificate.id} — no transition")
+        handle_non_approved(certificate, status.to_s, payment_id)
       end
     end
 
@@ -267,9 +265,35 @@ module Webhooks
       case status.to_s
       when "approved"
         listing.mark_as_paid!(payment_id: payment_id)
+        listing.update!(payment_status: "approved") unless listing.payment_status == "approved"
         Rails.logger.info("MercadoPago webhook: listing ##{listing.id} published (payment_id=#{payment_id})")
       else
-        Rails.logger.info("MercadoPago webhook: payment #{payment_id} status=#{status} for listing ##{listing.id} — no transition")
+        handle_non_approved(listing, status.to_s, payment_id)
+      end
+    end
+
+    # #125/#127: aplica un estado no-approved de MP al payable. Idempotente por
+    # estado (apply_mp_payment_status! no hace nada si el estado no cambió).
+    # Ante un pago revertido (refund/contracargo) notifica al staff (BR-141).
+    def handle_non_approved(payable, status, payment_id)
+      changed = payable.payment_status != status
+      payable.apply_mp_payment_status!(status)
+      unless changed
+        Rails.logger.info("MercadoPago webhook: #{payable.class}##{payable.id} status=#{status} unchanged — no-op")
+        return
+      end
+
+      if ResidenceCertificate::REVERTED_PAYMENT_STATUSES.include?(status)
+        Rails.logger.error("MercadoPago webhook: PAYMENT REVERTED #{payable.class}##{payable.id} status=#{status} (payment_id=#{payment_id})")
+        notify_staff_of_reversal(payable)
+      else
+        Rails.logger.info("MercadoPago webhook: #{payable.class}##{payable.id} payment_status=#{status} registered")
+      end
+    end
+
+    def notify_staff_of_reversal(payable)
+      User.where(superadmin: true).find_each do |staff|
+        PaymentReversalMailer.staff_alert(staff, payable).deliver_later if staff.email.present?
       end
     end
 
