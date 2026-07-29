@@ -17,6 +17,9 @@ class ResidenceCertificate < ApplicationRecord
   belongs_to :household_unit
   belongs_to :approved_by, class_name: "User", optional: true
 
+  # BR-100: el historial de eventos de pago (#101) no se destruye.
+  has_many :payment_events, as: :payable, dependent: :restrict_with_error
+
   has_one_attached :pdf_document
 
   after_initialize :set_default_status, if: :new_record?

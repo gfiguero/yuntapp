@@ -698,5 +698,79 @@ module Webhooks
       @certificate.reload
       assert_equal "MP-FIRST", @certificate.payment_id, "no debe cambiar el payment_id original"
     end
+
+    # --- Idempotencia histórica por payment_events (#101) ---
+
+    test "late retry of the same subscription charge does not re-renew (#101)" do
+      listing = Listing.create!(name: "Sub", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-H1", subscription_status: "authorized")
+      listing.mark_as_paid!(payment_id: "MP-INIT")
+      first_until = listing.published_until
+
+      invoice = {
+        "id" => "AUTHPAY-H1", "preapproval_id" => "PRE-H1",
+        "payment" => {"id" => "MP-RECUR-H1", "status" => "approved", "transaction_amount" => 1200}
+      }
+
+      # Primer webhook del cobro: renueva y registra el evento.
+      stub_subscription_service(authorized_payment: invoice) do
+        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-H1"}}
+      end
+      listing.reload
+      renewed_until = listing.published_until
+      assert_equal first_until + 30.days, renewed_until
+      assert_equal 1, PaymentEvent.where(payment_id: "MP-RECUR-H1", status: "approved").count
+
+      # Reintento tardío del MISMO cobro: no debe re-renovar (antes sí, porque el
+      # payment_id se perdía al sobrescribirse).
+      stub_subscription_service(authorized_payment: invoice) do
+        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-H1"}}
+      end
+      listing.reload
+      assert_equal renewed_until, listing.published_until, "un reintento del mismo cobro no debe extender de nuevo"
+      assert_equal 1, PaymentEvent.where(payment_id: "MP-RECUR-H1").count, "no debe duplicar el evento"
+    end
+
+    test "two distinct subscription charges accumulate and record two events (#101)" do
+      listing = Listing.create!(name: "Sub", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-H2", subscription_status: "authorized")
+      listing.mark_as_paid!(payment_id: "MP-INIT-2")
+      base = listing.published_until
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AP-A", "preapproval_id" => "PRE-H2",
+        "payment" => {"id" => "MP-R1", "status" => "approved", "transaction_amount" => 1200}
+      }) do
+        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AP-A"}}
+      end
+      stub_subscription_service(authorized_payment: {
+        "id" => "AP-B", "preapproval_id" => "PRE-H2",
+        "payment" => {"id" => "MP-R2", "status" => "approved", "transaction_amount" => 1200}
+      }) do
+        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AP-B"}}
+      end
+
+      listing.reload
+      assert_equal base + 60.days, listing.published_until, "dos cobros distintos acumulan vigencia"
+      assert_equal 2, listing.payment_events.where(status: "approved").count
+    end
+
+    test "a refund after approval is processed (not blocked) and both events are recorded (#101)" do
+      # Pago único: approved deja un evento; el refund posterior (mismo payment_id,
+      # distinto status) NO se bloquea y deja un segundo evento.
+      @certificate.update!(status: "paid", payment_id: "MP-DUAL", paid_at: Time.current)
+      @certificate.issue!
+
+      stub_fetch_payment({
+        "id" => "MP-DUAL", "transaction_amount" => 1500, "status" => "charged_back",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-DUAL"}}
+      end
+
+      assert_response :ok
+      assert @certificate.reload.payment_reverted?, "el refund no debe bloquearse por payment_events"
+      assert_equal 1, PaymentEvent.where(payment_id: "MP-DUAL", status: "charged_back").count
+    end
   end
 end
