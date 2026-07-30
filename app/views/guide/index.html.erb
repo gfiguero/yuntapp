@@ -10,7 +10,10 @@
          style="width: 0%" data-deck-target="progress"></div>
   </div>
 
-  <div aria-live="polite">
+  <%# El anuncio a lectores de pantalla al cambiar de diapositiva lo cubre
+      heading.focus() en deck_controller#show; un aria-live aquí sería inerte
+      (solo reacciona a mutaciones del DOM, no a toggles de clase). %>
+  <div>
     <%# --- Acto 1: la historia de María (obligatorio) --- %>
 
     <%= render "guide/slides/slide", index: 0, icon: "🏠", eyebrow: nil,
