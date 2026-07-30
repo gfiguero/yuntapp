@@ -103,12 +103,18 @@ class ResidenceCertificate < ApplicationRecord
 
   # Transición pending_payment → paid. Idempotente para el mismo payment_id (BR-071).
   # Si el certificado ya está pagado con otro payment_id, levanta AlreadyPaidError.
+  #
+  # Contempla `issued?` además de `paid?`: MP envía el merchant_order en dos
+  # fases (opened + closed) y el `closed` re-procesa el mismo pago cuando el
+  # certificado ya fue emitido. Ese re-proceso es un no-op limpio (mismo
+  # payment_id) — NO debe intentar el `update!(status: "paid")` sobre un cert
+  # inmutable (BR-008), que generaría un RecordInvalid espurio en los logs.
   def mark_as_paid!(payment_id:, paid_at: Time.current)
-    if paid? && self.payment_id == payment_id
+    if (paid? || issued?) && self.payment_id == payment_id
       return self
     end
 
-    if paid? && self.payment_id != payment_id
+    if (paid? || issued?) && self.payment_id != payment_id
       raise AlreadyPaidError, "Certificate ##{id} already paid with payment_id #{self.payment_id}"
     end
 

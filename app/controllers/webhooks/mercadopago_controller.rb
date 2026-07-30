@@ -123,6 +123,35 @@ module Webhooks
         payment = mercadopago.fetch_payment(pid.to_s)
         mark_payable_paid(payment, pid.to_s)
       end
+
+      record_order_closed(order, merchant_order_id) if (order["status"] || order[:status]).to_s == "closed"
+    end
+
+    # MP cierra el merchant_order (opened→closed) cuando el pago cubrió el total.
+    # Registramos el cierre como PaymentEvent (status "order_closed", clave el
+    # merchant_order_id) para tener trazabilidad del ciclo completo de la orden,
+    # sin ensuciar los logs. Idempotente por el índice único (payment_id, status).
+    def record_order_closed(order, merchant_order_id)
+      external_reference = (order["external_reference"] || order[:external_reference]).to_s
+      return if external_reference.blank?
+
+      payable = resolve_payable(external_reference)
+      return unless payable
+
+      # Prefijo `mo-` para que la clave del evento no comparta espacio con los
+      # payment_id reales (los merchant_order_id son un id distinto en MP).
+      record_payment_event(payable, payment_id: "mo-#{merchant_order_id}", status: "order_closed", amount: nil)
+      Rails.logger.info("MercadoPago webhook: merchant_order #{merchant_order_id} closed for #{payable.class}##{payable.id}")
+    end
+
+    # Resuelve el payable (certificado o publicación) desde el external_reference:
+    #   "listing-<id>" → Listing (BR-083); "<id>" a secas → ResidenceCertificate.
+    def resolve_payable(external_reference)
+      if external_reference.start_with?("listing-")
+        Listing.find_by(id: external_reference.delete_prefix("listing-"))
+      else
+        ResidenceCertificate.find_by(id: external_reference)
+      end
     end
 
     # topic=subscription_preapproval: cambió el estado de una suscripción

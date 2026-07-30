@@ -325,6 +325,75 @@ module Webhooks
       assert_equal "MP-PANEL-MO", @certificate.payment_id
     end
 
+    test "merchant_order re-processing a payment on an already-issued cert is a clean no-op (no RecordInvalid)" do
+      # MP reenvía el merchant_order (opened→closed) tras la emisión. El re-proceso
+      # del mismo pago sobre un cert ya `issued` debe ser un no-op limpio: 200, sin
+      # AlreadyPaidError/RecordInvalid que ensucie los logs, y el cert sigue issued.
+      @certificate.update!(status: "paid", payment_id: "MP-REPROC", paid_at: Time.current)
+      @certificate.issue!
+      assert @certificate.issued?
+      cert_id = @certificate.id # capturado fuera del block (dentro `self` es el fake)
+
+      real_service = MercadopagoService.new
+      fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
+      fake.define_singleton_method(:fetch_merchant_order) do |_id|
+        {"status" => "closed", "external_reference" => cert_id.to_s, "payments" => [{"id" => "MP-REPROC"}]}
+      end
+      fake.define_singleton_method(:fetch_payment) do |_id|
+        {"id" => "MP-REPROC", "transaction_amount" => 1500, "status" => "approved",
+         "external_reference" => cert_id.to_s}
+      end
+
+      stub_class_method(MercadopagoService, :new, fake) do
+        post_signed_webhook({type: "topic_merchant_order_wh", data: {id: "MO-CLOSED-99"}})
+      end
+
+      assert_response :ok
+      assert @certificate.reload.issued?, "el cert sigue issued (no se degrada)"
+      # El cierre de la orden queda registrado como evento (trazabilidad).
+      event = PaymentEvent.find_by(payment_id: "mo-MO-CLOSED-99", status: "order_closed")
+      assert event, "debe registrarse el cierre del merchant_order en payment_events"
+      assert_equal @certificate, event.payable
+    end
+
+    test "merchant_order closed records order_closed event on a Listing (marketplace)" do
+      listing = Listing.create!(name: "Pub", user: users(:artanis), amount: 1200)
+      listing.mark_as_paid!(payment_id: "MP-LMO")
+
+      real_service = MercadopagoService.new
+      fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
+      fake.define_singleton_method(:fetch_merchant_order) do |_id|
+        {"status" => "closed", "external_reference" => "listing-#{listing.id}", "payments" => []}
+      end
+
+      stub_class_method(MercadopagoService, :new, fake) do
+        post_signed_webhook({type: "topic_merchant_order_wh", data: {id: "MO-LIST-1"}})
+      end
+
+      assert_response :ok
+      event = PaymentEvent.find_by(payment_id: "mo-MO-LIST-1", status: "order_closed")
+      assert event, "debe registrarse el cierre para la publicación"
+      assert_equal listing, event.payable
+    end
+
+    test "merchant_order closed with blank external_reference records no event (clean no-op)" do
+      real_service = MercadopagoService.new
+      fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
+      fake.define_singleton_method(:fetch_merchant_order) do |_id|
+        {"status" => "closed", "external_reference" => "", "payments" => []}
+      end
+
+      stub_class_method(MercadopagoService, :new, fake) do
+        post_signed_webhook({type: "topic_merchant_order_wh", data: {id: "MO-BLANK"}})
+      end
+
+      assert_response :ok
+      assert_nil PaymentEvent.find_by(payment_id: "mo-MO-BLANK"), "sin external_reference no debe registrar evento"
+    end
+
     # --- BR-090: validación de monto ---
 
     test "rejects payment with amount different from certificate amount (BR-090)" do
