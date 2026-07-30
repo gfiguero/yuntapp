@@ -1,4 +1,92 @@
 <% content_for :title, "¿Cómo funciona Yuntapp?" %>
-<div class="max-w-2xl mx-auto">
-  <h2 class="text-2xl font-bold text-center">¿Cómo funciona Yuntapp?</h2>
+
+<div class="max-w-2xl mx-auto"
+     data-controller="deck"
+     data-action="touchstart->deck#touchStart touchend->deck#touchEnd">
+
+  <%# Barra de progreso %>
+  <div class="h-2 bg-amber-100 rounded-full overflow-hidden mb-8" aria-hidden="true">
+    <div class="h-full bg-amber-500 transition-all duration-300 motion-reduce:transition-none"
+         style="width: 0%" data-deck-target="progress"></div>
+  </div>
+
+  <div aria-live="polite">
+    <%# --- Acto 1: la historia de María (obligatorio) --- %>
+
+    <%= render "guide/slides/slide", index: 0, icon: "🏠", eyebrow: nil,
+          title: "¿Cómo funciona Yuntapp?",
+          body: ["Saca tu certificado de residencia por internet, sin ir a la municipalidad.",
+                 "Te lo explicamos paso a paso, con calma."] %>
+
+    <%= render "guide/slides/slide", index: 1, icon: "👋", eyebrow: "La historia de María",
+          title: "Ella es María",
+          body: ["María vive en su barrio hace años.",
+                 "Hoy necesita un certificado de residencia para un trámite. Antes tenía que ir a una oficina; ahora lo hace desde su casa."] %>
+
+    <%= render "guide/slides/slide", index: 2, icon: "📝", eyebrow: "Paso 1",
+          title: "Crea su cuenta",
+          body: ["Es como abrir un correo: pone su email y una clave.",
+                 "Con eso ya puede entrar a Yuntapp."] %>
+
+    <%= render "guide/slides/slide", index: 3, icon: "✅", eyebrow: "Paso 2",
+          title: "Se hace socia de su junta",
+          body: ["María muestra quién es (su carnet) y dónde vive.",
+                 "La junta de vecinos lo revisa una sola vez y la aprueba. Listo: ya es socia."] %>
+
+    <%= render "guide/slides/slide", index: 4, icon: "📄", eyebrow: "Paso 3",
+          title: "Pide su certificado",
+          body: ["Elige para qué lo necesita (por ejemplo, un trámite en el banco).",
+                 "Con un par de clics, queda solicitado."] %>
+
+    <%= render "guide/slides/slide", index: 5, icon: "💳", eyebrow: "Paso 4",
+          title: "Paga en línea",
+          body: ["Paga desde su celular con MercadoPago.",
+                 "El pago va primero: es el último paso antes de recibir el documento."] %>
+
+    <%= render "guide/slides/slide", index: 6, icon: "⚡", eyebrow: "Paso 5",
+          title: "Lo recibe al instante",
+          body: ["Apenas se confirma el pago, el sistema genera el certificado solo.",
+                 "María lo descarga en PDF, sin esperar a nadie."] %>
+
+    <%= render "guide/slides/slide", index: 7, icon: "🔎", eyebrow: "Paso 6",
+          title: "Cualquiera puede comprobar que es real",
+          body: ["El certificado trae un código QR, un código de letras y un enlace.",
+                 "Un banco o un arrendador puede verificar que es auténtico en segundos."] %>
+
+    <%# --- Bifurcación (index 8): el Acto 2 es opcional --- %>
+    <section class="deck-slide hidden text-center bg-white rounded-3xl shadow-sm border border-amber-100 px-6 py-12 md:py-16"
+             data-deck-target="slide" aria-hidden="true">
+      <div class="text-6xl md:text-7xl mb-6" aria-hidden="true">🙌</div>
+      <h2 tabindex="-1" class="text-2xl md:text-3xl font-bold text-stone-800 mb-4 outline-none">¡Eso es todo!</h2>
+      <div class="space-y-3 text-lg text-stone-600 max-w-prose mx-auto mb-8">
+        <p>Así de simple: María solicitó, pagó y recibió su certificado.</p>
+        <p>¿Quieres ver cómo funciona por dentro?</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <button type="button" data-action="click->deck#next"
+                class="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-semibold bg-amber-500 text-white hover:bg-amber-600 transition motion-reduce:transition-none">
+          Sí, muéstrame
+        </button>
+        <button type="button" data-action="click->deck#goto" data-deck-index-param="18"
+                class="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-semibold bg-white text-stone-700 border border-stone-300 hover:bg-stone-50 transition motion-reduce:transition-none">
+          Con esto me basta
+        </button>
+      </div>
+    </section>
+
+    <%# ACTO 2 y CIERRE se insertan aquí en Task 4 %>
+  </div>
+
+  <%# Controles inferiores %>
+  <div class="flex items-center justify-between gap-4 mt-8">
+    <button type="button" data-deck-target="prev" data-action="click->deck#prev"
+            class="inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold bg-white text-stone-700 border border-stone-300 hover:bg-stone-50 disabled:opacity-40 disabled:cursor-not-allowed transition motion-reduce:transition-none">
+      ← Atrás
+    </button>
+    <%= link_to "Salir", root_path, class: "text-sm text-stone-500 hover:text-stone-700 underline" %>
+    <button type="button" data-deck-target="next" data-action="click->deck#next"
+            class="inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed transition motion-reduce:transition-none">
+      Siguiente →
+    </button>
+  </div>
 </div>
