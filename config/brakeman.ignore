@@ -77,6 +77,74 @@
     {
       "fingerprint": "f852c112e990dd84eabded2aa0d862ed160402e26af97291e06c27b9fd08780b",
       "note": "Falso positivo: error_message helper usa ERB auto-escape. Los mensajes de error vienen de I18n, no de input del usuario."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "24cbd84fbe427e3d69d16b696bdaaded9897f832902583fbda0a3e06ad444838",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/panel/residence_certificates/new.html.erb",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "error_message(ResidenceCertificate.new(:member => current_user.household_unit.current_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.include?(:purpose), ResidenceCertificate.new(:member => current_user.household_unit.current_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.full_messages_for(:purpose))",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Panel::ResidenceCertificatesController",
+          "method": "create",
+          "line": 73,
+          "file": "app/controllers/panel/residence_certificates_controller.rb",
+          "rendered": {
+            "name": "panel/residence_certificates/new",
+            "file": "app/views/panel/residence_certificates/new.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "panel/residence_certificates/new"
+      },
+      "user_input": "ResidenceCertificate.new(:member => current_user.household_unit.current_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Falso positivo: error_message helper usa mensajes de validaci\u00f3n de Rails (texto traducido, sin input de usuario crudo). XSS Weak aceptado. Fingerprint re-generado tras bundle update (las gems movieron el parsing)."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "7c35d390299534df925de5f209d2e9bb755bfc829658cd76fbb15b7fdecbc3ee",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/panel/residence_certificates/new.html.erb",
+      "line": 25,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "error_message(ResidenceCertificate.new(:member => current_user.household_unit.current_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.include?(:member_id), ResidenceCertificate.new(:member => current_user.household_unit.current_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.full_messages_for(:member_id))",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Panel::ResidenceCertificatesController",
+          "method": "create",
+          "line": 73,
+          "file": "app/controllers/panel/residence_certificates_controller.rb",
+          "rendered": {
+            "name": "panel/residence_certificates/new",
+            "file": "app/views/panel/residence_certificates/new.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "panel/residence_certificates/new"
+      },
+      "user_input": "ResidenceCertificate.new(:member => current_user.household_unit.current_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Falso positivo: error_message helper usa mensajes de validaci\u00f3n de Rails (texto traducido, sin input de usuario crudo). XSS Weak aceptado. Fingerprint re-generado tras bundle update (las gems movieron el parsing)."
     }
   ],
   "updated": "2026-07-26 12:20:00 -0400"
