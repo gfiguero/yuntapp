@@ -1,0 +1,17 @@
+<div class="max-w-lg mx-auto p-4">
+  <h1 class="text-xl font-bold mb-4"><%= I18n.t("panel.listing_subscriptions.new.title") %></h1>
+
+  <%= form_with url: panel_listing_subscriptions_path(listing_id: @listing.id), method: :post do |f| %>
+    <label class="form-control w-full">
+      <span class="label-text"><%= I18n.t("panel.listing_subscriptions.new.email_label") %></span>
+      <%= f.email_field :mercadopago_email, value: @payer_email, required: true,
+            class: "input input-bordered w-full" %>
+    </label>
+    <p class="text-sm text-warning mt-2"><%= I18n.t("panel.listing_subscriptions.new.email_hint") %></p>
+
+    <div class="card-actions justify-end mt-4">
+      <%= link_to I18n.t("actions.cancel"), panel_listing_path(@listing), class: "btn btn-ghost" %>
+      <%= f.submit I18n.t("panel.listing_subscriptions.new.submit"), class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>
