@@ -45,6 +45,7 @@
 
 # Ignore Claude Code git worktrees (creados por el flujo EnterWorktree)
 .claude/worktrees/
+.claire/
 
 # Ignore JetBrains/RubyMine IDE files
 .idea/
