@@ -24,4 +24,11 @@ class GuideControllerTest < ActionDispatch::IntegrationTest
     # La bifurcación del Acto 2 salta al cierre con un índice explícito.
     assert_select "[data-deck-index-param]"
   end
+
+  test "incluye los conceptos del Acto 2 y el cierre" do
+    get guide_url
+    assert_select "h2", text: "Una idea clave"
+    assert_select "h2", text: "Nada se borra"
+    assert_select "h2", text: "Eso es Yuntapp"
+  end
 end

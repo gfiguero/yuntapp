@@ -77,7 +77,72 @@
       </div>
     </section>
 
-    <%# ACTO 2 y CIERRE se insertan aquí en Task 4 %>
+    <%# --- Acto 2: cómo funciona por dentro (opcional) --- %>
+
+    <%= render "guide/slides/slide", index: 9, icon: "🧩", eyebrow: "Para saber más",
+          title: "Una idea clave",
+          body: ["Por dentro, Yuntapp separa tres cosas que en la vida real son distintas:",
+                 "quién eres · dónde vives · tu vínculo con la junta.",
+                 "Así todo queda ordenado y seguro."] %>
+
+    <%= render "guide/slides/slide", index: 10, icon: "🔑", eyebrow: "Para saber más",
+          title: "Tu cuenta",
+          body: ["Es tu llave para entrar (tu email y tu clave).",
+                 "Si dejas de usarla, queda guardada como inactiva. Nunca se borra."] %>
+
+    <%= render "guide/slides/slide", index: 11, icon: "🪪", eyebrow: "Para saber más",
+          title: "Tu identidad",
+          body: ["Es como tu carnet dentro del sistema, unido a tu RUN.",
+                 "Te identifica siempre, aunque algún día uses otra cuenta."] %>
+
+    <%= render "guide/slides/slide", index: 12, icon: "🤝", eyebrow: "Para saber más",
+          title: "Tu membresía",
+          body: ["Es tu \"carné de socio\" de una junta.",
+                 "Si te cambias o te vas, queda inactiva con todo tu historial. Nunca se borra."] %>
+
+    <%= render "guide/slides/slide", index: 13, icon: "👨‍👩‍👧", eyebrow: "Para saber más",
+          title: "Tu casa y tu familia",
+          body: ["Una misma dirección puede tener varias familias.",
+                 "Y hay personas —como adultos mayores o niños— a quienes otro registra por ellas. Se les llama dependientes."] %>
+
+    <%= render "guide/slides/slide", index: 14, icon: "🏛️", eyebrow: "Para saber más",
+          title: "La junta de vecinos",
+          body: ["Es quien emite el certificado, con validez oficial.",
+                 "Para poder emitir, la junta debe estar constituida legalmente (tener su RUT)."] %>
+
+    <%= render "guide/slides/slide", index: 15, icon: "📜", eyebrow: "Para saber más",
+          title: "El certificado por dentro",
+          body: ["Pasa por tres momentos: por pagar → pagado → emitido.",
+                 "Regla de oro: nunca se emite sin el pago confirmado."] %>
+
+    <%= render "guide/slides/slide", index: 16, icon: "🧑‍💼", eyebrow: "Para saber más",
+          title: "Directiva y comunidad",
+          body: ["La junta tiene su directiva (presidente, secretario, tesorero...).",
+                 "Y los vecinos pueden publicar avisos en un espacio comunitario."] %>
+
+    <%= render "guide/slides/slide", index: 17, icon: "🛡️", eyebrow: "Para saber más",
+          title: "Nada se borra",
+          body: ["Todo lo importante queda guardado como historial.",
+                 "Los datos no se destruyen: solo se activan o desactivan. Así nada se pierde."] %>
+
+    <%# --- Cierre (index 18) --- %>
+    <section class="deck-slide hidden text-center bg-white rounded-3xl shadow-sm border border-amber-100 px-6 py-12 md:py-16"
+             data-deck-target="slide" aria-hidden="true">
+      <div class="text-6xl md:text-7xl mb-6" aria-hidden="true">🎉</div>
+      <h2 tabindex="-1" class="text-2xl md:text-3xl font-bold text-stone-800 mb-4 outline-none">Eso es Yuntapp</h2>
+      <div class="space-y-3 text-lg text-stone-600 max-w-prose mx-auto mb-8">
+        <p>Un trámite que antes era presencial, ahora en tu celular.</p>
+        <p>Simple para el vecino, seguro para la junta.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <%= link_to "Volver al inicio", root_path,
+              class: "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-semibold bg-amber-500 text-white hover:bg-amber-600 transition motion-reduce:transition-none" %>
+        <button type="button" data-action="click->deck#reset"
+                class="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-lg font-semibold bg-white text-stone-700 border border-stone-300 hover:bg-stone-50 transition motion-reduce:transition-none">
+          Ver de nuevo
+        </button>
+      </div>
+    </section>
   </div>
 
   <%# Controles inferiores %>
