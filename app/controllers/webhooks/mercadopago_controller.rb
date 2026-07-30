@@ -138,7 +138,9 @@ module Webhooks
       payable = resolve_payable(external_reference)
       return unless payable
 
-      record_payment_event(payable, payment_id: merchant_order_id.to_s, status: "order_closed", amount: nil)
+      # Prefijo `mo-` para que la clave del evento no comparta espacio con los
+      # payment_id reales (los merchant_order_id son un id distinto en MP).
+      record_payment_event(payable, payment_id: "mo-#{merchant_order_id}", status: "order_closed", amount: nil)
       Rails.logger.info("MercadoPago webhook: merchant_order #{merchant_order_id} closed for #{payable.class}##{payable.id}")
     end
 

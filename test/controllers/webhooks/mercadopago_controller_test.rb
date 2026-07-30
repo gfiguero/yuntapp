@@ -352,9 +352,46 @@ module Webhooks
       assert_response :ok
       assert @certificate.reload.issued?, "el cert sigue issued (no se degrada)"
       # El cierre de la orden queda registrado como evento (trazabilidad).
-      event = PaymentEvent.find_by(payment_id: "MO-CLOSED-99", status: "order_closed")
+      event = PaymentEvent.find_by(payment_id: "mo-MO-CLOSED-99", status: "order_closed")
       assert event, "debe registrarse el cierre del merchant_order en payment_events"
       assert_equal @certificate, event.payable
+    end
+
+    test "merchant_order closed records order_closed event on a Listing (marketplace)" do
+      listing = Listing.create!(name: "Pub", user: users(:artanis), amount: 1200)
+      listing.mark_as_paid!(payment_id: "MP-LMO")
+
+      real_service = MercadopagoService.new
+      fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
+      fake.define_singleton_method(:fetch_merchant_order) do |_id|
+        {"status" => "closed", "external_reference" => "listing-#{listing.id}", "payments" => []}
+      end
+
+      stub_class_method(MercadopagoService, :new, fake) do
+        post_signed_webhook({type: "topic_merchant_order_wh", data: {id: "MO-LIST-1"}})
+      end
+
+      assert_response :ok
+      event = PaymentEvent.find_by(payment_id: "mo-MO-LIST-1", status: "order_closed")
+      assert event, "debe registrarse el cierre para la publicación"
+      assert_equal listing, event.payable
+    end
+
+    test "merchant_order closed with blank external_reference records no event (clean no-op)" do
+      real_service = MercadopagoService.new
+      fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
+      fake.define_singleton_method(:fetch_merchant_order) do |_id|
+        {"status" => "closed", "external_reference" => "", "payments" => []}
+      end
+
+      stub_class_method(MercadopagoService, :new, fake) do
+        post_signed_webhook({type: "topic_merchant_order_wh", data: {id: "MO-BLANK"}})
+      end
+
+      assert_response :ok
+      assert_nil PaymentEvent.find_by(payment_id: "mo-MO-BLANK"), "sin external_reference no debe registrar evento"
     end
 
     # --- BR-090: validación de monto ---
