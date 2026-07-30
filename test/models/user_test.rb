@@ -79,4 +79,25 @@ class UserTest < ActiveSupport::TestCase
     assert User.exists?(user.id)
     assert_raises(ActiveRecord::RecordNotDestroyed) { user.destroy! }
   end
+
+  # --- BR-142: mercadopago_email ---
+
+  test "mercadopago_email accepts a valid email" do
+    user = users(:selendis)
+    user.mercadopago_email = "pagador@example.com"
+    assert user.valid?, user.errors.full_messages.to_sentence
+  end
+
+  test "mercadopago_email rejects an invalid format" do
+    user = users(:selendis)
+    user.mercadopago_email = "no-es-un-email"
+    assert_not user.valid?
+    assert user.errors[:mercadopago_email].any?
+  end
+
+  test "mercadopago_email allows blank" do
+    user = users(:selendis)
+    user.mercadopago_email = ""
+    assert user.valid?
+  end
 end

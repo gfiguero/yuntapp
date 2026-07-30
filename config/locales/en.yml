@@ -40,6 +40,15 @@ en:
       show:
         payment_in_review: "Your payment is under review by MercadoPago. Once approved, the certificate will be issued automatically."
         payment_reverted: "The payment for this certificate was reverted, so the document is no longer valid. If you think this is a mistake, contact your neighborhood association."
+    listing_subscriptions:
+      new:
+        title: Enable auto-renewal
+        email_label: Your MercadoPago account email
+        email_hint: "It must match your MercadoPago account email, or the charge will be rejected."
+        submit: Continue to MercadoPago
+      flash:
+        invalid_email: Enter a valid email address.
+        subscription_failed: "The subscription couldn't be started. Check that the email (%{email}) matches your MercadoPago account."
   activerecord:
     attributes:
       neighborhood_association:

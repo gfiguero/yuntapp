@@ -872,6 +872,11 @@ es:
       cancel_cta: Cancelar renovación automática
       cancel_confirm: ¿Cancelar la renovación automática? La publicación seguirá vigente hasta su fecha de vencimiento y luego deberás pagar manualmente.
       active_description: MercadoPago cobrará automáticamente cada mes y la publicación se renovará sola. Puedes cancelar cuando quieras; la vigencia ya pagada se conserva.
+      new:
+        title: Activar renovación automática
+        email_label: Correo de tu cuenta MercadoPago
+        email_hint: "Debe coincidir con el correo de tu cuenta de MercadoPago, o el cobro se rechazará."
+        submit: Continuar a MercadoPago
       success:
         title: Suscripción autorizada
         description: Tu renovación automática quedó activa. MercadoPago realizará el primer cobro y la publicación se habilitará en cuanto se confirme.
@@ -879,6 +884,8 @@ es:
         not_subscribable: La publicación ya tiene renovación automática activa o no requiere pago.
         no_subscription: Esta publicación no tiene una renovación automática activa.
         cancelled: Renovación automática cancelada. La publicación seguirá vigente hasta su vencimiento.
+        invalid_email: Ingresa un correo electrónico válido.
+        subscription_failed: "No se pudo iniciar la suscripción. Verifica que el correo (%{email}) coincida con el de tu cuenta de MercadoPago."
     dependents:
       index:
         title: Residentes Dependientes
