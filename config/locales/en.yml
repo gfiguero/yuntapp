@@ -44,6 +44,11 @@ en:
     attributes:
       neighborhood_association:
         rut: "Tax ID (RUT)"
+    errors:
+      models:
+        residence_certificate:
+          base:
+            immutable: cannot be modified once issued
   admin:
     onboarding_reviews:
       flash:

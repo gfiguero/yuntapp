@@ -372,18 +372,42 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     end
   end
 
-  test "mark_as_paid! refuses to downgrade from issued (BR-008)" do
+  test "mark_as_paid! refuses to downgrade from issued with a different payment_id (BR-008)" do
     cert = ResidenceCertificate.create!(
       member: @member,
       household_unit: @household_unit,
       neighborhood_association: @association,
       purpose: "trámite bancario",
-      status: "issued"
+      status: "issued",
+      payment_id: "MP-ORIG"
     )
 
-    assert_raises(ActiveRecord::RecordInvalid) do
-      cert.mark_as_paid!(payment_id: "MP-XYZ")
+    assert_raises(ResidenceCertificate::AlreadyPaidError) do
+      cert.mark_as_paid!(payment_id: "MP-OTHER")
     end
+    assert cert.reload.issued?, "no debe degradarse de issued"
+  end
+
+  test "mark_as_paid! is a clean no-op on an issued cert with the same payment_id (merchant_order closed)" do
+    # MP reenvía el pago (merchant_order opened→closed) tras la emisión; debe ser
+    # un no-op limpio, sin RecordInvalid por inmutabilidad ni tocar la BD.
+    cert = ResidenceCertificate.create!(
+      member: @member,
+      household_unit: @household_unit,
+      neighborhood_association: @association,
+      purpose: "trámite bancario",
+      status: "issued",
+      payment_id: "MP-SAME",
+      folio: "CR-#{@association.id}-8200",
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date, issued_at: Time.current
+    )
+
+    assert_nothing_raised do
+      assert_no_changes -> { cert.reload.updated_at } do
+        cert.mark_as_paid!(payment_id: "MP-SAME")
+      end
+    end
+    assert cert.reload.issued?
   end
 
   # --- After-commit job enqueue (BR-076) ---
