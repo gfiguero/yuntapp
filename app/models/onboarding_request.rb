@@ -11,6 +11,9 @@ class OnboardingRequest < ApplicationRecord
 
   validates :status, inclusion: {in: STATUSES}
   validates :terms_accepted_at, presence: true, unless: -> { draft? || cancelled? }
+  # BR-047/BR-060 (#105): el rechazo debe registrar el motivo (visible en el
+  # historial, obligatorio ante posible fraude por RUN duplicado).
+  validates :rejection_reason, presence: true, if: -> { rejected? }
 
   scope :draft, -> { where(status: "draft") }
   scope :pending, -> { where(status: "pending") }

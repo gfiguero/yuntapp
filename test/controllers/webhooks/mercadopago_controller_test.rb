@@ -43,14 +43,33 @@ module Webhooks
       stub_class_method(MercadopagoService, :new, fake, &block)
     end
 
-    # --- Signature verification (BR-072) ---
-    # Se rechaza con 401 solo cuando x-signature está presente pero es inválida.
-    # Si no hay firma (Feed v2.0) se procesa igual — la API de MP es la validación real.
+    # #106: POST al webhook firmado (MP siempre firma con secret configurado).
+    # Extrae el data_id de los params y agrega x-signature + x-request-id válidos.
+    def post_signed_webhook(params)
+      raw = params.dig(:data, :id) || params[:id] || params[:resource]
+      data_id = raw.to_s.include?("/") ? raw.to_s.split("/").last : raw.to_s
+      post webhooks_mercadopago_url,
+        params: params,
+        headers: {"x-signature" => valid_signature_header(data_id: data_id), "x-request-id" => "req-1"}
+    end
 
-    test "returns 200 when signature is not present (Feed v2.0)" do
+    # --- Signature verification (BR-072) ---
+    # Con secret configurado (#106), la firma es obligatoria. Sin firma → 401.
+
+    test "returns 401 when signature is missing (secret configured, #106)" do
       stub_fetch_payment({"id" => "MP-PAY-123", "status" => "approved", "external_reference" => nil}) do
         post webhooks_mercadopago_url,
           params: {topic: "payment", id: "MP-PAY-123"}
+      end
+      assert_response :unauthorized
+    end
+
+    test "processes without signature when no webhook_secret is configured (dev/test, #106)" do
+      Rails.application.config.mercadopago[:webhook_secret] = nil
+      # Sin secret configurado, un POST sin firma se procesa (no 401); un recurso
+      # inexistente es un no-op determinista → 200.
+      stub_fetch_payment(nil) do
+        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-NOSECRET"}}
       end
       assert_response :ok
     end
@@ -297,8 +316,7 @@ module Webhooks
       end
 
       stub_class_method(MercadopagoService, :new, fake) do
-        post webhooks_mercadopago_url,
-          params: {type: "topic_merchant_order_wh", data: {id: "MO-1"}}
+        post_signed_webhook({type: "topic_merchant_order_wh", data: {id: "MO-1"}})
       end
 
       assert_response :ok
@@ -439,7 +457,9 @@ module Webhooks
     # --- Suscripciones (BR-088/BR-089) ---
 
     def stub_subscription_service(preapproval: nil, authorized_payment: nil, &block)
+      real_service = MercadopagoService.new
       fake = Object.new
+      fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
       fake.define_singleton_method(:fetch_preapproval) { |_id| preapproval }
       fake.define_singleton_method(:fetch_authorized_payment) { |_id| authorized_payment }
       stub_class_method(MercadopagoService, :new, fake, &block)
@@ -453,8 +473,7 @@ module Webhooks
         "status" => "authorized",
         "external_reference" => "listing-#{listing.id}"
       }) do
-        post webhooks_mercadopago_url,
-          params: {type: "subscription_preapproval", data: {id: "PRE-1"}}
+        post_signed_webhook({type: "subscription_preapproval", data: {id: "PRE-1"}})
       end
 
       assert_response :ok
@@ -472,8 +491,7 @@ module Webhooks
         "status" => "cancelled",
         "external_reference" => "listing-#{listing.id}"
       }) do
-        post webhooks_mercadopago_url,
-          params: {type: "subscription_preapproval", data: {id: "PRE-2"}}
+        post_signed_webhook({type: "subscription_preapproval", data: {id: "PRE-2"}})
       end
 
       assert_response :ok
@@ -491,8 +509,7 @@ module Webhooks
         "preapproval_id" => "PRE-3",
         "payment" => {"id" => "MP-RECUR-1", "status" => "approved", "transaction_amount" => 1200}
       }) do
-        post webhooks_mercadopago_url,
-          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-1"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-1"}})
       end
 
       assert_response :ok
@@ -512,8 +529,7 @@ module Webhooks
         "preapproval_id" => "PRE-5",
         "payment" => {"id" => "MP-RECUR-3", "status" => "approved", "transaction_amount" => 500}
       }) do
-        post webhooks_mercadopago_url,
-          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-3"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-3"}})
       end
 
       assert_response :ok
@@ -533,8 +549,7 @@ module Webhooks
         "preapproval_id" => "PRE-6",
         "payment" => {"id" => "MP-RECUR-4", "status" => "approved"}
       }) do
-        post webhooks_mercadopago_url,
-          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-4"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-4"}})
       end
 
       assert_response :ok
@@ -552,8 +567,7 @@ module Webhooks
         "preapproval_id" => "PRE-4",
         "payment" => {"id" => "MP-RECUR-2", "status" => "rejected"}
       }) do
-        post webhooks_mercadopago_url,
-          params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-2"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-2"}})
       end
 
       assert_response :ok
@@ -573,7 +587,7 @@ module Webhooks
         "id" => "MP-OK-DUP", "transaction_amount" => 1500, "status" => "approved",
         "external_reference" => @certificate.id.to_s
       }) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-OK-DUP"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-OK-DUP"}})
       end
       assert_response :ok
       assert @certificate.reload.issued?, "un approved duplicado no debe regresar issued→paid"
@@ -584,7 +598,7 @@ module Webhooks
         "id" => "MP-INPROC", "transaction_amount" => 1500, "status" => "in_process",
         "external_reference" => @certificate.id.to_s
       }) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-INPROC"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-INPROC"}})
       end
       assert_response :ok
       @certificate.reload
@@ -602,7 +616,7 @@ module Webhooks
           "id" => "MP-OK", "transaction_amount" => 1500, "status" => "charged_back",
           "external_reference" => @certificate.id.to_s
         }) do
-          post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-OK"}}
+          post_signed_webhook({topic: "payment", data: {id: "MP-OK"}})
         end
       end
       assert_response :ok
@@ -618,7 +632,7 @@ module Webhooks
         "id" => "MP-PAID", "transaction_amount" => 1500, "status" => "refunded",
         "external_reference" => @certificate.id.to_s
       }) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-PAID"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-PAID"}})
       end
       assert_response :ok
       @certificate.reload
@@ -633,7 +647,7 @@ module Webhooks
         "external_reference" => @certificate.id.to_s
       }) do
         assert_no_enqueued_emails do
-          post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-SAME"}}
+          post_signed_webhook({topic: "payment", data: {id: "MP-SAME"}})
         end
       end
       assert_response :ok
@@ -646,7 +660,7 @@ module Webhooks
         "id" => "MP-CBAMT", "transaction_amount" => 999, "status" => "charged_back",
         "external_reference" => @certificate.id.to_s
       }) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-CBAMT"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-CBAMT"}})
       end
       assert_response :ok
       assert @certificate.reload.payment_reverted?, "la reversión no debe bloquearse por el monto"
@@ -662,7 +676,7 @@ module Webhooks
       fake.define_singleton_method(:verify_signature) { |**kw| real_service.verify_signature(**kw) }
       fake.define_singleton_method(:fetch_payment) { |_payment_id| raise Net::ReadTimeout }
       stub_class_method(MercadopagoService, :new, fake) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-BOOM"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-BOOM"}})
       end
 
       assert_response :internal_server_error
@@ -674,7 +688,7 @@ module Webhooks
       # Un recurso inexistente es un no-op determinista, no un error transitorio:
       # 200 para que MP no reintente indefinidamente.
       stub_fetch_payment(nil) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-NONE"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-NONE"}})
       end
 
       assert_response :ok
@@ -691,7 +705,7 @@ module Webhooks
         "status" => "approved",
         "external_reference" => @certificate.id.to_s
       }) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-SECOND"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-SECOND"}})
       end
 
       assert_response :ok
@@ -714,7 +728,7 @@ module Webhooks
 
       # Primer webhook del cobro: renueva y registra el evento.
       stub_subscription_service(authorized_payment: invoice) do
-        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-H1"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-H1"}})
       end
       listing.reload
       renewed_until = listing.published_until
@@ -724,7 +738,7 @@ module Webhooks
       # Reintento tardío del MISMO cobro: no debe re-renovar (antes sí, porque el
       # payment_id se perdía al sobrescribirse).
       stub_subscription_service(authorized_payment: invoice) do
-        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AUTHPAY-H1"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-H1"}})
       end
       listing.reload
       assert_equal renewed_until, listing.published_until, "un reintento del mismo cobro no debe extender de nuevo"
@@ -741,13 +755,13 @@ module Webhooks
         "id" => "AP-A", "preapproval_id" => "PRE-H2",
         "payment" => {"id" => "MP-R1", "status" => "approved", "transaction_amount" => 1200}
       }) do
-        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AP-A"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AP-A"}})
       end
       stub_subscription_service(authorized_payment: {
         "id" => "AP-B", "preapproval_id" => "PRE-H2",
         "payment" => {"id" => "MP-R2", "status" => "approved", "transaction_amount" => 1200}
       }) do
-        post webhooks_mercadopago_url, params: {type: "subscription_authorized_payment", data: {id: "AP-B"}}
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AP-B"}})
       end
 
       listing.reload
@@ -765,7 +779,7 @@ module Webhooks
         "id" => "MP-DUAL", "transaction_amount" => 1500, "status" => "charged_back",
         "external_reference" => @certificate.id.to_s
       }) do
-        post webhooks_mercadopago_url, params: {topic: "payment", data: {id: "MP-DUAL"}}
+        post_signed_webhook({topic: "payment", data: {id: "MP-DUAL"}})
       end
 
       assert_response :ok

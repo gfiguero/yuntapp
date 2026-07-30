@@ -22,19 +22,21 @@ module Webhooks
         return
       end
 
-      # La firma HMAC solo está presente en notificaciones v1.0 (WebHook).
-      # Feed v2.0 envía topic=payment y topic=merchant_order sin x-signature.
-      # En ambos casos confiamos en la consulta a la API de MP como validación
-      # secundaria. Solo rechazamos si x-signature está presente pero es inválida.
-      signature_present = request.headers["x-signature"].present?
-      if signature_present && !valid_signature?(data_id)
-        Rails.logger.warn("MercadoPago webhook: invalid signature for #{topic} (data_id=#{data_id})")
-        head :unauthorized
-        return
-      end
-
-      if !signature_present
-        Rails.logger.info("MercadoPago webhook: no signature for topic=#{topic} (data_id=#{data_id}), proceeding")
+      # BR-072 (#106): la doc oficial de MP indica que, con la clave secreta
+      # configurada, MercadoPago SIEMPRE firma las notificaciones Webhook
+      # (payment, merchant_order y suscripciones; la única excepción es QR, que
+      # no usamos). Por lo tanto, si hay secret configurado exigimos firma válida
+      # y rechazamos con 401 cuando falta o no valida — cerrando la vía de un POST
+      # forjado sin firma. Si NO hay secret configurado (dev/test) no se puede
+      # validar: se procesa apoyándose en la re-consulta a la API de MP.
+      if webhook_secret_configured?
+        unless request.headers["x-signature"].present? && valid_signature?(data_id)
+          Rails.logger.warn("MercadoPago webhook: missing or invalid signature for #{topic} (data_id=#{data_id}) — rejected")
+          head :unauthorized
+          return
+        end
+      else
+        Rails.logger.info("MercadoPago webhook: no webhook_secret configured, skipping signature check (topic=#{topic})")
       end
 
       case topic
@@ -89,6 +91,12 @@ module Webhooks
         request_id: request.headers["x-request-id"],
         data_id: data_id
       )
+    end
+
+    # #106: hay clave secreta de webhook configurada (producción). Solo entonces
+    # exigimos firma (MP siempre firma cuando el secret está configurado).
+    def webhook_secret_configured?
+      Rails.application.config.mercadopago[:webhook_secret].present?
     end
 
     # topic=payment: data_id es un payment_id. Siempre consultamos el estado

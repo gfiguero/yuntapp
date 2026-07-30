@@ -274,6 +274,16 @@ module Admin
       assert_redirected_to admin_dependent_reviews_url
     end
 
+    test "reject without a reason is refused with an alert (#105)" do
+      sign_in @admin
+
+      patch reject_admin_dependent_review_url(@dependent_request), params: {rejection_reason: ""}
+
+      assert_redirected_to admin_dependent_reviews_url
+      assert_equal I18n.t("admin.dependent_reviews.flash.rejection_reason_required"), flash[:alert]
+      assert_not @dependent_request.reload.rejected?, "no debe rechazar sin motivo"
+    end
+
     test "reject does not create downstream records" do
       sign_in @admin
 

@@ -654,6 +654,7 @@ es:
       flash:
         approved: Solicitud de acreditación aprobada exitosamente. Se ha creado la membresía del solicitante.
         rejected: Solicitud de acreditación rechazada.
+        rejection_reason_required: Debes indicar el motivo del rechazo.
         not_pending: Esta solicitud no está pendiente de revisión.
     verifications:
       index:
@@ -724,6 +725,7 @@ es:
       flash:
         approved: Residente dependiente aprobado exitosamente.
         rejected: Solicitud de residente dependiente rechazada.
+        rejection_reason_required: Debes indicar el motivo del rechazo.
         not_pending: Esta solicitud no está pendiente de revisión.
         family_group_missing_admin: "El grupo familiar no tiene un jefe de hogar activo; no se puede aprobar al dependiente."
 

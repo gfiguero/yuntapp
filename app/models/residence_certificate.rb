@@ -75,11 +75,11 @@ class ResidenceCertificate < ApplicationRecord
     REVERTED_PAYMENT_STATUSES.include?(payment_status)
   end
 
-  # BR-091: la desactivación del socio (BR-036) invalida sus certificados
-  # mientras permanezca inactivo — no se pueden descargar y la verificación
-  # pública los muestra como no válidos.
+  # BR-091 (#107): la validez del certificado exige que el titular sea socio
+  # APROBADO. Se expresa en positivo (`!member.approved?`) para cubrir cualquier
+  # estado no-activo del Member (inactive, rejected, pending), no solo `inactive`.
   def holder_deactivated?
-    member.inactive?
+    !member.approved?
   end
 
   # BR-091/BR-092/BR-141: el PDF solo puede descargarse si el certificado está

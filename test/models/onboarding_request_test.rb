@@ -86,10 +86,19 @@ class OnboardingRequestTest < ActiveSupport::TestCase
     assert onboarding.valid?
   end
 
-  test "valid with rejected status" do
+  test "valid with rejected status when a reason is present" do
     onboarding = onboarding_requests(:karass_pending)
     onboarding.status = "rejected"
+    onboarding.rejection_reason = "Documentos ilegibles"
     assert onboarding.valid?
+  end
+
+  test "invalid with rejected status and no reason (#105)" do
+    onboarding = onboarding_requests(:karass_pending)
+    onboarding.status = "rejected"
+    onboarding.rejection_reason = nil
+    assert_not onboarding.valid?
+    assert onboarding.errors[:rejection_reason].any?
   end
 
   test "invalid with unknown status" do
@@ -185,7 +194,7 @@ class OnboardingRequestTest < ActiveSupport::TestCase
 
   test "rejected scope filters correctly" do
     onboarding = onboarding_requests(:karass_pending)
-    onboarding.update!(status: "rejected")
+    onboarding.update!(status: "rejected", rejection_reason: "Motivo de prueba")
     results = OnboardingRequest.rejected
     assert_includes results, onboarding
   end
