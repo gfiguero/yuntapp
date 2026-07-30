@@ -7,13 +7,16 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= render "shared/google_fonts" %>
+    <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body class="bg-amber-50 min-h-screen flex flex-col text-stone-800">
+    <%= render "shared/skip_to_main" %>
     <header class="py-5 px-6">
       <div class="max-w-2xl mx-auto">
         <%= link_to root_path, class: "inline-block", aria: {label: "Ir al inicio"} do %>
