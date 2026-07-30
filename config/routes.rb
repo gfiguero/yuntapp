@@ -92,7 +92,7 @@ Rails.application.routes.draw do
         get :pending
       end
     end
-    resources :listing_subscriptions, only: [:new] do
+    resources :listing_subscriptions, only: [:new, :create] do
       collection do
         get :success
         delete :cancel

@@ -5,25 +5,46 @@ module Panel
   class ListingSubscriptionsController < ApplicationController
     layout "panel"
     before_action :authenticate_user!
-    before_action :set_listing, only: [:new, :cancel]
+    before_action :set_listing, only: [:new, :create, :cancel]
 
     # GET /panel/listing_subscriptions/new?listing_id=X
-    # Captura el precio vigente (snapshot, BR-084/BR-088), crea la
-    # preapproval y redirige a MP para que el usuario la autorice.
+    # Muestra el formulario para confirmar el email de la cuenta MercadoPago
+    # que se usará como payer_email de la suscripción (BR-142).
     def new
       unless @listing.subscribable?
         redirect_to panel_listing_path(@listing),
           alert: I18n.t("panel.listing_subscriptions.flash.not_subscribable")
         return
       end
-
       return unless ensure_priced_association!
 
+      @payer_email = current_user.mercadopago_email.presence || current_user.email
+    end
+
+    # POST /panel/listing_subscriptions?listing_id=X
+    # Guarda el email confirmado, captura el precio (snapshot, BR-084/BR-088),
+    # crea la preapproval con ese payer_email y redirige a MP para autorizar.
+    def create
+      unless @listing.subscribable?
+        redirect_to panel_listing_path(@listing),
+          alert: I18n.t("panel.listing_subscriptions.flash.not_subscribable")
+        return
+      end
+      return unless ensure_priced_association!
+
+      email = params[:mercadopago_email].to_s.strip
+      unless email.match?(URI::MailTo::EMAIL_REGEXP)
+        redirect_to new_panel_listing_subscription_path(listing_id: @listing.id),
+          alert: I18n.t("panel.listing_subscriptions.flash.invalid_email")
+        return
+      end
+
+      current_user.update!(mercadopago_email: email)
       @listing.update!(amount: @pricing.price, platform_fee: nil, neighborhood_association: @association)
 
       preapproval = mercadopago.create_listing_subscription(
         @listing,
-        payer_email: current_user.email,
+        payer_email: email,
         back_url: success_panel_listing_subscriptions_url
       )
 
@@ -33,7 +54,7 @@ module Panel
       if init_point.blank? || preapproval_id.blank?
         Rails.logger.error("MercadoPago returned no init_point/id for preapproval: #{preapproval.inspect}")
         redirect_to panel_listing_path(@listing),
-          alert: I18n.t("panel.payments.flash.preference_failed")
+          alert: I18n.t("panel.listing_subscriptions.flash.subscription_failed", email: email)
         return
       end
 
