@@ -57,6 +57,9 @@ Rails.application.routes.draw do
   post "verify", to: "verifications#lookup"
   get "verify/:identifier", to: "verifications#show", as: :verification
 
+  # Guía pública "cómo funciona" (deck explicativo). Sin autenticación.
+  get "como-funciona", to: "guide#index", as: :guide
+
   namespace :panel do
     root to: "dashboard#index"
     resource :profile, only: [:show], controller: "profile"
