@@ -12,6 +12,9 @@ class User < ApplicationRecord
 
   scope :filter_by_email, ->(email) { where.like(email: "%#{email}%") }
 
+  # BR-142: email de la cuenta MercadoPago para suscripciones (payer_email).
+  validates :mercadopago_email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
+
   # BR-100: una cuenta nunca se destruye (ni por el usuario vía Devise, ni por consola).
   # Solo se desactiva o bloquea, conservando el historial. Guard de defensa en profundidad.
   before_destroy :prevent_destruction
