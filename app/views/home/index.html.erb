@@ -6,13 +6,14 @@
         Yuntapp permite a tu Junta de Vecinos emitir certificados de residencia digitales, verificables y seguros.
         Moderniza la gestión documental y facilita la vida de tus vecinos con validación en línea.
       </p>
-      <div class="flex gap-4 justify-center lg:justify-start">
+      <div class="flex gap-4 justify-center lg:justify-start flex-wrap">
         <% if user_signed_in? %>
           <%= link_to "Ir a mi Panel", panel_root_path, class: "btn btn-primary btn-lg" %>
         <% else %>
           <%= link_to "Comenzar Ahora", new_user_registration_path, class: "btn btn-primary btn-lg" %>
           <%= link_to "Ingresar", new_user_session_path, class: "btn btn-outline btn-lg" %>
         <% end %>
+        <%= link_to "¿Cómo funciona?", guide_path, class: "btn btn-outline btn-lg" %>
       </div>
     </div>
 
