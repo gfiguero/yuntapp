@@ -13,6 +13,7 @@ module Panel
     def new
       @administration_request = AdministrationRequest.new
       @cascading_data = build_cascading_data
+      @current_memberships = current_active_memberships
     end
 
     def create
@@ -26,6 +27,7 @@ module Panel
         redirect_to panel_administration_request_path, notice: I18n.t("panel.administration_requests.flash.submitted")
       else
         @cascading_data = build_cascading_data
+        @current_memberships = current_active_memberships
         render :new, status: :unprocessable_content
       end
     end
@@ -63,6 +65,15 @@ module Panel
       User.where(admin: true, neighborhood_association_id: junta.id).find_each do |admin|
         AdministrationRequestMailer.notify_existing_admin(admin, @administration_request).deliver_later
       end
+    end
+
+    # BR-137: el solicitante debe saber, antes de enviar, que ser aprobado como
+    # admin de otra junta desactivará su membresía actual, invalidará los
+    # certificados que tenga allí (BR-091) y desactivará a sus residentes
+    # dependientes (BR-099). Devuelve las juntas donde hoy es socio aprobado.
+    def current_active_memberships
+      current_user.verified_identity&.members&.approved
+        &.includes(:neighborhood_association)&.map(&:neighborhood_association) || []
     end
 
     # Mismo patrón que Panel::OnboardingController#build_cascading_data.

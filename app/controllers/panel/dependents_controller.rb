@@ -3,6 +3,7 @@ module Panel
     layout "panel"
     before_action :authenticate_user!
     before_action :ensure_household_admin!
+    before_action :ensure_active_member!
 
     # GET /panel/dependents
     def index
@@ -62,6 +63,21 @@ module Panel
     def ensure_household_admin!
       unless current_user.household_admin?
         redirect_to panel_root_path, alert: I18n.t("panel.dependents.flash.not_household_admin")
+      end
+    end
+
+    # BR-091/BR-099: la desactivación del socio (BR-036) debe cortar el acceso
+    # operativo. `household_admin?` no basta: se apoya en la Residency, que por
+    # BR-038 no cambia de estado al desactivar el Member, así que seguía
+    # devolviendo true. Un socio dado de baja podía registrar dependientes y, al
+    # aprobarlos el admin, se le recreaba un Member(approved) — deshaciendo su
+    # propia desactivación. Mismo gate que en residence_certificates.
+    def ensure_active_member!
+      active = current_user.verified_identity&.members&.approved
+        &.exists?(neighborhood_association: current_user.neighborhood_association)
+
+      unless active
+        redirect_to panel_root_path, alert: I18n.t("panel.dependents.flash.member_inactive")
       end
     end
   end

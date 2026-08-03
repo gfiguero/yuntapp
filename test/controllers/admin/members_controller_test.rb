@@ -67,5 +67,40 @@ module Admin
       assert_response :success
       assert_select "input[name='member[run]']:not([disabled])"
     end
+
+    # BR-024: el alta manual es atómica y trazable.
+    test "create registra quién dio de alta al socio y lo deja pending (BR-024)" do
+      assert_difference -> { Member.count } => 1, -> { VerifiedIdentity.count } => 1 do
+        post admin_members_url, params: {
+          member: {
+            first_name: "Zeratul", last_name: "Nerazim",
+            run: "16785342-0", phone: "+56911223344", email: "zeratul@nerazim.io"
+          }
+        }
+      end
+
+      member = Member.order(:created_at).last
+      assert_equal "pending", member.status
+      assert_equal @admin, member.requested_by
+      assert_equal @admin.neighborhood_association, member.neighborhood_association
+    end
+
+    # Antes la identidad se guardaba fuera de transacción, así que un fallo del
+    # Member dejaba una VerifiedIdentity huérfana: una identidad "verificada"
+    # materializada sin socio ni verificación documental (BR-044).
+    test "create no deja la identidad huérfana si el socio no se guarda (BR-024)" do
+      assert_no_difference -> { VerifiedIdentity.count } do
+        assert_no_difference -> { Member.count } do
+          post admin_members_url, params: {
+            member: {
+              first_name: "Zeratul", last_name: "Nerazim",
+              run: "16785342-9", phone: "+56911223344", email: "zeratul@nerazim.io"
+            }
+          }
+        end
+      end
+
+      assert_response :unprocessable_content
+    end
   end
 end

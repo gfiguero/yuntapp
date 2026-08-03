@@ -38,6 +38,27 @@ module Panel
       assert_response :success
     end
 
+    # BR-120/BR-148: una junta sin RUT no puede emitir, así que tampoco puede
+    # aceptar solicitudes; el certificado quedaría pagado y atascado en `paid`
+    # sin emisión posible y sin devolución (BR-063). El estado se fuerza con
+    # update_column porque la columna es NOT NULL con validación de presencia
+    # (BR-121): es un guard de defensa en profundidad, no un estado alcanzable
+    # por la aplicación.
+    test "no permite solicitar certificado si la junta no tiene RUT (BR-148)" do
+      @association.update_column(:rut, "")
+      sign_in @household_admin
+
+      get new_panel_residence_certificate_url
+      assert_redirected_to panel_residence_certificates_url
+
+      assert_no_difference -> { ResidenceCertificate.count } do
+        post panel_residence_certificates_url, params: {
+          residence_certificate: {purpose: "trámite bancario", member_id: @residency.id}
+        }
+      end
+      assert_redirected_to panel_residence_certificates_url
+    end
+
     # --- Create ---
 
     test "create captures snapshot of current price as amount" do

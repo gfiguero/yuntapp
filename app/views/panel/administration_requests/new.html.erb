@@ -2,6 +2,14 @@
 <div class="w-full max-w-xl">
   <h1 class="font-bold text-4xl my-4"><%= I18n.t("panel.administration_requests.title") %></h1>
 
+  <%# BR-137: advertir la consecuencia del acoplamiento admin↔socio antes de enviar. %>
+  <% if @current_memberships.present? %>
+    <div class="alert alert-warning mb-4">
+      <%= I18n.t("panel.administration_requests.warn_deactivates_memberships",
+                 associations: @current_memberships.map(&:name).to_sentence) %>
+    </div>
+  <% end %>
+
   <%= form_with(model: @administration_request, url: panel_administration_request_path, method: :post, html: {novalidate: true}) do |form| %>
     <% if @administration_request.errors.any? %>
       <div class="alert alert-error mb-4"><%= @administration_request.errors.full_messages.to_sentence %></div>

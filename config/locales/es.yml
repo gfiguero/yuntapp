@@ -241,14 +241,9 @@ es:
         amount: Monto
         validity: Vigencia
         notes: Notas
-        approved_by: Aprobado Por
         issue_date: Fecha Emisión
         expiration_date: Fecha Vencimiento
         created_at: Fecha Solicitud
-      "verified_identity/verification_status":
-        pending: Pendiente
-        verified: Verificada
-        rejected: Rechazada
       "member/status":
         pending: Pendiente
         approved: Aprobado
@@ -291,6 +286,10 @@ es:
         residence_certificate:
           base:
             immutable: no puede modificarse una vez emitido
+        board_member:
+          attributes:
+            member:
+              not_in_association: debe ser un socio de esta junta de vecinos
         administration_request:
           target_missing: Debes seleccionar una junta existente o indicar nombre y comuna de una nueva
           already_active: Ya tienes una solicitud de administración en curso
@@ -458,6 +457,16 @@ es:
         other: "Hay %{count} solicitudes de administración esperando revisión:"
       signature: Equipo Yuntapp
 
+  certificate_issuance_failure_mailer:
+    staff_alert:
+      subject: "Alerta: certificado pagado sin emitir en Yuntapp"
+      body_intro: "Un certificado pagado agotó los reintentos de emisión y quedó atascado. Requiere intervención manual."
+      certificate: "Certificado"
+      association: "Junta emisora"
+      amount: "Monto pagado"
+      payment_id: "ID de pago MercadoPago"
+      error: "Error de emisión"
+      body_action: "El socio pagó y no recibió su documento; no hay devolución automática (BR-063). La causa más común es una junta sin RUT (BR-120): regularizar el RUT y reencolar la emisión."
   payment_reversal_mailer:
     staff_alert:
       subject: "Alerta: pago revertido en Yuntapp"
@@ -738,6 +747,7 @@ es:
       title: Solicitar administración de junta
       status_title: Estado de tu solicitud de administración
       new_junta_toggle: Quiero crear una junta nueva (no está en la lista)
+      warn_deactivates_memberships: "Hoy eres socio de %{associations}. Si el equipo de Yuntapp aprueba tu solicitud para administrar otra junta, tu membresía actual quedará desactivada: los certificados que tengas allí dejarán de ser válidos y tus residentes dependientes se desactivarán."
       submit: Enviar solicitud
       cancel: Cancelar solicitud
       cancel_confirm: "¿Seguro que quieres cancelar tu solicitud de administración?"
@@ -837,12 +847,15 @@ es:
         not_household_admin: Debes ser administrador del domicilio para solicitar certificados.
         member_inactive: Tu membresía en la junta fue desactivada. No puedes solicitar certificados; contacta a tu junta de vecinos.
         not_downloadable: Este certificado no puede descargarse porque está vencido o su titular fue desactivado.
+        association_without_rut: Tu junta de vecinos aún no tiene registrado su RUT, por lo que no puede emitir certificados. Comunícate con la directiva.
     payments:
       show:
         help: Serás redirigido a MercadoPago para completar el pago. Tu certificado se emitirá automáticamente tras la confirmación.
       success:
-        title: Pago recibido
-        description: Recibimos tu pago. Tu certificado se está procesando y estará disponible para descarga en breve.
+        title: Pago confirmado
+        description: Confirmamos tu pago. Tu certificado se está generando y estará disponible para descarga en breve.
+        title_processing: Procesando tu pago
+        description_processing: MercadoPago aún no nos confirma la operación. En cuanto lo haga, tu certificado se emitirá automáticamente. Puedes revisar el estado desde el detalle del certificado.
       failure:
         title: Pago rechazado
         description: El pago no pudo completarse. Puedes intentarlo nuevamente desde el detalle del certificado.
@@ -854,12 +867,15 @@ es:
       flash:
         not_household_admin: Debes ser administrador del domicilio para pagar certificados.
         not_pending_payment: Este certificado no está pendiente de pago.
+        association_without_rut: Tu junta de vecinos aún no tiene registrado su RUT, por lo que no puede emitir este certificado. No es posible pagarlo hasta que regularice su situación.
         misconfigured: MercadoPago no está configurado. Contacta soporte.
         preference_failed: No se pudo iniciar el pago. Inténtalo nuevamente.
     listing_payments:
       success:
-        title: Pago exitoso
-        description: Tu pago fue procesado. La publicación quedará habilitada por 30 días en cuanto MercadoPago confirme la operación.
+        title: Publicación habilitada
+        description: Confirmamos tu pago. Tu publicación quedó habilitada por 30 días.
+        title_processing: Procesando tu pago
+        description_processing: MercadoPago aún no nos confirma la operación. En cuanto lo haga, tu publicación quedará habilitada por 30 días.
       failure:
         title: Pago rechazado
         description: El pago no pudo completarse. Puedes intentarlo nuevamente desde tu publicación.
@@ -914,6 +930,7 @@ es:
       flash:
         created: Residente dependiente registrado. La junta revisará la solicitud.
         not_household_admin: Debes ser administrador del domicilio para gestionar residentes dependientes.
+        member_inactive: Tu membresía en la junta fue desactivada. No puedes gestionar residentes dependientes; contacta a tu junta de vecinos.
     account_deactivations:
       link: Desactivar mi cuenta
       new:
@@ -996,6 +1013,9 @@ es:
       new_association: "Nueva junta: %{name} (%{commune})"
       warn_existing_admin: Esta junta ya tiene un administrador activo. Avísale antes de aprobar.
       warn_duplicate_run: Este RUN ya está verificado en el sistema. Al aprobar se transferirá la identidad.
+      warn_deactivates_memberships: "Al aprobar, el solicitante quedará desactivado como socio en %{associations}. Sus certificados en esa(s) junta(s) quedarán inválidos y sus residentes dependientes se desactivarán en cascada."
+      warn_duplicate_association: "Ya existe una junta llamada «%{name}» en la comuna de %{commune}. Verifica que no sea un duplicado antes de aprobar."
+      warn_position_taken: "El cargo de %{position} ya lo ocupa %{name}. Aprobar no lo desplaza: la junta quedará con dos personas en el mismo cargo."
       confirm_run_label: Confirmo que es la misma persona y autorizo la transferencia de la identidad ya verificada con este RUN.
       flash:
         approved: Solicitud aprobada. El solicitante ya administra la junta.

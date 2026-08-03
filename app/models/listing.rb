@@ -131,17 +131,36 @@ class Listing < ApplicationRecord
   # payment_id. Extiende 30 días desde el vencimiento vigente si la
   # publicación está al día (el cobro llega antes de vencer), o desde la
   # fecha del cobro si estaba vencida.
+  # Monto que MP cobra realmente en el ciclo recurrente: el snapshot pactado al
+  # autorizar la suscripción (BR-088/BR-145). Las suscripciones anteriores al
+  # backfill no lo tienen y caen a `amount`.
+  def charged_subscription_amount
+    subscription_amount || amount
+  end
+
   def renew_from_subscription!(payment_id:, paid_at: Time.current)
     return self if self.payment_id == payment_id
 
     base = published? ? published_until : paid_at.to_date
+
+    # BR-004/BR-085: el cobro recurrente es por `subscription_amount`, no por
+    # `amount` — que se reescribe con el precio vigente de la junta cada vez que
+    # el usuario abre "pagar" (BR-145). Sin re-sincronizar aquí, una junta que
+    # sube su precio dejaba la publicación renovada registrando una comisión del
+    # 10% sobre un monto que nadie pagó, y el 90% de la junta salía del monto
+    # equivocado. El snapshot pasa a reflejar el dinero real de este ciclo.
+    @renewing_from_subscription = true
     update!(
       publication_status: "published",
       payment_id: payment_id,
       paid_at: paid_at,
-      published_until: base + PUBLICATION_PERIOD
+      published_until: base + PUBLICATION_PERIOD,
+      amount: charged_subscription_amount,
+      platform_fee: nil
     )
     self
+  ensure
+    @renewing_from_subscription = false
   end
 
   private
@@ -165,6 +184,11 @@ class Listing < ApplicationRecord
   # estaba VIGENTE (según el estado persistido). Una publicación vencida sí puede
   # re-capturar el precio para renovarse (BR-086), por eso se mira el estado en BD.
   def pricing_snapshot_immutable_while_published
+    # Excepción: la renovación por suscripción re-sincroniza el snapshot con el
+    # monto realmente cobrado por MP (ver renew_from_subscription!). No es una
+    # re-captura del precio vigente de la junta, que es lo que esta guarda
+    # bloquea, sino el registro del dinero que entró en este ciclo.
+    return if @renewing_from_subscription
     return unless publication_status_in_database == "published"
     return if published_until_in_database.nil? || published_until_in_database < Date.current
 

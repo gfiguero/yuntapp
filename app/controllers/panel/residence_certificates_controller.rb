@@ -4,6 +4,7 @@ module Panel
     before_action :authenticate_user!
     before_action :ensure_household_admin!
     before_action :ensure_active_member!, only: [:new, :create]
+    before_action :ensure_association_constituted!, only: [:new, :create]
     before_action :set_residence_certificate, only: [:show, :download]
 
     # GET /panel/residence_certificates
@@ -108,6 +109,17 @@ module Panel
         redirect_to panel_residence_certificates_path,
           alert: I18n.t("panel.residence_certificates.flash.member_inactive")
       end
+    end
+
+    # BR-148: una junta sin RUT no puede emitir (BR-120), así que tampoco puede
+    # recibir solicitudes. Sin este guard el socio solicitaba, pagaba, y el
+    # certificado quedaba atascado en `paid` para siempre: `issue!` aborta por
+    # falta de RUT, el job se rinde y BR-063 prohíbe la devolución.
+    def ensure_association_constituted!
+      return if certificate_association&.rut.present?
+
+      redirect_to panel_residence_certificates_path,
+        alert: I18n.t("panel.residence_certificates.flash.association_without_rut")
     end
 
     def certificate_association

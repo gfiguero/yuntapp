@@ -1,0 +1,9 @@
+<%= t("certificate_issuance_failure_mailer.staff_alert.body_intro") %>
+
+- <%= t("certificate_issuance_failure_mailer.staff_alert.certificate") %>: #<%= @certificate.id %>
+- <%= t("certificate_issuance_failure_mailer.staff_alert.association") %>: <%= @certificate.neighborhood_association&.name %>
+- <%= t("certificate_issuance_failure_mailer.staff_alert.amount") %>: <%= @certificate.amount %>
+- <%= t("certificate_issuance_failure_mailer.staff_alert.payment_id") %>: <%= @certificate.payment_id %>
+- <%= t("certificate_issuance_failure_mailer.staff_alert.error") %>: <%= @error_message %>
+
+<%= t("certificate_issuance_failure_mailer.staff_alert.body_action") %>

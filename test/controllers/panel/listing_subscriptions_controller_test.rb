@@ -116,6 +116,25 @@ module Panel
       assert_equal "cancelled", @listing.reload.subscription_status
     end
 
+    # BR-088: si MP ya dejó la preapproval en un estado terminal (el usuario la
+    # canceló desde la app de MP, o MP la dio de baja tras cobros fallidos), el
+    # update a MP falla. Antes ese error no se rescataba: 500 al usuario y la
+    # suscripción local intacta, sin forma de salir del estado.
+    test "cancel se completa aunque MP rechace la cancelación (BR-088)" do
+      @listing.update!(preapproval_id: "PRE-CTRL-3", subscription_status: "authorized")
+      fake = Object.new
+      fake.define_singleton_method(:cancel_preapproval) { |id| raise StandardError, "preapproval already cancelled" }
+
+      sign_in @member_user
+      stub_class_method(MercadopagoService, :new, fake) do
+        delete cancel_panel_listing_subscriptions_url(listing_id: @listing.id)
+      end
+
+      assert_redirected_to panel_listing_url(@listing)
+      assert_equal I18n.t("panel.listing_subscriptions.flash.cancelled"), flash[:notice]
+      assert_equal "cancelled", @listing.reload.subscription_status
+    end
+
     test "cancel without subscription redirects with alert" do
       sign_in @member_user
       delete cancel_panel_listing_subscriptions_url(listing_id: @listing.id)

@@ -93,4 +93,32 @@ class IssueCertificateJobTest < ActiveJob::TestCase
       IssueCertificateJob.new.perform(999999)
     end
   end
+
+  # BR-148: si la emisión agota los reintentos, el certificado queda en `paid`
+  # sin PDF — el socio pagó y no tiene documento, y BR-063 prohíbe la
+  # devolución. Antes el job se rendía en silencio; ahora avisa al staff.
+  test "notify_staff_of_failure encola un aviso para cada superadmin (BR-148)" do
+    superadmins = User.where(superadmin: true).where.not(email: [nil, ""])
+    assert superadmins.any?, "el fixture debe tener al menos un superadmin"
+
+    assert_enqueued_emails superadmins.count do
+      IssueCertificateJob.notify_staff_of_failure(@certificate, RuntimeError.new("junta sin RUT"))
+    end
+  end
+
+  test "el job avisa al staff cuando agota los reintentos (BR-148)" do
+    # Junta sin RUT: `issue!` aborta en todos los intentos (BR-120).
+    neighborhood_associations(:manios_de_buin).update_column(:rut, "")
+
+    staff_count = User.where(superadmin: true).where.not(email: [nil, ""]).count
+
+    # `retry_on` con bloque no re-lanza al agotar los intentos: el bloque es
+    # quien gestiona la rendición, y ahí es donde avisamos al staff.
+    assert_emails staff_count do
+      perform_enqueued_jobs { IssueCertificateJob.perform_later(@certificate.id) }
+    end
+
+    assert @certificate.reload.paid?, "el certificado queda en paid para revisión manual"
+    assert_not @certificate.pdf_document.attached?
+  end
 end

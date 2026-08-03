@@ -27,7 +27,7 @@ module Superadmin
       AdministrationRequestMailer.approved(@administration_request).deliver_later
       redirect_to superadmin_administration_request_path(@administration_request),
         notice: I18n.t("superadmin.administration_requests.flash.approved"), status: :see_other
-    rescue ActiveRecord::RecordInvalid => e
+    rescue ActiveRecord::RecordInvalid, AdministrationApprovalService::InactiveAssociationError => e
       redirect_to superadmin_administration_request_path(@administration_request),
         alert: e.message, status: :see_other
     end
@@ -68,5 +68,52 @@ module Superadmin
       existing.present? && existing.id != @administration_request.user.verified_identity_id
     end
     helper_method :requires_run_confirmation?
+
+    # BR-137: aprobar desactiva las membresías aprobadas del dirigente en OTRAS
+    # juntas, lo que invalida sus certificados allí (BR-091) y cascadea a sus
+    # dependientes (BR-099). La cascada ya se ejecutaba; lo que faltaba era
+    # advertirla antes de aprobar. Devuelve las juntas afectadas.
+    def memberships_to_deactivate
+      @memberships_to_deactivate ||= begin
+        identity = VerifiedIdentity.find_by(run: @administration_request.run)
+        target_id = @administration_request.neighborhood_association_id
+
+        if identity.nil?
+          []
+        else
+          identity.members.approved
+            .where.not(neighborhood_association_id: target_id)
+            .includes(:neighborhood_association)
+            .map(&:neighborhood_association)
+        end
+      end
+    end
+    helper_method :memberships_to_deactivate
+
+    # BR-139: junta nueva cuyo nombre+comuna coincide con una existente. No
+    # bloquea la aprobación; decide el staff.
+    def possible_duplicate_association
+      return nil if @administration_request.neighborhood_association_id.present?
+
+      name = @administration_request.proposed_association_name
+      commune_id = @administration_request.commune_id
+      return nil if name.blank? || commune_id.blank?
+
+      NeighborhoodAssociation.find_by(name: name, commune_id: commune_id)
+    end
+    helper_method :possible_duplicate_association
+
+    # BR-140: el cargo declarado ya lo ocupa un BoardMember activo de la junta
+    # destino. Advertencia, no bloqueo: la aprobación no desplaza al titular
+    # vigente, así que la junta quedaría con dos.
+    def position_already_taken_by
+      junta_id = @administration_request.neighborhood_association_id
+      return nil if junta_id.blank?
+
+      BoardMember.active
+        .includes(member: :verified_identity)
+        .find_by(neighborhood_association_id: junta_id, position: @administration_request.position)
+    end
+    helper_method :position_already_taken_by
   end
 end
