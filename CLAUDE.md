@@ -446,10 +446,12 @@ La aplicacion esta primariamente en espanol (interfaz, mensajes flash, labels de
 ```
 backlog.md                 # Tareas pendientes
 current-sprint.md          # Sprint actual
-architecture/decisions.md  # ADRs
+architecture/decisions.md  # Puntero a doc/adr/ (los ADRs se unificaron alli el 2026-08-02)
 reviews/pending.md         # PRs en revision
 bugs/active.md             # Bugs activos
 ```
+
+Los **ADRs** viven en [`doc/adr/`](doc/adr/README.md), fuente unica. Formato y numeracion en el README de ese directorio.
 
 ### Roles
 
@@ -494,6 +496,6 @@ EnterWorktree(name: "{tipo}-{slug}")
 1. Siempre `EnterWorktree` antes de escribir codigo
 2. Los archivos compartidos son la fuente de verdad
 3. Leer estado actual antes de actuar
-4. Documentar decisiones en `decisions.md`
+4. Documentar decisiones de arquitectura como un ADR nuevo en `doc/adr/`
 5. Usar IDs unicos: `BUG-XXX`, `ADR-XXX`, `#XXX`
 

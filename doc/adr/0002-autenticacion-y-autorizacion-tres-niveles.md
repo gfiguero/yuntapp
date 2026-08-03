@@ -28,9 +28,12 @@ La plataforma tiene tres tipos de usuarios con distintos permisos: superadminist
 - **Pundit/CanCanCan**: Mas granular pero agrega complejidad innecesaria para tres roles fijos.
 - **JWT stateless**: No es idomiatico en Rails con vistas server-rendered.
 - **Roles en tabla separada**: Sobre-ingenieria para un sistema con roles fijos.
+- **Autenticación desde cero**: rechazada por complejidad innecesaria frente a una solución madura.
+- **Rodauth**: rechazada por tener menor ecosistema en Rails que Devise.
 
 ## Consecuencias
 
 - Simple y predecible. Los roles son booleanos, no hay tabla de roles ni polimorfismo.
 - Si en el futuro se necesitan permisos mas granulares (ej: roles parciales de admin), habria que migrar a Pundit o similar.
 - La impersonacion por sesion es efectiva pero no deja audit trail automatico.
+- Se usa Devise desde la rama `main` de GitHub, no desde una release estable: se gana lo último a cambio de depender de código sin versionar.

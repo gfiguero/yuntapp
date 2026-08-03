@@ -30,6 +30,7 @@ La aplicacion necesita interactividad en formularios (autosave, selects en casca
 - **React/Vue SPA**: Complejidad innecesaria, requiere API separada.
 - **Alpine.js**: Demasiado simple para cascading selects y autosave con Turbo Streams.
 - **Bootstrap**: Menos flexible que Tailwind, mas pesado.
+- **ViewComponent**: no descartado — se mantiene como posible complemento futuro para encapsular componentes de vista, no como reemplazo de Hotwire.
 
 ## Consecuencias
 
