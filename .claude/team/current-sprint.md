@@ -23,16 +23,23 @@ zeitwerk, tests locales y en contenedor) + signoff.
 
 - Commit `e25e7b0` (Batch I), pusheado a `master`.
 - Deploy `014340e` a producción (desde `e261ed5`, que llevaba 3 días): boot healthy en 100,7s.
-- Migración `20260731174440_add_subscription_amount_to_listings` aplicada a mano — `deploy.yml`
-  no corre `db:migrate` en el boot. Sin migraciones pendientes. Backfill afectó 0 filas: prod
-  es entorno demo y hoy no tiene publicaciones.
+- Migración `20260731174440_add_subscription_amount_to_listings` aplicada **automáticamente
+  durante el boot** (log: `Migrating to AddSubscriptionAmountToListings` a las 01:14:50, antes
+  de que Puma escuchara). Lo hace `bin/docker-entrypoint`, que corre `db:prepare` cuando los dos
+  últimos argumentos del `CMD` son `./bin/rails server` — y el CMD es
+  `["./bin/thrust", "./bin/rails", "server"]`, así que la condición se cumple. **No hace falta
+  migrar a mano**; el `kamal app exec 'bin/rails db:migrate'` que se corrió después fue un no-op.
+  Backfill afectó 0 filas: prod es entorno demo y hoy no tiene publicaciones.
 - Backup previo: `storage/production.sqlite3.bak-predeploy-batchi` (573.440 bytes).
 - Verificado post-deploy: `/up` 200, home 200, `/como-funciona` 200, `/users/sign_in` 200,
   columna presente, logs sin errores de aplicación.
 
-**Nota operacional:** `gh signoff` exige que no queden cambios sin pushear, así que el orden es
-push → signoff. Al ir directo a master eso deja un `Bypassed rule violations` en el push, que el
-signoff posterior resuelve.
+**Notas operacionales:**
+- `gh signoff` exige que no queden cambios sin pushear, así que el orden es push → signoff. Al ir
+  directo a master eso deja un `Bypassed rule violations` en el push, que el signoff resuelve.
+- Las migraciones corren solas en cada boot vía `bin/docker-entrypoint` → `db:prepare`. Esa
+  automatización depende del `CMD` del Dockerfile: si se cambia por uno cuyos dos últimos
+  argumentos no sean `./bin/rails server`, dejará de migrar **en silencio**.
 
 ## Pendiente
 

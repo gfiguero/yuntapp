@@ -83,7 +83,8 @@ Las cinco deben pasar. Si alguna falla, NO deployar. Brakeman y bundler-audit bl
 bin/rails db:migrate:status
 ```
 
-Si hay migraciones pendientes, el deploy las aplicara automaticamente (ver Fase 3).
+Si hay migraciones pendientes, el boot del contenedor las aplicara automaticamente via
+`bin/docker-entrypoint` (ver Fase 3). Verificar igual que sean backwards-compatible.
 
 ### 1.4 Revisar cambios de schema
 
@@ -120,15 +121,39 @@ Kamal hace en orden:
 
 ## Fase 3: Migraciones en produccion
 
-Las migraciones corren automaticamente durante el deploy si `config/deploy.yml` tiene:
+**Las migraciones corren solas en cada boot del contenedor. No hay que aplicarlas a mano.**
 
-```yaml
-# config/deploy.yml
-boot:
-  cmd: bin/rails db:migrate && bin/rails server
+El mecanismo NO esta en `config/deploy.yml` (no hay `boot: cmd:` ahi). Esta en
+`bin/docker-entrypoint`, que el generador de Rails 8 incluye en el `Dockerfile`:
+
+```bash
+# bin/docker-entrypoint
+if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
+  ./bin/rails db:prepare
+fi
+exec "${@}"
 ```
 
-Si necesitas correr migraciones manualmente:
+El `CMD` del Dockerfile es `["./bin/thrust", "./bin/rails", "server"]`, asi que el penultimo
+argumento es `./bin/rails` y el ultimo `server`: la condicion se cumple y `db:prepare` corre
+**antes** del `exec` que levanta Puma. Es decir, el proceso nunca sirve trafico con el schema
+atrasado — no existe ventana de codigo-nuevo-con-schema-viejo.
+
+`db:prepare` crea la base si no existe y aplica las migraciones pendientes si ya existe.
+
+> **Cuidado**: esta automatizacion depende del `CMD`. Si se cambia por uno cuyos dos ultimos
+> argumentos no sean `./bin/rails server`, las migraciones dejan de correr **en silencio**, sin
+> ningun aviso en el deploy. Rails por si solo NO migra al arrancar: el servidor solo aborta con
+> "Migrations are pending".
+
+Para confirmar que una migracion se aplico en el boot, buscala en el log del contenedor:
+
+```bash
+kamal app logs --since 20m | grep -i migrat
+# => Migrating to AddSubscriptionAmountToListings (20260731174440)
+```
+
+Solo si necesitas correrlas fuera de un deploy (por ejemplo tras cambiar el CMD):
 
 ```bash
 kamal app exec 'bin/rails db:migrate'
