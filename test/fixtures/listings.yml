@@ -1,4 +1,9 @@
 # fixtures/listings.yml
+#
+# BR-083: toda publicación nace en `pending_payment` y solo aparece en la
+# vitrina pública tras pagar la habilitación. Las fixtures de abajo quedan
+# impagas a propósito (es el estado normal); esta es la única publicada, y es la
+# que usan los tests de la vitrina.
 
 artanis_zealot_gauntlets:
   name: "Protoss Zealot Plasma Gauntlets - Authentic"
@@ -7,6 +12,13 @@ artanis_zealot_gauntlets:
   active: true
   user: artanis
   category: weapons
+  publication_status: published
+  payment_id: "MP-FIXTURE-GAUNTLETS"
+  payment_status: approved
+  amount: 1000
+  platform_fee: 100
+  paid_at: <%= 1.day.ago %>
+  published_until: <%= 29.days.from_now.to_date %>
 
 artanis_warp_prism:
   name: "Salvaged Warp Prism - Fully Operational"

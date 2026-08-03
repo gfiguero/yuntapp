@@ -18,7 +18,7 @@ class ListingsController < ApplicationController
 
   # GET /listings/search.json
   def search
-    @listings = params[:items].present? ? Listing.filter_by_id(params[:items]) : Listing.all
+    @listings = params[:items].present? ? published_scope.filter_by_id(params[:items]) : published_scope
 
     respond_to do |format|
       format.json
@@ -32,13 +32,22 @@ class ListingsController < ApplicationController
 
   private
 
+  # BR-083/BR-086: la vitrina pública SOLO muestra publicaciones con la
+  # habilitación pagada y su vigencia de 30 días al día. Toda publicación nace
+  # en `pending_payment`, así que consultar `Listing.all` aquí permitía publicar
+  # gratis (y dejaba visibles las vencidas). Esta es la única fuente de listings
+  # del controlador público: index, show, search y el bypass de paginación.
+  def published_scope
+    Listing.published
+  end
+
   # Use callbacks to share common setup or constraints between actions.
   def set_listing
-    @listing = Listing.find(params.expect(:id))
+    @listing = published_scope.find(params.expect(:id))
   end
 
   def set_listings
-    @listings = Listing.all
+    @listings = published_scope
     @listings = @listings.send(sort_scope(sort_params[:sort_column].to_s), sort_params[:sort_direction]) if sort_params.present?
     filter_params.each { |attribute, value| @listings = @listings.send(filter_scope(attribute), value) } if filter_params.present?
   end
@@ -52,6 +61,6 @@ class ListingsController < ApplicationController
   end
 
   def disabled_pagination
-    render json: Listing.all if params[:items] == "all"
+    render json: published_scope if params[:items] == "all"
   end
 end

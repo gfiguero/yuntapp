@@ -65,9 +65,14 @@ module Superadmin
     end
 
     # DELETE /admin/communes/1
+    # BR-100: no se borra una comuna con juntas o domicilios asociados
+    # (restrict_with_error) — antes los orfanaba vía nullify.
     def destroy
-      @commune.destroy!
-      redirect_to superadmin_communes_path, notice: I18n.t("superadmin.communes.flash.destroyed"), status: :see_other, format: :html
+      if @commune.destroy
+        redirect_to superadmin_communes_path, notice: I18n.t("superadmin.communes.flash.destroyed"), status: :see_other, format: :html
+      else
+        redirect_to superadmin_commune_path(@commune), alert: I18n.t("superadmin.communes.flash.not_destroyed"), status: :see_other, format: :html
+      end
     end
 
     private

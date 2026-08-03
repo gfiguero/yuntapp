@@ -18,8 +18,16 @@ module Panel
     end
 
     # GET /panel/residence_certificates/1/download
-    # BR-091/BR-092: descarga bloqueada si el certificado está vencido o su
-    # titular fue desactivado. El PDF nunca se sirve directo desde la vista.
+    # BR-091/BR-092/BR-141: descarga bloqueada si el certificado está vencido, su
+    # titular fue desactivado o el pago fue revertido. El PDF nunca se sirve
+    # directo desde la vista.
+    #
+    # El contenido se envía con `send_data` en vez de redirigir al blob: la URL
+    # de Active Storage depende solo del signed_id (no de `current_user` ni de
+    # `downloadable?`) y con el servicio Disk no expira, así que quien guardara
+    # esa URL seguía descargando el certificado después de ser desactivado, de
+    # que venciera o de que le revirtieran el pago. Aquí cada descarga vuelve a
+    # pasar por la autorización.
     def download
       unless @residence_certificate.downloadable? && @residence_certificate.pdf_document.attached?
         redirect_to panel_residence_certificate_path(@residence_certificate),
@@ -27,7 +35,10 @@ module Panel
         return
       end
 
-      redirect_to rails_blob_path(@residence_certificate.pdf_document, disposition: "attachment")
+      send_data @residence_certificate.pdf_document.download,
+        filename: "#{@residence_certificate.folio}.pdf",
+        type: "application/pdf",
+        disposition: "attachment"
     end
 
     # GET /panel/residence_certificates/new

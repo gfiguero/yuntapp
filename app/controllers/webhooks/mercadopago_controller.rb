@@ -222,9 +222,17 @@ module Webhooks
         # snapshot de la publicación, igual que el pago único. Rechaza montos
         # distintos o payment_ids obsoletos de otra operación cuyo
         # preapproval/external_reference coincida (protección contra manipulación).
+        #
+        # BR-088: se compara contra `subscription_amount` (el monto pactado al
+        # autorizar, inmutable) y NO contra `amount`, que se reescribe con el
+        # precio vigente cada vez que el usuario abre pagar/suscribirse: si la
+        # junta subía el precio, el cobro legítimo de MP (por el monto viejo) se
+        # rechazaba y la publicación vencía pese a estar pagada. El fallback a
+        # `amount` cubre las suscripciones anteriores al backfill.
+        expected_amount = listing.subscription_amount || listing.amount
         amount = payment["transaction_amount"] || payment[:transaction_amount]
-        unless amount_matches?(amount, listing.amount)
-          Rails.logger.warn("MercadoPago webhook: subscription payment #{payment_id} amount #{amount.inspect} != listing ##{listing.id} amount #{listing.amount.inspect} — no renewal")
+        unless amount_matches?(amount, expected_amount)
+          Rails.logger.warn("MercadoPago webhook: subscription payment #{payment_id} amount #{amount.inspect} != listing ##{listing.id} subscription amount #{expected_amount.inspect} — no renewal")
           return
         end
 
@@ -248,6 +256,22 @@ module Webhooks
     # (reconciliación con Batch G: los refunds reusan el payment_id del approved).
     def payment_already_processed?(payment_id, status)
       PaymentEvent.exists?(payment_id: payment_id, status: status)
+    end
+
+    # BR-141: una reversión ya registrada (refund/contracargo) es definitiva para
+    # ESE pago. Sin esta guarda, una notificación tardía que trajera el mismo
+    # payment como `approved` volvía a marcarlo pagado y deshacía la reversión —
+    # el caso concreto es un `merchant_order` que reprocesa sus payments anidados,
+    # o una consulta a la API de MP que devuelve estado obsoleto.
+    #
+    # La guarda es por payment_id, no por payable: si el usuario paga de nuevo
+    # tras la reversión, ese pago nuevo trae otro payment_id y se procesa normal
+    # (BR-003/BR-073: puede reintentar).
+    def reverted_payment?(payable, payment_id)
+      return false unless PaymentEvent.exists?(payment_id: payment_id, status: ResidenceCertificate::REVERTED_PAYMENT_STATUSES)
+
+      Rails.logger.warn("MercadoPago webhook: payment #{payment_id} was reverted for #{payable.class}##{payable.id} — ignoring late approved notification")
+      true
     end
 
     # Registra el evento de pago (log histórico + idempotencia). Idempotente por
@@ -294,6 +318,8 @@ module Webhooks
 
       case status.to_s
       when "approved"
+        return if reverted_payment?(certificate, payment_id)
+
         # BR-090: el monto solo se valida en la transición a pagado. Las
         # reversiones (refund/contracargo) deben procesarse siempre, sin gate de monto.
         unless amount_matches?(amount, certificate.amount)
@@ -318,6 +344,8 @@ module Webhooks
 
       case status.to_s
       when "approved"
+        return if reverted_payment?(listing, payment_id)
+
         # BR-090: mismo control de monto que los certificados. Solo en la
         # transición a pagado; reversiones deben procesarse sin gate de monto.
         unless amount_matches?(amount, listing.amount)

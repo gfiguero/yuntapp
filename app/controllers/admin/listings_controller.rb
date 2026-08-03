@@ -50,9 +50,16 @@ module Admin
     end
 
     # DELETE /admin/listings/1
+    # BR-100: ver Panel::ListingsController#destroy — el historial de pago se
+    # preserva retirando la publicación de la vitrina.
     def destroy
-      @listing.destroy!
-      redirect_to admin_listings_path, notice: I18n.t("admin.listings.flash.destroyed"), status: :see_other, format: :html
+      if @listing.ever_paid?
+        @listing.withdraw!
+        redirect_to admin_listings_path, notice: I18n.t("admin.listings.flash.withdrawn"), status: :see_other, format: :html
+      else
+        @listing.destroy!
+        redirect_to admin_listings_path, notice: I18n.t("admin.listings.flash.destroyed"), status: :see_other, format: :html
+      end
     end
 
     private

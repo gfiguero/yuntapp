@@ -14,10 +14,16 @@
   <% end %>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:last_name))) %>
 
+  <%# BR-046: el RUN es inmutable una vez creada la identidad. En edición se
+      muestra deshabilitado; el controller además descarta el parámetro. %>
   <% invalid = member.errors.include?(:run) %>
+  <% run_locked = member.persisted? %>
   <%= form.label :run, I18n.t('activerecord.attributes.member.run'), class: "floating-label" do %>
-    <%= form.text_field :run, class: "input w-full validator #{'input-error' if invalid}", required: true, placeholder: I18n.t('activerecord.attributes.member.run') %>
+    <%= form.text_field :run, class: "input w-full validator #{'input-error' if invalid}", required: !run_locked, disabled: run_locked, placeholder: I18n.t('activerecord.attributes.member.run') %>
     <span><%= I18n.t('activerecord.attributes.member.run') %></span>
+  <% end %>
+  <% if run_locked %>
+    <p class="text-sm opacity-70"><%= I18n.t('admin.members.form.run_immutable') %></p>
   <% end %>
   <%= raw(error_message(invalid, member.errors.full_messages_for(:run))) %>
 

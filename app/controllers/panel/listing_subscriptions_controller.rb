@@ -40,7 +40,16 @@ module Panel
       end
 
       current_user.update!(mercadopago_email: email)
-      @listing.update!(amount: @pricing.price, platform_fee: nil, neighborhood_association: @association)
+      # BR-088/BR-090: `subscription_amount` es el snapshot del monto pactado con
+      # MP, inmutable mientras la suscripción viva. Es el que valida el cobro
+      # recurrente en el webhook — `amount` se reescribe con el precio vigente en
+      # cada intento de pago y no sirve como referencia del cobro mensual.
+      @listing.update!(
+        amount: @pricing.price,
+        subscription_amount: @pricing.price,
+        platform_fee: nil,
+        neighborhood_association: @association
+      )
 
       preapproval = mercadopago.create_listing_subscription(
         @listing,

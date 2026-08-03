@@ -65,9 +65,13 @@ module Superadmin
     end
 
     # DELETE /admin/countries/1
+    # BR-100: no se borra geografía con regiones asociadas (restrict_with_error).
     def destroy
-      @country.destroy!
-      redirect_to superadmin_countries_path, notice: I18n.t("superadmin.countries.flash.destroyed"), status: :see_other, format: :html
+      if @country.destroy
+        redirect_to superadmin_countries_path, notice: I18n.t("superadmin.countries.flash.destroyed"), status: :see_other, format: :html
+      else
+        redirect_to superadmin_country_path(@country), alert: I18n.t("superadmin.countries.flash.not_destroyed"), status: :see_other, format: :html
+      end
     end
 
     private

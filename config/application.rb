@@ -22,6 +22,13 @@ module Yuntapp
     # in config/environments, which are processed later.
     #
     config.time_zone = "Santiago"
+
+    # Las URLs de Active Storage (documentos de identidad, vigencias de directiva)
+    # se firman con caducidad: por defecto el signed_id no expira nunca y con el
+    # servicio Disk una URL filtrada queda accesible de forma indefinida. El PDF
+    # del certificado además no pasa por aquí — se sirve autorizado por el
+    # controlador en cada descarga (BR-091/BR-092/BR-141).
+    config.active_storage.urls_expire_in = 5.minutes
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end

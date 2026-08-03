@@ -203,6 +203,50 @@ module Panel
       assert Member.exists?(member_id), "Member should not be destroyed"
     end
 
+    # BR-018/BR-100: `current_onboarding_request` abarca draft Y pending, así que
+    # el `destroy` anterior borraba la solicitud EN REVISIÓN junto con su
+    # identidad y su residencia (dependent: :destroy). Una solicitud enviada se
+    # cancela: los datos quedan como historial y pueden duplicarse (BR-048/049).
+    test "restart cancels a pending request instead of destroying it (BR-018/BR-100)" do
+      sign_in @karass
+      onboarding = @karass.current_onboarding_request
+      assert onboarding.pending?
+
+      assert_no_difference -> { OnboardingRequest.count } do
+        delete panel_onboarding_restart_url
+      end
+      assert_redirected_to panel_onboarding_step1_url
+
+      assert OnboardingRequest.exists?(onboarding.id), "la solicitud pendiente no debe destruirse"
+      assert onboarding.reload.cancelled?
+    end
+
+    test "restart preserves identity and residence of a pending request (BR-100)" do
+      sign_in @karass
+      onboarding = @karass.current_onboarding_request
+      identity = IdentityVerificationRequest.create!(
+        user: @karass, onboarding_request: onboarding, status: "pending",
+        first_name: "Karass", last_name: "Nerazim", run: "12345678-5", phone: "+56912345678"
+      )
+
+      delete panel_onboarding_restart_url
+
+      assert IdentityVerificationRequest.exists?(identity.id), "la identidad no debe destruirse en cascada"
+      assert_equal "cancelled", identity.reload.status
+    end
+
+    # Un borrador nunca enviado no es dato consolidado: sigue descartándose.
+    test "restart discards a draft request" do
+      sign_in @urunis
+      get panel_onboarding_step1_url
+      draft = @urunis.reload.current_onboarding_request
+      assert draft.draft?
+
+      delete panel_onboarding_restart_url
+
+      assert_not OnboardingRequest.exists?(draft.id)
+    end
+
     # --- update_step2 — file attachments + RUN validation ---
 
     test "update_step2 attaches identity_documents when present" do

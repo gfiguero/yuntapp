@@ -160,6 +160,55 @@ class ListingPublicationTest < ActiveSupport::TestCase
     assert listing.save
   end
 
+  # --- BR-100: el historial financiero de una publicación no se destruye ---
+
+  test "a paid listing cannot be destroyed (BR-100)" do
+    @listing.update!(amount: 1000)
+    @listing.mark_as_paid!(payment_id: "MP-NODESTROY-1")
+
+    assert_no_difference -> { Listing.count } do
+      assert_not @listing.destroy
+    end
+
+    assert Listing.exists?(@listing.id)
+    assert_not_empty @listing.errors[:base]
+  end
+
+  test "an unpaid draft listing can be destroyed (BR-100)" do
+    assert @listing.pending_payment?
+    assert_not @listing.ever_paid?
+
+    assert_difference -> { Listing.count }, -1 do
+      assert @listing.destroy
+    end
+  end
+
+  # Una publicación vencida ya generó ingreso: su snapshot financiero (amount,
+  # platform_fee, junta beneficiaria — BR-085) sigue siendo dato consolidado.
+  test "an expired listing still counts as paid history (BR-100)" do
+    @listing.update!(amount: 1000)
+    @listing.mark_as_paid!(payment_id: "MP-NODESTROY-2")
+    @listing.update_columns(published_until: 1.day.ago.to_date)
+
+    assert @listing.ever_paid?
+    assert_not @listing.destroy
+  end
+
+  test "withdraw! keeps the record but removes it from the storefront (BR-100)" do
+    @listing.update!(amount: 1000)
+    @listing.mark_as_paid!(payment_id: "MP-WITHDRAW-1")
+    assert_includes Listing.published, @listing
+
+    @listing.withdraw!
+
+    assert Listing.exists?(@listing.id)
+    assert_equal false, @listing.reload.active
+    assert_not_includes Listing.published, @listing
+    # El pago no se toca: la vigencia comprada sigue registrada.
+    assert_equal "MP-WITHDRAW-1", @listing.payment_id
+    assert_equal Date.current + 30.days, @listing.published_until
+  end
+
   # --- #108: un solo household_admin por FamilyGroup a nivel de BD ---
 
   test "DB rejects a second household_admin residency in the same family_group (#108)" do

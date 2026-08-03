@@ -855,5 +855,152 @@ module Webhooks
       assert @certificate.reload.payment_reverted?, "el refund no debe bloquearse por payment_events"
       assert_equal 1, PaymentEvent.where(payment_id: "MP-DUAL", status: "charged_back").count
     end
+
+    # --- BR-088/BR-090: el monto de la suscripción es un snapshot propio ---
+
+    test "recurring charge is validated against subscription_amount, not the mutable amount (BR-088/BR-090)" do
+      # El usuario se suscribió a $1.200; después la junta subió su precio y el
+      # usuario reabrió el flujo de pago, reescribiendo `amount` a $2.000. El
+      # cobro recurrente de MP sigue siendo por los $1.200 pactados y debe
+      # renovar igual: antes se rechazaba y la publicación vencía pese al pago.
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 1200, subscription_amount: 1200, preapproval_id: "PRE-SNAP",
+        subscription_status: "authorized")
+      listing.mark_as_paid!(payment_id: "MP-SNAP-FIRST")
+      current_until = listing.published_until
+      listing.update_columns(amount: 2000, platform_fee: 200)
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AUTHPAY-SNAP",
+        "preapproval_id" => "PRE-SNAP",
+        "payment" => {"id" => "MP-RECUR-SNAP", "status" => "approved", "transaction_amount" => 1200}
+      }) do
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-SNAP"}})
+      end
+
+      assert_response :ok
+      listing.reload
+      assert_equal current_until + 30.days, listing.published_until, "el cobro pactado debe renovar"
+      assert_equal "MP-RECUR-SNAP", listing.payment_id
+    end
+
+    test "recurring charge for an amount other than the pacted one is rejected (BR-090)" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 2000, subscription_amount: 1200, preapproval_id: "PRE-SNAP2",
+        subscription_status: "authorized")
+      listing.mark_as_paid!(payment_id: "MP-SNAP2-FIRST")
+      current_until = listing.published_until
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AUTHPAY-SNAP2",
+        "preapproval_id" => "PRE-SNAP2",
+        "payment" => {"id" => "MP-RECUR-SNAP2", "status" => "approved", "transaction_amount" => 2000}
+      }) do
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-SNAP2"}})
+      end
+
+      assert_response :ok
+      assert_equal current_until, listing.reload.published_until,
+        "un cobro por un monto distinto al pactado no renueva"
+    end
+
+    test "subscriptions predating the snapshot column fall back to amount (BR-090)" do
+      listing = Listing.create!(name: "Sub listing", user: users(:artanis),
+        amount: 1200, preapproval_id: "PRE-SNAP3", subscription_status: "authorized")
+      assert_nil listing.subscription_amount
+      listing.mark_as_paid!(payment_id: "MP-SNAP3-FIRST")
+      current_until = listing.published_until
+
+      stub_subscription_service(authorized_payment: {
+        "id" => "AUTHPAY-SNAP3",
+        "preapproval_id" => "PRE-SNAP3",
+        "payment" => {"id" => "MP-RECUR-SNAP3", "status" => "approved", "transaction_amount" => 1200}
+      }) do
+        post_signed_webhook({type: "subscription_authorized_payment", data: {id: "AUTHPAY-SNAP3"}})
+      end
+
+      assert_response :ok
+      assert_equal current_until + 30.days, listing.reload.published_until
+    end
+
+    # --- BR-141: una reversión es definitiva para ese pago ---
+
+    test "a late approved notification cannot resurrect a reverted certificate payment (BR-141)" do
+      @certificate.update!(status: "paid", payment_id: "MP-LATE", paid_at: Time.current)
+      @certificate.issue!
+
+      # 1) Llega el contracargo: el certificado queda inválido.
+      stub_fetch_payment({
+        "id" => "MP-LATE", "transaction_amount" => 1500, "status" => "charged_back",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post_signed_webhook({topic: "payment", data: {id: "MP-LATE"}})
+      end
+      assert @certificate.reload.payment_reverted?
+
+      # 2) Llega tarde una notificación del MISMO pago como approved (p. ej. un
+      #    merchant_order que reprocesa sus payments anidados).
+      stub_fetch_payment({
+        "id" => "MP-LATE", "transaction_amount" => 1500, "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post_signed_webhook({topic: "payment", data: {id: "MP-LATE"}})
+      end
+
+      assert_response :ok
+      assert @certificate.reload.payment_reverted?, "la reversión no debe deshacerse"
+      assert_equal "charged_back", @certificate.payment_status
+    end
+
+    test "a late approved notification cannot republish a reverted listing (BR-141)" do
+      listing = Listing.create!(name: "Reverted", user: users(:artanis), amount: 1200)
+      listing.mark_as_paid!(payment_id: "MP-LLATE")
+
+      stub_fetch_payment({
+        "id" => "MP-LLATE", "transaction_amount" => 1200, "status" => "refunded",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post_signed_webhook({topic: "payment", data: {id: "MP-LLATE"}})
+      end
+      assert listing.reload.pending_payment?
+
+      stub_fetch_payment({
+        "id" => "MP-LLATE", "transaction_amount" => 1200, "status" => "approved",
+        "external_reference" => "listing-#{listing.id}"
+      }) do
+        post_signed_webhook({topic: "payment", data: {id: "MP-LLATE"}})
+      end
+
+      assert_response :ok
+      listing.reload
+      assert listing.pending_payment?, "la publicación revertida no debe republicarse"
+      assert_equal "refunded", listing.payment_status
+    end
+
+    # BR-003/BR-073: la guarda es por pago, no por recurso — el usuario puede
+    # volver a pagar tras una reversión y ese pago nuevo sí se procesa.
+    test "a new payment after a reversal is processed normally (BR-003/BR-073)" do
+      @certificate.update!(status: "paid", payment_id: "MP-OLD", paid_at: Time.current)
+
+      stub_fetch_payment({
+        "id" => "MP-OLD", "transaction_amount" => 1500, "status" => "refunded",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post_signed_webhook({topic: "payment", data: {id: "MP-OLD"}})
+      end
+      assert @certificate.reload.pending_payment?
+
+      stub_fetch_payment({
+        "id" => "MP-NEW", "transaction_amount" => 1500, "status" => "approved",
+        "external_reference" => @certificate.id.to_s
+      }) do
+        post_signed_webhook({topic: "payment", data: {id: "MP-NEW"}})
+      end
+
+      assert_response :ok
+      @certificate.reload
+      assert @certificate.paid?, "un pago nuevo tras la reversión sí debe procesarse"
+      assert_equal "MP-NEW", @certificate.payment_id
+    end
   end
 end

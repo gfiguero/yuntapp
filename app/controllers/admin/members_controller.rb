@@ -66,8 +66,13 @@ module Admin
     end
 
     # PATCH/PUT /admin/members/1
+    # BR-046: el RUN de una identidad ya verificada es inmutable. Corregirlo
+    # exige desactivar al socio (BR-036) y rehacer el onboarding con el RUN
+    # correcto, para que la junta verifique la documentación de nuevo. Permitirlo
+    # aquí dejaba reescribir la identidad de un socio (y de sus certificados ya
+    # emitidos) sin ninguna verificación. `create` ya lo excluía; `update` no.
     def update
-      @member.verified_identity.update!(verified_identity_params)
+      @member.verified_identity.update!(verified_identity_params.except(:run))
       if @member.save
         redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.updated"), status: :see_other
       else

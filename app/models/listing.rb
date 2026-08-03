@@ -30,7 +30,17 @@ class Listing < ApplicationRecord
   # re-capturarse el precio para la renovación (BR-086).
   validate :pricing_snapshot_immutable_while_published, on: :update
 
-  scope :published, -> { where(publication_status: "published").where("published_until >= ?", Date.current) }
+  # BR-083/BR-086: vitrina pública = habilitación pagada + vigencia al día +
+  # no retirada por su dueño. `active` es nullable y las publicaciones históricas
+  # lo tienen en NULL, así que se excluye solo el `false` explícito (retirada).
+  # Se enumeran los valores permitidos porque `where.not(active: false)` traduce
+  # a `active != 0`, que en SQL descarta también las filas con NULL.
+  scope :published, -> { where(publication_status: "published").where("published_until >= ?", Date.current).where(active: [true, nil]) }
+
+  # BR-100: una publicación con historial de pago conserva su snapshot financiero
+  # (amount, platform_fee y la junta beneficiaria — BR-085). Ese registro no se
+  # destruye: se retira de la vitrina (`active: false`).
+  before_destroy :prevent_destroy_of_paid_listing
 
   def pending_payment?
     publication_status == "pending_payment"
@@ -73,6 +83,20 @@ class Listing < ApplicationRecord
 
   def payment_reverted?
     REVERTED_PAYMENT_STATUSES.include?(payment_status)
+  end
+
+  # BR-100: ¿tiene historial financiero que preservar? Un borrador que nunca se
+  # pagó no es dato consolidado y sí puede eliminarse.
+  def ever_paid?
+    payment_id.present? || paid_at.present? || published_until.present? || payment_events.exists?
+  end
+
+  # Retiro de la vitrina conservando el registro (sustituye al borrado físico
+  # de una publicación pagada). No toca la vigencia: si el usuario la reactiva
+  # antes de `published_until`, vuelve a aparecer con los días que le quedaban.
+  def withdraw!
+    update!(active: false)
+    self
   end
 
   # Espejo de ResidenceCertificate#apply_mp_payment_status! para publicaciones
@@ -121,6 +145,15 @@ class Listing < ApplicationRecord
   end
 
   private
+
+  # BR-100: guard server-side por cualquier ruta (panel, admin, consola). Espejo
+  # del guard de Member/User.
+  def prevent_destroy_of_paid_listing
+    return unless ever_paid?
+
+    errors.add(:base, "No se puede eliminar una publicación con historial de pago; se retira de la vitrina")
+    throw :abort
+  end
 
   # BR-085: Yuntapp retiene exactamente el 10%. `amount` es entero (CLP sin
   # decimales); redondeamos al peso más cercano en vez de truncar (#99).

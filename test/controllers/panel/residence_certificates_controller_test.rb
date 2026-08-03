@@ -160,14 +160,38 @@ module Panel
       assert_redirected_to panel_residence_certificates_url
     end
 
-    test "download redirects to stored PDF for a vigente certificate" do
+    # El PDF se envía por el controlador (send_data) en vez de redirigir al blob:
+    # la URL de Active Storage no depende del usuario ni de downloadable? y con el
+    # servicio Disk no expira, así que una URL guardada seguía sirviendo el
+    # certificado tras vencer, ser desactivado el titular o revertirse el pago.
+    test "download serves the stored PDF inline for a vigente certificate" do
       sign_in @household_admin
       cert = issued_cert
       attach_pdf(cert)
 
       get download_panel_residence_certificate_url(cert)
-      assert_response :redirect
-      assert_match "/rails/active_storage/", @response.redirect_url
+      assert_response :success
+      assert_equal "application/pdf", @response.media_type
+      assert_match(/attachment/, @response.headers["Content-Disposition"])
+      assert_match(/#{cert.folio}\.pdf/, @response.headers["Content-Disposition"])
+      assert_equal cert.pdf_document.download, @response.body
+    end
+
+    # BR-091/BR-092/BR-141: la autorización se revalúa en CADA descarga. Antes,
+    # obtenida la URL del blob, seguía sirviendo el PDF indefinidamente.
+    test "download stops serving the PDF once the certificate expires (BR-092)" do
+      sign_in @household_admin
+      cert = issued_cert
+      attach_pdf(cert)
+
+      get download_panel_residence_certificate_url(cert)
+      assert_response :success
+
+      cert.update_columns(expiration_date: Date.current - 1.day)
+
+      get download_panel_residence_certificate_url(cert)
+      assert_redirected_to panel_residence_certificate_url(cert)
+      assert_equal I18n.t("panel.residence_certificates.flash.not_downloadable"), flash[:alert]
     end
 
     test "download is blocked for an expired certificate" do

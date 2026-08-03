@@ -67,9 +67,16 @@ module Panel
     end
 
     # DELETE /panel/listings/1
+    # BR-100: una publicación con historial de pago no se destruye — se retira
+    # de la vitrina conservando su snapshot financiero (BR-085).
     def destroy
-      @listing.destroy!
-      redirect_to panel_listings_path, notice: I18n.t("panel.listings.flash.destroyed"), status: :see_other, format: :html
+      if @listing.ever_paid?
+        @listing.withdraw!
+        redirect_to panel_listings_path, notice: I18n.t("panel.listings.flash.withdrawn"), status: :see_other, format: :html
+      else
+        @listing.destroy!
+        redirect_to panel_listings_path, notice: I18n.t("panel.listings.flash.destroyed"), status: :see_other, format: :html
+      end
     end
 
     private

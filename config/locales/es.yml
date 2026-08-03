@@ -516,6 +516,8 @@ es:
         count: "%{count} socios"
       show:
         identifier: "Socio ID: %{id}"
+      form:
+        run_immutable: El RUN de una identidad verificada no puede modificarse. Para corregirlo, desactiva al socio y solicita un nuevo onboarding con el RUN correcto.
       deactivate:
         title: Desactivar Socio
         warning: "¿Está seguro que desea desactivar al socio %{name}? Esta acción es reversible pero requiere una nueva solicitud de onboarding."
@@ -577,6 +579,7 @@ es:
         created: Publicación creada exitosamente.
         updated: Publicación actualizada exitosamente.
         destroyed: Publicación eliminada exitosamente.
+        withdrawn: Publicación retirada de la vitrina. Su historial de pago se conserva.
     users:
       index:
         title: Usuarios
@@ -809,6 +812,7 @@ es:
         created: Publicación creada exitosamente.
         updated: Publicación actualizada exitosamente.
         destroyed: Publicación eliminada exitosamente.
+        withdrawn: Publicación retirada de la vitrina. Su historial de pago se conserva.
     residence_certificates:
       index:
         title: Certificados de Residencia
@@ -1029,6 +1033,7 @@ es:
         created: País creado exitosamente.
         updated: País actualizado exitosamente.
         destroyed: País eliminado exitosamente.
+        not_destroyed: No se puede eliminar un país con regiones asociadas.
     regions:
       index:
         title: Regiones
@@ -1039,6 +1044,7 @@ es:
         created: Región creada exitosamente.
         updated: Región actualizada exitosamente.
         destroyed: Región eliminada exitosamente.
+        not_destroyed: No se puede eliminar una región con comunas asociadas.
     communes:
       index:
         title: Comunas
@@ -1049,6 +1055,7 @@ es:
         created: Comuna creada exitosamente.
         updated: Comuna actualizada exitosamente.
         destroyed: Comuna eliminada exitosamente.
+        not_destroyed: No se puede eliminar una comuna con juntas de vecinos o domicilios asociados.
     neighborhood_associations:
       index:
         title: Juntas de Vecinos

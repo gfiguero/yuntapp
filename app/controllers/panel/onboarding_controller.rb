@@ -9,9 +9,21 @@ module Panel
     before_action :ensure_step3!, only: [:step4, :submit]
     before_action :ensure_step4!, only: [:step4, :submit]
 
+    # BR-018/BR-100: reiniciar NO destruye una solicitud ya enviada. Como
+    # `current_onboarding_request` abarca draft Y pending, el `destroy` anterior
+    # borraba en cascada (dependent: :destroy) la solicitud en revisión junto con
+    # su identidad y su residencia — el patrón de borrado que BR-100 prohíbe.
+    # Una solicitud `pending` se cancela (conserva los datos como historial
+    # auditable y habilita duplicarla, BR-048/BR-049/BR-051); solo el borrador,
+    # que nunca se envió y no es dato consolidado, se descarta.
     def restart
       session.delete(:onboarding)
-      current_user.current_onboarding_request&.destroy
+      onboarding = current_user.current_onboarding_request
+      if onboarding&.pending?
+        onboarding.cancel!
+      else
+        onboarding&.destroy
+      end
       current_user.member&.deactivate!(reason: I18n.t("panel.onboarding.deactivation_reason"))
       redirect_to panel_onboarding_step1_path, notice: I18n.t("panel.onboarding.flash.restarted")
     end
