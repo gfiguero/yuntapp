@@ -17,12 +17,27 @@ Trabajo directo en master por indicación del owner (sin worktree).
 - [x] **A7** (BR-141/BR-146) — una notificación tardía con el mismo `payment_id` como `approved` podía deshacer un refund/contracargo. Guarda por `PaymentEvent` revertido
 - [x] **A8** (BR-091/BR-092/BR-141/BR-147) — el PDF se servía por URL de blob sin expiración, evadiendo `downloadable?`. Ahora `send_data` autorizado en cada descarga + `urls_expire_in = 5.minutes`
 
-**Estado:** implementado y verde. 701 tests / 1747 asserts / 0 fallos (+31 tests nuevos).
-`bin/ci` pasa todas las etapas (Standard, ERB lint, gem + importmap audit, Brakeman, zeitwerk,
-tests locales y en contenedor); falta solo el signoff, que exige el commit.
+**Estado: COMPLETADO Y DESPLEGADO (2026-08-02).** 701 tests / 1747 asserts / 0 fallos (+31 tests
+nuevos). `bin/ci` verde en todas las etapas (Standard, ERB lint, gem + importmap audit, Brakeman,
+zeitwerk, tests locales y en contenedor) + signoff.
 
-**Pendiente de deploy:** 1 migración nueva (`20260731174440_add_subscription_amount_to_listings`,
-aditiva + backfill de suscripciones vigentes).
+- Commit `e25e7b0` (Batch I), pusheado a `master`.
+- Deploy `014340e` a producción (desde `e261ed5`, que llevaba 3 días): boot healthy en 100,7s.
+- Migración `20260731174440_add_subscription_amount_to_listings` aplicada a mano — `deploy.yml`
+  no corre `db:migrate` en el boot. Sin migraciones pendientes. Backfill afectó 0 filas: prod
+  es entorno demo y hoy no tiene publicaciones.
+- Backup previo: `storage/production.sqlite3.bak-predeploy-batchi` (573.440 bytes).
+- Verificado post-deploy: `/up` 200, home 200, `/como-funciona` 200, `/users/sign_in` 200,
+  columna presente, logs sin errores de aplicación.
+
+**Nota operacional:** `gh signoff` exige que no queden cambios sin pushear, así que el orden es
+push → signoff. Al ir directo a master eso deja un `Bypassed rule violations` en el push, que el
+signoff posterior resuelve.
+
+## Pendiente
+
+- Las **11 severidades Media** de `docs/2026-07-30-auditoria-profunda.md` (y 12 Baja + 4 BR
+  faltantes). Ningún trabajo iniciado.
 
 ## En Review
 
