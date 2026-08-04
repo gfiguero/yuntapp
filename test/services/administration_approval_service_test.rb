@@ -72,4 +72,31 @@ class AdministrationApprovalServiceTest < ActiveSupport::TestCase
 
     assert_equal "inactive", prev.reload.status
   end
+
+  # BR-054: una junta disuelta tiene todos sus socios en inactive. Aprobar hacia
+  # ella dejaba a un admin operando una junta que el staff ya disolvió, con un
+  # Member(approved) y un BoardMember(active) que contradicen la disolución.
+  test "no aprueba hacia una junta disuelta (BR-054)" do
+    junta = neighborhood_associations(:manios_de_buin)
+    req = AdministrationRequest.create!(
+      user: users(:urunis),
+      neighborhood_association: junta,
+      organization_rut: junta.rut,
+      position: "secretario",
+      first_name: "Ana", last_name: "Soto", run: "15111222-6", phone: "+56911112222",
+      status: "pending", directiva_validity_document: upload
+    )
+    junta.update_column(:active, false)
+
+    assert_no_difference -> { Member.count } do
+      assert_no_difference -> { BoardMember.count } do
+        assert_raises(AdministrationApprovalService::InactiveAssociationError) do
+          AdministrationApprovalService.approve!(req, approved_by: @staff)
+        end
+      end
+    end
+
+    assert req.reload.pending?, "la solicitud sigue pendiente"
+    assert_not users(:urunis).reload.admin?
+  end
 end

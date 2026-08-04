@@ -11,6 +11,8 @@
 # de IdentityTransferService (la cascada de deactivate! resuelve al household_admin
 # anterior por su residencia aprobada más reciente).
 class AdministrationApprovalService
+  class InactiveAssociationError < StandardError; end
+
   def self.approve!(administration_request, approved_by:)
     new(administration_request, approved_by).approve!
   end
@@ -37,8 +39,18 @@ class AdministrationApprovalService
 
   private
 
+  # BR-054: una junta disuelta (`active: false`) tiene todos sus socios en
+  # `inactive` por cascada. Aprobar hacia ella dejaba a un admin operando una
+  # junta que el staff ya disolvió, y le creaba un Member(approved) y un
+  # BoardMember(active) que contradicen esa disolución. El formulario del panel
+  # ya solo ofrece juntas activas, pero el id viaja por params y la junta puede
+  # disolverse entre el envío de la solicitud y la revisión del staff.
   def resolve_association!
-    return @req.neighborhood_association if @req.neighborhood_association_id.present?
+    if @req.neighborhood_association_id.present?
+      junta = @req.neighborhood_association
+      raise InactiveAssociationError, "La junta #{junta.name} está disuelta (BR-054)" unless junta.active?
+      return junta
+    end
 
     NeighborhoodAssociation.create!(
       name: @req.proposed_association_name,

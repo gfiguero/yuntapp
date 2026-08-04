@@ -90,7 +90,24 @@ module Panel
         return
       end
 
-      mercadopago.cancel_preapproval(@listing.preapproval_id)
+      # BR-088: cancelar es idempotente desde la perspectiva del usuario. Si MP
+      # ya dejó la preapproval en un estado terminal (la canceló él mismo desde
+      # la app de MP, o la dio de baja tras cobros fallidos), el `update` a MP
+      # devuelve error. Antes ese error no se rescataba y el usuario recibía un
+      # 500 con la suscripción local intacta, sin forma de salir del estado.
+      # Ahora el estado local se marca `cancelled` igual: la intención del
+      # usuario se cumple y la vigencia ya pagada se conserva (BR-089).
+      begin
+        mercadopago.cancel_preapproval(@listing.preapproval_id)
+      rescue MercadopagoService::ConfigurationError
+        raise
+      rescue => e
+        Rails.logger.warn(
+          "MercadoPago rechazó la cancelación de la preapproval #{@listing.preapproval_id} " \
+          "(listing ##{@listing.id}): #{e.class}: #{e.message}. Se cancela localmente igual."
+        )
+      end
+
       @listing.update!(subscription_status: "cancelled")
       redirect_to panel_listing_path(@listing),
         notice: I18n.t("panel.listing_subscriptions.flash.cancelled")

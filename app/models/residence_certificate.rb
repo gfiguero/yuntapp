@@ -15,7 +15,6 @@ class ResidenceCertificate < ApplicationRecord
   belongs_to :neighborhood_association
   belongs_to :member
   belongs_to :household_unit
-  belongs_to :approved_by, class_name: "User", optional: true
 
   # BR-100: el historial de eventos de pago (#101) no se destruye.
   has_many :payment_events, as: :payable, dependent: :restrict_with_error
@@ -109,16 +108,25 @@ class ResidenceCertificate < ApplicationRecord
   # certificado ya fue emitido. Ese re-proceso es un no-op limpio (mismo
   # payment_id) — NO debe intentar el `update!(status: "paid")` sobre un cert
   # inmutable (BR-008), que generaría un RecordInvalid espurio en los logs.
+  # BR-141: las tres transiciones de estado del certificado (mark_as_paid!,
+  # apply_mp_payment_status! e issue!) leen el estado y luego escriben. Sin
+  # serializar, un webhook de reversión y el IssueCertificateJob podían operar
+  # sobre la misma lectura de `paid` y pisarse: el job emitía mientras la
+  # reversión devolvía a `pending_payment`. `with_lock` recarga el registro
+  # dentro de una transacción, así que cada transición decide sobre el estado
+  # vigente. (En SQLite el `FOR UPDATE` es no-op —Arel lo omite—, pero el motor
+  # serializa las escrituras y la recarga dentro de la transacción es lo que
+  # cierra la ventana read-then-write.)
   def mark_as_paid!(payment_id:, paid_at: Time.current)
-    if (paid? || issued?) && self.payment_id == payment_id
-      return self
-    end
+    with_lock do
+      next if (paid? || issued?) && self.payment_id == payment_id
 
-    if (paid? || issued?) && self.payment_id != payment_id
-      raise AlreadyPaidError, "Certificate ##{id} already paid with payment_id #{self.payment_id}"
-    end
+      if (paid? || issued?) && self.payment_id != payment_id
+        raise AlreadyPaidError, "Certificate ##{id} already paid with payment_id #{self.payment_id}"
+      end
 
-    update!(status: "paid", payment_id: payment_id, paid_at: paid_at)
+      update!(status: "paid", payment_id: payment_id, paid_at: paid_at)
+    end
     self
   end
 
@@ -126,15 +134,22 @@ class ResidenceCertificate < ApplicationRecord
   # de negocio (BR-141, BR-073). Idempotente por estado. `approved` NO pasa por
   # aquí — el webhook usa mark_as_paid!.
   def apply_mp_payment_status!(mp_status)
-    return self if payment_status == mp_status
+    with_lock do
+      next if payment_status == mp_status
 
-    if REVERTED_PAYMENT_STATUSES.include?(mp_status) && paid?
-      # Asunción: refund/contracargo se trata como reversión TOTAL (el modelo de
-      # negocio usa montos únicos, sin refunds parciales). Si MP habilitara
-      # refunds parciales, revisar esta lógica.
-      update!(payment_status: mp_status, status: "pending_payment")
-    else
-      update!(payment_status: mp_status)
+      if REVERTED_PAYMENT_STATUSES.include?(mp_status) && paid?
+        # Asunción: refund/contracargo se trata como reversión TOTAL (el modelo de
+        # negocio usa montos únicos, sin refunds parciales). Si MP habilitara
+        # refunds parciales, revisar esta lógica.
+        #
+        # BR-004: no hace falta recalcular `platform_fee` al revertir. A
+        # diferencia de `Listing`, el `amount` del certificado se captura al
+        # crearlo y no se re-captura nunca (no hay ruta que lo reescriba), así
+        # que el fee del re-pago es el mismo 10% del mismo monto.
+        update!(payment_status: mp_status, status: "pending_payment")
+      else
+        update!(payment_status: mp_status)
+      end
     end
     self
   end
@@ -151,29 +166,34 @@ class ResidenceCertificate < ApplicationRecord
   # colisión (índice único association+folio) se limpia el folio y se reintenta
   # recalculando el siguiente número libre, en vez de quedar atascado en `paid`.
   def issue!(issue_date: Date.current)
-    return self if issued?
-    raise "Cannot issue certificate ##{id}: status is #{status}, must be paid" unless paid?
-    raise "Cannot issue certificate ##{id}: junta sin RUT (no constituida legalmente, BR-120)" if neighborhood_association.rut.blank?
+    # BR-141: el lock recarga el estado antes de decidir, de modo que una
+    # reversión concurrente que devolvió el certificado a `pending_payment`
+    # aborta la emisión limpiamente en lugar de emitir un documento inválido.
+    with_lock do
+      next if issued?
+      raise "Cannot issue certificate ##{id}: status is #{status}, must be paid" unless paid?
+      raise "Cannot issue certificate ##{id}: junta sin RUT (no constituida legalmente, BR-120)" if neighborhood_association.rut.blank?
 
-    attempts = 0
-    begin
-      attempts += 1
-      transaction(requires_new: true) do
-        assign_attributes(
-          folio: folio.presence || next_folio,
-          validation_token: validation_token.presence || SecureRandom.uuid,
-          validation_code: validation_code.presence || generate_validation_code,
-          issue_date: issue_date,
-          expiration_date: issue_date + VALIDITY_PERIOD,
-          issued_at: Time.current,
-          status: "issued"
-        )
-        save!
+      attempts = 0
+      begin
+        attempts += 1
+        transaction(requires_new: true) do
+          assign_attributes(
+            folio: folio.presence || next_folio,
+            validation_token: validation_token.presence || SecureRandom.uuid,
+            validation_code: validation_code.presence || generate_validation_code,
+            issue_date: issue_date,
+            expiration_date: issue_date + VALIDITY_PERIOD,
+            issued_at: Time.current,
+            status: "issued"
+          )
+          save!
+        end
+      rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
+        raise unless folio_collision?(e) && attempts < FOLIO_MAX_ATTEMPTS
+        self.folio = nil
+        retry
       end
-    rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
-      raise unless folio_collision?(e) && attempts < FOLIO_MAX_ATTEMPTS
-      self.folio = nil
-      retry
     end
 
     self

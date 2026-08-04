@@ -34,6 +34,17 @@ module Panel
       assert_redirected_to panel_root_url
     end
 
+    # BR-148: no cobramos por un certificado que la junta no podrá emitir.
+    test "no permite pagar si la junta no tiene RUT (BR-148)" do
+      neighborhood_associations(:manios_de_buin).update_column(:rut, "")
+      sign_in @household_admin
+
+      get new_panel_payment_url(certificate_id: @certificate.id)
+
+      assert_redirected_to panel_residence_certificate_url(@certificate)
+      assert_equal "pending_payment", @certificate.reload.status
+    end
+
     test "unauthenticated is redirected from new" do
       get new_panel_payment_url(certificate_id: @certificate.id)
       assert_redirected_to new_user_session_url
@@ -128,6 +139,31 @@ module Panel
       sign_in @household_admin
       get success_panel_payments_url
       assert_response :success
+    end
+
+    # BR-002/BR-003: quien confirma el pago es el webhook, que puede no haber
+    # llegado cuando MP redirige aquí. La página debe reflejar el estado real en
+    # vez de afirmar el éxito: un certificado en `pending_payment` no está pagado.
+    test "success muestra 'procesando' mientras el webhook no confirma el pago" do
+      sign_in @household_admin
+      assert @certificate.pending_payment?
+
+      get success_panel_payments_url(external_reference: @certificate.id)
+
+      assert_response :success
+      assert_match I18n.t("panel.payments.success.title_processing"), @response.body
+      assert_no_match(/#{I18n.t("panel.payments.success.description")}/, @response.body)
+    end
+
+    test "success confirma el pago una vez que el certificado está pagado" do
+      @certificate.mark_as_paid!(payment_id: "MP-SUCCESS")
+      sign_in @household_admin
+
+      get success_panel_payments_url(external_reference: @certificate.id)
+
+      assert_response :success
+      assert_match I18n.t("panel.payments.success.description"), @response.body
+      assert_no_match(/#{I18n.t("panel.payments.success.title_processing")}/, @response.body)
     end
   end
 end

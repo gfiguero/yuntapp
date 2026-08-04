@@ -33,7 +33,6 @@ class User < ApplicationRecord
   has_one :current_onboarding_request, -> { where(status: ["draft", "pending"]) }, class_name: "OnboardingRequest"
 
   has_many :listings
-  has_many :approved_certificates, class_name: "ResidenceCertificate", foreign_key: :approved_by_id
   has_many :requested_members, class_name: "Member", foreign_key: :requested_by_id
   has_many :approved_members, class_name: "Member", foreign_key: :approved_by_id
 

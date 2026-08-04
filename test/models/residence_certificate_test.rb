@@ -111,9 +111,16 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
       neighborhood_association: @association, purpose: "nuevo", status: "paid"
     )
 
-    # Forzamos que el primer intento use el folio ya tomado; el retry debe
-    # recalcular al siguiente libre en vez de atascarse.
-    cert.folio = "CR-#{@association.id}-1"
+    # El primer cálculo devuelve el folio ya tomado (como si otro proceso lo
+    # hubiera computado a la vez); el retry debe recalcular al siguiente libre
+    # en vez de atascarse. Mismo patrón que el test de agotamiento de reintentos.
+    taken_folio = "CR-#{@association.id}-1"
+    calls = 0
+    cert.define_singleton_method(:next_folio) do
+      calls += 1
+      (calls == 1) ? taken_folio : super()
+    end
+
     assert_nothing_raised { cert.issue! }
     assert cert.issued?
     assert_not_equal taken.folio, cert.folio
@@ -140,6 +147,58 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
 
     assert_raises(ActiveRecord::RecordInvalid) { cert.issue! }
     assert cert.reload.paid?, "el certificado debe quedar en paid, no atascado a medias"
+  end
+
+  # BR-062/BR-064/BR-077: la emisión es automática; no existe aprobación de
+  # admin. `approved_by_id` era un residuo del flujo anterior que nunca se
+  # asignaba y que la vista admin mostraba siempre como "—".
+  test "el certificado no tiene aprobador: la emisión es automática (BR-077)" do
+    assert_not ResidenceCertificate.column_names.include?("approved_by_id")
+    assert_not ResidenceCertificate.new.respond_to?(:approved_by)
+  end
+
+  # BR-141: las transiciones de estado deciden sobre el estado vigente en BD, no
+  # sobre la lectura que el proceso tenía en memoria. Antes, un job que había
+  # cargado el certificado como `paid` seguía emitiéndolo aunque un webhook de
+  # contracargo ya lo hubiera devuelto a `pending_payment`.
+  test "issue! aborta si el pago fue revertido concurrentemente (BR-141)" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "trámite", status: "paid",
+      payment_id: "MP-RACE", paid_at: Time.current
+    )
+
+    # Otro proceso (webhook de refund) revierte el certificado en la BD mientras
+    # este todavía lo tiene cargado como `paid`.
+    ResidenceCertificate.where(id: cert.id)
+      .update_all(status: "pending_payment", payment_status: "refunded")
+    assert cert.paid?, "en memoria sigue viéndose como paid"
+
+    assert_raises(RuntimeError) { cert.issue! }
+    assert_not cert.reload.issued?, "no debe emitirse un certificado revertido"
+  end
+
+  # BR-004: a diferencia de `Listing` (cuyo `amount` se re-captura con el precio
+  # vigente), el monto del certificado se fija al crearlo y ninguna ruta lo
+  # reescribe. Por eso la comisión sigue siendo el 10% exacto tras un ciclo
+  # reversión → re-pago, sin necesidad de recalcularla.
+  test "la comisión sigue alineada con el monto tras revertir el pago (BR-004/BR-141)" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "trámite",
+      amount: 2000, status: "paid", payment_id: "MP-REV", paid_at: Time.current
+    )
+    assert_equal 200, cert.platform_fee
+
+    cert.apply_mp_payment_status!("refunded")
+    cert.reload
+    assert cert.pending_payment?
+
+    cert.mark_as_paid!(payment_id: "MP-REV-2")
+
+    cert.reload
+    assert_equal 2000, cert.amount
+    assert_equal 200, cert.platform_fee, "el 10% exacto del monto realmente cobrado"
   end
 
   # BR-008: issued certificates are immutable

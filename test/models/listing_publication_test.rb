@@ -21,6 +21,30 @@ class ListingPublicationTest < ActiveSupport::TestCase
     assert_not @listing.payable?
   end
 
+  # BR-004/BR-085/BR-145: el cobro recurrente es por `subscription_amount` (fijo
+  # al autorizar), pero `amount` se reescribe con el precio vigente cada vez que
+  # el usuario abre "pagar". Sin re-sincronizar, la publicación renovada quedaba
+  # registrando un 10% sobre un monto que nadie pagó.
+  test "renew_from_subscription! sincroniza el snapshot con el monto cobrado (BR-004/BR-085)" do
+    @listing.update!(subscription_amount: 1000, amount: 2000, platform_fee: 200)
+
+    @listing.renew_from_subscription!(payment_id: "MP-SUB-FEE")
+
+    @listing.reload
+    assert_equal 1000, @listing.amount, "el snapshot debe reflejar el monto realmente cobrado"
+    assert_equal 100, @listing.platform_fee, "la comisión es el 10% del monto cobrado"
+  end
+
+  test "renew_from_subscription! cae a amount si no hay snapshot de suscripción (BR-145)" do
+    @listing.update!(subscription_amount: nil, amount: 3000, platform_fee: nil)
+
+    @listing.renew_from_subscription!(payment_id: "MP-SUB-LEGACY")
+
+    @listing.reload
+    assert_equal 3000, @listing.amount
+    assert_equal 300, @listing.platform_fee
+  end
+
   test "mark_as_paid! is idempotent for same payment_id (BR-087)" do
     @listing.mark_as_paid!(payment_id: "MP-1")
     original_until = @listing.published_until

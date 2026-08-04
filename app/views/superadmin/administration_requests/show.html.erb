@@ -21,6 +21,27 @@
       <%= I18n.t("superadmin.administration_requests.warn_duplicate_run") %>
     </div>
   <% end %>
+  <%# BR-137: aprobar desactiva al socio en sus otras juntas e invalida los certificados que tenga allí. %>
+  <% if memberships_to_deactivate.any? %>
+    <div class="alert alert-warning mb-4">
+      <%= I18n.t("superadmin.administration_requests.warn_deactivates_memberships",
+                 associations: memberships_to_deactivate.map(&:name).to_sentence) %>
+    </div>
+  <% end %>
+  <%# BR-139: posible junta duplicada (mismo nombre y comuna). Advertencia, decide el staff. %>
+  <% if (duplicate = possible_duplicate_association) %>
+    <div class="alert alert-warning mb-4">
+      <%= I18n.t("superadmin.administration_requests.warn_duplicate_association", name: duplicate.name, commune: duplicate.commune&.name) %>
+    </div>
+  <% end %>
+  <%# BR-140: el cargo ya tiene titular activo; la aprobación no lo desplaza. %>
+  <% if (incumbent = position_already_taken_by) %>
+    <div class="alert alert-warning mb-4">
+      <%= I18n.t("superadmin.administration_requests.warn_position_taken",
+                 position: I18n.t("admin.board_members.positions.#{incumbent.position}"),
+                 name: incumbent.member&.name) %>
+    </div>
+  <% end %>
 
   <div class="card bg-base-100 shadow border border-base-content/5">
     <div class="card-body">

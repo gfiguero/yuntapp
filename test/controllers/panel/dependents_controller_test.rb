@@ -36,6 +36,31 @@ module Panel
       assert_response :success
     end
 
+    # BR-091/BR-099: la desactivación del socio corta el acceso operativo.
+    # `household_admin?` se apoya en la Residency, que por BR-038 no cambia al
+    # desactivar el Member, así que este gate es el único que corta: sin él, un
+    # socio dado de baja registraba dependientes y al aprobarlos el admin se le
+    # recreaba un Member(approved), deshaciendo su propia desactivación.
+    test "socio desactivado no puede ver ni registrar dependientes (BR-091/BR-099)" do
+      members(:selendis_member).deactivate!(reason: "prueba de desactivación")
+      sign_in @household_admin
+
+      get panel_dependents_url
+      assert_redirected_to panel_root_url
+
+      get new_panel_dependent_url
+      assert_redirected_to panel_root_url
+
+      assert_no_difference -> { IdentityVerificationRequest.count } do
+        post panel_dependents_url, params: {
+          identity_verification_request: {
+            first_name: "Aiur", last_name: "Daelaam", run: "88888888-8", phone: ""
+          }
+        }
+      end
+      assert_redirected_to panel_root_url
+    end
+
     # --- Create ---
 
     test "household_admin can create a pending dependent request" do

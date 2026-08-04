@@ -4,6 +4,27 @@ Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede m
 
 ## En Progreso
 
+### Batch J — Severidad Media de la auditoría profunda 2026-07-30 (worktree `fix-batch-j`)
+Como [DESARROLLADOR]: las 11 de severidad Media de `docs/2026-07-30-auditoria-profunda.md`.
+
+- [x] **J1** (BR-120/BR-148) — nada impedía solicitar ni pagar un certificado en una junta sin RUT: `issue!` abortaba después y el certificado quedaba `paid` para siempre, sin devolución (BR-063) y sin aviso. Guards en `residence_certificates#new/create` y `payments#new` + `CertificateIssuanceFailureMailer` al staff cuando `IssueCertificateJob` se rinde. **Matiz importante**: desde BR-121 `rut` es `NOT NULL` con validación de presencia, así que el escenario no es alcanzable por la app — la auditoría lo sobrevaloró. El valor real es el aviso al staff, que cubre cualquier fallo de emisión
+- [x] **J2** (BR-007) — IDOR de directiva: `member_id` viajaba por strong params sin validar pertenencia, así que un POST manipulado metía un socio de otra junta en la directiva y filtraba su nombre y RUN en las vistas (incluida la pública). Validación en `BoardMember`
+- [x] **J3** (BR-091/BR-099) — `panel/dependents` solo exigía `household_admin?`, que se apoya en la `Residency` y por BR-038 no cambia al desactivar el `Member`. Un socio dado de baja registraba dependientes y al aprobarlos recuperaba un `Member(approved)`. `ensure_active_member!`
+- [x] **J4** (BR-024/BR-044) — `admin/members#create` guardaba la `VerifiedIdentity` fuera de transacción: si el `Member` fallaba quedaba una identidad huérfana. Transacción + `status`/`requested_by` explícitos; `update` también deja de reventar con 500 ante datos inválidos
+- [x] **J5** (BR-054) — la aprobación de administración no exigía junta `active`: dejaba un admin operando una junta disuelta. `InactiveAssociationError`
+- [x] **J6** (BR-137/BR-139/BR-140) — las tres advertencias al staff existían como regla pero no en la UI. `memberships_to_deactivate`, `possible_duplicate_association` y `position_already_taken_by` en la show del staff, más el aviso al solicitante en el formulario del panel (BR-137 exige ambos)
+- [x] **J7** (BR-141) — `mark_as_paid!`/`apply_mp_payment_status!`/`issue!` leían y escribían sin serializar: un job con el certificado cargado como `paid` lo emitía aunque un contracargo ya lo hubiera revertido. `with_lock` (en SQLite el `FOR UPDATE` es no-op, pero la recarga dentro de la transacción es lo que cierra la ventana)
+- [x] **J8** (BR-004/BR-085/BR-149) — el cobro recurrente es por `subscription_amount`, pero `amount` se reescribe con el precio vigente: tras A6 la renovación pasa a aceptarse y registraba un 10% sobre un monto que nadie pagó. `renew_from_subscription!` re-sincroniza el snapshot. En certificados **no aplica**: su `amount` se fija al crear y ninguna ruta lo reescribe (el "fix" ahí era un no-op — `compute_platform_fee` lo recalcula en el mismo `save`)
+- [x] **J9** (BR-088) — cancelar la suscripción propagaba 500 si MP ya la había cancelado. Se rescata el error del SDK y el estado local se marca `cancelled` igual
+- [x] **J10** — las páginas `success` afirmaban el resultado sin mirar el estado real. Ahora distinguen "confirmado" de "procesando". Severidad real menor a la reportada: el copy anterior ya estaba matizado
+- [x] **J11** (BR-062/BR-077) — `approved_by_id` vestigial eliminado (asociación, vista, jbuilder, i18n y columna, con migración). También se quitó el i18n huérfano `verified_identity/verification_status`. La rama doc del hallazgo ya se había cerrado sola al podar CLAUDE.md en `b154ad4`
+
+**Estado: implementado, 723 tests / 1835 asserts / 0 fallos (+22 tests nuevos).**
+
+BRs nuevas: **BR-148** (precondición de RUT + aviso al staff) y **BR-149** (fee alineado al monto
+realmente cobrado). Notas de enforcement agregadas a BR-007, BR-024, BR-054, BR-077, BR-088,
+BR-091, BR-137, BR-139, BR-140 y BR-141.
+
 ### Batch I — Severidad Alta de la auditoría profunda 2026-07-30 (directo en `master`)
 Como [DESARROLLADOR]: las 8 de severidad Alta de `docs/2026-07-30-auditoria-profunda.md`.
 Trabajo directo en master por indicación del owner (sin worktree).
@@ -43,8 +64,13 @@ zeitwerk, tests locales y en contenedor) + signoff.
 
 ## Pendiente
 
-- Las **11 severidades Media** de `docs/2026-07-30-auditoria-profunda.md` (y 12 Baja + 4 BR
-  faltantes). Ningún trabajo iniciado.
+- Las **12 severidades Baja** de `docs/2026-07-30-auditoria-profunda.md`. De las 4 BR faltantes
+  del informe quedan 2: normalización de direcciones (Baja) — las otras dos son BR-143 (Batch I)
+  y BR-148/BR-149 (Batch J).
+- **Hallazgo nuevo (2026-08-02, fuera de la auditoría):** `VerifiedIdentity#normalize_phone` borra
+  todo carácter no numérico, así que un teléfono basura (`"no-es-un-telefono"`) queda como `""` y
+  la validación `phone: true, if: -> { phone.present? }` no llega a correr. El usuario cree que
+  registró un teléfono y se guarda vacío. Detectado escribiendo los tests de J4; sin remediar.
 
 ## En Review
 

@@ -7,6 +7,7 @@ module Panel
     before_action :ensure_household_admin!
     before_action :set_certificate, only: :new
     before_action :ensure_pending_payment!, only: :new
+    before_action :ensure_association_constituted!, only: :new
 
     # GET /panel/payments/new?certificate_id=X
     # Crea una preference en MercadoPago y redirige al checkout.
@@ -79,6 +80,17 @@ module Panel
     def ensure_household_admin!
       return if current_user.household_admin?
       redirect_to panel_root_path, alert: I18n.t("panel.payments.flash.not_household_admin")
+    end
+
+    # BR-148: no cobramos por un certificado que la junta no podrá emitir. El
+    # guard de solicitud (residence_certificates) ya lo bloquea antes, pero un
+    # certificado creado cuando la junta sí tenía RUT no debe poder pagarse si
+    # la junta lo perdió, y esta acción es alcanzable con el id directo.
+    def ensure_association_constituted!
+      return if @certificate.neighborhood_association&.rut.present?
+
+      redirect_to panel_residence_certificate_path(@certificate),
+        alert: I18n.t("panel.payments.flash.association_without_rut")
     end
   end
 end

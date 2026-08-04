@@ -29,10 +29,6 @@
       <dd><%= residence_certificate.notes || "—" %></dd>
     </div>
     <div class="p-2 grid gap-2">
-      <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.approved_by') %></dt>
-      <dd><%= residence_certificate.approved_by&.email || "—" %></dd>
-    </div>
-    <div class="p-2 grid gap-2">
       <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.issue_date') %></dt>
       <dd><%= residence_certificate.issue_date || "—" %></dd>
     </div>

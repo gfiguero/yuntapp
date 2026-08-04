@@ -42,25 +42,47 @@ module Admin
     end
 
     # POST /admin/members
+    #
+    # BR-024: el alta manual es atómica. Antes la `VerifiedIdentity` se guardaba
+    # primero y el `Member` después, fuera de transacción: si el Member fallaba,
+    # la identidad quedaba persistida y huérfana — una identidad verificada
+    # materializada sin socio ni verificación documental (BR-044).
+    #
+    # El socio nace `pending` y con `requested_by` para que quede registrado qué
+    # admin lo dio de alta; la aprobación sigue siendo un acto aparte (#approve),
+    # que es donde se sella `approved_by`/`approved_at`.
     def create
       run = normalize_run(verified_identity_params[:run])
       verified_identity = VerifiedIdentity.find_or_initialize_by(run: run)
       verified_identity.assign_attributes(verified_identity_params.except(:run))
       verified_identity.run = run
 
-      unless verified_identity.save
-        @member = Member.new
-        @member.errors.merge!(verified_identity.errors)
-        render :new, status: :unprocessable_content
-        return
+      @member = Member.new(
+        neighborhood_association: current_neighborhood_association,
+        status: "pending",
+        requested_by: current_user
+      )
+
+      created = false
+      ActiveRecord::Base.transaction do
+        unless verified_identity.save
+          @member.errors.merge!(verified_identity.errors)
+          raise ActiveRecord::Rollback
+        end
+
+        # Se asigna DESPUÉS de persistir: `Member` valida la presencia de
+        # `verified_identity_id`, que no existe hasta que la identidad tiene id.
+        @member.verified_identity = verified_identity
+        raise ActiveRecord::Rollback unless @member.save
+        created = true
       end
 
-      @member = Member.new(neighborhood_association: current_neighborhood_association)
-      @member.verified_identity = verified_identity
-
-      if @member.save
+      if created
         redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.created")
       else
+        # La identidad revertida conserva los atributos tipeados: se reasigna
+        # (en memoria) para que el formulario los muestre de vuelta.
+        @member.verified_identity ||= verified_identity
         render :new, status: :unprocessable_content
       end
     end
@@ -71,9 +93,25 @@ module Admin
     # correcto, para que la junta verifique la documentación de nuevo. Permitirlo
     # aquí dejaba reescribir la identidad de un socio (y de sus certificados ya
     # emitidos) sin ninguna verificación. `create` ya lo excluía; `update` no.
+    #
+    # BR-024: igual que `create`, la edición es atómica y los errores de la
+    # identidad se muestran en el formulario. Con `update!` un dato inválido
+    # (p. ej. un teléfono mal formado) reventaba con 500 en vez de un 422.
     def update
-      @member.verified_identity.update!(verified_identity_params.except(:run))
-      if @member.save
+      identity = @member.verified_identity
+
+      updated = false
+      ActiveRecord::Base.transaction do
+        unless identity.update(verified_identity_params.except(:run))
+          @member.errors.merge!(identity.errors)
+          raise ActiveRecord::Rollback
+        end
+
+        raise ActiveRecord::Rollback unless @member.save
+        updated = true
+      end
+
+      if updated
         redirect_to admin_member_path(@member), notice: I18n.t("admin.members.flash.updated"), status: :see_other
       else
         render :edit, status: :unprocessable_content

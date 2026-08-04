@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_31_174440) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_02_210000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -282,7 +282,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_174440) do
 
   create_table "residence_certificates", force: :cascade do |t|
     t.integer "amount"
-    t.integer "approved_by_id"
     t.datetime "created_at", null: false
     t.date "expiration_date"
     t.string "folio"
@@ -301,7 +300,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_174440) do
     t.datetime "updated_at", null: false
     t.string "validation_code"
     t.string "validation_token"
-    t.index ["approved_by_id"], name: "index_residence_certificates_on_approved_by_id"
     t.index ["household_unit_id"], name: "index_residence_certificates_on_household_unit_id"
     t.index ["member_id"], name: "index_residence_certificates_on_member_id"
     t.index ["neighborhood_association_id", "folio"], name: "index_residence_certificates_on_association_and_folio", unique: true
@@ -451,7 +449,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_31_174440) do
   add_foreign_key "residence_certificates", "household_units"
   add_foreign_key "residence_certificates", "members"
   add_foreign_key "residence_certificates", "neighborhood_associations"
-  add_foreign_key "residence_certificates", "users", column: "approved_by_id"
   add_foreign_key "residence_verification_requests", "communes"
   add_foreign_key "residence_verification_requests", "neighborhood_associations"
   add_foreign_key "residence_verification_requests", "neighborhood_delegations"
