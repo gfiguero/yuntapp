@@ -467,7 +467,10 @@ Rutas de onboarding: `panel/onboarding/step1..4`, con PATCH para actualizaciones
 - Ejecutar tests: `bin/rails test`
 - Ejecutar test especifico: `bin/rails test test/models/user_test.rb`
 - **System tests: `bin/rails test:system`** — `bin/rails test` NO los incluye, Rails los excluye por
-  defecto. Corren en `bin/ci` como paso propio, y solo en local: la imagen de produccion no trae Chrome.
+  defecto.
+- **System tests con production parity: `bin/system-tests-docker`** — corre la misma suite con la app
+  en la imagen de produccion y Chrome en un contenedor aparte (`compose.test.yml`). Es el unico paso
+  que ejercita los assets **precompilados**. Nunca meter Chrome en la imagen de produccion. Ver ADR-0015.
 - Los system tests se escriben **por caso de uso (UC-XXX), no por regla de negocio**. Cubren lo que vive
   en el cliente y ningun controller test alcanza: selects en cascada por Turbo Stream, autosave de
   Stimulus, botones que el servidor habilita. Las reglas de negocio se prueban en el nivel que les

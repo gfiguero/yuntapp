@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# System tests contra la imagen de producción, con el navegador en un contenedor
+# aparte. Ver compose.test.yml y test/application_system_test_case.rb.
+#
+# Uso:
+#   bin/system-tests-docker            # construye la imagen y corre la suite
+#   SKIP_BUILD=1 bin/system-tests-docker   # reutiliza yuntapp-ci ya construida
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+COMPOSE_FILE="compose.test.yml"
+
+cleanup() {
+  docker compose -f "$COMPOSE_FILE" down --remove-orphans --volumes >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+if [ -z "${SKIP_BUILD:-}" ]; then
+  echo "==> Construyendo la imagen de producción (yuntapp-ci)"
+  docker build --platform linux/amd64 -t yuntapp-ci .
+fi
+
+echo "==> Levantando Chrome y corriendo los system tests contra la imagen de producción"
+docker compose -f "$COMPOSE_FILE" run --rm app

@@ -4,6 +4,53 @@ Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede m
 
 ## En Progreso
 
+### Suite de system tests por caso de uso + production parity (worktree `test-system-suite`)
+Como [TESTER]: tras el piloto (PR #157), el owner aprobó la estrategia y pidió montar el modo
+contenedor y cubrir todos los casos. Decisión documentada en **ADR-0015**.
+
+**Modo producción (la "opción D")**: `compose.test.yml` + `bin/system-tests-docker`. La app corre en la
+imagen desplegable sin modificar y Chrome vive aparte. Verificado empíricamente que
+`asset_path("application.js")` devuelve el **mismo digest** en `RAILS_ENV=test` dentro del contenedor
+que en producción — o sea que este modo sí ejercita el JS/CSS precompilados, que era el hueco que
+motivaba todo. Chrome nunca entra a la imagen de producción.
+
+**Cobertura de casos de uso**:
+
+| UC | Test | Estado |
+|---|---|---|
+| UC-001 Registro | `registration_test.rb` | ✅ |
+| UC-002 Onboarding | `onboarding_test.rb` | ✅ (PR #157) |
+| UC-003 Solicitud de certificado | `residence_certificate_request_test.rb` | ✅ |
+| UC-004 Pago | — | **No aplica**: el núcleo es el webhook de MP, sin UI |
+| UC-005 Emisión automática | — | **No aplica**: es un job, el actor es el sistema |
+| UC-006 Descarga | `residence_certificate_download_test.rb` | ✅ hasta el enlace |
+| UC-007 Verificación pública | `certificate_verification_test.rb` | ✅ |
+| UC-008 Onboarding de admin | `administration_request_test.rb` | ✅ pasos 1-6 |
+
+**Costo real: 7 system tests en 14.3s**, muy por debajo de los 50-60s extrapolados en el piloto — el
+arranque de Chrome se amortiza entre tests del mismo run (~1.5s marginal, no ~10s).
+
+**Trampas encontradas, para quien escriba el siguiente**:
+1. **Nunca consultar la base justo después de un `click_button`.** Con Turbo el submit es asíncrono y
+   se lee una transacción que no cerró. Costó un falso negativo en UC-008. La señal correcta es el
+   flash, la navegación o que un botón se habilite.
+2. **`docker compose run` no resuelve el alias del servicio** desde el otro contenedor
+   (`ERR_NAME_NOT_RESOLVED`): el test case detecta la IP del contenedor en runtime.
+3. **Devise usa `deliver_later` y en test el adapter es `TestAdapter`**, así que `deliveries` queda
+   vacío y el mailer correría en el thread de Puma. UC-001 lee el `confirmation_token` de la base.
+4. `karass` tiene una `AdministrationRequest` pending en fixtures — para UC-008 hay que usar `rohana`.
+
+**Defecto encontrado de paso y corregido**: un RUT inválido mostraba
+**"Translation missing: es.…invalid_rut_check_digit"** en pantalla al usuario final. Al buscar el
+alcance real resultaron ser **seis** claves faltantes, no una: `AdministrationRequest#organization_rut`
+y `#run`, y `NeighborhoodAssociation#rut`, tanto en formato como en dígito verificador.
+
+Causa: `es.yml` repetía las traducciones de `RunValidator` bajo `models:` para solo dos modelos, así
+que cualquier otro que usara el validador filtraba el error crudo. Se movieron al fallback global
+`es.errors.messages`, que cubre los modelos actuales y los futuros. Se agrega
+`test/models/rut_error_messages_test.rb` como guard, verificado por mutación (al quitar la clave, falla
+con el mensaje sin traducir).
+
 ### System test piloto de UC-002 (worktree `test-onboarding-system`)
 Como [TESTER]: el owner planteó "un caso de uso por cada regla de negocio, y un system test por cada
 uno". Se acordó pilotear **uno** primero para medir el costo real antes de comprometerse a la estrategia.

@@ -22,6 +22,7 @@ Hasta el 2026-08-02 convivían dos conjuntos de ADRs con numeraciones que colisi
 | [0012](0012-onboarding-multi-paso-con-session-y-turbo-streams.md) | Onboarding multi-paso con session y Turbo Streams | Aceptado |
 | [0013](0013-identidad-verificada-separada-de-usuario.md) | Identidad verificada como modelo separado del usuario | Aceptado (actualizado 2026-08-02) |
 | [0014](0014-transferencia-de-identidad-por-run-duplicado.md) | Servicio compartido de detección de RUN duplicado y transferencia de identidad | Aceptado (implementado) |
+| [0015](0015-system-tests-por-caso-de-uso.md) | System tests por caso de uso, con production parity | Aceptado |
 
 ## Cómo agregar un ADR
 
