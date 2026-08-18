@@ -72,6 +72,17 @@ zeitwerk, tests locales y en contenedor) + signoff.
   la validación `phone: true, if: -> { phone.present? }` no llega a correr. El usuario cree que
   registró un teléfono y se guarda vacío. Detectado escribiendo los tests de J4; sin remediar.
 
+### Bump de seguridad previo al deploy de Batch J (worktree `chore-bump-gems-seguridad`) — 2026-08-18
+Como [DESARROLLADOR]: `bin/ci` sobre master (`46803d8`) falló en `Security: Gem audit` y
+`Security: Brakeman`, así que no hubo signoff y el deploy de Batch J quedó bloqueado. Ambos fallos
+son **preexistentes y ajenos a Batch J**. Resueltos subiendo `sqlite3` 2.9.5→2.9.6 (CVE real de la
+BD de producción), `json` 2.21.1→2.21.2 (transitiva) y `brakeman` 8.0.5→8.0.6 (solo destraba el
+exit 5 "no es la última versión"; Brakeman reporta **0 hallazgos** en el código).
+
+**Aprendizaje operacional:** el squash merge crea un commit nuevo en master que **no hereda el
+signoff** de la rama. Por eso hay que correr `bin/ci` sobre master antes de cada deploy, no solo
+antes del merge.
+
 ## En Review
 
 <!-- Tareas con PR abierto esperando revision -->
