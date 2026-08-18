@@ -4,6 +4,40 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
 
 ---
 
+## System test piloto de UC-002 (onboarding en Chrome headless)
+
+- **Autor**: [TESTER]
+- **Fecha**: 2026-08-18
+- **Branch**: `worktree-test-onboarding-system`
+- **Archivos modificados**:
+  - `test/system/onboarding_test.rb` — nuevo, el primer system test del proyecto
+  - `config/ci.rb` — paso `Tests: system (Chrome headless)`
+  - `CLAUDE.md` — sección Tests
+- **Descripción**: Piloto para medir el costo real de un system test antes de decidir la estrategia
+  completa. La infraestructura ya existía sin usar: `test/application_system_test_case.rb` está
+  configurado con `headless_chrome` desde siempre y `test/system/` estaba vacío.
+- **Tests**: `bin/rails test` 723 runs / 0 fallos (sin cambios). `bin/rails test:system` 1 run /
+  26 assertions / 0 fallos en 9.6s. `standardrb` limpio (345 archivos).
+- **Review**: Pendiente
+- **Puntos que merecen ojo del reviewer**:
+  - **El test se validó por mutación, no solo por pasar en verde.** Pasó a la primera, lo que no prueba
+    nada, así que se rompió el código a propósito dos veces: (a) quitar
+    `identity_verification_request&.update!(status: "pending")` de `submit!` → falla en la aserción de
+    BR-017; (b) dejar el select de comuna `disabled: true` → falla esperando el cascading. Ambas
+    revertidas. La segunda es el argumento entero del piloto: es un bug que solo un browser ve.
+  - **`bin/rails test` no incluye system tests.** Rails los excluye por defecto. Sin el paso nuevo en
+    `config/ci.rb` el test existiría sin correr nunca. Vale la pena que alguien más confirme que el
+    paso quedó donde corresponde.
+  - **Los system tests no corren en el contenedor** — la imagen de producción no trae Chrome. O sea
+    que este nivel de test no tiene production parity, a diferencia del resto de la suite.
+  - **El test espera señales del servidor, no `sleep`.** El autosave tiene 2s de debounce; en vez de
+    dormir, se espera a que el botón "Continuar" se habilite, que es el turbo_stream confirmando que
+    el paso quedó guardado. Si aparece flakiness, ese es el primer lugar donde mirar.
+  - **Depende de fixtures con datos aleatorios**: los nombres de `neighborhood_delegations` se generan
+    con `sample`/`rand`, así que el test lee el nombre en runtime en vez de hardcodearlo.
+
+---
+
 ## Cops Rails vía `standard-rails` (plugin de Standard, no un segundo linter)
 
 - **Autor**: [DESARROLLADOR]

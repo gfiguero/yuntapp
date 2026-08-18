@@ -4,6 +4,42 @@ Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede m
 
 ## En Progreso
 
+### System test piloto de UC-002 (worktree `test-onboarding-system`)
+Como [TESTER]: el owner planteó "un caso de uso por cada regla de negocio, y un system test por cada
+uno". Se acordó pilotear **uno** primero para medir el costo real antes de comprometerse a la estrategia.
+
+Por qué UC-002 y no otro: es el flujo con más lógica de cliente sin cobertura — selects en cascada por
+Turbo Stream, `autosave_controller` con 2s de debounce, `manual_address_controller`,
+`terms_acceptance_controller`. Nada de eso lo toca un controller test.
+
+- [x] `test/system/onboarding_test.rb` — recorre los 4 pasos en Chrome headless y verifica la
+      postcondición del UC-002 más BR-013, BR-015, BR-017, BR-019, BR-020
+- [x] Verificado por **mutación**, no solo porque pasa: se rompió BR-017 en `OnboardingRequest#submit!`
+      (falla en la línea 45, `Expected "pending", Actual "draft"`) y se rompió el cascading dejando el
+      select de comuna `disabled: true` (falla en la línea 78). Ambas mutaciones revertidas
+- [x] `config/ci.rb` gana el paso `Tests: system (Chrome headless)`
+
+**Números medidos** (el dato que motivaba el piloto):
+
+| | |
+|---|---|
+| Este system test | **9.6s** (26 assertions) |
+| System test trivial (piso de arranque Puma + Chrome) | 3.8s |
+| Suite actual sin system tests | 24.5s / 723 tests |
+| Cobertura del solo UC-002 | 731 / 3570 líneas (20.5%) |
+
+**Extrapolación**: los 8 UC ≈ **50-60s** añadidos al CI. Asumible. Los 132 BR a este costo serían
+~20 min, que era el argumento para no hacer un system test por regla.
+
+**Hallazgos que cambian el plan**:
+1. `bin/rails test` **no corre system tests** — Rails los excluye por defecto. Estuvieron invisibles
+   hasta que se agregó el paso explícito. Cualquiera que escriba uno sin tocar `config/ci.rb` cree
+   tener cobertura que no corre.
+2. **No pueden correr en el contenedor**: la imagen de producción no trae Chrome ni debe traerlo. El
+   paso queda solo en local, así que los system tests no tienen production parity.
+3. `parallelize` sigue comentado en `test_helper.rb:46`. Con 8 UC no molesta; si esto creciera, hay que
+   revisar por qué se desactivó.
+
 ### Cops Rails vía `standard-rails` (worktree `refactor-standard-rails`)
 Como [DESARROLLADOR]: el owner pidió aprovechar las ventajas de escribir código Rails-way. La opción
 obvia era volver a `rubocop-rails-omakase`, el preset oficial de Rails — se descartó porque reabre el

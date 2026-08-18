@@ -25,6 +25,11 @@ CI.run do
   # --- Tests locales (rápidos, fallan temprano antes del build Docker) ---
   step "Tests: Rails (local)", "bin/rails test"
 
+  # `bin/rails test` NO incluye los system tests: Rails los excluye por defecto y
+  # hay que invocarlos aparte. Corren solo aquí, nunca en el contenedor — la
+  # imagen de producción no trae Chrome ni tiene por qué traerlo.
+  step "Tests: system (Chrome headless)", "bin/rails test:system"
+
   # --- Production parity: build de la imagen de producción y tests DENTRO
   # del contenedor. Atrapa gaps entre el entorno local y producción (versión
   # de Ruby, gemas nativas, librerías de sistema como libvips) ANTES del deploy.
