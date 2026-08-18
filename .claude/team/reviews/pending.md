@@ -4,6 +4,41 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
 
 ---
 
+## Suite de system tests por caso de uso + production parity (ADR-0015)
+
+- **Autor**: [TESTER]
+- **Fecha**: 2026-08-18
+- **Branch**: `worktree-test-system-suite`
+- **Archivos nuevos**:
+  - `compose.test.yml`, `bin/system-tests-docker` — el modo con production parity
+  - `test/system/registration_test.rb` (UC-001), `residence_certificate_request_test.rb` (UC-003),
+    `residence_certificate_download_test.rb` (UC-006), `certificate_verification_test.rb` (UC-007),
+    `administration_request_test.rb` (UC-008)
+  - `doc/adr/0015-system-tests-por-caso-de-uso.md`
+- **Modificados**: `test/application_system_test_case.rb` (dos modos), `config/ci.rb` (dos pasos),
+  `CLAUDE.md`, `doc/adr/README.md`
+- **Tests**: `bin/rails test` 723 / 0 fallos. `bin/rails test:system` **7 runs / 75 assertions / 0
+  fallos en 14.3s**. `standardrb` limpio (350 archivos).
+- **Review**: Pendiente
+- **Puntos que merecen ojo del reviewer**:
+  - **UC-004 y UC-005 no tienen system test, a propósito.** El núcleo de ambos es un webhook y un job:
+    no hay navegador que los recorra. Si el reviewer cree que igual deberían existir, es una discusión
+    de ADR-0015, no de este PR.
+  - **UC-006 llega hasta el enlace de descarga, no descarga el archivo.** Verificar el binario exigiría
+    configurar el directorio de descargas de Chrome; el `send_data` ya está cubierto en el controller
+    test. La frontera está escrita en el propio test.
+  - **La detección de IP del contenedor** (`Socket.ip_address_list`) es la parte más frágil del
+    montaje. Fue necesaria porque `docker compose run` no resuelve el alias `app` desde el contenedor
+    de Chrome. Si alguien cambia a `docker compose up`, esto se puede simplificar.
+  - **El CI ahora corre los system tests dos veces** (local y contra la imagen). Es deliberado: el
+    local falla temprano, antes del build Docker, siguiendo la filosofía que ya declaraba `config/ci.rb`.
+    Si el tiempo molesta, lo primero que yo quitaría es la pasada local, no la de parity.
+  - **Defecto encontrado y NO corregido**: un RUT de organización con DV inválido muestra
+    `Translation missing: es.…invalid_rut_check_digit` al usuario. Falta la clave en `es.yml`. Queda
+    fuera de este PR por alcance, pero es visible en producción.
+
+---
+
 ## System test piloto de UC-002 (onboarding en Chrome headless)
 
 - **Autor**: [TESTER]

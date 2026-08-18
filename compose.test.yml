@@ -1,0 +1,41 @@
+# System tests con production parity.
+#
+# `app` corre la imagen de producción SIN modificar — el mismo artefacto que
+# despliega Kamal, con sus assets precompilados. El navegador vive aparte, en
+# `chrome`, para no contaminar la imagen desplegable.
+#
+# Se levanta con `bin/system-tests-docker`, que construye `yuntapp-ci` primero.
+name: yuntapp-system-tests
+
+services:
+  chrome:
+    image: selenium/standalone-chromium:latest
+    # Chrome se cae con "session deleted because of page crash" si /dev/shm es
+    # el default de 64MB.
+    shm_size: 2gb
+    environment:
+      SE_NODE_MAX_SESSIONS: "1"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/status"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  app:
+    image: yuntapp-ci
+    depends_on:
+      chrome:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: test
+      SELENIUM_REMOTE_URL: http://chrome:4444
+      CAPYBARA_SERVER_PORT: "3001"
+      # TEST_APP_HOSTNAME se deja sin definir a propósito: el test case detecta
+      # la IP del contenedor. El alias `app` no resuelve desde el contenedor de
+      # Chrome cuando se usa `docker compose run`.
+    tmpfs:
+      # El contenedor corre como uid 1000 y /rails es de root; SimpleCov necesita
+      # un directorio de cobertura escribible o revienta en at_exit.
+      - /rails/coverage:uid=1000
+      - /rails/tmp:uid=1000
+    command: bin/rails db:test:prepare test:system
