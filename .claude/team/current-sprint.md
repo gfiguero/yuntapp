@@ -98,6 +98,22 @@ exit 5 "no es la última versión"; Brakeman reporta **0 hallazgos** en el códi
 signoff** de la rama. Por eso hay que correr `bin/ci` sobre master antes de cada deploy, no solo
 antes del merge.
 
+### Actualización de gemas al día (worktree `chore-actualizar-gemas`) — 2026-08-18
+Como [DESARROLLADOR]: pedido de "Ruby 4.0.6 + último Rails + todas las gemas al día".
+
+**Ruby y Rails ya estaban en la última**: Ruby 4.0.6 desde el PR #81 (`.ruby-version`, intérprete y
+`ARG RUBY_VERSION` del Dockerfile coinciden; es lo último que ofrece rbenv) y Rails 8.1.3.1,
+publicada el 2026-07-29. No hubo nada que migrar ahí.
+
+El trabajo real fueron las 19 gemas desactualizadas: **16 subieron**, incluidas `mercadopago-sdk`
+3.2.1→3.4.0, `resend` 1.6.0→1.9.0 y `solid_queue` 1.5.1→1.6.0. **3 quedan retenidas** por
+restricciones de sus propias dependencias, no por nuestro Gemfile: `bigdecimal` (ttfunk→Prawn exige
+`~> 3.1`; forzar 4.x rompería el PDF de certificados), `rubocop` y `rubocop-performance` (Standard
+los pinea a propósito). Forzarlas sería pasar por encima de la compatibilidad declarada.
+
+Cierra los 8 PRs de Dependabot abiertos. Detalle de la verificación manual del SDK de MercadoPago
+y del schema de solid_queue en `reviews/pending.md`.
+
 ## En Review
 
 <!-- Tareas con PR abierto esperando revision -->
