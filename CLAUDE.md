@@ -462,10 +462,17 @@ Rutas de onboarding: `panel/onboarding/step1..4`, con PATCH para actualizaciones
 
 ### Tests
 - Minitest con fixtures YAML.
-- Tests de modelos y controladores.
+- Tests de modelos, controladores y system tests (Capybara + Chrome headless).
 - SimpleCov para cobertura de codigo.
 - Ejecutar tests: `bin/rails test`
 - Ejecutar test especifico: `bin/rails test test/models/user_test.rb`
+- **System tests: `bin/rails test:system`** — `bin/rails test` NO los incluye, Rails los excluye por
+  defecto. Corren en `bin/ci` como paso propio, y solo en local: la imagen de produccion no trae Chrome.
+- Los system tests se escriben **por caso de uso (UC-XXX), no por regla de negocio**. Cubren lo que vive
+  en el cliente y ningun controller test alcanza: selects en cascada por Turbo Stream, autosave de
+  Stimulus, botones que el servidor habilita. Las reglas de negocio se prueban en el nivel que les
+  corresponde — modelo para invariantes y normalizacion, controller para autorizacion y multi-tenant
+  (un POST manipulado no se reproduce con clicks).
 
 ## Idioma
 
