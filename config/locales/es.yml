@@ -260,6 +260,12 @@ es:
         record_invalid: "La validación falló: %{errors}"
         restrict_dependent_destroy:
           has_one: "No se puede eliminar el registro porque existe un %{record} dependiente"
+        # Fallback global de RunValidator. Sin esto, cualquier modelo que use el
+        # validador y no repita las claves bajo `models:` muestra
+        # "Translation missing: es.…" en pantalla al usuario. Pasaba en
+        # AdministrationRequest (organization_rut y run) y NeighborhoodAssociation#rut.
+        invalid_rut_format: no tiene un formato de RUT válido
+        invalid_rut_check_digit: tiene un dígito verificador incorrecto
       models:
         identity_verification_request:
           attributes:

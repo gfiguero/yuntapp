@@ -40,9 +40,16 @@ arranque de Chrome se amortiza entre tests del mismo run (~1.5s marginal, no ~10
    vacío y el mailer correría en el thread de Puma. UC-001 lee el `confirmation_token` de la base.
 4. `karass` tiene una `AdministrationRequest` pending en fixtures — para UC-008 hay que usar `rohana`.
 
-**Defecto encontrado de paso (NO corregido, fuera de alcance)**: un RUT de organización con dígito
-verificador inválido muestra **"Translation missing: es.…invalid_rut_check_digit"** en pantalla. Falta
-la clave en `es.yml`. Es visible para el usuario final.
+**Defecto encontrado de paso y corregido**: un RUT inválido mostraba
+**"Translation missing: es.…invalid_rut_check_digit"** en pantalla al usuario final. Al buscar el
+alcance real resultaron ser **seis** claves faltantes, no una: `AdministrationRequest#organization_rut`
+y `#run`, y `NeighborhoodAssociation#rut`, tanto en formato como en dígito verificador.
+
+Causa: `es.yml` repetía las traducciones de `RunValidator` bajo `models:` para solo dos modelos, así
+que cualquier otro que usara el validador filtraba el error crudo. Se movieron al fallback global
+`es.errors.messages`, que cubre los modelos actuales y los futuros. Se agrega
+`test/models/rut_error_messages_test.rb` como guard, verificado por mutación (al quitar la clave, falla
+con el mensaje sin traducir).
 
 ### System test piloto de UC-002 (worktree `test-onboarding-system`)
 Como [TESTER]: el owner planteó "un caso de uso por cada regla de negocio, y un system test por cada

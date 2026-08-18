@@ -33,9 +33,13 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
   - **El CI ahora corre los system tests dos veces** (local y contra la imagen). Es deliberado: el
     local falla temprano, antes del build Docker, siguiendo la filosofía que ya declaraba `config/ci.rb`.
     Si el tiempo molesta, lo primero que yo quitaría es la pasada local, no la de parity.
-  - **Defecto encontrado y NO corregido**: un RUT de organización con DV inválido muestra
-    `Translation missing: es.…invalid_rut_check_digit` al usuario. Falta la clave en `es.yml`. Queda
-    fuera de este PR por alcance, pero es visible en producción.
+  - **Fix de i18n incluido**: un RUT inválido mostraba `Translation missing: es.…` al usuario final.
+    Al medir el alcance resultaron **seis** claves faltantes, no una (`AdministrationRequest#organization_rut`,
+    `#run` y `NeighborhoodAssociation#rut`, en formato y dígito verificador). Se resolvió moviendo las
+    traducciones de `RunValidator` al fallback global `es.errors.messages` en vez de seguir
+    duplicándolas por modelo, más `test/models/rut_error_messages_test.rb` como guard.
+    **Nota para el reviewer**: `en.yml` no tiene ninguna de estas claves. No se tocó porque el locale
+    por defecto es `es` y ampliar a `en` excede este PR, pero queda anotado.
 
 ---
 
