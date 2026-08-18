@@ -25,6 +25,21 @@ BRs nuevas: **BR-148** (precondición de RUT + aviso al staff) y **BR-149** (fee
 realmente cobrado). Notas de enforcement agregadas a BR-007, BR-024, BR-054, BR-077, BR-088,
 BR-091, BR-137, BR-139, BR-140 y BR-141.
 
+**DESPLEGADO A PRODUCCIÓN el 2026-08-18** — imagen `53855ed`, que incluye Batch J (`46803d8`, PR
+#142) más el bump de gems de seguridad (PR #154). La migración `20260802210000`
+(`RemoveApprovedByFromResidenceCertificates`) se aplicó sola en el boot (`migrated (0.3063s)`).
+Post-deploy verificado: `/up` 200, columna `approved_by_id` ausente, cero excepciones en la ventana
+del deploy, `/verify/<code>` 200 y `/verify/<inexistente>` 404, datos intactos (7 certificados,
+6 emitidos, 20 socios, 1 junta).
+
+**Riesgo que se corrió y no se materializó:** el `remove_reference` de `approved_by_id` no es
+backwards-compatible. Kamal migra al bootear el contenedor nuevo y recién después hace el swap del
+proxy, así que hubo una ventana de segundos donde el contenedor viejo —que todavía tenía
+`belongs_to :approved_by` y su schema cache en memoria— sirvió tráfico contra un schema sin la
+columna. Un `INSERT` en `residence_certificates` en esa ventana habría dado 500. No ocurrió (cero
+excepciones en los logs), pero **la próxima vez que se elimine una columna conviene el patrón de
+dos fases**: primero desplegar con `ignored_columns`, después la migración que la borra.
+
 ### Batch I — Severidad Alta de la auditoría profunda 2026-07-30 (directo en `master`)
 Como [DESARROLLADOR]: las 8 de severidad Alta de `docs/2026-07-30-auditoria-profunda.md`.
 Trabajo directo en master por indicación del owner (sin worktree).

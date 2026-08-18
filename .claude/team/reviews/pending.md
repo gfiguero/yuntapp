@@ -25,7 +25,7 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
     última versión") y **cero hallazgos de seguridad en el código**. Gem de desarrollo, no viaja a
     producción; se sube solo para destrabar el paso del CI.
 - **Tests**: Pasando — 723 runs / 1835 asserts / 0 fallos, sin cambios respecto de master.
-- **Review**: Pendiente
+- **Review**: Mergeado como PR #154 (`53855ed`) y desplegado a producción el 2026-08-18
 - **Puntos que merecen ojo del reviewer**:
   - `bundle update --conservative` acotado a las tres gems: el diff del lock son 10 líneas, todas
     de versión. No arrastra nada más.
