@@ -4,6 +4,36 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
 
 ---
 
+## Bump de seguridad: sqlite3 2.9.6 · json 2.21.2 · brakeman 8.0.6
+
+- **Autor**: [DESARROLLADOR]
+- **Fecha**: 2026-08-18
+- **Branch**: `worktree-chore-bump-gems-seguridad`
+- **Issue relacionado**: bloqueaba el deploy de Batch J (`bin/ci` sin signoff)
+- **Archivos modificados**:
+  - `Gemfile.lock`
+- **Descripción**: al preparar el deploy de Batch J, `bin/ci` falló en dos pasos de seguridad. Los
+  fallos son **preexistentes en master y ajenos a Batch J** (el diff `014340e..46803d8` no toca
+  `Gemfile` ni `Gemfile.lock`); aparecieron porque salieron advisories nuevos desde la última
+  corrida. Este PR los resuelve para poder desplegar con el gate limpio:
+  - `sqlite3` 2.9.5 → 2.9.6 — GHSA-mwm8-39rw-8826, use-after-free en argumentos de agregación.
+    Es la BD de producción. Explotación requiere funciones de agregación custom, que Rails no usa,
+    pero es el driver de la base y no hay razón para quedarse atrás.
+  - `json` 2.21.1 → 2.21.2 — GHSA-9hj4-r449-hfvc en `JSON::ResumableParser#partial_value`. API
+    opt-in que la app no usa; es dependencia transitiva.
+  - `brakeman` 8.0.5 → 8.0.6 — **no es una vulnerabilidad**. Brakeman salía con exit 5 ("no es la
+    última versión") y **cero hallazgos de seguridad en el código**. Gem de desarrollo, no viaja a
+    producción; se sube solo para destrabar el paso del CI.
+- **Tests**: Pasando — 723 runs / 1835 asserts / 0 fallos, sin cambios respecto de master.
+- **Review**: Pendiente
+- **Puntos que merecen ojo del reviewer**:
+  - `bundle update --conservative` acotado a las tres gems: el diff del lock son 10 líneas, todas
+    de versión. No arrastra nada más.
+  - Supersede los PRs de Dependabot #148 (sqlite3) y #151 (brakeman), que quedan por cerrar. El
+    bump de `json` no tenía PR de Dependabot por ser transitivo.
+
+---
+
 ## Batch J: las 11 severidades Media de la auditoría profunda 2026-07-30
 
 - **Autor**: [DESARROLLADOR]
