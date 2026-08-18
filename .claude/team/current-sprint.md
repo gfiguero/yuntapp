@@ -23,7 +23,15 @@ misma config, mismo paso de CI, cero churn de formato.
 - [x] ADR-0011 revisado con la comparación omakase vs `standard-rails` y las exclusiones
 
 **Estado: implementado, 723 tests / 1835 asserts / 0 fallos — idéntico al baseline de master.**
-`standardrb`, `erb_lint`, `zeitwerk:check` y Brakeman en verde.
+`bin/ci` completo en verde (3m45s), incluido el paso de production parity que corre la suite dentro
+de la imagen Docker de producción. PR #156, firmado con `gh signoff`.
+
+**Aprendizaje de plumbing**: `gh signoff` falla con `@{push} does not resolve` si la rama se pusheó
+con la URL SSH explícita en vez de `origin`. El remote del repo es HTTPS y no hay credential helper
+configurado, así que `git push origin` pide usuario y falla en entornos no interactivos. Arreglo sin
+tocar el remote: `git fetch git@github.com:gfiguero/yuntapp.git <rama>:refs/remotes/origin/<rama>` y
+después `git branch --set-upstream-to=origin/<rama>`. La solución de raíz sería `gh auth setup-git`
+o pasar el remote a SSH — pendiente de decisión del owner.
 
 ### Batch J — Severidad Media de la auditoría profunda 2026-07-30 (worktree `fix-batch-j`)
 Como [DESARROLLADOR]: las 11 de severidad Media de `docs/2026-07-30-auditoria-profunda.md`.

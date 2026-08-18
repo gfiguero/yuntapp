@@ -41,8 +41,9 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
     endpoints públicos que heredan de `ActionController::Base` a propósito porque
     `ApplicationController` exige `authenticate_user!` (BR-009 verificación pública, BR-072 webhook de
     MP), y el `update` que Devise define en la superclase. Cada una está comentada en `.standard.yml`.
-  - **No se corrió `bin/ci` completo** (el build Docker + tests en contenedor). Los pasos rápidos están
-    todos en verde; falta el paso de production parity antes del `gh signoff`.
+  - **`bin/ci` completo en verde** (3m45s), incluido el paso de production parity: los 723 tests
+    corren también **dentro de la imagen Docker de producción**, 0 fallos. `gh signoff` firmado sobre
+    `5cb3363`; el PR queda `MERGEABLE` / `CLEAN`.
 
 ---
 
