@@ -22,7 +22,7 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
   - `rubocop` 1.88.2 (última 1.89.0) ← `standard 1.56.0` exige `rubocop (~> 1.88.0)`.
   - `rubocop-performance` 1.26.1 (última 1.27.0) ← `standard-performance 1.9.0` exige `~> 1.26.0`.
 - **Tests**: Pasando — 723 runs / 1835 asserts / 0 fallos, sin cambios respecto de master.
-- **Review**: Pendiente
+- **Review**: Mergeado como PR #155 (`e0090c0`) y desplegado a producción el 2026-08-18
 - **Puntos que merecen ojo del reviewer**:
   - **`mercadopago-sdk` 3.2.1 → 3.4.0 es el cambio de mayor riesgo** y los tests lo mockean, así
     que no lo cubren de verdad. Verificado a mano contra el código de la gem: 3.4.0 envuelve las

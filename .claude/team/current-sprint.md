@@ -114,6 +114,15 @@ los pinea a propósito). Forzarlas sería pasar por encima de la compatibilidad 
 Cierra los 8 PRs de Dependabot abiertos. Detalle de la verificación manual del SDK de MercadoPago
 y del schema de solid_queue en `reviews/pending.md`.
 
+**DESPLEGADO A PRODUCCIÓN el 2026-08-18** — imagen `e0090c0` (PR #155), desde `53855ed`. Deploy sin
+migraciones ni cambios de schema: solo `Gemfile.lock` y docs, así que no hubo ventana de
+incompatibilidad. Post-deploy verificado en el contenedor: Ruby 4.0.6 · Rails 8.1.3.1 ·
+mercadopago-sdk 3.4.0 (los 5 recursos que usamos responden, `RequestOptions` conserva
+`custom_headers` y `MPResponse < Hash` es `true`) · resend 1.9.0 con `delivery_method: resend`
+registrado · solid_queue 1.6.0 con Supervisor/Dispatcher/Worker/Scheduler arriba y el worker ya en
+el `pool_type: :thread` nuevo · sqlite3 2.9.6 · rack 3.2.7. Cero excepciones en los logs, `/up` 200,
+`/verify/<code>` 200 y `/verify/<inexistente>` 404, datos intactos (7 certs / 20 socios / 1 junta).
+
 ## En Review
 
 <!-- Tareas con PR abierto esperando revision -->
