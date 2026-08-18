@@ -17,7 +17,7 @@ Run all code quality checks for the yuntapp Rails project. Maximize parallelism 
 
 **Group 1 — Run in parallel:**
 
-1. **StandardRB**: `bundle exec standardrb` (Ruby Standard style — includes RuboCop rules)
+1. **StandardRB**: `bundle exec standardrb` (Ruby Standard style + cops Rails vía el plugin `standard-rails` — ver ADR-0011)
 2. **ERB Lint**: `bundle exec erb_lint --lint-all` (ERB template lint)
 3. **Routes**: `bin/rails routes` (verify routes compile without errors)
 4. **Brakeman**: `bundle exec brakeman --no-pager -q` (static security analysis for Rails)

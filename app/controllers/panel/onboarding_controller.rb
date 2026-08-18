@@ -554,14 +554,14 @@ module Panel
     def ensure_step1!
       onboarding_request_id = session.dig(:onboarding, "onboarding_request_id")
 
-      unless onboarding_request_id.present?
+      if onboarding_request_id.blank?
         redirect_to panel_onboarding_step1_path, alert: "Debes completar el paso 1 primero."
         return
       end
 
       onboarding_request = OnboardingRequest.find_by(id: onboarding_request_id)
 
-      unless onboarding_request&.neighborhood_association_id.present?
+      if onboarding_request&.neighborhood_association_id.blank?
         redirect_to panel_onboarding_step1_path, alert: "Debes seleccionar una asociación vecinal para continuar."
       end
     end
@@ -569,19 +569,19 @@ module Panel
     def ensure_step2!
       onboarding_request = OnboardingRequest.find_by(id: session.dig(:onboarding, "onboarding_request_id"))
 
-      unless onboarding_request&.identity_verification_request.present?
+      if onboarding_request&.identity_verification_request.blank?
         redirect_to panel_onboarding_step2_path, alert: "Debes completar el paso de identidad primero."
       end
     end
 
     def ensure_step3!
       # Debe haber completado step 2 (Identidad) -> identity_request_id en sesión
-      redirect_to panel_onboarding_step2_path unless session.dig(:onboarding, "identity_request_id").present?
+      redirect_to panel_onboarding_step2_path if session.dig(:onboarding, "identity_request_id").blank?
     end
 
     def ensure_step4!
       # Debe haber completado step 3 (Residencia) -> residence_request_id en sesión
-      redirect_to panel_onboarding_step3_path unless session.dig(:onboarding, "residence_request_id").present?
+      redirect_to panel_onboarding_step3_path if session.dig(:onboarding, "residence_request_id").blank?
     end
 
     def normalize_run(value)

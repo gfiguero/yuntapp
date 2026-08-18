@@ -4,6 +4,27 @@ Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede m
 
 ## En Progreso
 
+### Cops Rails vía `standard-rails` (worktree `refactor-standard-rails`)
+Como [DESARROLLADOR]: el owner pidió aprovechar las ventajas de escribir código Rails-way. La opción
+obvia era volver a `rubocop-rails-omakase`, el preset oficial de Rails — se descartó porque reabre el
+conflicto de espaciado que cerró ADR-0011 el 2026-06-29 (`{ a: 1 }` vs `{a: 1}`), reformatearía 232
+líneas en 294 archivos sin cambio funcional y obligaría a reescribir `config/ci.rb`, `bin/standardrb`
+y la skill `/check-code`.
+
+Se adopta `standard-rails`, que es un **plugin de Standard**, no un segundo linter: mismo ejecutable,
+misma config, mismo paso de CI, cero churn de formato.
+
+- [x] `gem "standard-rails"` + `plugins: [standard-rails]` en `.standard.yml`
+- [x] 41 ofensas corregidas en 37 archivos (`Rails/CompactBlank` ×22, `Rails/Blank` ×10, `Rails/Pluck` ×4,
+      `Rails/RedundantPresenceValidationOnBelongsTo` ×2, `Rails/RootPathnameMethods` ×2, `Rails/FindEach` ×1)
+- [x] 5 ofensas descartadas por falso positivo o decisión deliberada, documentadas con motivo en
+      `.standard.yml` y en la tabla del ADR (migraciones históricas, `puts` de seeds, los dos endpoints
+      públicos que heredan de `ActionController::Base`, y el `update` que Devise define en la superclase)
+- [x] ADR-0011 revisado con la comparación omakase vs `standard-rails` y las exclusiones
+
+**Estado: implementado, 723 tests / 1835 asserts / 0 fallos — idéntico al baseline de master.**
+`standardrb`, `erb_lint`, `zeitwerk:check` y Brakeman en verde.
+
 ### Batch J — Severidad Media de la auditoría profunda 2026-07-30 (worktree `fix-batch-j`)
 Como [DESARROLLADOR]: las 11 de severidad Media de `docs/2026-07-30-auditoria-profunda.md`.
 

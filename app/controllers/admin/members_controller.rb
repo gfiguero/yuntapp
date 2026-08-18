@@ -177,7 +177,7 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :name, :run, :status).reject { |key, value| value.blank? }
+      params.permit(:id, :name, :run, :status).compact_blank
     end
 
     def disabled_pagination

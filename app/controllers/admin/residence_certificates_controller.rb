@@ -54,7 +54,7 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :status, :folio).reject { |key, value| value.blank? }
+      params.permit(:id, :status, :folio).compact_blank
     end
 
     def disabled_pagination

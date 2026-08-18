@@ -102,7 +102,7 @@ module Panel
     end
 
     def filter_params
-      params.permit(:id, :name, :price, :description, :active).reject { |key, value| value.blank? }
+      params.permit(:id, :name, :price, :description, :active).compact_blank
     end
 
     def disabled_pagination

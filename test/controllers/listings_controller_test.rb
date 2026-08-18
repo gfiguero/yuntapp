@@ -46,7 +46,7 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
     get listings_url(format: :json)
     assert_response :success
 
-    ids = JSON.parse(response.body).map { |listing| listing["id"] }
+    ids = JSON.parse(response.body).pluck("id")
     assert_includes ids, @listing.id
     assert_not_includes ids, unpaid.id
   end
@@ -72,7 +72,7 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
 
     get listings_url(format: :json)
     assert_response :success
-    assert_not_includes JSON.parse(response.body).map { |l| l["id"] }, @listing.id
+    assert_not_includes JSON.parse(response.body).pluck("id"), @listing.id
   end
 
   # BR-100: una publicación retirada (active: false) conserva su registro pero
@@ -82,14 +82,14 @@ class ListingsControllerTest < ActionDispatch::IntegrationTest
 
     get listings_url(format: :json)
     assert_response :success
-    assert_not_includes JSON.parse(response.body).map { |l| l["id"] }, @listing.id
+    assert_not_includes JSON.parse(response.body).pluck("id"), @listing.id
   end
 
   test "items=all bypass does not leak unpaid publications (BR-083)" do
     get listings_url(format: :json), params: {items: "all"}
     assert_response :success
 
-    ids = JSON.parse(response.body).map { |listing| listing["id"] }
+    ids = JSON.parse(response.body).pluck("id")
     assert_equal [@listing.id], ids
   end
 end

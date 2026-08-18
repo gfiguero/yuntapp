@@ -95,7 +95,7 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :position, :active).reject { |key, value| value.blank? }
+      params.permit(:id, :position, :active).compact_blank
     end
 
     def disabled_pagination

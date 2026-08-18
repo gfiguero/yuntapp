@@ -97,13 +97,13 @@ class AdministrationRequest < ApplicationRecord
   end
 
   def normalize_run_field
-    return unless run.present?
+    return if run.blank?
     self.run = run.to_s.gsub(/[.\-\s]/, "").upcase
     self.run = "#{run[0..-2]}-#{run[-1]}" if run.match?(/\A\d{7,8}[0-9K]\z/)
   end
 
   def normalize_rut_field
-    return unless organization_rut.present?
+    return if organization_rut.blank?
     self.organization_rut = organization_rut.to_s.gsub(/[.\-\s]/, "").upcase
     self.organization_rut = "#{organization_rut[0..-2]}-#{organization_rut[-1]}" if organization_rut.match?(/\A\d{7,8}[0-9K]\z/)
   end

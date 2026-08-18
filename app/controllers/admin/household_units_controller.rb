@@ -84,7 +84,7 @@ module Admin
     end
 
     def filter_params
-      params.permit(:id, :number, :neighborhood_delegation_id).reject { |key, value| value.blank? }
+      params.permit(:id, :number, :neighborhood_delegation_id).compact_blank
     end
 
     def disabled_pagination

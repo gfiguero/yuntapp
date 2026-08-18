@@ -73,6 +73,9 @@ group :development, :test do
   # Ruby style guide and linter (replaces rubocop-rails-omakase as the single source of truth)
   gem "standard", ">= 1.35.1", require: false
 
+  # Rails-specific cops (rubocop-rails) served through Standard — ver doc/adr/0011
+  gem "standard-rails", require: false
+
   gem "simplecov"
   gem "erb_lint", require: false
 end

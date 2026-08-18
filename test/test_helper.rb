@@ -60,7 +60,7 @@ module ActiveSupport
       next unless fixture_file.exist?
 
       service_root = Rails.root.join("tmp/storage")
-      ActiveStorage::Blob.all.each do |blob|
+      ActiveStorage::Blob.all.find_each do |blob|
         path = service_root.join(blob.key)
         next if path.exist?
 
