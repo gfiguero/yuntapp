@@ -4,6 +4,48 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
 
 ---
 
+## Actualización de gemas: 16 al día, 3 retenidas por sus dependencias
+
+- **Autor**: [DESARROLLADOR]
+- **Fecha**: 2026-08-18
+- **Branch**: `worktree-chore-actualizar-gemas`
+- **Issue relacionado**: cierra los 8 PRs de Dependabot abiertos (#143, #144, #145, #147, #149, #150, #152, #153)
+- **Archivos modificados**:
+  - `Gemfile.lock`
+- **Descripción**: `bundle update` completo. **Ruby y Rails ya estaban en la última**: Ruby 4.0.6
+  (`.ruby-version`, intérprete y `ARG RUBY_VERSION` del Dockerfile ya coincidían desde el PR #81) y
+  Rails 8.1.3.1 (publicada 2026-07-29, la restricción `~> 8.1` no bloqueaba nada). El trabajo real
+  fueron las 19 gemas desactualizadas: 16 subieron, 3 quedan retenidas por restricciones legítimas
+  de sus propias dependencias, no por nuestro Gemfile:
+  - `bigdecimal` 3.3.1 (última 4.1.2) ← `ttfunk 1.8.0` exige `bigdecimal (~> 3.1)`. ttfunk es
+    dependencia de Prawn, el generador del PDF de certificados. Forzar 4.x rompería la emisión.
+  - `rubocop` 1.88.2 (última 1.89.0) ← `standard 1.56.0` exige `rubocop (~> 1.88.0)`.
+  - `rubocop-performance` 1.26.1 (última 1.27.0) ← `standard-performance 1.9.0` exige `~> 1.26.0`.
+- **Tests**: Pasando — 723 runs / 1835 asserts / 0 fallos, sin cambios respecto de master.
+- **Review**: Pendiente
+- **Puntos que merecen ojo del reviewer**:
+  - **`mercadopago-sdk` 3.2.1 → 3.4.0 es el cambio de mayor riesgo** y los tests lo mockean, así
+    que no lo cubren de verdad. Verificado a mano contra el código de la gem: 3.4.0 envuelve las
+    respuestas en `MPResponse`, pero es `MPResponse < Hash` y la propia gem lo documenta como
+    "backward-compatible Hash wrapper" — `response[:response]`, que es lo único que usa
+    `MercadopagoService`, sigue funcionando. Las excepciones tipadas nuevas (`MercadoPagoError` y
+    subtipos) son **opt-in** vía `raise_for_status!`, que no llamamos, así que el manejo de errores
+    no cambia. `RequestOptions.new(custom_headers:)` intacto (importa: es el vehículo del
+    `x-idempotency-key` estable de #126). Los 5 recursos que usamos —`preference`, `preapproval`,
+    `payment`, `invoice`, `merchant_order`— siguen existiendo. Todo lo demás del diff es aditivo
+    (`search`, `capture`, paginación, tuning de reintentos).
+  - **`solid_queue` 1.5.1 → 1.6.0 no requiere migración.** Comparé `db/queue_schema.rb` contra el
+    template de la gem 1.6.0: mismas 11 tablas y mismos índices; solo difieren en espacios dentro
+    de los corchetes (formato de Standard en nuestra copia). Los cambios de 1.6.0 son internos
+    (`fiber_pool.rb`/`thread_pool.rb` nuevos, `pool.rb`/`worker.rb`/`configuration.rb`). El
+    post-install message sobre breaking changes aplica a upgrades desde <1.0, no al nuestro.
+  - **`resend` 1.6.0 → 1.9.0**: solo se ejercita en producción (`delivery_method = :resend`), así
+    que ningún test lo cubre. Verificado que el railtie sigue registrando `add_delivery_method
+    :resend, Resend::Mailer` y que `Resend::Mailer` no cambió. El diff está en automations,
+    broadcasts y suppressions — APIs que no usamos.
+
+---
+
 ## Bump de seguridad: sqlite3 2.9.6 · json 2.21.2 · brakeman 8.0.6
 
 - **Autor**: [DESARROLLADOR]
