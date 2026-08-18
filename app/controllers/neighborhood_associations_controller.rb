@@ -48,7 +48,7 @@ class NeighborhoodAssociationsController < ApplicationController
   end
 
   def filter_params
-    params.permit(:id, :name).reject { |key, value| value.blank? }
+    params.permit(:id, :name).compact_blank
   end
 
   def disabled_pagination

@@ -57,7 +57,7 @@ class ListingsController < ApplicationController
   end
 
   def filter_params
-    params.permit(:id, :name, :price, :description, :active, :user_id).reject { |key, value| value.blank? }
+    params.permit(:id, :name, :price, :description, :active, :user_id).compact_blank
   end
 
   def disabled_pagination

@@ -1,7 +1,35 @@
 fix: true
 format: "progress"
+
+# Cops de rubocop-rails servidas a través de Standard (ADR-0011).
+# Standard sigue siendo el linter único: standard-rails es un plugin suyo,
+# no un segundo linter con reglas de estilo propias.
+plugins:
+  - standard-rails
+
 ignore:
   - 'config/**/*'
   - 'bin/**/*'
   - 'node_modules/**/*'
   - 'vendor/**/*'
+
+  # Migraciones ya aplicadas en producción: son historia inmutable, no se reescriben.
+  - 'db/migrate/**/*':
+      - Rails/CreateTableWithTimestamps
+
+  # El feedback de progreso de las seeds va a stdout a propósito.
+  - 'db/seeds.rb':
+      - Rails/Output
+
+  # Endpoints públicos que heredan de ActionController::Base a propósito:
+  # ApplicationController exige authenticate_user! globalmente y estos dos no
+  # deben pasar por Devise (verificación pública BR-009, webhook de MercadoPago BR-072).
+  - 'app/controllers/verifications_controller.rb':
+      - Rails/ApplicationController
+  - 'app/controllers/webhooks/mercadopago_controller.rb':
+      - Rails/ApplicationController
+
+  # `update` lo define Devise::RegistrationsController en la superclase;
+  # el cop solo mira el cuerpo léxico de la clase y no lo ve.
+  - 'app/controllers/users/registrations_controller.rb':
+      - Rails/LexicallyScopedActionFilter

@@ -11,7 +11,6 @@ class Member < ApplicationRecord
   has_many :board_members, dependent: :restrict_with_error
   has_many :residence_certificates, dependent: :restrict_with_error
 
-  validates :verified_identity_id, presence: true
   validates :status, presence: true, inclusion: {in: STATUSES}
   validates :deactivation_reason, presence: true, if: -> { inactive? }
 

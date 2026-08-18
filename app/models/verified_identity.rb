@@ -33,7 +33,7 @@ class VerifiedIdentity < ApplicationRecord
   private
 
   def normalize_run_field
-    return unless run.present?
+    return if run.blank?
     self.run = run.to_s.gsub(/[.\-\s]/, "").upcase
     # Insertar guión antes del dígito verificador: 12345678K → 12345678-K
     self.run = "#{run[0..-2]}-#{run[-1]}" if run.match?(/\A\d{7,8}[0-9K]\z/)

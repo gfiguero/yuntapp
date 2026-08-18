@@ -4,6 +4,49 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
 
 ---
 
+## Cops Rails vía `standard-rails` (plugin de Standard, no un segundo linter)
+
+- **Autor**: [DESARROLLADOR]
+- **Fecha**: 2026-08-18
+- **Branch**: `worktree-refactor-standard-rails`
+- **Archivos modificados**:
+  - `Gemfile`, `Gemfile.lock` — `standard-rails` 1.6.0 (trae `rubocop-rails` 2.34.3)
+  - `.standard.yml` — `plugins:` + 5 exclusiones con su motivo
+  - 33 archivos de `app/`, `lib/` y `test/` — las correcciones automáticas
+  - `doc/adr/0011-linting-standard-erb-brakeman.md` — revisión 2026-08-18
+  - `CLAUDE.md`, `.claude/skills/check-code/SKILL.md`
+- **Descripción**: El pedido era escribir más código Rails-way. El camino evidente —volver a
+  `rubocop-rails-omakase`, el preset oficial de Rails— se midió y se descartó: reabre el conflicto de
+  espaciado que cerró ADR-0011 (`Layout/SpaceInsideHashLiteralBraces`, omakase exige `{ a: 1 }` y
+  Standard `{a: 1}`), reformatea **232 líneas en 294 archivos** sin un solo cambio de comportamiento y
+  obliga a tocar `config/ci.rb`, `bin/standardrb` y la skill `/check-code`. `standard-rails` es un
+  plugin de Standard: un solo ejecutable, una sola config, un solo paso de CI, cero churn de formato.
+- **Tests**: Pasando — 723 runs / 1835 asserts / 0 fallos. **Idéntico al baseline de master**, medido
+  antes y después del autofix. `standardrb` limpio (344 archivos), `erb_lint` limpio (332 archivos),
+  `zeitwerk:check` OK, Brakeman 0 warnings.
+- **Review**: Pendiente
+- **Puntos que merecen ojo del reviewer**:
+  - **Las 41 correcciones son `--fix-unsafely`**, no autofix seguro. RuboCop marca estas cops como
+    unsafe porque no puede probar equivalencia semántica (p. ej. `Rails/CompactBlank` asume que el
+    receptor responde a `blank?`). Se revisó el diff completo a mano y se corrió la suite antes y
+    después; aun así es el punto que más merece una segunda lectura.
+  - **`Rails/RedundantPresenceValidationOnBelongsTo` en `Member` y `Residency`** es el único cambio con
+    efecto observable posible: quitar `validates :verified_identity_id, presence: true` mueve el error
+    de validación del atributo `:verified_identity_id` al `:verified_identity`. `belongs_to` no es
+    `optional` en ninguno de los dos, así que la validación se mantiene; lo que cambia es la clave del
+    mensaje. Se verificó que ningún test ni i18n cuelga de `verified_identity_id`, pero si alguna vista
+    renderiza errores por atributo, conviene mirarla.
+  - **Las 5 exclusiones son decisiones, no ruido silenciado**: migraciones ya aplicadas
+    (`Rails/CreateTableWithTimestamps`), el `puts` intencional de seeds (`Rails/Output`), los dos
+    endpoints públicos que heredan de `ActionController::Base` a propósito porque
+    `ApplicationController` exige `authenticate_user!` (BR-009 verificación pública, BR-072 webhook de
+    MP), y el `update` que Devise define en la superclase. Cada una está comentada en `.standard.yml`.
+  - **`bin/ci` completo en verde** (3m45s), incluido el paso de production parity: los 723 tests
+    corren también **dentro de la imagen Docker de producción**, 0 fallos. `gh signoff` firmado sobre
+    `5cb3363`; el PR queda `MERGEABLE` / `CLEAN`.
+
+---
+
 ## Actualización de gemas: 16 al día, 3 retenidas por sus dependencias
 
 - **Autor**: [DESARROLLADOR]

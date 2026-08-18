@@ -55,7 +55,7 @@ module Superadmin
     end
 
     def filter_params
-      params.permit(:id, :status, :user_id, :first_name, :last_name, :run).reject { |key, value| value.blank? }
+      params.permit(:id, :status, :user_id, :first_name, :last_name, :run).compact_blank
     end
 
     def disabled_pagination

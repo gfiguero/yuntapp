@@ -57,7 +57,7 @@ class NeighborhoodAssociation < ApplicationRecord
 
   # Mismo patrón que VerifiedIdentity#normalize_run_field.
   def normalize_rut
-    return unless rut.present?
+    return if rut.blank?
     self.rut = rut.to_s.gsub(/[.\-\s]/, "").upcase
     self.rut = "#{rut[0..-2]}-#{rut[-1]}" if rut.match?(/\A\d{7,8}[0-9K]\z/)
   end

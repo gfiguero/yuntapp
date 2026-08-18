@@ -1,4 +1,4 @@
-Dir[Rails.root.join("lib/scripts/*.rb")].each { |file| require file }
+Rails.root.glob("lib/scripts/*.rb").each { |file| require file }
 
 namespace :yuntapp do
   desc "Generate scaffolds for yuntapp project"

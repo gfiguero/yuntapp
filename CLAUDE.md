@@ -382,6 +382,38 @@ Claude Code debe agregar una fila a esta tabla cada vez que descubra o acuerde u
 
 ---
 
+## Stack Tecnologico
+
+> Versiones verificadas contra `.ruby-version` y `Gemfile.lock` el 2026-08-18. Actualizar esta tabla al subir dependencias mayores.
+
+| Componente | Version | Nota |
+|---|---|---|
+| Ruby | 4.0.6 | Fijada en `.ruby-version` |
+| Rails | 8.1.3.1 | |
+| Bundler | 2.6.9 | `BUNDLED WITH` en `Gemfile.lock` |
+| SQLite3 | 2.9.6 | Base de datos en `storage/` |
+| Devise | 5.0.4 | Autenticacion |
+| Pagy | 43.6.1 | Paginacion |
+| Propshaft | 1.3.2 | Asset pipeline |
+| Importmap Rails | 2.2.3 | Sin bundler JS (no hay `package.json`) |
+| Tailwind CSS Rails | 4.6.0 | Tailwind v4 |
+| DaisyUI | plugin local | `app/assets/tailwind/daisyui.mjs` |
+| Solid Queue | 1.6.0 | Background jobs |
+| Solid Cache | 1.0.10 | Cache |
+| Solid Cable | 4.0.2 | WebSockets |
+| Kamal | 2.12.0 | Deploy con Docker |
+| Thruster | 0.1.25 | Aceleracion HTTP |
+| Minitest | 6.0.6 | Tests con fixtures YAML |
+| SimpleCov | 1.1.1 | Cobertura |
+| Standard | 1.56.0 | Linting Ruby — linter unico (ADR-0011) |
+| standard-rails | 1.6.0 | Plugin de Standard: cops de `rubocop-rails` 2.34.3. No es un segundo linter |
+| ERB Lint | 0.9.0 | Linting de vistas |
+| Brakeman | 8.0.6 | Analisis de seguridad |
+
+**Frontend**: Hotwire (Turbo + Stimulus), Tailwind CSS v4, DaisyUI. Sin Webpack ni esbuild.
+
+---
+
 ## Arquitectura de la Aplicacion
 
 ### Tres Niveles de Acceso
