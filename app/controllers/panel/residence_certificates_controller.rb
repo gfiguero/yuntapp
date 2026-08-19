@@ -62,11 +62,13 @@ module Panel
         return
       end
 
-      # Fuente única de "residente actual": el mismo current_residencies que ofrece
-      # el selector (selectable_residencies). Un id que no corresponda a un residente
-      # vigente resuelve a member nil y el save falla con error de validación.
+      # Fuente única de titulares válidos: exactamente la misma lista que ofrece el
+      # selector. Antes esto releía `current_residencies` por su cuenta, sin el filtro
+      # por núcleo familiar, así que un `member_id` manipulado emitía un certificado a
+      # nombre de un conviviente de otro `FamilyGroup` (BR-041). Un id que no esté en
+      # la lista resuelve a member nil y el save falla con error de validación.
       submitted_id = params[:residence_certificate][:member_id].to_i
-      residency = current_user.household_unit.current_residencies.find { |r| r.id == submitted_id }
+      residency = selectable_residencies.find { |r| r.id == submitted_id }
       member = residency&.verified_identity&.members&.approved&.find_by(neighborhood_association: certificate_association)
 
       @residence_certificate = ResidenceCertificate.new(
@@ -126,11 +128,23 @@ module Panel
       @certificate_association ||= current_user.household_unit.neighborhood_delegation.neighborhood_association
     end
 
-    # Solo residentes del domicilio con Member aprobado en la junta pueden ser
-    # titulares de un certificado (excluye dependientes desactivados — BR-037).
+    # Titulares posibles de un certificado: los residentes del **núcleo familiar**
+    # del solicitante con Member aprobado en la junta (excluye dependientes
+    # desactivados — BR-037).
+    #
+    # BR-041/BR-098: el filtro por `family_group` es de seguridad, no cosmético.
+    # Un `HouseholdUnit` es una dirección física y puede alojar varias familias sin
+    # relación entre sí (BR-040). Sin este filtro, el jefe de un núcleo veía el RUN
+    # de los otros convivientes y podía emitir certificados oficiales a su nombre.
+    # Es la única fuente de titulares válidos: `create` la reusa para que un
+    # `member_id` manipulado no eluda el filtro del selector.
     def selectable_residencies
+      family_group = current_user.family_group
+      return [] if family_group.blank?
+
       current_user.household_unit.current_residencies.select do |residency|
-        residency.verified_identity.members.approved.exists?(neighborhood_association: certificate_association)
+        residency.family_group_id == family_group.id &&
+          residency.verified_identity.members.approved.exists?(neighborhood_association: certificate_association)
       end
     end
   end
