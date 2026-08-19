@@ -280,6 +280,61 @@ module Panel
 
     private
 
+    # --- BR-041/BR-098: aislamiento entre núcleos familiares del mismo domicilio ---
+
+    test "el selector no ofrece residentes de otro núcleo familiar del mismo domicilio" do
+      vecino = residente_de_otro_nucleo
+
+      sign_in @household_admin
+      get new_panel_residence_certificate_url
+      assert_response :success
+
+      # El selector muestra el nombre del residente, no su RUN.
+      assert_no_match vecino.name, @response.body,
+        "BR-041: un residente de otro núcleo familiar no debe aparecer en el selector"
+      assert_match @member.name, @response.body,
+        "el residente del propio núcleo sí debe ofrecerse"
+    end
+
+    test "un POST manipulado no puede emitir a nombre de otro núcleo familiar" do
+      vecino = residente_de_otro_nucleo
+      residency_ajena = Residency.find_by(verified_identity: vecino)
+
+      sign_in @household_admin
+
+      assert_no_difference -> { ResidenceCertificate.count } do
+        post panel_residence_certificates_url, params: {
+          residence_certificate: {member_id: residency_ajena.id, purpose: "trámite bancario"}
+        }
+      end
+
+      assert_response :unprocessable_content
+    end
+
+    # Segundo núcleo familiar en la MISMA dirección física (BR-040): otra familia
+    # que convive, con su propio household_admin y su Member aprobado en la junta.
+    def residente_de_otro_nucleo
+      household = household_units(:selendis_household)
+      otro_grupo = FamilyGroup.create!(household_unit: household)
+
+      identidad = VerifiedIdentity.create!(
+        first_name: "Zeratul", last_name: "Nerazim",
+        run: "9876543-3", phone: "+56911112233", email: "zeratul@shakuras.io"
+      )
+      Member.create!(verified_identity: identidad, neighborhood_association: @association,
+        status: "approved", approved_at: Time.current)
+      Residency.create!(
+        verified_identity: identidad,
+        verified_residence: @residency.verified_residence,
+        household_unit: household,
+        family_group: otro_grupo,
+        household_admin: true,
+        status: "approved"
+      )
+
+      identidad
+    end
+
     def issued_cert(expiration: Date.current + 30.days)
       ResidenceCertificate.create!(
         member: @member,

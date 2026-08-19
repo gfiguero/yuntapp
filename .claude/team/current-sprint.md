@@ -4,6 +4,42 @@ Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede m
 
 ## En Progreso
 
+### Aislamiento entre núcleos familiares + saneo de reglas de ámbito (worktree `fix-aislamiento-nucleo-familiar`)
+Como [DESARROLLADOR]: salió de una revisión de casos borde sobre las 132 reglas de negocio.
+
+**El hallazgo.** `Panel::ResidenceCertificatesController` ofrecía como titulares a **todos** los
+residentes del `HouseholdUnit`, sin filtrar por `FamilyGroup`. Como un `HouseholdUnit` es una dirección
+física que puede alojar varias familias sin relación (BR-040), el jefe de un núcleo veía los nombres de
+los convivientes de otro núcleo y —lo grave— **podía emitirles un certificado de residencia oficial**.
+Verificado con test antes del fix: el POST manipulado creaba el certificado (`count` +1).
+
+**No era un bug contra la regla, era un choque de reglas.** BR-098 documentaba textualmente
+"`selectable_residencies` ofrece todo residente del `household_unit`", contradiciendo a BR-041. El
+código seguía a BR-098. Se resolvió como decisión de producto del owner: **gana el aislamiento**, porque
+el propósito declarado de BR-098 —que un jefe de hogar gestione el certificado de su adulto mayor o
+familiar dependiente— se cumple íntegro dentro del núcleo.
+
+**Fix**: `selectable_residencies` filtra por `family_group` y pasa a ser la **única** fuente de
+titulares; `create` la reusa en vez de releer `current_residencies` por su cuenta (era el segundo
+vector: el filtro del selector no cubría un `member_id` manipulado).
+
+**Causa raíz de la discrepancia**: BR-040/BR-041 partieron en dos un concepto que antes era uno
+(domicilio == núcleo familiar). Las reglas escritas antes quedaron con el ámbito viejo. Saneo aplicado:
+
+| Regla | Acción |
+|---|---|
+| BR-021 | `[RETIRADA]` → **BR-150**: el `household_admin` se determina por vía de entrada (onboarding propio vs registro como dependiente), no por orden de llegada |
+| BR-032 | `[RETIRADA]` → **BR-151**: un usuario con login por **núcleo**, no por domicilio |
+| BR-022, BR-034, BR-035 | Ámbito precisado a `FamilyGroup`; contenido intacto |
+| BR-098 | Corregida: "de su domicilio" → "de su `FamilyGroup`", y la descripción de la implementación actualizada |
+| BR-041 | Nota de enforcement con los dos controladores que lo aplican |
+
+**Estado: 727 tests / 1883 asserts / 0 fallos** (+2 nuevos, ambos verificados en rojo antes del fix).
+
+**Pendientes detectados en la misma revisión, NO abordados aquí**: BR-135 (el branch `no_price` de
+certificados no tiene test; el de listings sí), BR-134 (guard `redirect_if_active_request` sin test),
+BR-016 (reset en cascada región/comuna sin cobertura), BR-061 y BR-132 (bajo riesgo).
+
 ### Suite de system tests por caso de uso + production parity (worktree `test-system-suite`)
 Como [TESTER]: tras el piloto (PR #157), el owner aprobó la estrategia y pidió montar el modo
 contenedor y cubrir todos los casos. Decisión documentada en **ADR-0015**.

@@ -4,6 +4,36 @@ Este archivo rastrea los PRs pendientes de revision. El Desarrollador crea entra
 
 ---
 
+## Aislamiento entre núcleos familiares en certificados (BR-041) + saneo de reglas de ámbito
+
+- **Autor**: [DESARROLLADOR]
+- **Fecha**: 2026-08-19
+- **Branch**: `worktree-fix-aislamiento-nucleo-familiar`
+- **Archivos modificados**:
+  - `app/controllers/panel/residence_certificates_controller.rb` — filtro por `family_group` y fuente única
+  - `test/controllers/panel/residence_certificates_controller_test.rb` — 2 tests nuevos
+  - `CLAUDE.md` — BR-021 y BR-032 retiradas, BR-150/BR-151 nuevas, BR-022/034/035/041/098 corregidas
+- **Tests**: 727 runs / 1883 asserts / 0 fallos. `standardrb` limpio (351 archivos).
+- **Review**: Pendiente
+- **Puntos que merecen ojo del reviewer**:
+  - **Los dos tests se vieron fallar antes del fix.** El del POST manipulado fallaba con
+    `ResidenceCertificate.count didn't change by 0, but by 1` — o sea que la emisión cruzada era real,
+    no teórica.
+  - **Eran dos vectores, no uno.** Filtrar solo `selectable_residencies` habría dejado abierto el
+    `create`, que releía `current_residencies` por su cuenta. Su comentario ya afirmaba ser "la misma
+    fuente que el selector" sin serlo; ahora lo es de verdad.
+  - **La decisión de fondo fue del owner**, no técnica: BR-041 (aislar) vs BR-098 (alcance por
+    domicilio) estaban en conflicto explícito y ambas vigentes. Si el reviewer discrepa, la discusión
+    es sobre la regla, no sobre el código.
+  - **Impacto en datos existentes: ninguno.** El filtro solo restringe lo que se ofrece; no toca
+    certificados ya emitidos. Vale la pena revisar en producción si algún certificado vigente fue
+    emitido cruzando núcleos —hoy improbable, porque hacen falta dos `FamilyGroup` en una dirección.
+  - **`current_residencies` sigue sin filtrar por núcleo** y es correcto que así sea: su docstring
+    advierte que no se use para autorización. El filtro vive en el llamador. Si aparece un tercer
+    consumidor, conviene revisar que también lo aplique.
+
+---
+
 ## Suite de system tests por caso de uso + production parity (ADR-0015)
 
 - **Autor**: [TESTER]
