@@ -27,8 +27,30 @@ Este archivo contiene todas las tareas pendientes de implementar. El Arquitecto 
 - [ ] TASK-009: Seeds en prod: `db:seed` (geografía) y `demo:seed` (junta demo)
 - [ ] TASK-010: Prueba de humo Resend en producción
 - [ ] TASK-011: Sandbox → producción en credenciales MP (tras validar flujo)
+- [ ] TASK-019: **Verificar en producción si existió algún domicilio con más de un `FamilyGroup`** antes del fix de aislamiento (PR #159, BR-041). Requiere las llaves SSH del servidor —no estaban en el equipo donde salió el hallazgo—, así que quedó pendiente para correrlo desde la máquina que las tiene. Es una consulta de **solo lectura**:
+
+  ```
+  bin/kamal app exec -i -r web "bin/rails console"
+  ```
+  ```ruby
+  multi = HouseholdUnit.joins(:family_groups)
+    .group("household_units.id").having("COUNT(family_groups.id) > 1").count.keys
+  puts "Domicilios con más de un núcleo familiar: #{multi.size}"
+  multi.each do |hu_id|
+    ResidenceCertificate.where(household_unit_id: hu_id).find_each do |c|
+      fg = Residency.find_by(verified_identity_id: c.member.verified_identity_id,
+        household_unit_id: hu_id, status: "approved")&.family_group_id
+      puts "#{c.folio} | #{c.status} | titular: #{c.member.name} | núcleo ##{fg}"
+    end
+  end
+  ```
+
+  **Si el primer número es 0, el tema queda cerrado**: sin dos núcleos en una dirección, ninguna emisión pudo cruzarse. Es el resultado esperado (producción tiene ~20 socios en una junta, y hace falta que dos personas distintas completen onboarding en la misma dirección).
+
+  **Límite conocido**: si da distinto de 0, el listado **no prueba** que hubo emisión cruzada. `ResidenceCertificate` no guarda quién solicitó —solo `member`, `household_unit` y `neighborhood_association`— y ambos jefes de hogar tienen cuenta, así que cada uno pudo pedir el suyo legítimamente. Habría que revisarlo caso por caso con contexto humano. Ver TASK-020.
 
 ### Prioridad 5 — Features faltantes (P1, P2, P4)
+- [ ] TASK-020: **Registrar quién solicita cada certificado** (`requested_by_id` en `residence_certificates`, poblado en `Panel::ResidenceCertificatesController#create`). Hoy el certificado solo guarda al **titular**, así que no hay forma de auditar quién lo pidió. Con BR-098 permitiendo solicitar a nombre de terceros, esa trazabilidad tiene valor propio: es lo que impidió responder TASK-019 de forma concluyente. Migración pequeña; **propuesta abierta, sin decisión del owner todavía**
 - [ ] TASK-012: Disolución de juntas: campo `active`, `NeighborhoodAssociation#deactivate!` con cascada, UI superadmin, retirar destroy físico (BR-054/055)
 - [ ] TASK-013: Duplicar solicitud de onboarding rechazada/cancelada — acción/ruta `duplicate` que clona OR/IVR/RVR a un nuevo `draft` (BR-048/BR-049; BR-047 ya OK)
 - [ ] TASK-014: Vista solo-lectura de otros `FamilyGroup` del mismo `HouseholdUnit` (BR-042)
