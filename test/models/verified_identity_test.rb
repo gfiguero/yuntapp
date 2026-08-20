@@ -124,4 +124,51 @@ class VerifiedIdentityTest < ActiveSupport::TestCase
     assert_equal "Juan Carlos", persona.first_name
     assert_equal "Pérez", persona.last_name
   end
+
+  # --- Phone normalization (BR-013) ---
+
+  test "normalizes phone starting with 9 to +56 prefix" do
+    persona = verified_identities(:karass_persona)
+    persona.phone = "987654321"
+    persona.valid?
+    assert_equal "+56987654321", persona.phone
+  end
+
+  test "normalizes phone stripping non-numeric characters" do
+    persona = verified_identities(:karass_persona)
+    persona.phone = "+56 9 8765 4321"
+    persona.valid?
+    assert_equal "+56987654321", persona.phone
+  end
+
+  # Regresion TASK-021: la limpieza dejaba "" ante una entrada sin digitos, y como
+  # la validacion corre solo `if: -> { phone.present? }`, nunca llegaba a fallar:
+  # el telefono basura se guardaba vacio y el usuario creia haberlo registrado.
+  test "keeps unrecognizable phone instead of blanking it" do
+    persona = verified_identities(:karass_persona)
+    persona.phone = "no-es-un-telefono"
+    persona.valid?
+    assert_equal "no-es-un-telefono", persona.phone
+  end
+
+  test "rejects unrecognizable phone" do
+    persona = verified_identities(:karass_persona)
+    persona.phone = "no-es-un-telefono"
+    assert_not persona.valid?
+    assert persona.errors[:phone].any?
+  end
+
+  test "does not persist an unrecognizable phone as blank" do
+    persona = verified_identities(:karass_persona)
+    assert_raises(ActiveRecord::RecordInvalid) do
+      persona.update!(phone: "telefono")
+    end
+  end
+
+  test "keeps a digitless phone unchanged so validation can reject it" do
+    persona = verified_identities(:karass_persona)
+    persona.phone = "(sin telefono)"
+    assert_not persona.valid?
+    assert_equal "(sin telefono)", persona.phone
+  end
 end

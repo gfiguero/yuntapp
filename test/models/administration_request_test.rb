@@ -81,4 +81,12 @@ class AdministrationRequestTest < ActiveSupport::TestCase
     r.cancel!
     assert r.cancelled?
   end
+
+  # Regresion TASK-021: tercera copia de la misma normalizacion, mismo defecto.
+  test "conserva el telefono irreconocible en vez de vaciarlo" do
+    r = AdministrationRequest.new(base_attrs(phone: "no-es-un-telefono"))
+    assert_not r.valid?
+    assert_equal "no-es-un-telefono", r.phone
+    assert r.errors[:phone].any?
+  end
 end
