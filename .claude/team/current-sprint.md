@@ -14,24 +14,89 @@ Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede m
 ## Pendiente
 
 - **Deploy de `master` a producción.** El último deploy es la imagen `e0090c0` (PR #155, 2026-08-18).
-  Desde entonces se mergearon **cinco PRs sin desplegar**: #156 (`standard-rails`), #157 y #158
-  (system tests + production parity), y #159/#160 (aislamiento entre núcleos familiares, BR-041).
-  El único con efecto sobre el comportamiento en producción es **#159**: restringe qué titulares
-  ofrece el panel al solicitar un certificado. Sin migraciones pendientes. Recordar que el squash
-  merge no hereda el signoff: hay que correr `bin/ci` sobre master antes de desplegar.
-- **TASK-019** (backlog): con las llaves SSH a mano, correr la consulta de solo lectura que verifica
-  si algún domicilio de producción llegó a tener más de un `FamilyGroup` antes del fix de #159.
-- Las **12 severidades Baja** de `docs/2026-07-30-auditoria-profunda.md` — ahora rastreadas como
-  **TASK-017** en el backlog. De las 4 BR faltantes del informe queda 1: normalización de direcciones
-  (Baja); las otras tres se cerraron con BR-143 (Batch I) y BR-148/BR-149 (Batch J).
-- El hallazgo de `VerifiedIdentity#normalize_phone` (teléfono basura que se guarda vacío) pasó al
-  backlog como **TASK-021**; confirmado vigente el 2026-08-20.
+  Desde entonces se mergearon **once PRs sin desplegar**: #156 (`standard-rails`), #157 y #158 (system
+  tests + production parity), #159/#160 (aislamiento entre núcleos familiares), #161 (docs de equipo) y
+  los cinco de esta tanda, #162 a #166.
+  **Trae una migración**, `20260820054632_add_requested_by_to_residence_certificates`: es aditiva y
+  compatible hacia atrás, así que no hay la ventana de incompatibilidad que sí hubo al eliminar
+  `approved_by` en Batch J. Recordar que el squash merge no hereda el signoff: hay que correr `bin/ci`
+  sobre master antes de desplegar.
+- **TASK-019** (backlog): con las llaves SSH a mano, correr la consulta de solo lectura que verifica si
+  algún domicilio de producción llegó a tener más de un `FamilyGroup` antes del fix de #159. Ojo:
+  TASK-020 **no la cierra retroactivamente** — los certificados ya emitidos no tienen `requested_by`.
+- **TASK-017 quedó parcialmente cerrada.** Siguen pendientes 9 de las 12 Baja del informe del
+  2026-07-30 y los hallazgos de la auditoría del 2026-07-22. Detalle en el backlog.
+- **TASK-022 y TASK-023**, hallazgos nuevos de esta tanda: `household_unit.name` inexistente invocado
+  por una vista de admin, y el flake sin diagnosticar del system test en contenedor.
 
 ## En Review
 
 <!-- Tareas con PR abierto esperando revision. Al 2026-08-20 no hay PRs abiertos. -->
 
 ## Completado
+
+### PRs #162–#166 · Las cinco tareas de código del backlog (2026-08-20)
+Como [DESARROLLADOR]: el owner pidió ejecutar las tareas de código pendientes. Se acordó alcance por
+adelantado —incluir TASK-020, acotar TASK-017 a los hallazgos de impacto real, un PR por tarea— y cada
+una salió con su rama, sus tests, su `bin/ci` completo y su signoff.
+
+| PR | Commit | Tarea | Qué resolvió |
+|---|---|---|---|
+| #162 | `278e006` | TASK-021 | El teléfono irreconocible ya no se guarda vacío en silencio (BR-013) |
+| #163 | `60e1b35` | TASK-017 | `masked_run` publicaba el RUN completo en la página pública (BR-078); muere `Admin::UsersController` |
+| #164 | `34b0e1b` | TASK-013 | Historial de solicitudes + duplicar una rechazada (BR-047/048/049) |
+| #166 | `7b72f5a` | TASK-020 | Trazabilidad de quién solicita cada certificado (BR-152 nueva) |
+| #165 | `fb3bcf3` | TASK-014 | Convivientes del domicilio sin exponer sus datos (BR-042) |
+
+**Cuatro de las cinco tareas destaparon algo que no estaba anotado**, y ese es el patrón a retener:
+
+1. **BR-047 nunca se implementó y era la precondición de TASK-013.** El backlog afirmaba "BR-047 ya OK".
+   Una solicitud rechazada salía de `current_onboarding_request` y desaparecía de la vista del usuario
+   **junto con su motivo de rechazo**.
+2. **`AdministrationRequest` nunca validó el formato del teléfono**, pese a BR-127. El bug de TASK-021
+   lo mantenía oculto: la basura quedaba vacía y fallaba por presencia, así que el hueco solo se hizo
+   visible al corregir la normalización. Arreglar un defecto destapó el otro.
+3. **BR-042 estaba escrita al revés de BR-041**: pedía mostrar "quiénes conviven" donde otra regla lo
+   prohíbe. Decisión del owner: recuentos sin nombres.
+4. **BR-026 describía un flujo inexistente** (re-envío "cambiando el estado a `pending`"), lo que además
+   cerró TASK-015.
+
+**Un hallazgo de auditoría se descartó por falso positivo**: el "doble cobro del primer mes" de las
+suscripciones. `Listing#subscribable?` impide suscribirse con vigencia pagada desde el 2026-07-22, así
+que el `start_date` que proponía la auditoría **habría regalado 30 días** en el único caso alcanzable.
+
+**Reglas tocadas**: BR-013, BR-026, BR-042, BR-047, BR-049, BR-078, BR-093, BR-127 y la nueva **BR-152**.
+
+**Aprendizajes operacionales de la tanda**:
+- **Un worktree nuevo necesita `bundle install`** si el `Gemfile.lock` cambió desde el último bundle de
+  la máquina. `bin/ci` ni siquiera arranca: `Bundler::GemNotFound` en `config/boot.rb`.
+- **Brakeman ignora por fingerprint, y el fingerprint incluye la expresión completa.** Agregar un
+  argumento a `ResidenceCertificate.new` invalidó dos ignores ya evaluados y los hallazgos reaparecieron
+  como nuevos. Es la **segunda vez** que pasa por esa misma línea (la primera fue el PR #159), así que
+  la nota del ignore ahora lo advierte.
+- **`assigns` no está disponible** en los tests (requiere `rails-controller-testing`, que el proyecto no
+  usa). Verificar contra `response.body` resulta mejor: prueba lo que el usuario ve.
+- **Mergear PRs que tocan los mismos archivos genera conflictos previsibles.** #164 y #165 insertaban su
+  entrada en el mismo punto del menú del panel y sus bloques de i18n eran contiguos. Se resolvió
+  conservando ambos, y hubo que **re-correr `bin/ci` y re-firmar**: el merge cambia el HEAD y el signoff
+  anterior deja de valer.
+- **Los tests que pasan a la primera no prueban nada.** Se validaron por mutación los dos de aislamiento
+  (el scope por `current_user` en #164 y la no-fuga de nombres en #165); ambos fallan al romper el
+  código a propósito.
+
+### PR #161 · Saneo de backlog, sprint y reviews (2026-08-20)
+Como [ARQUITECTO]: los tres archivos de `.claude/team/` estaban desfasados del repositorio. El backlog
+listaba como pendientes **siete tareas ya implementadas** —la más vieja desde el 2026-07-25— y el
+sprint tenía seis trabajos mergeados todavía en "En Progreso".
+
+Cada tarea se verificó contra el código antes de marcarla, y la evidencia quedó escrita para no tener
+que volver a auditarla. TASK-003 se cerró como **falso positivo**: el hallazgo pedía corregir la
+herencia de los controllers admin, que ya estaba bien — el reporte había salido de un grep textual por
+`Admin::ApplicationController`, cuando Ruby lo resuelve por el `module Admin` envolvente.
+
+Las siete entradas de reviews cerradas se movieron a `reviews/archive-2026-08.md` **en vez de
+borrarse**: los "Puntos que merecen ojo del reviewer" son el único registro de verificaciones que los
+tests no cubren, como la compatibilidad de `mercadopago-sdk` 3.4.0 y el schema de Solid Queue 1.6.0.
 
 ### PR #159 + #160 · Aislamiento entre núcleos familiares + saneo de reglas de ámbito (2026-08-19)
 Como [DESARROLLADOR]: salió de una revisión de casos borde sobre las 132 reglas de negocio.

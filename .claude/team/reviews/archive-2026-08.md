@@ -253,3 +253,57 @@ verificacion del SDK de MercadoPago 3.4.0 y del schema de Solid Queue 1.6.0, que
   - **J10**: severidad real menor a la reportada; el copy anterior ya decía "se está procesando".
 
 ---
+
+---
+
+## PR #161: Saneo de backlog, sprint y reviews contra el estado real del codigo
+
+- **Autor**: [ARQUITECTO]
+- **Fecha**: 2026-08-20
+- **Branch**: `worktree-chore-saneo-archivos-equipo`
+- **Archivos modificados**:
+  - `.claude/team/backlog.md` — 7 tareas marcadas hechas con evidencia, TASK-021 nueva, TASK-017 desglosada
+  - `.claude/team/current-sprint.md` — 6 trabajos mergeados movidos a Completado; "Pendiente" reescrito
+  - `.claude/team/reviews/pending.md` — vaciado
+  - `.claude/team/reviews/archive-2026-08.md` — nuevo, recibe las 7 entradas cerradas
+- **Descripcion**: solo documentacion de equipo. No toca codigo, tests ni configuracion.
+- **Tests**: no aplica — el diff no incluye codigo
+- **Review**: no quedo registrada; mergeado como PR #161 (`a644975`) el 2026-08-20
+- **Puntos que merecen ojo del reviewer**:
+  - **TASK-003 se cierra como falso positivo, no como implementada.** El hallazgo L5 pedia corregir la
+    herencia de los controllers admin; en realidad ya estaba bien y el reporte salio de buscar el nombre
+    completo `Admin::ApplicationController` con grep, cuando Ruby lo resuelve por el `module Admin`
+    envolvente. Si el reviewer discrepa, es la unica tarea que se cierra sin cambio de codigo detras.
+  - **TASK-005 estaba hecha en otro lugar del que decia la tarea.** Pedia `with_lock` en
+    `IssueCertificateJob`; Batch J lo puso en el modelo. El efecto es el mismo o mejor (cubre las tres
+    transiciones, no solo la emision), pero conviene que alguien confirme que no queda un hueco en el job.
+  - **El dato mas accionable del PR no es una tarea, es el deploy**: hay cinco PRs mergeados sin
+    desplegar (#156-#160) sobre la imagen `e0090c0`. Se documenta en "Pendiente" del sprint.
+  - **Las reviews cerradas se archivaron, no se borraron.** Si la convencion preferida es borrarlas, el
+    archivo `archive-2026-08.md` sobra — pero entonces se pierde la verificacion manual del SDK de
+    MercadoPago 3.4.0 y del schema de Solid Queue 1.6.0, que ningun test cubre.
+
+---
+
+## PRs #162–#166: las cinco tareas de codigo del backlog
+
+- **Autor**: [DESARROLLADOR]
+- **Fecha**: 2026-08-20
+- **Review**: no quedo registrada por PR; los cinco se mergearon el 2026-08-20 con `bin/ci` completo en
+  verde y signoff propio. Detalle tecnico de cada uno en su PR de GitHub y en `current-sprint.md`.
+- **Ramas**: `worktree-fix-normalizacion-telefono` (#162, `278e006`),
+  `worktree-fix-hallazgos-baja-impacto` (#163, `60e1b35`),
+  `worktree-feat-duplicar-solicitud-onboarding` (#164, `34b0e1b`),
+  `worktree-feat-convivientes-domicilio` (#165, `fb3bcf3`),
+  `worktree-feat-trazabilidad-certificados` (#166, `7b72f5a`)
+- **Puntos que merecen ojo del reviewer**:
+  - **#163 descarta un hallazgo de auditoria como falso positivo.** Si alguien discrepa, la discusion es
+    sobre si `Listing#subscribable?` podria relajarse en el futuro — hoy el `start_date` propuesto
+    regalaria 30 dias.
+  - **#164 y #165 precisan reglas escritas**: BR-026 describia un flujo inexistente y BR-042 chocaba con
+    BR-041. Ambas correcciones son decisiones de producto, no tecnicas.
+  - **#166 deja la columna `requested_by_id` nullable a proposito**, sin backfill. Es la decision mas
+    discutible de la tanda: prioriza no afirmar lo que no se sabe por sobre la completitud del dato.
+  - **#162 cambia el comportamiento observable de `AdministrationRequest`**: un telefono malformado ahora
+    falla por formato en vez de por presencia.
+

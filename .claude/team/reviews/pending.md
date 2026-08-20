@@ -7,34 +7,32 @@ Las entradas de los PRs ya mergeados se movieron a `archive-2026-08.md`. Al cerr
 entrada alli en vez de borrarla: los "Puntos que merecen ojo del reviewer" suelen ser el unico
 registro de por que se decidio algo.
 
+**Al 2026-08-20 no hay PRs abiertos** salvo el de este mismo saneo, registrado abajo.
+
 ---
 
-## PR #161: Saneo de backlog, sprint y reviews contra el estado real del codigo
+## PR: Saneo de los archivos de equipo tras cerrar las cinco tareas de codigo
 
 - **Autor**: [ARQUITECTO]
 - **Fecha**: 2026-08-20
-- **Branch**: `worktree-chore-saneo-archivos-equipo`
+- **Branch**: `worktree-chore-saneo-equipo-post-tasks`
 - **Archivos modificados**:
-  - `.claude/team/backlog.md` — 7 tareas marcadas hechas con evidencia, TASK-021 nueva, TASK-017 desglosada
-  - `.claude/team/current-sprint.md` — 6 trabajos mergeados movidos a Completado; "Pendiente" reescrito
-  - `.claude/team/reviews/pending.md` — vaciado
-  - `.claude/team/reviews/archive-2026-08.md` — nuevo, recibe las 7 entradas cerradas
+  - `.claude/team/backlog.md` — TASK-013/014/015/020/021 cerradas, TASK-017 parcial, TASK-022 y TASK-023 nuevas
+  - `.claude/team/current-sprint.md` — PRs #161 a #166 en Completado; "Pendiente" reescrito
+  - `.claude/team/reviews/pending.md` y `archive-2026-08.md` — seis entradas archivadas
 - **Descripcion**: solo documentacion de equipo. No toca codigo, tests ni configuracion.
 - **Tests**: no aplica — el diff no incluye codigo
 - **Review**: Pendiente
 - **Puntos que merecen ojo del reviewer**:
-  - **TASK-003 se cierra como falso positivo, no como implementada.** El hallazgo L5 pedia corregir la
-    herencia de los controllers admin; en realidad ya estaba bien y el reporte salio de buscar el nombre
-    completo `Admin::ApplicationController` con grep, cuando Ruby lo resuelve por el `module Admin`
-    envolvente. Si el reviewer discrepa, es la unica tarea que se cierra sin cambio de codigo detras.
-  - **TASK-005 estaba hecha en otro lugar del que decia la tarea.** Pedia `with_lock` en
-    `IssueCertificateJob`; Batch J lo puso en el modelo. El efecto es el mismo o mejor (cubre las tres
-    transiciones, no solo la emision), pero conviene que alguien confirme que no queda un hueco en el job.
-  - **El dato mas accionable del PR no es una tarea, es el deploy**: hay cinco PRs mergeados sin
-    desplegar (#156-#160) sobre la imagen `e0090c0`. Se documenta en "Pendiente" del sprint.
-  - **Las reviews cerradas se archivaron, no se borraron.** Si la convencion preferida es borrarlas, el
-    archivo `archive-2026-08.md` sobra — pero entonces se pierde la verificacion manual del SDK de
-    MercadoPago 3.4.0 y del schema de Solid Queue 1.6.0, que ningun test cubre.
+  - **TASK-017 queda marcada como parcial, no cerrada.** Se remediaron los hallazgos de impacto real por
+    decision de alcance del owner; los 9 restantes de las 12 Baja siguen listados con su detalle. Si se
+    prefiere cerrarla y abrir una tarea nueva para el resto, es una decision de rastreo.
+  - **Un hallazgo de auditoria quedo registrado como descartado**, no como pendiente: el "doble cobro
+    del primer mes" de las suscripciones es inalcanzable, y actuar sobre el habria regalado 30 dias. La
+    evidencia esta en el backlog y en el PR #163.
+  - **Los aprendizajes operacionales de la tanda se anotaron en el sprint** (bundle install en worktrees
+    nuevos, fingerprints de Brakeman, `assigns` ausente, conflictos previsibles al mergear). Son el tipo
+    de cosa que se vuelve a descubrir desde cero si no queda escrita.
 
 ---
 
