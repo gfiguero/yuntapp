@@ -15,6 +15,10 @@ class ResidenceCertificate < ApplicationRecord
   belongs_to :neighborhood_association
   belongs_to :member
   belongs_to :household_unit
+  # BR-152: quién pidió el certificado, que no siempre es su titular — el
+  # household_admin puede solicitarlo a nombre de un dependiente (BR-098).
+  # `optional` porque los certificados anteriores a la columna no lo tienen.
+  belongs_to :requested_by, class_name: "User", optional: true
 
   # BR-100: el historial de eventos de pago (#101) no se destruye.
   has_many :payment_events, as: :payable, dependent: :restrict_with_error
@@ -85,6 +89,16 @@ class ResidenceCertificate < ApplicationRecord
   # emitido, vigente, su titular sigue activo y el pago no fue revertido.
   def downloadable?
     issued? && !expired? && !holder_deactivated? && !payment_reverted?
+  end
+
+  # BR-152: true cuando el certificado lo pidió alguien distinto de su titular
+  # (BR-098, el household_admin a nombre de un dependiente). Falso también para
+  # los certificados anteriores a la columna, que no tienen solicitante: no se
+  # afirma lo que no se sabe.
+  def requested_by_other?
+    return false if requested_by.nil?
+
+    requested_by.verified_identity_id != member.verified_identity_id
   end
 
   # RUN enmascarado para verificación pública (BR-078).

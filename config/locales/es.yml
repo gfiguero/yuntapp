@@ -236,6 +236,7 @@ es:
         folio: Folio
         status: Estado
         member: Residente
+        requested_by: Solicitado por
         household_unit: Domicilio
         purpose: Motivo
         amount: Monto
