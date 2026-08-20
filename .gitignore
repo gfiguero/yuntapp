@@ -49,3 +49,8 @@
 
 # Ignore JetBrains/RubyMine IDE files
 .idea/
+
+# Indice de codebase-memory-mcp: se regenera solo cada pocos segundos, asi que
+# versionarlo ensucia el working tree de forma permanente y bloquea `gh signoff`,
+# que es el gate de merge y deploy del proyecto. Se reconstruye con index_repository.
+.codebase-memory/
