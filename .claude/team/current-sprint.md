@@ -2,9 +2,38 @@
 
 Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede mover tareas desde el backlog.
 
+> **Saneado el 2026-08-20**: "En Progreso" acumulaba seis trabajos ya mergeados, el más viejo desde el
+> 2026-08-02. Todos pasaron a Completado con su número de PR; el detalle técnico y los aprendizajes se
+> conservan íntegros porque es donde vive el contexto que no está en el código. El sprint queda sin
+> nada en curso.
+
 ## En Progreso
 
-### Aislamiento entre núcleos familiares + saneo de reglas de ámbito (worktree `fix-aislamiento-nucleo-familiar`)
+<!-- Vacio: no hay trabajo en curso al 2026-08-20 -->
+
+## Pendiente
+
+- **Deploy de `master` a producción.** El último deploy es la imagen `e0090c0` (PR #155, 2026-08-18).
+  Desde entonces se mergearon **cinco PRs sin desplegar**: #156 (`standard-rails`), #157 y #158
+  (system tests + production parity), y #159/#160 (aislamiento entre núcleos familiares, BR-041).
+  El único con efecto sobre el comportamiento en producción es **#159**: restringe qué titulares
+  ofrece el panel al solicitar un certificado. Sin migraciones pendientes. Recordar que el squash
+  merge no hereda el signoff: hay que correr `bin/ci` sobre master antes de desplegar.
+- **TASK-019** (backlog): con las llaves SSH a mano, correr la consulta de solo lectura que verifica
+  si algún domicilio de producción llegó a tener más de un `FamilyGroup` antes del fix de #159.
+- Las **12 severidades Baja** de `docs/2026-07-30-auditoria-profunda.md` — ahora rastreadas como
+  **TASK-017** en el backlog. De las 4 BR faltantes del informe queda 1: normalización de direcciones
+  (Baja); las otras tres se cerraron con BR-143 (Batch I) y BR-148/BR-149 (Batch J).
+- El hallazgo de `VerifiedIdentity#normalize_phone` (teléfono basura que se guarda vacío) pasó al
+  backlog como **TASK-021**; confirmado vigente el 2026-08-20.
+
+## En Review
+
+<!-- Tareas con PR abierto esperando revision. Al 2026-08-20 no hay PRs abiertos. -->
+
+## Completado
+
+### PR #159 + #160 · Aislamiento entre núcleos familiares + saneo de reglas de ámbito (2026-08-19)
 Como [DESARROLLADOR]: salió de una revisión de casos borde sobre las 132 reglas de negocio.
 
 **El hallazgo.** `Panel::ResidenceCertificatesController` ofrecía como titulares a **todos** los
@@ -40,7 +69,7 @@ vector: el filtro del selector no cubría un `member_id` manipulado).
 certificados no tiene test; el de listings sí), BR-134 (guard `redirect_if_active_request` sin test),
 BR-016 (reset en cascada región/comuna sin cobertura), BR-061 y BR-132 (bajo riesgo).
 
-### Suite de system tests por caso de uso + production parity (worktree `test-system-suite`)
+### PR #158 · Suite de system tests por caso de uso + production parity (2026-08-18)
 Como [TESTER]: tras el piloto (PR #157), el owner aprobó la estrategia y pidió montar el modo
 contenedor y cubrir todos los casos. Decisión documentada en **ADR-0015**.
 
@@ -87,7 +116,7 @@ que cualquier otro que usara el validador filtraba el error crudo. Se movieron a
 `test/models/rut_error_messages_test.rb` como guard, verificado por mutación (al quitar la clave, falla
 con el mensaje sin traducir).
 
-### System test piloto de UC-002 (worktree `test-onboarding-system`)
+### PR #157 · System test piloto de UC-002 (2026-08-18)
 Como [TESTER]: el owner planteó "un caso de uso por cada regla de negocio, y un system test por cada
 uno". Se acordó pilotear **uno** primero para medir el costo real antes de comprometerse a la estrategia.
 
@@ -123,7 +152,7 @@ Turbo Stream, `autosave_controller` con 2s de debounce, `manual_address_controll
 3. `parallelize` sigue comentado en `test_helper.rb:46`. Con 8 UC no molesta; si esto creciera, hay que
    revisar por qué se desactivó.
 
-### Cops Rails vía `standard-rails` (worktree `refactor-standard-rails`)
+### PR #156 · Cops Rails vía `standard-rails` (2026-08-18)
 Como [DESARROLLADOR]: el owner pidió aprovechar las ventajas de escribir código Rails-way. La opción
 obvia era volver a `rubocop-rails-omakase`, el preset oficial de Rails — se descartó porque reabre el
 conflicto de espaciado que cerró ADR-0011 el 2026-06-29 (`{ a: 1 }` vs `{a: 1}`), reformatearía 232
@@ -152,7 +181,43 @@ tocar el remote: `git fetch git@github.com:gfiguero/yuntapp.git <rama>:refs/remo
 después `git branch --set-upstream-to=origin/<rama>`. La solución de raíz sería `gh auth setup-git`
 o pasar el remote a SSH — pendiente de decisión del owner.
 
-### Batch J — Severidad Media de la auditoría profunda 2026-07-30 (worktree `fix-batch-j`)
+### PR #155 · Actualización de gemas al día (2026-08-18)
+Como [DESARROLLADOR]: pedido de "Ruby 4.0.6 + último Rails + todas las gemas al día".
+
+**Ruby y Rails ya estaban en la última**: Ruby 4.0.6 desde el PR #81 (`.ruby-version`, intérprete y
+`ARG RUBY_VERSION` del Dockerfile coinciden; es lo último que ofrece rbenv) y Rails 8.1.3.1,
+publicada el 2026-07-29. No hubo nada que migrar ahí.
+
+El trabajo real fueron las 19 gemas desactualizadas: **16 subieron**, incluidas `mercadopago-sdk`
+3.2.1→3.4.0, `resend` 1.6.0→1.9.0 y `solid_queue` 1.5.1→1.6.0. **3 quedan retenidas** por
+restricciones de sus propias dependencias, no por nuestro Gemfile: `bigdecimal` (ttfunk→Prawn exige
+`~> 3.1`; forzar 4.x rompería el PDF de certificados), `rubocop` y `rubocop-performance` (Standard
+los pinea a propósito). Forzarlas sería pasar por encima de la compatibilidad declarada.
+
+Cierra los 8 PRs de Dependabot abiertos. Detalle de la verificación manual del SDK de MercadoPago
+y del schema de solid_queue en `reviews/pending.md`.
+
+**DESPLEGADO A PRODUCCIÓN el 2026-08-18** — imagen `e0090c0` (PR #155), desde `53855ed`. Deploy sin
+migraciones ni cambios de schema: solo `Gemfile.lock` y docs, así que no hubo ventana de
+incompatibilidad. Post-deploy verificado en el contenedor: Ruby 4.0.6 · Rails 8.1.3.1 ·
+mercadopago-sdk 3.4.0 (los 5 recursos que usamos responden, `RequestOptions` conserva
+`custom_headers` y `MPResponse < Hash` es `true`) · resend 1.9.0 con `delivery_method: resend`
+registrado · solid_queue 1.6.0 con Supervisor/Dispatcher/Worker/Scheduler arriba y el worker ya en
+el `pool_type: :thread` nuevo · sqlite3 2.9.6 · rack 3.2.7. Cero excepciones en los logs, `/up` 200,
+`/verify/<code>` 200 y `/verify/<inexistente>` 404, datos intactos (7 certs / 20 socios / 1 junta).
+
+### PR #154 · Bump de seguridad previo al deploy de Batch J (2026-08-18)
+Como [DESARROLLADOR]: `bin/ci` sobre master (`46803d8`) falló en `Security: Gem audit` y
+`Security: Brakeman`, así que no hubo signoff y el deploy de Batch J quedó bloqueado. Ambos fallos
+son **preexistentes y ajenos a Batch J**. Resueltos subiendo `sqlite3` 2.9.5→2.9.6 (CVE real de la
+BD de producción), `json` 2.21.1→2.21.2 (transitiva) y `brakeman` 8.0.5→8.0.6 (solo destraba el
+exit 5 "no es la última versión"; Brakeman reporta **0 hallazgos** en el código).
+
+**Aprendizaje operacional:** el squash merge crea un commit nuevo en master que **no hereda el
+signoff** de la rama. Por eso hay que correr `bin/ci` sobre master antes de cada deploy, no solo
+antes del merge.
+
+### PR #142 · Batch J — Severidad Media de la auditoría profunda 2026-07-30 (2026-08-04)
 Como [DESARROLLADOR]: las 11 de severidad Media de `docs/2026-07-30-auditoria-profunda.md`.
 
 - [x] **J1** (BR-120/BR-148) — nada impedía solicitar ni pagar un certificado en una junta sin RUT: `issue!` abortaba después y el certificado quedaba `paid` para siempre, sin devolución (BR-063) y sin aviso. Guards en `residence_certificates#new/create` y `payments#new` + `CertificateIssuanceFailureMailer` al staff cuando `IssueCertificateJob` se rinde. **Matiz importante**: desde BR-121 `rut` es `NOT NULL` con validación de presencia, así que el escenario no es alcanzable por la app — la auditoría lo sobrevaloró. El valor real es el aviso al staff, que cubre cualquier fallo de emisión
@@ -188,7 +253,7 @@ columna. Un `INSERT` en `residence_certificates` en esa ventana habría dado 500
 excepciones en los logs), pero **la próxima vez que se elimine una columna conviene el patrón de
 dos fases**: primero desplegar con `ignored_columns`, después la migración que la borra.
 
-### Batch I — Severidad Alta de la auditoría profunda 2026-07-30 (directo en `master`)
+### Batch I — Severidad Alta de la auditoría profunda 2026-07-30 (directo en `master`, 2026-08-02)
 Como [DESARROLLADOR]: las 8 de severidad Alta de `docs/2026-07-30-auditoria-profunda.md`.
 Trabajo directo en master por indicación del owner (sin worktree).
 
@@ -224,58 +289,6 @@ zeitwerk, tests locales y en contenedor) + signoff.
 - Las migraciones corren solas en cada boot vía `bin/docker-entrypoint` → `db:prepare`. Esa
   automatización depende del `CMD` del Dockerfile: si se cambia por uno cuyos dos últimos
   argumentos no sean `./bin/rails server`, dejará de migrar **en silencio**.
-
-## Pendiente
-
-- Las **12 severidades Baja** de `docs/2026-07-30-auditoria-profunda.md`. De las 4 BR faltantes
-  del informe quedan 2: normalización de direcciones (Baja) — las otras dos son BR-143 (Batch I)
-  y BR-148/BR-149 (Batch J).
-- **Hallazgo nuevo (2026-08-02, fuera de la auditoría):** `VerifiedIdentity#normalize_phone` borra
-  todo carácter no numérico, así que un teléfono basura (`"no-es-un-telefono"`) queda como `""` y
-  la validación `phone: true, if: -> { phone.present? }` no llega a correr. El usuario cree que
-  registró un teléfono y se guarda vacío. Detectado escribiendo los tests de J4; sin remediar.
-
-### Bump de seguridad previo al deploy de Batch J (worktree `chore-bump-gems-seguridad`) — 2026-08-18
-Como [DESARROLLADOR]: `bin/ci` sobre master (`46803d8`) falló en `Security: Gem audit` y
-`Security: Brakeman`, así que no hubo signoff y el deploy de Batch J quedó bloqueado. Ambos fallos
-son **preexistentes y ajenos a Batch J**. Resueltos subiendo `sqlite3` 2.9.5→2.9.6 (CVE real de la
-BD de producción), `json` 2.21.1→2.21.2 (transitiva) y `brakeman` 8.0.5→8.0.6 (solo destraba el
-exit 5 "no es la última versión"; Brakeman reporta **0 hallazgos** en el código).
-
-**Aprendizaje operacional:** el squash merge crea un commit nuevo en master que **no hereda el
-signoff** de la rama. Por eso hay que correr `bin/ci` sobre master antes de cada deploy, no solo
-antes del merge.
-
-### Actualización de gemas al día (worktree `chore-actualizar-gemas`) — 2026-08-18
-Como [DESARROLLADOR]: pedido de "Ruby 4.0.6 + último Rails + todas las gemas al día".
-
-**Ruby y Rails ya estaban en la última**: Ruby 4.0.6 desde el PR #81 (`.ruby-version`, intérprete y
-`ARG RUBY_VERSION` del Dockerfile coinciden; es lo último que ofrece rbenv) y Rails 8.1.3.1,
-publicada el 2026-07-29. No hubo nada que migrar ahí.
-
-El trabajo real fueron las 19 gemas desactualizadas: **16 subieron**, incluidas `mercadopago-sdk`
-3.2.1→3.4.0, `resend` 1.6.0→1.9.0 y `solid_queue` 1.5.1→1.6.0. **3 quedan retenidas** por
-restricciones de sus propias dependencias, no por nuestro Gemfile: `bigdecimal` (ttfunk→Prawn exige
-`~> 3.1`; forzar 4.x rompería el PDF de certificados), `rubocop` y `rubocop-performance` (Standard
-los pinea a propósito). Forzarlas sería pasar por encima de la compatibilidad declarada.
-
-Cierra los 8 PRs de Dependabot abiertos. Detalle de la verificación manual del SDK de MercadoPago
-y del schema de solid_queue en `reviews/pending.md`.
-
-**DESPLEGADO A PRODUCCIÓN el 2026-08-18** — imagen `e0090c0` (PR #155), desde `53855ed`. Deploy sin
-migraciones ni cambios de schema: solo `Gemfile.lock` y docs, así que no hubo ventana de
-incompatibilidad. Post-deploy verificado en el contenedor: Ruby 4.0.6 · Rails 8.1.3.1 ·
-mercadopago-sdk 3.4.0 (los 5 recursos que usamos responden, `RequestOptions` conserva
-`custom_headers` y `MPResponse < Hash` es `true`) · resend 1.9.0 con `delivery_method: resend`
-registrado · solid_queue 1.6.0 con Supervisor/Dispatcher/Worker/Scheduler arriba y el worker ya en
-el `pool_type: :thread` nuevo · sqlite3 2.9.6 · rack 3.2.7. Cero excepciones en los logs, `/up` 200,
-`/verify/<code>` 200 y `/verify/<inexistente>` 404, datos intactos (7 certs / 20 socios / 1 junta).
-
-## En Review
-
-<!-- Tareas con PR abierto esperando revision -->
-
-## Completado
 
 ### Recuperación de la auditoría perdida (2026-07-31)
 La sesión de auditoría del 2026-07-30 se cortó por un apagón antes de versionarse. Se recuperó
