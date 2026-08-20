@@ -13,27 +13,49 @@ Este archivo contiene las tareas del sprint en curso. Solo el Arquitecto puede m
 
 ## Pendiente
 
-- **Deploy de `master` a producción.** El último deploy es la imagen `e0090c0` (PR #155, 2026-08-18).
-  Desde entonces se mergearon **once PRs sin desplegar**: #156 (`standard-rails`), #157 y #158 (system
-  tests + production parity), #159/#160 (aislamiento entre núcleos familiares), #161 (docs de equipo) y
-  los cinco de esta tanda, #162 a #166.
-  **Trae una migración**, `20260820054632_add_requested_by_to_residence_certificates`: es aditiva y
-  compatible hacia atrás, así que no hay la ventana de incompatibilidad que sí hubo al eliminar
-  `approved_by` en Batch J. Recordar que el squash merge no hereda el signoff: hay que correr `bin/ci`
-  sobre master antes de desplegar.
 - **TASK-019** (backlog): con las llaves SSH a mano, correr la consulta de solo lectura que verifica si
   algún domicilio de producción llegó a tener más de un `FamilyGroup` antes del fix de #159. Ojo:
   TASK-020 **no la cierra retroactivamente** — los certificados ya emitidos no tienen `requested_by`.
 - **TASK-017 quedó parcialmente cerrada.** Siguen pendientes 9 de las 12 Baja del informe del
   2026-07-30 y los hallazgos de la auditoría del 2026-07-22. Detalle en el backlog.
-- **TASK-022 y TASK-023**, hallazgos nuevos de esta tanda: `household_unit.name` inexistente invocado
-  por una vista de admin, y el flake sin diagnosticar del system test en contenedor.
+- **TASK-022 y TASK-023**, hallazgos nuevos: `household_unit.name` inexistente invocado por una vista
+  de admin, y el flake sin diagnosticar del system test en contenedor.
+- **Go-live de MercadoPago** (TASK-008/TASK-011): confirmar el webhook en el panel de MP, pago de
+  prueba end-to-end y paso de credenciales sandbox a producción.
+- **Seeds en producción** (TASK-009) y **humo de Resend** (TASK-010).
 
 ## En Review
 
 <!-- Tareas con PR abierto esperando revision. Al 2026-08-20 no hay PRs abiertos. -->
 
 ## Completado
+
+### DEPLOY a producción `ae084ee` (2026-08-20)
+Como [DESARROLLADOR]: doce PRs acumulados desde `e0090c0` (#156–#167). **113,8 s**, contenedor sano
+antes del swap del proxy.
+
+**Migración**: `20260820054632_add_requested_by_to_residence_certificates`, aplicada sola en el boot
+(`bin/docker-entrypoint` → `db:prepare`). Es **aditiva y backwards-compatible** —columna nullable con
+índice y FK—, así que no hubo la ventana de riesgo del `remove_reference` de Batch J: el contenedor
+viejo podía seguir insertando sin conocer la columna.
+
+**Verificado en vivo, no solo por el reporte de Kamal**: `/up`, home y `/como-funciona` en 200;
+`/verify/<inexistente>` en 404; `masked_run` devolviendo `3.XXX.XXX-0` sobre un certificado real (BR-078
+funcionando); `normalize_phone("no-es-un-telefono")` conservando la entrada en vez de vaciarla (BR-013);
+las rutas nuevas `/panel/onboarding/history` y `/panel/household_neighbours` respondiendo 302 (piden
+login); datos intactos (7 certificados, 20 socios, 26 usuarios, 1 junta); cero excepciones reales en los
+logs —los únicos "error" del arranque son los `connection refused` del health check antes de que Puma
+escuchara—. Backup previo: `production.sqlite3.bak-predeploy-20260820`.
+
+**El gate costó dos intentos, y la causa es reutilizable**: `gh signoff` exige el working tree limpio y
+`.codebase-memory/` aparecía modificado. Commitear el índice **no sirvió** —el MCP lo reescribe cada
+pocos segundos y volvió a ensuciarse un segundo después del commit—, así que el directorio pasó a
+`.gitignore` con `git rm --cached`. Queda resuelto de raíz para los próximos deploys.
+
+**El flake de TASK-023 se manifestó de nuevo**, esta vez en la pasada **local** de system tests (1 error,
+68 asserts) mientras la del contenedor pasaba limpia. Aislado no se reproduce, y el filtro de salida del
+CI se volvió a comer el detalle. Sigue sin diagnosticar; ya está anotado que hay que capturar la salida
+completa antes de reintentar.
 
 ### PRs #162–#166 · Las cinco tareas de código del backlog (2026-08-20)
 Como [DESARROLLADOR]: el owner pidió ejecutar las tareas de código pendientes. Se acordó alcance por
