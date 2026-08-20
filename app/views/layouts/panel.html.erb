@@ -69,6 +69,16 @@
             </li>
           <% end %>
 
+          <%# BR-042: contexto de quiénes conviven en el domicilio, solo para el
+              jefe de hogar y sin datos personales de los otros núcleos. %>
+          <% if current_user.household_admin? %>
+            <li>
+              <%= link_to I18n.t('panel.household_neighbours.index.sidebar'),
+                    panel_household_neighbours_path,
+                    class: ("active" if controller_name == "household_neighbours") %>
+            </li>
+          <% end %>
+
           <% unless current_user.admin? %>
             <% admin_req = current_user.administration_requests.order(created_at: :desc).first %>
             <li>

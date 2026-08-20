@@ -1,0 +1,52 @@
+<div class="w-full">
+  <h1 class="font-bold text-4xl my-4"><%= I18n.t('panel.household_neighbours.index.title') %></h1>
+  <p class="text-base-content/60 mb-6"><%= I18n.t('panel.household_neighbours.index.description') %></p>
+
+  <div class="card bg-base-100 shadow mb-4">
+    <div class="card-body">
+      <h2 class="card-title text-lg"><%= I18n.t('panel.household_neighbours.index.address') %></h2>
+      <p class="text-base-content/80">
+        <%= [
+              @household_unit.street_name.presence || @household_unit.neighborhood_delegation&.name,
+              @household_unit.number
+            ].compact_blank.join(" ") %>
+      </p>
+      <% if @household_unit.address_detail.present? %>
+        <p class="text-sm text-base-content/60"><%= @household_unit.address_detail %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @other_family_groups.empty? %>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body items-center text-center">
+        <p class="text-base-content/70"><%= I18n.t('panel.household_neighbours.index.alone') %></p>
+      </div>
+    </div>
+  <% else %>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-lg">
+          <%= I18n.t('panel.household_neighbours.index.count', count: @other_family_groups.size) %>
+        </h2>
+
+        <ul class="mt-2 divide-y divide-base-200">
+          <% @other_family_groups.each_with_index do |family_group, index| %>
+            <li class="py-3 flex items-center justify-between gap-4">
+              <span class="font-medium">
+                <%= I18n.t('panel.household_neighbours.index.group_label', number: index + 1) %>
+              </span>
+              <span class="badge badge-ghost">
+                <%= I18n.t('panel.household_neighbours.index.residents', count: @resident_counts.fetch(family_group.id, 0)) %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+
+        <div class="alert alert-info mt-4">
+          <p class="text-sm"><%= I18n.t('panel.household_neighbours.index.privacy_note') %></p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
