@@ -1,4 +1,6 @@
 class AdministrationRequest < ApplicationRecord
+  include PhoneNormalization
+
   include Filterable
 
   STATUSES = %w[draft pending approved rejected cancelled].freeze
@@ -14,7 +16,6 @@ class AdministrationRequest < ApplicationRecord
 
   before_validation :normalize_run_field
   before_validation :normalize_rut_field
-  before_validation :normalize_phone
   before_validation :normalize_names
 
   validates :status, presence: true, inclusion: {in: STATUSES}
@@ -30,6 +31,10 @@ class AdministrationRequest < ApplicationRecord
   end
   validates :organization_rut, run: true, if: -> { organization_rut.present? }
   validates :run, run: true, if: -> { run.present? }
+  # BR-127: el dirigente valida el teléfono igual que el residente. Faltaba: el
+  # modelo normalizaba pero nunca validaba el formato, y el defecto de TASK-021
+  # lo enmascaraba (la basura quedaba vacía y fallaba por presencia en `pending`).
+  validates :phone, phone: true, if: -> { phone.present? }
 
   validate :only_one_active_per_user
 
@@ -59,20 +64,6 @@ class AdministrationRequest < ApplicationRecord
     raise "Only pending administration requests can be cancelled (current: #{status})" unless pending?
     update!(status: "cancelled")
     self
-  end
-
-  # Reutiliza el patrón exacto de VerifiedIdentity#normalize_phone para
-  # llegar al formato +569XXXXXXXX de forma consistente en todo el proyecto.
-  def normalize_phone
-    return if phone.blank?
-    clean_phone = phone.to_s.gsub(/[^0-9+]/, "")
-    self.phone = if clean_phone.match?(/\A9\d{8}\z/)
-      "+56#{clean_phone}"
-    elsif clean_phone.match?(/\A569\d{8}\z/)
-      "+#{clean_phone}"
-    else
-      clean_phone
-    end
   end
 
   private

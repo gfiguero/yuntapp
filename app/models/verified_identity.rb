@@ -1,6 +1,8 @@
 class VerifiedIdentity < ApplicationRecord
   self.table_name = "verified_identities"
 
+  include PhoneNormalization
+
   belongs_to :identity_verification_request, optional: true
 
   has_many :users
@@ -10,23 +12,10 @@ class VerifiedIdentity < ApplicationRecord
 
   before_validation :normalize_run_field
   before_validation :normalize_names
-  before_validation :normalize_phone
 
   validates :first_name, :last_name, :run, presence: true
   validates :run, uniqueness: true, run: true, if: -> { run.present? }
   validates :phone, phone: true, if: -> { phone.present? }
-
-  def normalize_phone
-    return if phone.blank?
-    clean_phone = phone.to_s.gsub(/[^0-9+]/, "")
-    self.phone = if clean_phone.match?(/\A9\d{8}\z/)
-      "+56#{clean_phone}"
-    elsif clean_phone.match?(/\A569\d{8}\z/)
-      "+#{clean_phone}"
-    else
-      clean_phone
-    end
-  end
 
   def name = "#{first_name} #{last_name}"
 
