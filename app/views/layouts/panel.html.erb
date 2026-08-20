@@ -58,6 +58,17 @@
             </li>
           <% end %>
 
+          <%# BR-047: el historial es la única vía para ver una solicitud rechazada
+              o cancelada — salen de `current_onboarding_request` y con ellas el
+              motivo del rechazo. Se muestra solo si hay algo que mirar. %>
+          <% if current_user.onboarding_requests.where(status: %w[approved rejected cancelled]).exists? %>
+            <li>
+              <%= link_to I18n.t('panel.onboarding_requests.index.title'),
+                    panel_onboarding_history_path,
+                    class: ("active" if controller_name == "onboarding_requests") %>
+            </li>
+          <% end %>
+
           <% unless current_user.admin? %>
             <% admin_req = current_user.administration_requests.order(created_at: :desc).first %>
             <li>
