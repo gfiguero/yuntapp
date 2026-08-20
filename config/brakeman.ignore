@@ -73,19 +73,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "5aa8b29d4fc7a240143eebf611327640f6e4bfc11d89f7d65a388705efdcbde8",
+      "fingerprint": "eb84df77db6057ef42cc49c776adb3dd2872cbcf35f87f09ebd15c899b2fcad1",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped model attribute",
       "file": "app/views/panel/residence_certificates/new.html.erb",
       "line": 32,
       "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "error_message(ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.include?(:purpose), ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.full_messages_for(:purpose))",
+      "code": "error_message(ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price, :requested_by => current_user).errors.include?(:purpose), ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price, :requested_by => current_user).errors.full_messages_for(:purpose))",
       "render_path": [
         {
           "type": "controller",
           "class": "Panel::ResidenceCertificatesController",
           "method": "create",
-          "line": 87,
+          "line": 90,
           "file": "app/controllers/panel/residence_certificates_controller.rb",
           "rendered": {
             "name": "panel/residence_certificates/new",
@@ -97,29 +97,29 @@
         "type": "template",
         "template": "panel/residence_certificates/new"
       },
-      "user_input": "ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors",
+      "user_input": "ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price, :requested_by => current_user).errors",
       "confidence": "Weak",
       "cwe_id": [
         79
       ],
-      "note": "Falso positivo: error_message helper usa mensajes de validación de Rails (texto traducido, sin input de usuario crudo — ningún locale interpola el valor ingresado y las validaciones involucradas son presence: true). XSS Weak aceptado. Fingerprint re-generado 2026-08-19: el fix de aislamiento por FamilyGroup cambió la línea del create y con ella el hash del warning."
+      "note": "Falso positivo: error_message helper usa mensajes de validación de Rails (texto traducido, sin input de usuario crudo — ningún locale interpola el valor ingresado y las validaciones involucradas son presence: true). XSS Weak aceptado. Fingerprint re-generado 2026-08-20: agregar `requested_by: current_user` al `ResidenceCertificate.new` del create (BR-152) cambió la expresión que Brakeman reconstruye y con ella el hash del warning. Es la segunda vez que pasa por esta misma vía (la anterior fue el fix de aislamiento del 2026-08-19): cualquier cambio en los argumentos de ese `new` invalida estos dos fingerprints sin que el hallazgo cambie de naturaleza."
     },
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "3e7f27eae25a930ce32783cba23b9dc59858bae0a952a96d6c3105def239e470",
+      "fingerprint": "ca0206069f88202620ea3cef73a3640a2f88a10f753b8dd03f765992b9b36959",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped model attribute",
       "file": "app/views/panel/residence_certificates/new.html.erb",
       "line": 25,
       "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "error_message(ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.include?(:member_id), ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors.full_messages_for(:member_id))",
+      "code": "error_message(ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price, :requested_by => current_user).errors.include?(:member_id), ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price, :requested_by => current_user).errors.full_messages_for(:member_id))",
       "render_path": [
         {
           "type": "controller",
           "class": "Panel::ResidenceCertificatesController",
           "method": "create",
-          "line": 87,
+          "line": 90,
           "file": "app/controllers/panel/residence_certificates_controller.rb",
           "rendered": {
             "name": "panel/residence_certificates/new",
@@ -131,12 +131,12 @@
         "type": "template",
         "template": "panel/residence_certificates/new"
       },
-      "user_input": "ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price).errors",
+      "user_input": "ResidenceCertificate.new(:member => selectable_residencies.find do\n (r.id == params[:residence_certificate][:member_id].to_i)\n end.verified_identity.members.approved.find_by(:neighborhood_association => certificate_association), :household_unit => current_user.household_unit, :neighborhood_association => certificate_association, :purpose => params.require(:residence_certificate).permit(:purpose)[:purpose], :amount => CertificatePricing.current_for(certificate_association).price, :requested_by => current_user).errors",
       "confidence": "Weak",
       "cwe_id": [
         79
       ],
-      "note": "Falso positivo: error_message helper usa mensajes de validación de Rails (texto traducido, sin input de usuario crudo — ningún locale interpola el valor ingresado y las validaciones involucradas son presence: true). XSS Weak aceptado. Fingerprint re-generado 2026-08-19: el fix de aislamiento por FamilyGroup cambió la línea del create y con ella el hash del warning."
+      "note": "Falso positivo: error_message helper usa mensajes de validación de Rails (texto traducido, sin input de usuario crudo — ningún locale interpola el valor ingresado y las validaciones involucradas son presence: true). XSS Weak aceptado. Fingerprint re-generado 2026-08-20: agregar `requested_by: current_user` al `ResidenceCertificate.new` del create (BR-152) cambió la expresión que Brakeman reconstruye y con ella el hash del warning. Es la segunda vez que pasa por esta misma vía (la anterior fue el fix de aislamiento del 2026-08-19): cualquier cambio en los argumentos de ese `new` invalida estos dos fingerprints sin que el hallazgo cambie de naturaleza."
     }
   ],
   "updated": "2026-07-26 12:20:00 -0400"
