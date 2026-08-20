@@ -947,6 +947,22 @@ es:
         confirm_prompt: "¿Seguro que deseas desactivar tu cuenta? Se cerrará tu sesión."
       flash:
         deactivated: Tu cuenta fue desactivada. Para reactivarla, solicita el enlace a tu correo.
+    household_neighbours:
+      index:
+        title: Convivientes del domicilio
+        description: Otros núcleos familiares registrados en tu misma dirección.
+        sidebar: Convivientes
+        address: Tu dirección
+        alone: Por ahora eres el único núcleo familiar registrado en esta dirección.
+        count:
+          one: Hay 1 núcleo familiar más en esta dirección
+          other: Hay %{count} núcleos familiares más en esta dirección
+        group_label: "Núcleo familiar %{number}"
+        residents:
+          zero: Sin residentes registrados
+          one: 1 residente
+          other: "%{count} residentes"
+        privacy_note: Por privacidad, solo ves cuántas personas integran cada núcleo. Los datos de sus residentes son visibles únicamente para el jefe de hogar de ese núcleo y para la directiva.
     onboarding:
       title: Acreditación
       subtitle: Completa tu solicitud de acreditación paso a paso

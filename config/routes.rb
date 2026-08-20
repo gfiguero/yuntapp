@@ -78,6 +78,10 @@ Rails.application.routes.draw do
       end
     end
     resources :dependents, only: [:index, :new, :create]
+
+    # BR-042: contexto de qué otros núcleos familiares conviven en el domicilio.
+    # Solo lectura y sin datos personales de los otros núcleos (BR-041).
+    get "household_neighbours", to: "household_neighbours#index", as: :household_neighbours
     resources :payments, only: [:new] do
       collection do
         get :success
