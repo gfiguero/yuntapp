@@ -15,6 +15,12 @@ class User < ApplicationRecord
   # BR-142: email de la cuenta MercadoPago para suscripciones (payer_email).
   validates :mercadopago_email, format: {with: URI::MailTo::EMAIL_REGEXP}, allow_blank: true
 
+  # BR-093: el email es inmutable tras el registro. Hasta ahora la regla vivía
+  # solo en `Users::RegistrationsController#discard_email_param`, o sea que
+  # dependía de que cada controller recordara descartar el parámetro. Este guard
+  # la hace valer por cualquier ruta (panel, admin, consola).
+  validate :email_is_immutable, on: :update
+
   # BR-100: una cuenta nunca se destruye (ni por el usuario vía Devise, ni por consola).
   # Solo se desactiva o bloquea, conservando el historial. Guard de defensa en profundidad.
   before_destroy :prevent_destruction
@@ -130,6 +136,13 @@ class User < ApplicationRecord
   def prevent_destruction
     errors.add(:base, I18n.t("users.errors.cannot_destroy"))
     throw :abort
+  end
+
+  # BR-093. Quien necesite otro correo registra una cuenta nueva; la identidad
+  # verificada se traslada por el mecanismo de RUN duplicado (BR-057–BR-059).
+  def email_is_immutable
+    return unless email_changed?
+    errors.add(:email, I18n.t("users.errors.email_immutable"))
   end
 
   # Encola los correos de Devise (confirmacion, reset de password, etc.) en

@@ -100,4 +100,28 @@ class UserTest < ActiveSupport::TestCase
     user.mercadopago_email = ""
     assert user.valid?
   end
+
+  # BR-093: el email es inmutable tras el registro. Hasta ahora solo lo hacía
+  # cumplir `Users::RegistrationsController#discard_email_param`, es decir que la
+  # regla dependía de que cada controller recordara descartar el parámetro.
+  test "email is immutable after creation" do
+    user = users(:karass)
+    original = user.email
+    user.email = "otro@example.com"
+    assert_not user.valid?
+    assert user.errors[:email].any?
+    assert_equal original, user.reload.email
+  end
+
+  test "update! cannot change the email" do
+    user = users(:karass)
+    assert_raises(ActiveRecord::RecordInvalid) do
+      user.update!(email: "otro@example.com")
+    end
+  end
+
+  test "saving a user without touching the email still works" do
+    user = users(:karass)
+    assert user.update(mercadopago_email: "pago@example.com")
+  end
 end

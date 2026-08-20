@@ -89,15 +89,20 @@ class ResidenceCertificate < ApplicationRecord
 
   # RUN enmascarado para verificación pública (BR-078).
   # Formato: 12.XXX.XXX-K (preserva primer dígito y dígito verificador).
+  FULLY_MASKED_RUN = "X.XXX.XXX-X"
+
   def masked_run
     raw = member&.run
     return nil if raw.blank?
 
-    body, dv = raw.split("-")
-    return raw if body.nil? || dv.nil?
+    # Falla cerrado: un RUN que no viene en el formato normalizado (BR-010) se
+    # enmascara por completo. Antes hacía `return raw`, o sea que un valor sin
+    # guión —datos legacy o mal migrados— se publicaba **entero** en la página de
+    # verificación, que es pública y no requiere login.
+    return FULLY_MASKED_RUN unless raw.match?(/\A\d{7,8}-[0-9K]\z/)
 
-    first_digit = body[0]
-    "#{first_digit}.XXX.XXX-#{dv}"
+    body, dv = raw.split("-")
+    "#{body[0]}.XXX.XXX-#{dv}"
   end
 
   # Transición pending_payment → paid. Idempotente para el mismo payment_id (BR-071).
