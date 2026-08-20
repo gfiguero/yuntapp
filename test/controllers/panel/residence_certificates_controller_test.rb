@@ -311,6 +311,57 @@ module Panel
       assert_response :unprocessable_content
     end
 
+    # --- Trazabilidad de quién solicita (BR-152) ---
+
+    test "create registra quién solicitó el certificado" do
+      sign_in @household_admin
+
+      assert_difference -> { ResidenceCertificate.count }, 1 do
+        post panel_residence_certificates_url, params: {
+          residence_certificate: {member_id: @residency.id, purpose: "trámite bancario"}
+        }
+      end
+
+      certificate = ResidenceCertificate.order(:created_at).last
+      assert_equal @household_admin, certificate.requested_by
+    end
+
+    # El caso que da sentido a la columna (BR-098): titular y solicitante son
+    # personas distintas. Sin esto, el certificado de un dependiente no deja
+    # rastro de quién lo pidió.
+    test "el solicitante queda registrado aunque el titular sea un dependiente" do
+      dependiente = dependiente_del_nucleo
+      residency_dependiente = Residency.find_by(verified_identity: dependiente)
+
+      sign_in @household_admin
+      post panel_residence_certificates_url, params: {
+        residence_certificate: {member_id: residency_dependiente.id, purpose: "matrícula escolar"}
+      }
+
+      certificate = ResidenceCertificate.order(:created_at).last
+      assert_equal @household_admin, certificate.requested_by
+      assert_not_equal certificate.member.verified_identity, @household_admin.verified_identity
+    end
+
+    # Residente dependiente del MISMO núcleo del solicitante (BR-065/BR-098).
+    def dependiente_del_nucleo
+      identidad = VerifiedIdentity.create!(
+        first_name: "Rohana", last_name: "Khalai",
+        run: "13579246-2", phone: "+56922223344"
+      )
+      Member.create!(verified_identity: identidad, neighborhood_association: @association,
+        status: "approved", dependent: true, approved_at: Time.current)
+      Residency.create!(
+        verified_identity: identidad,
+        verified_residence: @residency.verified_residence,
+        household_unit: household_units(:selendis_household),
+        family_group: @residency.family_group,
+        household_admin: false,
+        status: "approved"
+      )
+      identidad
+    end
+
     # Segundo núcleo familiar en la MISMA dirección física (BR-040): otra familia
     # que convive, con su propio household_admin y su Member aprobado en la junta.
     def residente_de_otro_nucleo

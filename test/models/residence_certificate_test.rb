@@ -692,11 +692,29 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_equal "9.XXX.XXX-2", cert.masked_run
   end
 
-  test "masked_run returns nil when run is malformed" do
+  # BR-078: ante un RUN que no se puede separar en cuerpo y dígito verificador,
+  # masked_run falla CERRADO. Antes hacía `return raw`, devolviendo el RUN
+  # completo sin enmascarar a la página pública de verificación.
+  test "masked_run does not leak a RUN without a dash" do
+    cert = issued_certificate
+    cert.member.verified_identity.update_columns(run: "12345678K")
+    masked = cert.masked_run
+    assert_not_includes masked.to_s, "12345678"
+    assert_equal "X.XXX.XXX-X", masked
+  end
+
+  test "masked_run does not leak a malformed RUN" do
     cert = issued_certificate
     cert.member.verified_identity.update_columns(run: "malformed-no-dash-pattern")
-    # malformed RUN sin formato body-dv → masked_run retorna el raw
-    assert_kind_of String, cert.masked_run
+    masked = cert.masked_run
+    assert_not_includes masked.to_s, "malformed"
+    assert_equal "X.XXX.XXX-X", masked
+  end
+
+  test "masked_run returns nil when run is blank" do
+    cert = issued_certificate
+    cert.member.verified_identity.update_columns(run: "")
+    assert_nil cert.masked_run
   end
 
   test "findable_publicly scope returns only issued certs" do

@@ -16,6 +16,15 @@
       <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.member') %></dt>
       <dd><%= residence_certificate.member.name %></dd>
     </div>
+    <%# BR-152: se muestra solo cuando el solicitante no es el titular (BR-098).
+        En el caso normal —el socio pide su propio certificado— repetir el nombre
+        sería ruido. %>
+    <% if residence_certificate.requested_by_other? %>
+      <div class="p-2 grid gap-2">
+        <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.requested_by') %></dt>
+        <dd><%= residence_certificate.requested_by.name %></dd>
+      </div>
+    <% end %>
     <div class="p-2 grid gap-2">
       <dt class="font-medium"><%= I18n.t('activerecord.attributes.residence_certificate.household_unit') %></dt>
       <dd><%= residence_certificate.household_unit.number %></dd>

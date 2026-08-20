@@ -9,6 +9,8 @@ class OnboardingRequest < ApplicationRecord
 
   STATUSES = %w[draft pending approved rejected cancelled].freeze
 
+  class NotDuplicableError < StandardError; end
+
   validates :status, inclusion: {in: STATUSES}
   validates :terms_accepted_at, presence: true, unless: -> { draft? || cancelled? }
   # BR-047/BR-060 (#105): el rechazo debe registrar el motivo (visible en el
@@ -59,6 +61,34 @@ class OnboardingRequest < ApplicationRecord
     self
   end
 
+  # BR-048/BR-049: el usuario puede duplicar una solicitud resuelta para
+  # corregir solo lo necesario en vez de empezar de cero. La copia nace en
+  # `draft` y la original queda intacta en el historial (BR-047).
+  #
+  # Los documentos adjuntos NO se copian, por decisión de producto: el rechazo
+  # suele deberse justamente a un documento ilegible o incorrecto, y recopiarlo
+  # invitaría a reenviar el mismo problema.
+  DUPLICABLE_STATUSES = %w[rejected cancelled].freeze
+
+  def duplicable? = DUPLICABLE_STATUSES.include?(status)
+
+  def duplicate!
+    raise NotDuplicableError, "Cannot duplicate an onboarding request in status: #{status}" unless duplicable?
+
+    transaction do
+      copy = OnboardingRequest.create!(
+        user: user,
+        status: "draft",
+        neighborhood_association: neighborhood_association,
+        region: region,
+        commune: commune
+      )
+      duplicate_identity_request_into(copy)
+      duplicate_residence_request_into(copy)
+      copy
+    end
+  end
+
   # BR-051: el usuario puede cancelar su solicitud `pending` en cualquier
   # momento. El cambio es atómico: OR + IVR + RVR pasan a `cancelled`,
   # preservando los datos para que el usuario pueda duplicarlos en una
@@ -71,5 +101,43 @@ class OnboardingRequest < ApplicationRecord
       residence_verification_request&.update!(status: "cancelled")
     end
     self
+  end
+
+  private
+
+  # Copia los datos de texto de la identidad. Sin documentos (ver `duplicate!`),
+  # sin estado heredado y sin el motivo de rechazo de la solicitud anterior.
+  def duplicate_identity_request_into(copy)
+    source = identity_verification_request
+    return if source.nil?
+
+    IdentityVerificationRequest.create!(
+      user: source.user,
+      onboarding_request: copy,
+      neighborhood_association: source.neighborhood_association,
+      first_name: source.first_name,
+      last_name: source.last_name,
+      run: source.run,
+      phone: source.phone,
+      status: "draft"
+    )
+  end
+
+  def duplicate_residence_request_into(copy)
+    source = residence_verification_request
+    return if source.nil?
+
+    ResidenceVerificationRequest.create!(
+      user: source.user,
+      onboarding_request: copy,
+      neighborhood_association: source.neighborhood_association,
+      commune_id: source.commune_id,
+      neighborhood_delegation_id: source.neighborhood_delegation_id,
+      street_name: source.street_name,
+      number: source.number,
+      address_detail: source.address_detail,
+      manual_address: source.manual_address,
+      status: "draft"
+    )
   end
 end

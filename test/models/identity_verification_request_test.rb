@@ -346,4 +346,20 @@ class IdentityVerificationRequestTest < ActiveSupport::TestCase
     assert_includes results, dependent
     assert_not_includes results, non_dependent
   end
+
+  # Regresion TASK-021: ver la nota en VerifiedIdentityTest. Aqui la validacion es
+  # `allow_blank: true`, con el mismo efecto: la basura se vaciaba y pasaba.
+  test "keeps unrecognizable phone instead of blanking it" do
+    identity = identity_verification_requests(:karass_identity)
+    identity.phone = "no-es-un-telefono"
+    identity.valid?
+    assert_equal "no-es-un-telefono", identity.phone
+  end
+
+  test "rejects unrecognizable phone" do
+    identity = identity_verification_requests(:karass_identity)
+    identity.phone = "no-es-un-telefono"
+    assert_not identity.valid?
+    assert identity.errors[:phone].any?
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_02_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_20_054632) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -296,6 +296,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_210000) do
     t.string "payment_status"
     t.integer "platform_fee"
     t.text "purpose"
+    t.integer "requested_by_id"
     t.string "status", default: "pending_payment", null: false
     t.datetime "updated_at", null: false
     t.string "validation_code"
@@ -305,6 +306,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_210000) do
     t.index ["neighborhood_association_id", "folio"], name: "index_residence_certificates_on_association_and_folio", unique: true
     t.index ["neighborhood_association_id"], name: "index_residence_certificates_on_neighborhood_association_id"
     t.index ["payment_id"], name: "index_residence_certificates_on_payment_id", unique: true, where: "payment_id IS NOT NULL"
+    t.index ["requested_by_id"], name: "index_residence_certificates_on_requested_by_id"
     t.index ["validation_code"], name: "index_residence_certificates_on_validation_code", unique: true, where: "validation_code IS NOT NULL"
     t.index ["validation_token"], name: "index_residence_certificates_on_validation_token", unique: true, where: "validation_token IS NOT NULL"
   end
@@ -449,6 +451,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_02_210000) do
   add_foreign_key "residence_certificates", "household_units"
   add_foreign_key "residence_certificates", "members"
   add_foreign_key "residence_certificates", "neighborhood_associations"
+  add_foreign_key "residence_certificates", "users", column: "requested_by_id"
   add_foreign_key "residence_verification_requests", "communes"
   add_foreign_key "residence_verification_requests", "neighborhood_associations"
   add_foreign_key "residence_verification_requests", "neighborhood_delegations"

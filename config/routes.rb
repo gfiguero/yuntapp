@@ -114,6 +114,11 @@ Rails.application.routes.draw do
 
     get "onboarding/status", to: "onboarding#status", as: :onboarding_status
 
+    # BR-047: historial de solicitudes con su motivo de rechazo.
+    # BR-048/BR-049: duplicar una rechazada o cancelada en una nueva `draft`.
+    get "onboarding/history", to: "onboarding_requests#index", as: :onboarding_history
+    post "onboarding/history/:id/duplicate", to: "onboarding_requests#duplicate", as: :onboarding_request_duplicate
+
     scope :onboarding do
       get "step1", to: "onboarding#step1", as: :onboarding_step1
       patch "step1", to: "onboarding#update_step1"

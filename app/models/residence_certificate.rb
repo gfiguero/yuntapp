@@ -15,6 +15,10 @@ class ResidenceCertificate < ApplicationRecord
   belongs_to :neighborhood_association
   belongs_to :member
   belongs_to :household_unit
+  # BR-152: quién pidió el certificado, que no siempre es su titular — el
+  # household_admin puede solicitarlo a nombre de un dependiente (BR-098).
+  # `optional` porque los certificados anteriores a la columna no lo tienen.
+  belongs_to :requested_by, class_name: "User", optional: true
 
   # BR-100: el historial de eventos de pago (#101) no se destruye.
   has_many :payment_events, as: :payable, dependent: :restrict_with_error
@@ -87,17 +91,32 @@ class ResidenceCertificate < ApplicationRecord
     issued? && !expired? && !holder_deactivated? && !payment_reverted?
   end
 
+  # BR-152: true cuando el certificado lo pidió alguien distinto de su titular
+  # (BR-098, el household_admin a nombre de un dependiente). Falso también para
+  # los certificados anteriores a la columna, que no tienen solicitante: no se
+  # afirma lo que no se sabe.
+  def requested_by_other?
+    return false if requested_by.nil?
+
+    requested_by.verified_identity_id != member.verified_identity_id
+  end
+
   # RUN enmascarado para verificación pública (BR-078).
   # Formato: 12.XXX.XXX-K (preserva primer dígito y dígito verificador).
+  FULLY_MASKED_RUN = "X.XXX.XXX-X"
+
   def masked_run
     raw = member&.run
     return nil if raw.blank?
 
-    body, dv = raw.split("-")
-    return raw if body.nil? || dv.nil?
+    # Falla cerrado: un RUN que no viene en el formato normalizado (BR-010) se
+    # enmascara por completo. Antes hacía `return raw`, o sea que un valor sin
+    # guión —datos legacy o mal migrados— se publicaba **entero** en la página de
+    # verificación, que es pública y no requiere login.
+    return FULLY_MASKED_RUN unless raw.match?(/\A\d{7,8}-[0-9K]\z/)
 
-    first_digit = body[0]
-    "#{first_digit}.XXX.XXX-#{dv}"
+    body, dv = raw.split("-")
+    "#{body[0]}.XXX.XXX-#{dv}"
   end
 
   # Transición pending_payment → paid. Idempotente para el mismo payment_id (BR-071).
