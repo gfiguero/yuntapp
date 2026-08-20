@@ -368,6 +368,7 @@ es:
       cascade_reason: "Desactivación de la cuenta del socio"
     errors:
       cannot_destroy: Una cuenta de usuario no puede eliminarse; solo desactivarse o bloquearse.
+      email_immutable: no puede modificarse después del registro.
 
   reactivations:
     new:
@@ -595,16 +596,6 @@ es:
         updated: Publicación actualizada exitosamente.
         destroyed: Publicación eliminada exitosamente.
         withdrawn: Publicación retirada de la vitrina. Su historial de pago se conserva.
-    users:
-      index:
-        title: Usuarios
-        count: "%{count} usuarios"
-      show:
-        identifier: "Usuario ID: %{id}"
-      flash:
-        created: Usuario creado exitosamente.
-        updated: Usuario actualizado exitosamente.
-        destroyed: Usuario eliminado exitosamente.
     residence_certificates:
       index:
         title: Certificados de Residencia
