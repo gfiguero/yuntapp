@@ -76,7 +76,10 @@ module Panel
         household_unit: current_user.household_unit,
         neighborhood_association: certificate_association,
         purpose: params.require(:residence_certificate).permit(:purpose)[:purpose],
-        amount: pricing.price
+        amount: pricing.price,
+        # BR-152: nunca viene del formulario, siempre de la sesión. El titular
+        # (`member`) puede ser un dependiente; el solicitante es quien opera.
+        requested_by: current_user
       )
 
       if @residence_certificate.save
