@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_20_054632) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_21_032052) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -285,6 +285,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_054632) do
     t.datetime "created_at", null: false
     t.date "expiration_date"
     t.string "folio"
+    t.integer "folio_sequence"
+    t.integer "folio_year"
     t.integer "household_unit_id", null: false
     t.date "issue_date"
     t.datetime "issued_at"
@@ -304,6 +306,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_054632) do
     t.index ["household_unit_id"], name: "index_residence_certificates_on_household_unit_id"
     t.index ["member_id"], name: "index_residence_certificates_on_member_id"
     t.index ["neighborhood_association_id", "folio"], name: "index_residence_certificates_on_association_and_folio", unique: true
+    t.index ["neighborhood_association_id", "folio_year", "folio_sequence"], name: "index_residence_certificates_on_association_year_sequence", unique: true, where: "folio_sequence IS NOT NULL"
     t.index ["neighborhood_association_id"], name: "index_residence_certificates_on_neighborhood_association_id"
     t.index ["payment_id"], name: "index_residence_certificates_on_payment_id", unique: true, where: "payment_id IS NOT NULL"
     t.index ["requested_by_id"], name: "index_residence_certificates_on_requested_by_id"
