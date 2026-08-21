@@ -107,6 +107,44 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_equal format("CR-%04d-%04d-00001", Date.current.year + 1, @association.id), cert.folio
   end
 
+  test "una junta con folios del formato viejo continua el correlativo, sin reescribirlos" do
+    viejo = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "formato viejo", status: "issued",
+      folio: "CR-#{@association.id}-14", folio_year: Date.current.year, folio_sequence: 14,
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date
+    )
+
+    nuevo = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "formato nuevo", status: "paid"
+    )
+    nuevo.issue!
+
+    assert_equal 15, nuevo.folio_sequence, "el correlativo debe continuar desde el folio viejo"
+    assert_equal format("CR-%04d-%04d-00015", Date.current.year, @association.id), nuevo.folio
+    assert_equal "CR-#{@association.id}-14", viejo.reload.folio, "BR-008: el folio viejo no se reescribe"
+  end
+
+  test "filter_by_folio encuentra ambos formatos" do
+    ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "viejo", status: "issued",
+      folio: "CR-#{@association.id}-14", folio_year: Date.current.year, folio_sequence: 14,
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date
+    )
+    ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "nuevo", status: "issued",
+      folio: format("CR-%04d-%04d-00015", Date.current.year, @association.id),
+      folio_year: Date.current.year, folio_sequence: 15,
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date
+    )
+
+    assert_equal 2, ResidenceCertificate.filter_by_folio("14").count +
+      ResidenceCertificate.filter_by_folio("15").count
+  end
+
   test "issue! recovers from a folio collision by retrying with the next number (#98)" do
     # Simula una emisión concurrente: otro certificado de la misma junta toma
     # el folio que este iba a usar, justo entre el cálculo y el save.
