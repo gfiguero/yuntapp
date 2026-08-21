@@ -177,6 +177,8 @@ class ResidenceCertificate < ApplicationRecord
   # de la misma junta (#98).
   FOLIO_MAX_ATTEMPTS = 5
 
+  FOLIO_PREFIX = "CR"
+
   # Transición paid → issued. Genera folio, tokens y fecha de vencimiento atómicamente (BR-062, BR-074).
   # Idempotente: si ya está issued, retorna sin cambios.
   #
@@ -196,9 +198,21 @@ class ResidenceCertificate < ApplicationRecord
       attempts = 0
       begin
         attempts += 1
+        # Con el índice (association, folio_year, folio_sequence) la colisión
+        # ya no implica que el folio sea el problema: puede ser un folio
+        # preexistente —único como string— cuyo `folio_sequence` recién
+        # calculado choca con otro certificado. Solo el folio construido EN
+        # ESTE intento debe descartarse en el rescue; uno que ya viniera en el
+        # registro (defensa contra doble emisión) debe sobrevivir al retry.
+        folio_built_this_attempt = folio.blank?
         transaction(requires_new: true) do
+          year = issue_date.year
+          sequence = folio_sequence || next_folio_sequence(year)
+
           assign_attributes(
-            folio: folio.presence || next_folio,
+            folio_year: folio_year || year,
+            folio_sequence: sequence,
+            folio: folio.presence || build_folio(year, sequence),
             validation_token: validation_token.presence || SecureRandom.uuid,
             validation_code: validation_code.presence || generate_validation_code,
             issue_date: issue_date,
@@ -210,7 +224,8 @@ class ResidenceCertificate < ApplicationRecord
         end
       rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
         raise unless folio_collision?(e) && attempts < FOLIO_MAX_ATTEMPTS
-        self.folio = nil
+        self.folio = nil if folio_built_this_attempt
+        self.folio_sequence = nil
         retry
       end
     end
@@ -252,19 +267,18 @@ class ResidenceCertificate < ApplicationRecord
     IssueCertificateJob.perform_later(id)
   end
 
-  # Siguiente folio secuencial POR JUNTA (BR-006). Se basa en el mayor número
-  # de folio ya emitido por la junta (parseando el sufijo de `CR-{assoc}-{n}`),
-  # no en `maximum(:id)` global, que producía folios no secuenciales por junta
-  # y, al no cambiar entre reintentos, dejaba el certificado atascado (#98).
-  def next_folio
-    prefix = "CR-#{neighborhood_association_id}-"
-    last = self.class
-      .where(neighborhood_association_id: neighborhood_association_id)
-      .where.not(folio: nil)
-      .pluck(:folio)
-      .map { |f| f.to_s.delete_prefix(prefix).to_i }
-      .max || 0
-    "#{prefix}#{last + 1}"
+  # Correlativo siguiente de la junta para ese año. Consulta agregada sobre la
+  # columna entera: sin parseo de strings y sin cargar los folios en memoria.
+  def next_folio_sequence(year)
+    max = self.class
+      .where(neighborhood_association_id: neighborhood_association_id, folio_year: year)
+      .maximum(:folio_sequence) || 0
+    max + 1
+  end
+
+  # El folio es la representación del dato, no el dato. Ver BR-006.
+  def build_folio(year, sequence)
+    format("%s-%04d-%04d-%05d", FOLIO_PREFIX, year, neighborhood_association_id, sequence)
   end
 
   # ¿El error proviene de una colisión del folio (índice único association+folio
@@ -273,11 +287,12 @@ class ResidenceCertificate < ApplicationRecord
   def folio_collision?(error)
     case error
     when ActiveRecord::RecordNotUnique
-      # SQLite (BD de prod) reporta el nombre de columna en el mensaje
-      # ("UNIQUE constraint failed: ...residence_certificates.folio"), así que
-      # matcheamos "folio". Depende de que la columna se llame `folio`; si se
-      # renombrara, actualizar este match. NO matchea payment_id/validation_*.
-      error.message.include?("folio")
+      # SQLite (BD de prod) reporta las columnas en el mensaje: tanto
+      # "...residence_certificates.folio" como
+      # "...residence_certificates.folio_sequence" contienen "folio". El match
+      # por substring cubre ambos índices, pero se deja explícito para que no
+      # dependa del azar de los nombres. NO matchea payment_id/validation_*.
+      error.message.include?("folio") || error.message.include?("folio_sequence")
     when ActiveRecord::RecordInvalid
       error.record.errors.key?(:folio)
     else
