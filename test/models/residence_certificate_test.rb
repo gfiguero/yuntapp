@@ -66,34 +66,45 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert_equal "pending_payment", cert.status
   end
 
-  test "issue! sets folio with the CR-{association}-{sequence} format (BR-006)" do
+  test "issue! genera el folio con el formato CR-anio-junta-correlativo (BR-006)" do
     cert = ResidenceCertificate.create!(
-      member: @member,
-      household_unit: @household_unit,
-      neighborhood_association: @association,
-      purpose: "trámite bancario",
-      status: "paid"
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "trámite bancario", status: "paid"
     )
     cert.issue!
-    assert_match(/\ACR-#{@association.id}-\d+\z/, cert.folio)
+
+    assert_match(/\ACR-\d{4}-\d+-\d{5}\z/, cert.folio)
+    assert_equal Date.current.year, cert.folio_year
+    assert_equal format("CR-%04d-%04d-%05d", cert.folio_year, @association.id, cert.folio_sequence), cert.folio
   end
 
-  test "next_folio is sequential per association, not derived from global id (#98)" do
+  test "el correlativo del folio es por junta y por anio" do
     first = ResidenceCertificate.create!(
       member: @member, household_unit: @household_unit,
       neighborhood_association: @association, purpose: "uno", status: "paid"
-    )
-    first.issue!
-    first_seq = first.folio.delete_prefix("CR-#{@association.id}-").to_i
+    ).tap(&:issue!)
 
     second = ResidenceCertificate.create!(
       member: @member, household_unit: @household_unit,
       neighborhood_association: @association, purpose: "dos", status: "paid"
-    )
-    second.issue!
-    second_seq = second.folio.delete_prefix("CR-#{@association.id}-").to_i
+    ).tap(&:issue!)
 
-    assert_equal first_seq + 1, second_seq, "el folio debe incrementar de a uno por junta"
+    assert_equal first.folio_sequence + 1, second.folio_sequence
+    assert_equal first.folio_year, second.folio_year
+  end
+
+  test "el correlativo reinicia al cambiar de anio" do
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "del futuro", status: "paid"
+    )
+    # Un año sin certificados previos arranca en 1, sin importar el correlativo
+    # que lleve el año en curso.
+    cert.issue!(issue_date: Date.new(Date.current.year + 1, 1, 5))
+
+    assert_equal 1, cert.folio_sequence
+    assert_equal Date.current.year + 1, cert.folio_year
+    assert_equal format("CR-%04d-%04d-00001", Date.current.year + 1, @association.id), cert.folio
   end
 
   test "issue! recovers from a folio collision by retrying with the next number (#98)" do
@@ -102,7 +113,8 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     taken = ResidenceCertificate.create!(
       member: @member, household_unit: @household_unit,
       neighborhood_association: @association, purpose: "tomado", status: "issued",
-      folio: "CR-#{@association.id}-1",
+      folio: "CR-#{Date.current.year}-#{format("%04d", @association.id)}-00001",
+      folio_year: Date.current.year, folio_sequence: 1,
       issue_date: Date.current, expiration_date: 30.days.from_now.to_date
     )
 
@@ -114,24 +126,25 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     # El primer cálculo devuelve el folio ya tomado (como si otro proceso lo
     # hubiera computado a la vez); el retry debe recalcular al siguiente libre
     # en vez de atascarse. Mismo patrón que el test de agotamiento de reintentos.
-    taken_folio = "CR-#{@association.id}-1"
+    taken_sequence = taken.folio_sequence
     calls = 0
-    cert.define_singleton_method(:next_folio) do
+    cert.define_singleton_method(:next_folio_sequence) do |year|
       calls += 1
-      (calls == 1) ? taken_folio : super()
+      (calls == 1) ? taken_sequence : super(year)
     end
 
     assert_nothing_raised { cert.issue! }
     assert cert.issued?
     assert_not_equal taken.folio, cert.folio
-    assert_match(/\ACR-#{@association.id}-\d+\z/, cert.folio)
+    assert_match(/\ACR-\d{4}-\d+-\d{5}\z/, cert.folio)
   end
 
   test "issue! gives up after max attempts and leaves cert in paid for the job to retry (#98)" do
     ResidenceCertificate.create!(
       member: @member, household_unit: @household_unit,
       neighborhood_association: @association, purpose: "tomado", status: "issued",
-      folio: "CR-#{@association.id}-1",
+      folio: "CR-#{Date.current.year}-#{format("%04d", @association.id)}-00001",
+      folio_year: Date.current.year, folio_sequence: 1,
       issue_date: Date.current, expiration_date: 30.days.from_now.to_date
     )
 
@@ -140,10 +153,11 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
       neighborhood_association: @association, purpose: "nuevo", status: "paid"
     )
 
-    # next_folio siempre devuelve el folio ya tomado → la colisión nunca se
-    # resuelve. Tras FOLIO_MAX_ATTEMPTS, issue! propaga el error y el certificado
-    # queda en paid (BR-076: IssueCertificateJob reintentará / revisión manual).
-    cert.define_singleton_method(:next_folio) { "CR-#{neighborhood_association_id}-1" }
+    # next_folio_sequence siempre devuelve el mismo correlativo tomado → la
+    # colisión nunca se resuelve. Tras FOLIO_MAX_ATTEMPTS, issue! propaga el
+    # error y el certificado queda en paid (BR-076: IssueCertificateJob
+    # reintentará / revisión manual).
+    cert.define_singleton_method(:next_folio_sequence) { |_year| 1 }
 
     assert_raises(ActiveRecord::RecordInvalid) { cert.issue! }
     assert cert.reload.paid?, "el certificado debe quedar en paid, no atascado a medias"
@@ -519,7 +533,7 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     cert.issue!
 
     assert cert.issued?
-    assert_match(/\ACR-\d+-\d+\z/, cert.folio)
+    assert_match(/\ACR-\d{4}-\d+-\d{5}\z/, cert.folio)
     assert cert.validation_token.present?
     assert_match(/\A[\h-]+\z/, cert.validation_token) # uuid-ish
     assert cert.validation_code.present?
