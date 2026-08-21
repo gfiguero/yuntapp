@@ -267,6 +267,9 @@ es:
         # AdministrationRequest (organization_rut y run) y NeighborhoodAssociation#rut.
         invalid_rut_format: no tiene un formato de RUT válido
         invalid_rut_check_digit: tiene un dígito verificador incorrecto
+        # Límites de los documentos que sube el vecino (AttachmentLimits).
+        invalid_document_type: "debe ser una foto (JPG, PNG, HEIC o WEBP) o un PDF"
+        document_too_large: "supera el tamaño máximo de %{max} MB. Intenta con una foto de menor resolución"
       models:
         identity_verification_request:
           attributes:

@@ -1,4 +1,8 @@
 class ResidenceVerificationRequest < ApplicationRecord
+  include AttachmentLimits
+
+  validates_document_attachments :residence_documents
+
   belongs_to :user
   belongs_to :neighborhood_association
   belongs_to :neighborhood_delegation, optional: true

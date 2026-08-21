@@ -1,4 +1,8 @@
 class VerifiedIdentity < ApplicationRecord
+  include AttachmentLimits
+
+  validates_document_attachments :identity_document
+
   self.table_name = "verified_identities"
 
   include PhoneNormalization

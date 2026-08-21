@@ -9,9 +9,7 @@ module Panel
 
     # GET /panel/residence_certificates
     def index
-      @residence_certificates = ResidenceCertificate
-        .where(household_unit: current_user.household_unit)
-        .order(created_at: :desc)
+      @residence_certificates = own_family_group_certificates.order(created_at: :desc)
     end
 
     # GET /panel/residence_certificates/1
@@ -94,7 +92,34 @@ module Panel
     private
 
     def set_residence_certificate
-      @residence_certificate = ResidenceCertificate.where(household_unit: current_user.household_unit).find(params[:id])
+      @residence_certificate = own_family_group_certificates.find(params[:id])
+    end
+
+    # BR-041: los certificados visibles son los del **núcleo familiar** del
+    # solicitante, no los de su dirección. Un `HouseholdUnit` puede alojar varias
+    # familias sin relación (BR-040), y el PDF que sirve `download` lleva el RUN
+    # sin enmascarar y el domicilio completo.
+    #
+    # El fix de aislamiento anterior (PR #159) cerró la emisión —`selectable_residencies`
+    # y `create`— pero dejó `index`, `show` y `download` scopeados por
+    # `household_unit`, así que la fuga siguió abierta en lectura, que era el
+    # lado más grave. Detectado en la auditoría del 2026-08-21 por tres
+    # auditores independientes.
+    #
+    # El titular de un certificado es un `Member`; su pertenencia al núcleo vive
+    # en la `Residency` aprobada que vincula su identidad con el `family_group`.
+    def own_family_group_certificates
+      family_group = current_user.family_group
+      return ResidenceCertificate.none if family_group.blank?
+
+      identity_ids = Residency
+        .approved
+        .where(family_group_id: family_group.id)
+        .select(:verified_identity_id)
+
+      ResidenceCertificate
+        .where(household_unit_id: family_group.household_unit_id)
+        .where(member_id: Member.where(verified_identity_id: identity_ids).select(:id))
     end
 
     def ensure_household_admin!

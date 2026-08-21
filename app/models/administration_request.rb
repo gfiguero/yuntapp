@@ -1,4 +1,8 @@
 class AdministrationRequest < ApplicationRecord
+  include AttachmentLimits
+
+  validates_document_attachments :directiva_validity_document, :identity_documents
+
   include PhoneNormalization
 
   include Filterable

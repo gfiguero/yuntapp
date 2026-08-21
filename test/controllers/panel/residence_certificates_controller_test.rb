@@ -362,6 +362,87 @@ module Panel
       identidad
     end
 
+    # --- BR-041: aislamiento en LECTURA, no solo en emisión ---
+    #
+    # El PR #159 cerró la emisión (selectable_residencies y create) pero dejó
+    # `index`, `show` y `download` scopeados por `household_unit`. El PDF que
+    # sirve `download` lleva RUN sin enmascarar y domicilio completo, así que la
+    # fuga era peor en lectura que en emisión.
+
+    test "el índice no lista certificados de otro núcleo familiar del mismo domicilio" do
+      ajeno = certificado_de_otro_nucleo
+
+      sign_in @household_admin
+      get panel_residence_certificates_url
+
+      assert_response :success
+      assert_no_match ajeno.folio, @response.body,
+        "BR-041: el certificado de otra familia no debe aparecer en el índice"
+    end
+
+    test "show no expone el certificado de otro núcleo familiar" do
+      ajeno = certificado_de_otro_nucleo
+
+      sign_in @household_admin
+      get panel_residence_certificate_url(ajeno)
+
+      assert_response :not_found
+    end
+
+    test "download no entrega el PDF de otro núcleo familiar" do
+      ajeno = certificado_de_otro_nucleo
+
+      sign_in @household_admin
+      get download_panel_residence_certificate_url(ajeno)
+
+      assert_response :not_found
+    end
+
+    test "el propio núcleo sigue viendo y descargando sus certificados" do
+      propio = issued_cert
+      attach_pdf(propio)
+
+      sign_in @household_admin
+      get panel_residence_certificates_url
+      assert_match propio.folio, @response.body
+
+      get panel_residence_certificate_url(propio)
+      assert_response :success
+
+      get download_panel_residence_certificate_url(propio)
+      assert_response :success
+      assert_equal "application/pdf", @response.media_type
+    end
+
+    # Certificado emitido a nombre del household_admin de OTRO núcleo familiar
+    # que comparte la misma dirección física.
+    def certificado_de_otro_nucleo
+      vecino = residente_de_otro_nucleo
+      member = Member.find_by(verified_identity: vecino)
+
+      cert = ResidenceCertificate.create!(
+        member: member,
+        household_unit: household_units(:selendis_household),
+        neighborhood_association: @association,
+        purpose: "certificado de la otra familia",
+        status: "issued",
+        folio: "CR-2026-9999-00042",
+        folio_year: 2026,
+        folio_sequence: 42,
+        validation_token: SecureRandom.uuid,
+        validation_code: SecureRandom.alphanumeric(8).upcase,
+        issue_date: Date.current,
+        expiration_date: Date.current + 30.days,
+        issued_at: Time.current
+      )
+      cert.pdf_document.attach(
+        io: StringIO.new("%PDF-1.4 contenido ajeno"),
+        filename: "ajeno.pdf",
+        content_type: "application/pdf"
+      )
+      cert
+    end
+
     # Segundo núcleo familiar en la MISMA dirección física (BR-040): otra familia
     # que convive, con su propio household_admin y su Member aprobado en la junta.
     def residente_de_otro_nucleo
