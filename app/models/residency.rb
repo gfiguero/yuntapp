@@ -1,4 +1,8 @@
 class Residency < ApplicationRecord
+  include AttachmentLimits
+
+  validates_document_attachments :documents
+
   STATUSES = %w[pending approved rejected].freeze
 
   belongs_to :verified_identity

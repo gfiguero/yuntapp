@@ -1,4 +1,8 @@
 class IdentityVerificationRequest < ApplicationRecord
+  include AttachmentLimits
+
+  validates_document_attachments :identity_documents
+
   include PhoneNormalization
 
   belongs_to :user, optional: true
