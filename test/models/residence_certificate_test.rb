@@ -141,8 +141,8 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
       issue_date: Date.current, expiration_date: 30.days.from_now.to_date
     )
 
-    assert_equal 2, ResidenceCertificate.filter_by_folio("14").count +
-      ResidenceCertificate.filter_by_folio("15").count
+    assert_equal 1, ResidenceCertificate.filter_by_folio("14").count
+    assert_equal 1, ResidenceCertificate.filter_by_folio("15").count
   end
 
   test "issue! recovers from a folio collision by retrying with the next number (#98)" do
@@ -175,6 +175,41 @@ class ResidenceCertificateTest < ActiveSupport::TestCase
     assert cert.issued?
     assert_not_equal taken.folio, cert.folio
     assert_match(/\ACR-\d{4}-\d+-\d{5}\z/, cert.folio)
+  end
+
+  test "issue! preserves a preexisting folio when only its folio_sequence collides (#98)" do
+    # Este escenario no es alcanzable desde la aplicación (ningún flujo
+    # persiste un folio en un certificado sin emitir); se construye a mano,
+    # igual que los demás tests de colisión de este archivo.
+    taken = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "tomado", status: "issued",
+      folio: "CR-#{Date.current.year}-#{format("%04d", @association.id)}-00001",
+      folio_year: Date.current.year, folio_sequence: 1,
+      issue_date: Date.current, expiration_date: 30.days.from_now.to_date
+    )
+
+    cert = ResidenceCertificate.create!(
+      member: @member, household_unit: @household_unit,
+      neighborhood_association: @association, purpose: "nuevo", status: "paid",
+      folio: "CR-MANUAL-PREEXISTING"
+    )
+
+    # El folio_sequence calculado en el primer intento choca con el de
+    # `taken` (índice association+folio_year+folio_sequence), aunque el
+    # string del folio preexistente es único. El retry debe recalcular el
+    # correlativo sin descartar el folio preexistente.
+    taken_sequence = taken.folio_sequence
+    calls = 0
+    cert.define_singleton_method(:next_folio_sequence) do |year|
+      calls += 1
+      (calls == 1) ? taken_sequence : super(year)
+    end
+
+    assert_nothing_raised { cert.issue! }
+    assert cert.issued?
+    assert_equal "CR-MANUAL-PREEXISTING", cert.folio, "el folio preexistente debe sobrevivir al retry"
+    assert_not_equal taken.folio_sequence, cert.folio_sequence
   end
 
   test "issue! gives up after max attempts and leaves cert in paid for the job to retry (#98)" do

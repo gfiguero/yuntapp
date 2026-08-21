@@ -198,6 +198,13 @@ class ResidenceCertificate < ApplicationRecord
       attempts = 0
       begin
         attempts += 1
+        # Con el índice (association, folio_year, folio_sequence) la colisión
+        # ya no implica que el folio sea el problema: puede ser un folio
+        # preexistente —único como string— cuyo `folio_sequence` recién
+        # calculado choca con otro certificado. Solo el folio construido EN
+        # ESTE intento debe descartarse en el rescue; uno que ya viniera en el
+        # registro (defensa contra doble emisión) debe sobrevivir al retry.
+        folio_built_this_attempt = folio.blank?
         transaction(requires_new: true) do
           year = issue_date.year
           sequence = folio_sequence || next_folio_sequence(year)
@@ -217,7 +224,7 @@ class ResidenceCertificate < ApplicationRecord
         end
       rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
         raise unless folio_collision?(e) && attempts < FOLIO_MAX_ATTEMPTS
-        self.folio = nil
+        self.folio = nil if folio_built_this_attempt
         self.folio_sequence = nil
         retry
       end
